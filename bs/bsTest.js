@@ -38,7 +38,7 @@ function bsTest( $printer,$title ){
 	$printer( r ), f = window.top;
 	if( f.bsTest && f.bsTest.suite.urls && !bsTest.isOK )
 		r = window.location.pathname.split("/").pop(),
-		f.document.getElementById(r.replace(/\./, '_')).innerHTML = '<b style="font-size:20px;color:#a00">FAIL</b>',
+		f.document.getElementById(r).innerHTML = '<b style="font-size:20px;color:#a00">FAIL</b>',
 		f.bsTest.result( '<div style="font-weight:bold;font-size:30px;padding:10px;color:#a00">FAIL</div><hr>' );
 	if( bsTest.result ) bsTest.result( '<hr><div style="font-weight:bold;font-size:30px;padding:10px;color:#' + ( !bsTest.isOK ? 'a00">FAIL' : '0a0">OK' ) + '</div>' );
 }
@@ -136,7 +136,7 @@ bsTest.suite = function(){
 		'<div style="width:250px;float:left;border:1px dashed #999;background:#eee;padding:10px;margin:10px">'+
 			'<div>'+
 				'<a href="'+url+'" target="_blank">'+url+'</a> ' +
-				'<span id="'+url.replace(/\./, '_')+'"><b style="font-size:20px;color:#0a0">OK</b></span>'+
+				'<span id="'+url+'"><b style="font-size:20px;color:#0a0">OK</b></span>'+
 			'</div>'+
 			'<iframe src="'+url+'" scrolling="no" style="margin-top:10px;border:0;width:100%;height:200px"></iframe>'+
 		'</div>'
