@@ -35,11 +35,11 @@ function bsTest( $printer,$title ){
 	if( f ) bsTest.isOK = 0;
 	r += '</ol></div><div style="padding:5px;float:right;border:1px dashed #999;text-align:center"><b style="font-size:30px;color:#' + ( f ? 'a00">FAIL' : '0a0">OK' ) + '</b><br>ok:<b style="color:#0a0">' + s + '</b> no:<b style="color:#a00">' + f + '</b></div><br clear="both"></div>'+
 		'<div id="bsTestOff'+id+'" style="display:block;cursor:pointer" onclick="bsTest.off(this)"><b>'+title+'</b> : <b style="color:#' + ( f ? 'a00">FAIL' : '0a0">OK' ) + '</b></div></div>';
-	$printer( r );
-	if( window.top.bsTest && window.top.bsTest.suite.urls && !bsTest.isOK )
+	$printer( r ), f = window.top;
+	if( f.bsTest && f.bsTest.suite.urls && !bsTest.isOK )
 		r = window.location.pathname.split("/").pop(),
-		window.top.document.querySelector('span[class="'+r+'"]').innerHTML = '<b style="font-size:20px;color:#a00">FAIL</b>',
-		window.top.bsTest.result( '<div style="font-weight:bold;font-size:30px;padding:10px;color:#a00">FAIL</div><hr>' );
+		f.document.getElementById(r.replace(/\./, '_')).innerHTML = '<b style="font-size:20px;color:#a00">FAIL</b>',
+		f.bsTest.result( '<div style="font-weight:bold;font-size:30px;padding:10px;color:#a00">FAIL</div><hr>' );
 	if( bsTest.result ) bsTest.result( '<hr><div style="font-weight:bold;font-size:30px;padding:10px;color:#' + ( !bsTest.isOK ? 'a00">FAIL' : '0a0">OK' ) + '</div>' );
 }
 bsTest.f2s = (function(){
@@ -136,7 +136,7 @@ bsTest.suite = function(){
 		'<div style="width:250px;float:left;border:1px dashed #999;background:#eee;padding:10px;margin:10px">'+
 			'<div>'+
 				'<a href="'+url+'" target="_blank">'+url+'</a> ' +
-				'<span class="'+url+'"><b style="font-size:20px;color:#0a0">OK</b></span>'+
+				'<span id="'+url.replace(/\./, '_')+'"><b style="font-size:20px;color:#0a0">OK</b></span>'+
 			'</div>'+
 			'<iframe src="'+url+'" scrolling="no" style="margin-top:10px;border:0;width:100%;height:200px"></iframe>'+
 		'</div>'
