@@ -433,7 +433,7 @@ function init(doc){
 			float:function( $v ){return '' + parseFloat( $v ) === $v;},
 			int:function( $v ){return '' + parseInt( $v, 10 ) === $v;},
 			length:function( $v, $a ){return $v.length === +$a[0];},
-			range:function( $v, $a ){return $v = $v.length, +$a[0] <= v && v <= +$a[1];},
+			range:function( $v, $a ){return $v = $v.length, +$a[0] <= $v && $v <= +$a[1];},
 			indexOf:function( $v, $a ){
 				var i, j;
 				i = $a.length;
