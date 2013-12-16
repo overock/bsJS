@@ -36,7 +36,7 @@ function bsTest( $printer,$title ){
 	r += '</ol></div><div style="padding:5px;float:right;border:1px dashed #999;text-align:center"><b style="font-size:30px;color:#' + ( f ? 'a00">FAIL' : '0a0">OK' ) + '</b><br>ok:<b style="color:#0a0">' + s + '</b> no:<b style="color:#a00">' + f + '</b></div><br clear="both"></div>'+
 		'<div id="bsTestOff'+id+'" style="display:block;cursor:pointer" onclick="bsTest.off(this)"><b>'+title+'</b> : <b style="color:#' + ( f ? 'a00">FAIL' : '0a0">OK' ) + '</b></div></div>';
 	$printer( r );
-	if( window.top.bsTest && !bsTest.isOK )
+	if( window.top.bsTest && window.top.bsTest.suite.urls && !bsTest.isOK )
 		r = window.location.pathname.split("/").pop(),
 		window.top.document.querySelector('span[class="'+r+'"]').innerHTML = '<b style="font-size:20px;color:#a00">FAIL</b>',
 		window.top.bsTest.result( '<div style="font-weight:bold;font-size:30px;padding:10px;color:#a00">FAIL</div><hr>' );
@@ -117,7 +117,7 @@ bsTest._bsCompare = function($t, $o, $r) {
 	}
 	return [$r, chk];
 };
-bsTest.isOKsub = bsTest.isOK = 1, bsTest.id = 0, bsTest.IFid = 'bsTestIF';
+bsTest.isOK = 1, bsTest.id = 0;
 bsTest.off = function(dom){dom.style.display = 'none', document.getElementById('bsTestOn'+dom.id.substr(9)).style.display = 'block';};
 bsTest.on = function(dom){dom.style.display = 'none', document.getElementById('bsTestOff'+dom.id.substr(8)).style.display = 'block';};
 bsTest.tear = function( $title, $func ){
@@ -130,15 +130,15 @@ bsTest.tear = function( $title, $func ){
 	'</div>' );
 };
 bsTest.suite = function(){
-	var i = arguments.length;
+	var i = arguments.length, url;
 	bsTest.suite.urls = arguments;
-	while( i-- ) bsTest.printer(
+	while( i-- ) url = arguments[i], bsTest.printer(
 		'<div style="width:250px;float:left;border:1px dashed #999;background:#eee;padding:10px;margin:10px">'+
 			'<div>'+
-				'<a href="'+arguments[i]+'" target="_blank">'+arguments[i]+'</a> ' +
-				'<span class="'+arguments[i]+'"><b style="font-size:20px;color:#0a0">OK</b></span>'+
+				'<a href="'+url+'" target="_blank">'+url+'</a> ' +
+				'<span class="'+url+'"><b style="font-size:20px;color:#0a0">OK</b></span>'+
 			'</div>'+
-			'<iframe src="'+arguments[i]+'" scrolling="no" style="margin-top:10px;border:0;width:100%;height:200px"></iframe>'+
+			'<iframe src="'+url+'" scrolling="no" style="margin-top:10px;border:0;width:100%;height:200px"></iframe>'+
 		'</div>'
 	);
 	bsTest.result( '<div style="font-weight:bold;font-size:30px;padding:10px;color:#0a0">OK</div><hr>' );
