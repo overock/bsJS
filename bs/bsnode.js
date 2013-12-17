@@ -7,7 +7,7 @@
  * GitHub: https://github.com/projectBS/bsJS
  * Facebook group: https://www.facebook.com/groups/bs5js/
  */
-var bs, top;
+var bs;
 bs = exports,
 bs.$ex = (function(){
 	var rc, random;
@@ -78,7 +78,7 @@ bs.$ex = (function(){
 			if( t1 !== undefined ) cnt++, t2 = t1;
 		}
 		if( cnt == 0 ) return $0;
-		if( cnt > 1 ) return '@ERROR matchs '+cnt+'times@'
+		if( cnt > 1 ) return '@ERROR matchs '+cnt+'times@';
 		i = typeof t2;
 		if( i == 'object' )
 			if( t2.TMPL ) return t2.TMPL( $0 );
@@ -118,7 +118,7 @@ bs.$ex = (function(){
 	bs.sql = bs.q = function( $sel ){return sql[$sel] || ( sql[$sel] = new sql( $sel ) );},
 	sql = function( $sel ){this.sel = $sel;},
 	sql.prototype.$ = function(){
-		var i, j, k, v;
+		var i, j, k, v, t0;
 		i = 0, j = arguments.length;
 		while( i < j ){
 			k = arguments[i++], v = arguments[i++];
@@ -250,9 +250,8 @@ bs.$ex = (function(){
 	sort = function( a, b ){return a = a.length, b = b.length, a > b ? 1 : a == b ? 0 : -1;},
 	bs.$next = function(){next();},
 	bs.$flush = flush = function(){
-		var t0, i;
-		i = cookie.length;
-		while( i-- ) head[head.length] = ['Set-Cookie', cookie[i]];
+		var t0, k;
+		for(k in cookie) head[head.length] = ['Set-Cookie', cookie[k]];
 		head.push( flush[0], flush[1], ( t0 = response.join(''), flush[2][1] = Buffer.byteLength( t0, 'utf8' ), flush[2] ) ),
 		rp.writeHead( 200, head ), rp.end( t0 );
 	},
@@ -269,13 +268,13 @@ bs.$ex = (function(){
 		if( $v === undefined ){
 			if( t0 && ( t0 = session[t0] ) ) return t0[$k];
 		}else{
-			if( !t0 ) bs.$ck( '@'+sessionName, t0 = bs.$crypt( 'sha256', bs.$ex( 1000,'~',9999 ) + (id++) + bs.$ex( 1000,'~',9999 ) ) );
+			if( !t0 ) bs.$ck( '@'+sessionName, t0 = bs.$crypt( 'sha256', ''+bs.$ex( 1000,'~',9999 ) + (id++) + bs.$ex( 1000,'~',9999 ) ) );
 			if( !session[t0] ) session[t0] = {};
 			return session[t0][$k] = $v;
 		}
 	},
 	//cookie
-	cookie = {}, clientCookie = null,
+	clientCookie = null,
 	ckParser = function(){
 		var t0, t1, i;
 		clientCookie = {};
@@ -287,7 +286,7 @@ bs.$ex = (function(){
 	bs.$cookie = bs.$ck = function( $k, $v, $path, $expire, $domain ){
 		var t0, t1;
 		if( $v === undefined ) return clientCookie[$k];
-		if( $k.chatAt(0) == '@' ) t0 = 1, $k = $k.substr(1);
+		if( $k.charAt(0) == '@' ) t0 = 1, $k = $k.substr(1);
 		t0 = $k + '=' + ( bs.$escape($v) || '' ) + 
 			';Path=' + ( $path || '/' ) + 
 			( t0 ? ';HttpOnly' : '' ) + 
@@ -299,7 +298,7 @@ bs.$ex = (function(){
 		cookie[$k] = t0;
 	},
 	//head, request, response
-	head = [], response = [], 
+	head = [], response = [],
 	bs.$head = function( $k, $v ){head[head.length] = [$k, $v];},
 	bs.$method = function(){return rq.method.toLowerCase();},
 	bs.$request = bs.$rq = function( $k ){return $k ? rq[$k] : rq;},
@@ -378,7 +377,7 @@ bs.$ex = (function(){
 					}
 				}else path += '/', file = index;
 			}
-			ckParser(), head.length = cookie.length = response.length = 0, data = {};
+			ckParser(), head.length = response.length = 0, data = {}, cookie = {};
 			if( bs.$method() == 'get' ) router();
 			else postForm.parse( $rq, onData );
 		}).listen( $data.port || 80 );
