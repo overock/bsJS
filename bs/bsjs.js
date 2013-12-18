@@ -25,8 +25,10 @@ if( !W['JSON'] ) W['JSON'] = {
 		function stringify( $obj ){
 			var t0, i, j;
 			switch( t0 = typeof $obj ){
-			case'number':case'boolean':case'function': return $obj.toString();
-			case'undefined':case 'null': return t0;
+			case'number':case'boolean': return $obj.toString();
+			//case'function': return undefined;
+			case'undefined': return undefined;
+			case 'null': return t0;
 			case'string': return '"' + $obj + '"';
 			case'object':
 				t0 = '';
@@ -37,6 +39,7 @@ if( !W['JSON'] ) W['JSON'] = {
 					for( i in $obj ) if( $obj.hasOwnProperty( i ) ){
 						if ($obj[i] === null )  t0 += ',"'+i+'":' + null;
 						else if ($obj[i] === undefined) continue;
+						else if ('function' === (typeof $obj[i])) continue;
 						else t0 += ',"'+i+'":' + stringify( $obj[i] );
 					}
 					return '{' + t0.substr(1) + '}';
