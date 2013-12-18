@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<title>bs5 Test suite</title>
-<meta name="keywords" content="bs5" />
-<meta name="description" content="bs5 Test suite" />
+<title>bsJS Test suite</title>
+<meta name="keywords" content="bsJS" />
+<meta name="description" content="bsJS Test suite" />
 <meta charset="utf-8"/>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="format-detection" content="telephone=no" />
@@ -33,6 +33,24 @@ bsTest.result = function(r){ document.getElementById('result').innerHTML = r; }
 bs( function(){
 
 	var t0, t1, t2;
+	
+	bsTest.tear( "object test",  function(){
+	});
+	
+	bsTest('stringify number object', 
+		'12345', '12345', JSON.stringify(12345));
+	
+	bsTest('stringify string object', 
+		'"abcdef"', '"abcdef"', JSON.stringify("abcdef"));
+	
+	bsTest('stringify boolean object', 
+		'true', 'true', JSON.stringify(true),
+		'false', 'false', JSON.stringify(false));
+	
+	bsTest('stringify undefined object',
+		'undefined', undefined, JSON.stringify(undefined));
+	
+	
 	bsTest.tear( "number test",  function(){
 		// number test
 		t0 = {
@@ -51,15 +69,15 @@ bs( function(){
 
 		
     bsTest('stringify number', 
-		'number', t1, '{"a":0,"b":1,"c":0.1,"d":0.1,"e":-1,"f":-0.1,"g":-0.1}');
-    bsTest('parse number',
-    	'test 0', t2.a, t0.a,
-    	'test 1', t2.b, t0.b,
-    	'test 0.1', t2.c, t0.c,
-    	'test .1', t2.d, t0.d,
-    	'test -1', t2.e, t0.e,
-    	'test -0.1', t2.f, t0.f,
-    	'test -.1', t2.g, t0.g);
+		'number', '{"a":0,"b":1,"c":0.1,"d":0.1,"e":-1,"f":-0.1,"g":-0.1}', t1);
+	bsTest('parse number',
+		'test 0', t0.a, t2.a,
+		'test 1', t0.b, t2.b,
+		'test 0.1', t0.c, t2.c,
+		'test .1', t0.d, t2.d,
+		'test -1', t0.e, t2.e,
+		'test -0.1', t0.f, t2.f,
+		'test -.1', t0.g, t2.g);
 
 
 	bsTest.tear( "boolean test",  function(){
@@ -74,10 +92,10 @@ bs( function(){
 	});
 
     bsTest('stringify boolean', 
-		'boolean', t1, '{"a":true,"b":false}');
+		'boolean', '{"a":true,"b":false}', t1);
     bsTest('parse boolean', 
-		'boolean true', t2.a, t0.a,
-		'boolean false', t2.b, t0.b);
+		'boolean true', t0.a, t2.a,
+		'boolean false', t0.b, t2.b);
 
 	bsTest.tear( "function test",  function(){
 		// function test
@@ -92,8 +110,15 @@ bs( function(){
 	});
 
     bsTest('stringify function : function은 stringify하지 않고 통과하는지 확인', 
-		'function', t1, '{"a":"a"}');
+		'function', '{"a":"a"}', t1);
 
+	t0 = function() { return 1; }
+	t1 = JSON.stringify(t0);
+	//t2 = JSON.parse(t1);
+	
+    bsTest('stringify function : function을 바로 stringify하는 경우', 
+		'function', undefined, t1);
+		
 	bsTest.tear( "string test",  function(){
 		// string test
 		t0 = {
@@ -110,14 +135,14 @@ bs( function(){
 
 
 	bsTest('stringify string', 
-		'string', t1, '{"a":"a","b":"abc","c":"a b c","d":" abc","e":"abc "}');
+		'string', '{"a":"a","b":"abc","c":"a b c","d":" abc","e":"abc "}', t1);
 
 	bsTest('parse string', 
-		'string "a"', t2.a, t0.a,
-		'string "abc"', t2.b, t0.b,
-		'string "a b c"', t2.c, t0.c,
-		'string " abc"', t2.d, t0.d,
-		'string "abc "', t2.e, t0.e);
+		'string "a"', t0.a, t2.a,
+		'string "abc"', t0.b, t2.b,
+		'string "a b c"', t0.c, t2.c,
+		'string " abc"', t0.d, t2.d,
+		'string "abc "', t0.e, t2.e);
 
 	bsTest.tear( "null test",  function(){
 		// null test
@@ -131,10 +156,10 @@ bs( function(){
 
 
 	bsTest('stringify null', 
-		'null', t1, '{"a":null}');
+		'null', '{"a":null}', t1);
 
 	bsTest('parse null', 
-		'null', t2.a, t0.a);
+		'null', t0.a, t2.a);
 
 
 	bsTest.tear( "undefined test",  function(){
@@ -149,7 +174,7 @@ bs( function(){
 	});
 
 	bsTest('stringify undefined : undefined는 stringify하지 않고 통과하는지 확인', 
-		'undefined', t1, '{"a":1}');
+		'undefined', '{"a":1}', t1);
 
 	bsTest.tear( "object test",  function(){
 		// object test
@@ -165,10 +190,10 @@ bs( function(){
 
 
 	bsTest('stringify objcet', 
-		'object', t1, '{"a":{"a0":"123"}}');
+		'object', '{"a":{"a0":"123"}}', t1);
 
 	bsTest('parse objcet', 
-		'{a: {a0: \'123\'}', t2.a.a0, t0.a.a0);
+		'{a: {a0: \'123\'}', t0.a.a0, t2.a.a0);
 
 	bsTest.tear( "array test",  function(){
 		// array test
@@ -188,10 +213,10 @@ bs( function(){
 
 
 	bsTest('stringify array', 
-		'array', t1, '{"a":[{"a0":1,"a1":"a"},{"a0":2,"a1":"b"},{"a0":3,"a1":"c"},{"a0":4,"a1":"d"},{"a0":5,"a1":"e"}]}');
+		'array', '{"a":[{"a0":1,"a1":"a"},{"a0":2,"a1":"b"},{"a0":3,"a1":"c"},{"a0":4,"a1":"d"},{"a0":5,"a1":"e"}]}', t1);
 
 	bsTest('parse array', 
-		'array ', t2.a[2].a1, t0.a[2].a1);
+		'array ', t0.a[2].a1, t2.a[2].a1);
 
 });
 
