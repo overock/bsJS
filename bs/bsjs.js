@@ -1155,7 +1155,7 @@ function init(doc){
 							t0 = self[self.type];
 							if( typeof t0 == 'function' ) t0.call( $dom, self );
 							else if( t0.splice ) t1 = t0[0], t2 = t0[1], t0 = t0.slice( 1 ), t0[0] = self, t2.apply( t1, t0 );
-							else if( t0[self.type] ) t0[self.type]( self );
+							else if( t0[self.type] ) t0[t0['@'+self.type]]( self );
 						};
 					},
 					ev.prototype.prevent = bs.DETECT.event ? function(){this.event.preventDefault(), this.event.stopPropagation();} :
@@ -1177,12 +1177,13 @@ function init(doc){
 						del = function($ev,$k){$ev.target['on'+$k] = null;};
 					ev.prototype.$ = function( $k, $v ){
 						var t0;
+						t0 = $k;
 						if( typeof ev$[$k] == 'string' ) $k = ev$[$k];
 						if( $v === null ) del( this, $k ), delete this[$k];
 						else if( $k == 'rollover' ) this.$( 'mouseover', ev$.rollover );
 						else if( $k == 'rollout' ) this.$( 'mouseout', ev$.rollout );
 						else if( !$k ) return;
-						else this[$k] = $v, add( this, $k );
+						else this[$k] = $v, this['@'+$k] =t0, add( this, $k );
 					};
 					return ev;
 				} )( ev$, x, y );
@@ -1193,8 +1194,15 @@ function init(doc){
 		bs.WIN = (function(){
 			var win, ev;
 			ev = (function( doc ){
-				var ev, d, w;
+				var ev, d, w, make;
 				ev = bs._ev, delete bs._ev, d = {}, w = {};
+				make = function( $data ){
+					if( !$data.v ) $data.v = function( $e ){
+						var i, j;
+						for( i = 0, j = $data.length ; i < j ; i++ ) $data[i]( $e );
+					};
+					return $data.v;
+				};
 				return function( e, k, v, t ){
 					var t0, i, j, target;
 					if( t ) t0 = w, target = W;
@@ -1202,10 +1210,7 @@ function init(doc){
 					if( v ){
 						t0 = t0[e] || ( t0[e] = [] ),
 						t0[t0.length] = t0[k] = v;
-						if( !t0.v ) t0.v = function( $e ){
-							for( i = 0, j = t0.length ; i < j ; i++ ) t0[i]( $e );
-						};
-						ev( target, e, t0.v )
+						ev( target, e, make( t0 ) );
 					}else if( ( t0 = t0[e] ) && t0[k] ){
 						t0.splice( t0.indexOf( t0[k] ), 1 );
 						if( !t0.length ) ev( target, e, null );
