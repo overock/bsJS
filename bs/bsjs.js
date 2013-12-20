@@ -1085,7 +1085,7 @@ function init(doc){
 			})(),
 			d.id = function( $dom, $v ){ return $v === undefined ? $dom.id : ($dom.id = $v); },
 			d.src = function( $dom ){ return $dom.src; },
-			ev = (function(){
+			bs._ev = ev = (function(){
 				var k, ev, i;
 				function ev$( $dom, $k, $v ){
 					var t0;
@@ -1106,9 +1106,10 @@ function init(doc){
 					ev$.down = 'mousedown', ev$.up = 'mouseup', ev$.move = 'mousemove',
 					ev$.rollover = function( $e ){if( !isChild( this, $e.event.fromElement || $e.event.relatedTarget ) ) $.type = 'rollover', $v.call( this, $e );},
 					ev$.rollout = function( $e ){if( !isChild( this, $e.event.toElement || $e.event.explicitOriginalTarget ) ) $.type = 'rollout', $v.call( this, $e );};
+					if( W['TransitionEvent'] && !ev$.transitionend ) ev$.transitionend = 1;
 				}
 				ev = ( function( ev$, x, y ){
-					var ev, pageX, pageY, evType, prevent, keycode;
+					var ev, pageX, pageY, evType, prevent, keycode, add, del, eventName;
 					if( bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 9 ) pageX = 'x', pageY = 'y';
 					else pageX = 'pageX', pageY = 'pageY';
 					evType = {'touchstart':2,'touchend':1,'touchmove':1,'mousedown':4,'mouseup':3,'mousemove':3,'click':3,'mouseover':3,'mouseout':3},
@@ -1120,7 +1121,43 @@ function init(doc){
 						while( i < j )k = t0[i++], v = parseInt(t0[i++]), t1[k] = v, t1[v] = k;
 						return t1;
 					})(),
-					ev = function( $dom ){this.dom = $dom;},
+					(function(){
+						eventName = {webkitTransitionEnd:'transitionend'};
+					})(),
+					ev = function( $dom ){
+						var self;
+						self = this,
+						self.target = $dom,
+						self.listener = function( $e ){
+							var type, start, dx, dy, t0, t1, t2, id, i, j, X, Y;
+							self.event = $e || ( $e = event ), self.type = eventName[$e.type] || $e.type, self.keyCode = $e.keyCode, self.value = $dom.value && bs.$trim( $dom.value );
+							if( type = evType[self.type] ){
+								dx = x( $dom ), dy = y( $dom );
+								if( type < 3 ){
+									t0 = $e.changedTouches, self.length = i = t0.length;
+									while( i-- ) self[i] = t1 = t0[i], id = t1.identifier,
+										self['lx'+id] = ( self['x'+id] = X = t1[pageX] ) - dx,
+										self['ly'+id] = ( self['y'+id] = Y = t1[pageY] ) - dy,
+										self['cx'+id] = t1.clientX, self['cy'+id] = t1.clientY,
+										type == 2 ?
+											( self['_x'+id] = X, self['_y'+id] = Y ) :
+											( self['dx'+id] = X - self['_x'+id], self['dy'+id] = Y - self['_y'+id] );
+									self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
+								}else{
+									self.length = 0,
+									self.lx = ( self.x = $e[pageX] ) - dx, self.ly = ( self.y = $e[pageY] ) - dy,
+									self.cx = $e.clientX, self.cy = $e.clientY,
+									type == 4 ?
+										( self._x = self.x, self._y = self.y ) :
+										( self.dx = self.x - self._x, self.dy = self.y - self._y );
+								}
+							}
+							t0 = self[self.type];
+							if( typeof t0 == 'function' ) t0.call( $dom, self );
+							else if( t0.splice ) t1 = t0[0], t2 = t0[1], t0 = t0.slice( 1 ), t0[0] = self, t2.apply( t1, t0 );
+							else if( t0[self.type] ) t0[self.type]( self );
+						};
+					},
 					ev.prototype.prevent = bs.DETECT.event ? function(){this.event.preventDefault(), this.event.stopPropagation();} :
 						function( $e ){this.event.returnValue = false, this.event.cancelBubble = true;},
 					ev.prototype.key = function( $key ){return this.code == keycode[$key];},
@@ -1131,40 +1168,21 @@ function init(doc){
 					function isChild( $p, $c ){
 						if( $c ) do if( $c == $p ) return 1; while( $c = $c.parentNode )
 						return 0;
-					},
+					};
+					if( W['addEventListener'] ) add = function($ev,$k){$ev.target.addEventListener( $k, $ev.listener, false );},
+						del = function($ev,$k){$ev.target.removeEventListener( $k, $ev.listener, false );};
+					else if( W['attachEvent'] ) add = function($ev,$k){$ev.target.attachEvent( 'on'+$k, $ev.listener );},
+						del = function($ev,$k){$ev.target.detachEvent( 'on'+$k, $ev.listener );};
+					else add = function($ev,$k){$ev.target['on'+$k] = $ev.listener;},
+						del = function($ev,$k){$ev.target['on'+$k] = null;};
 					ev.prototype.$ = function( $k, $v ){
-						var self, dom, type;
-						self = this, dom = self.dom;
+						var t0;
 						if( typeof ev$[$k] == 'string' ) $k = ev$[$k];
-						if( $v === null ) dom['on'+$k] = null, delete self[$k];
-						else if( $k == 'rollover' ) self.$( 'mouseover', ev$.rollover );
-						else if( $k == 'rollout' ) self.$( 'mouseout', ev$.rollout );
+						if( $v === null ) del( this, $k ), delete this[$k];
+						else if( $k == 'rollover' ) this.$( 'mouseover', ev$.rollover );
+						else if( $k == 'rollout' ) this.$( 'mouseout', ev$.rollout );
 						else if( !$k ) return;
-						else self[$k] = $v, dom['on'+$k] = function( $e ){
-							var type, start, dx, dy, t0, t1, t2, id, i, j, X, Y;
-							self.event = $e || ( $e = event ), self.type = $e.type, self.code = $e.keyCode, self.value = dom.value && bs.$trim( dom.value );
-							if( type = evType[$k] ){
-								dx = x( dom ), dy = y( dom );
-								if( type < 3 ){
-									t0 = $e.changedTouches, self.length = i = t0.length;
-									while( i-- ) self[i] = t1 = t0[i], id = t1.identifier,
-										self['lx'+id] = ( self['x'+id] = X = t1[pageX] ) - dx,
-										self['ly'+id] = ( self['y'+id] = Y = t1[pageY] ) - dy,
-										type == 2 ?
-											( self['_x'+id] = X, self['_y'+id] = Y ) :
-											( self['dx'+id] = X - self['_x'+id], self['dy'+id] = Y - self['_y'+id] );
-									self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0;
-								}else{
-									self.length = 0,
-									self.lx = ( self.x = $e[pageX] ) - dx,
-									self.ly = ( self.y = $e[pageY] ) - dy,
-									type == 4 ?
-										( self._x = self.x, self._y = self.y ) :
-										( self.dx = self.x - self._x, self.dy = self.y - self._y );
-								}
-							}
-							$v.call( dom, self );
-						};
+						else this[$k] = $v, add( this, $k );
 					};
 					return ev;
 				} )( ev$, x, y );
@@ -1173,23 +1191,27 @@ function init(doc){
 			return d;
 		})( bs, style, doc ) );
 		bs.WIN = (function(){
-			var win;
-			function ev( e, k, v, t ){
-				var t0, i, j, target;
-				target = t || W;
-				if( v ){
-					t0 = ev[e] || ( ev[e] = [] ),
-					t0[t0.length] = t0[k] = v;
-					if( !target['on'+e] ) target['on'+e] = ev['@'+e] || ( ev['@'+e] = function( $e ){
-						var t0, i, E;
-						ev.event = $e || event, ev.type = ev.event.type, ev.code = ev.event.keyCode, t0 = ev[e], i = t0.length;
-						while( i-- ) t0[i]( ev );
-					} );
-				}else if( ( t0 = ev[e] ) && t0[k] ){
-					t0.splice( t0.indexOf( t0[k] ), 1 );
-					if( !t0.length ) target['on'+e] = null;
-				}
-			}
+			var win, ev;
+			ev = (function( doc ){
+				var ev, d, w;
+				ev = bs._ev, delete bs._ev, d = {}, w = {};
+				return function( e, k, v, t ){
+					var t0, i, j, target;
+					if( t ) t0 = w, target = W;
+					else t0 = d, target = doc;
+					if( v ){
+						t0 = t0[e] || ( t0[e] = [] ),
+						t0[t0.length] = t0[k] = v;
+						if( !t0.v ) t0.v = function( $e ){
+							for( i = 0, j = t0.length ; i < j ; i++ ) t0[i]( $e );
+						};
+						ev( target, e, t0.v )
+					}else if( ( t0 = t0[e] ) && t0[k] ){
+						t0.splice( t0.indexOf( t0[k] ), 1 );
+						if( !t0.length ) ev( target, e, null );
+					}
+				};
+			})( doc );
 			function hash( e, k, v ){
 				var t0, old, w, h;
 				if( v ){
@@ -1203,7 +1225,7 @@ function init(doc){
 								ev.type = 'hashchange'; ev.event = event, old = location.hash, t0 = ev[e], i = t0.length;
 								while( i-- ) t0[i]( ev );
 							}
-						}, 50 );
+						}, 1 );
 					}
 				}else if( ( t0 = ev[e] ) && t0[k] ){
 					t0.splice( t0.indexOf( t0[k] ), 1 );
@@ -1289,8 +1311,8 @@ function init(doc){
 		bs.KEY = (function () {
 			var buffer, keycode;
 			return keycode = bs.keycode, delete bs.keycode, 
-				bs.WIN.on("keydown", '@bsKD', function($e){buffer[keycode[$e.code]] = 1;}),
-				bs.WIN.on("keyup", '@bsKU', function($e){buffer[keycode[$e.code]] = 0;}),
+				bs.WIN.on("keydown", '@bsKD', function($e){buffer[keycode[$e.keyCode]] = 1;}),
+				bs.WIN.on("keyup", '@bsKU', function($e){buffer[keycode[$e.keyCode]] = 0;}),
 				buffer = {};
 		})();
 	})( doc );
@@ -1384,7 +1406,9 @@ function init(doc){
 				sineInOut:function(a,c,b){return 0.5*-b*(Math.cos(PI*a)-1)+c},
 				circleIn:function(a,c,b){return -b*(Math.sqrt(1-a*a)-1)+c},
 				circleOut:function(a,c,b){a-=1;return b*Math.sqrt(1-a*a)+c},
-				circleInOut:function(a,c,b){a*=2;if(1>a)return 0.5*-b*(Math.sqrt(1-a*a)-1)+c;a-=2;return 0.5*b*(Math.sqrt(1-a*a)+1)+c}
+				circleInOut:function(a,c,b){a*=2;if(1>a)return 0.5*-b*(Math.sqrt(1-a*a)-1)+c;a-=2;return 0.5*b*(Math.sqrt(1-a*a)+1)+c},
+				quadraticIn:function(a,c,b){return b*a*a+c},
+				quadraticOut:function(a,c,b){return -b*a*(a-2)+c}
 			};
 		})();
 		tweenPool = {length:0},
@@ -1747,73 +1771,6 @@ function init(doc){
             };
         return d;
     })(bs) );
-    // bs.plane 팩토리 프로토타입
-    bs.factory( 'plane', (function( bs ){
-        var d, ani, key, ANI;
-        bs.c( '.PLANE' ).$( 'position', 'absolute'),
-            bs.c( '.PLANE img' ).$( 'width', '100%', 'height','100%'),
-            ANI = bs.ANI.ani,
-            (function(){
-                var t0, i;
-                t0 = 'x,y,z,width,height,src,world,@'.split(','),
-                    key = {}, i = t0.length;
-                while( i-- ) key[t0[i]] = 1;
-            })(),
-            d = bs.factory.creator( 'plane' ),
-            d.init = function( $key ){},
-            ani = function( $time ){
-                var div = this.div,zIndex,tx,tz,tScale
-                var world = this.world, pan = world.pan, tilt = world.tilt,farclip = world.farclip, w = world.width,h = world.height
-                var dx, sz, sin = Math.sin(pan) , cos = Math.cos(pan)
-                dx = this.x -  world.camx,sz = this.z -  world.camz
-                // 카메라를 중심으로 플랜의 위치를 구함
-                tx = cos * dx + sin * sz, tz = -sin * dx + cos * sz;
-                tScale = w / tz *.5// 대충거리로...크기비율을 결정
-                if (tz < 0.1 || tz > farclip) div.$('display', 'none')
-                else{
-                    zIndex = parseInt(tz * 100000 - tz * 100)  // 안겹치게...제트축만들고... 혹시나 살짝빼서 또 겹치는걸 없앰
-                    div.$(
-                        'display','block','z-index', parseInt(100 * tScale),
-                        'margin-left', (tx - this.width / 4)*tScale*2 +w/2,
-                        'margin-top', tilt - tScale * world.camy - (tScale  + this.height * tScale ) / 2+h/2,
-                        'width', tScale + this.width * tScale, 'height', tScale  + this.height * tScale,
-                        'opacity', (farclip - tz) > farclip/5 ? 1 : (farclip - tz + farclip/5) / farclip
-                    )
-                }
-            },
-            d.$ = function(){
-                var t0, i, j, k, v;
-                if( ( t0 = arguments[0] ).charAt(0) == '@' ){
-                    if( this[t0] ) t0 = this[t0];
-                    else ( t0 = this[t0] = {
-                        ANI:ani,
-                        div:bs.d('<div class="PLANE"></div>').$('display','none','this'),
-                        img:bs.d('<img '+'src="'+this.src+'"/>'),
-                        world : bs.world(this.world).$(this['@']),
-                        width:100, height:100
-                    }).div.$( '>', t0.img);
-                    bs.world(this.world).$(this['@'],'div').$('>',t0.div); // 지정된 월드에 박는다.
-                    i = 1, j = arguments.length;
-                    if( j == 1 ) return t0;
-                    while( i < j ){
-                        k = arguments[i++], v = arguments[i++];
-                        if( key[k] ) t0[k] = v;
-                        else if( k == 'div' ) return t0.div;
-                        else if( k == 'img' ) return t0.img;
-                        else t0.div.$( k, v );
-                    };
-                    ANI(t0);
-                }else{
-                    i = 0, j = arguments.length;
-                    while( i < j ){
-                        if( !key[k = arguments[i++]] ) throw 1;
-                        this[k] = arguments[i++];
-                    }
-                }
-            };
-        return d;
-    })(bs) );
-    ////////////////////////////////////////////////////////////////////
 	(function(bs){
 		var LZString={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",_f:String.fromCharCode,compressToBase64:function(c){if(c==null){return""}var a="";var k,h,f,j,g,e,d;var b=0;c=LZString.compress(c);while(b<c.length*2){if(b%2==0){k=c.charCodeAt(b/2)>>8;h=c.charCodeAt(b/2)&255;if(b/2+1<c.length){f=c.charCodeAt(b/2+1)>>8}else{f=NaN}}else{k=c.charCodeAt((b-1)/2)&255;if((b+1)/2<c.length){h=c.charCodeAt((b+1)/2)>>8;f=c.charCodeAt((b+1)/2)&255}else{h=f=NaN}}b+=3;j=k>>2;g=((k&3)<<4)|(h>>4);e=((h&15)<<2)|(f>>6);d=f&63;if(isNaN(h)){e=d=64}else{if(isNaN(f)){d=64}}a=a+LZString._keyStr.charAt(j)+LZString._keyStr.charAt(g)+LZString._keyStr.charAt(e)+LZString._keyStr.charAt(d)}return a},decompressFromBase64:function(g){if(g==null){return""}var a="",d=0,e,o,m,k,n,l,j,h,b=0,c=LZString._f;g=g.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(b<g.length){n=LZString._keyStr.indexOf(g.charAt(b++));l=LZString._keyStr.indexOf(g.charAt(b++));j=LZString._keyStr.indexOf(g.charAt(b++));h=LZString._keyStr.indexOf(g.charAt(b++));o=(n<<2)|(l>>4);m=((l&15)<<4)|(j>>2);k=((j&3)<<6)|h;if(d%2==0){e=o<<8;if(j!=64){a+=c(e|m)}if(h!=64){e=k<<8}}else{a=a+c(e|o);if(j!=64){e=m<<8}if(h!=64){a+=c(e|k)}}d+=3}return LZString.decompress(a)},compressToUTF16:function(d){if(d==null){return""}var b="",e,j,h,a=0,g=LZString._f;d=LZString.compress(d);for(e=0;e<d.length;e++){j=d.charCodeAt(e);switch(a++){case 0:b+=g((j>>1)+32);h=(j&1)<<14;break;case 1:b+=g((h+(j>>2))+32);h=(j&3)<<13;break;case 2:b+=g((h+(j>>3))+32);h=(j&7)<<12;break;case 3:b+=g((h+(j>>4))+32);h=(j&15)<<11;break;case 4:b+=g((h+(j>>5))+32);h=(j&31)<<10;break;case 5:b+=g((h+(j>>6))+32);h=(j&63)<<9;break;case 6:b+=g((h+(j>>7))+32);h=(j&127)<<8;break;case 7:b+=g((h+(j>>8))+32);h=(j&255)<<7;break;case 8:b+=g((h+(j>>9))+32);h=(j&511)<<6;break;case 9:b+=g((h+(j>>10))+32);h=(j&1023)<<5;break;case 10:b+=g((h+(j>>11))+32);h=(j&2047)<<4;break;case 11:b+=g((h+(j>>12))+32);h=(j&4095)<<3;break;case 12:b+=g((h+(j>>13))+32);h=(j&8191)<<2;break;case 13:b+=g((h+(j>>14))+32);h=(j&16383)<<1;break;case 14:b+=g((h+(j>>15))+32,(j&32767)+32);a=0;break}}return b+g(h+32)},decompressFromUTF16:function(d){if(d==null){return""}var b="",h,j,a=0,e=0,g=LZString._f;while(e<d.length){j=d.charCodeAt(e)-32;switch(a++){case 0:h=j<<1;break;case 1:b+=g(h|(j>>14));h=(j&16383)<<2;break;case 2:b+=g(h|(j>>13));h=(j&8191)<<3;break;case 3:b+=g(h|(j>>12));h=(j&4095)<<4;break;case 4:b+=g(h|(j>>11));h=(j&2047)<<5;break;case 5:b+=g(h|(j>>10));h=(j&1023)<<6;break;case 6:b+=g(h|(j>>9));h=(j&511)<<7;break;case 7:b+=g(h|(j>>8));h=(j&255)<<8;break;case 8:b+=g(h|(j>>7));h=(j&127)<<9;break;case 9:b+=g(h|(j>>6));h=(j&63)<<10;break;case 10:b+=g(h|(j>>5));h=(j&31)<<11;break;case 11:b+=g(h|(j>>4));h=(j&15)<<12;break;case 12:b+=g(h|(j>>3));h=(j&7)<<13;break;case 13:b+=g(h|(j>>2));h=(j&3)<<14;break;case 14:b+=g(h|(j>>1));h=(j&1)<<15;break;case 15:b+=g(h|j);a=0;break}e++}return LZString.decompress(b)},compress:function(e){if(e==null){return""}var h,l,n={},m={},o="",c="",r="",d=2,g=3,b=2,q="",a=0,j=0,p,k=LZString._f;for(p=0;p<e.length;p+=1){o=e.charAt(p);if(!Object.prototype.hasOwnProperty.call(n,o)){n[o]=g++;m[o]=true}c=r+o;if(Object.prototype.hasOwnProperty.call(n,c)){r=c}else{if(Object.prototype.hasOwnProperty.call(m,r)){if(r.charCodeAt(0)<256){for(h=0;h<b;h++){a=(a<<1);if(j==15){j=0;q+=k(a);a=0}else{j++}}l=r.charCodeAt(0);for(h=0;h<8;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}else{l=1;for(h=0;h<b;h++){a=(a<<1)|l;if(j==15){j=0;q+=k(a);a=0}else{j++}l=0}l=r.charCodeAt(0);for(h=0;h<16;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}delete m[r]}else{l=n[r];for(h=0;h<b;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}n[c]=g++;r=String(o)}}if(r!==""){if(Object.prototype.hasOwnProperty.call(m,r)){if(r.charCodeAt(0)<256){for(h=0;h<b;h++){a=(a<<1);if(j==15){j=0;q+=k(a);a=0}else{j++}}l=r.charCodeAt(0);for(h=0;h<8;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}else{l=1;for(h=0;h<b;h++){a=(a<<1)|l;if(j==15){j=0;q+=k(a);a=0}else{j++}l=0}l=r.charCodeAt(0);for(h=0;h<16;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}delete m[r]}else{l=n[r];for(h=0;h<b;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}}l=2;for(h=0;h<b;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}while(true){a=(a<<1);if(j==15){q+=k(a);break}else{j++}}return q},decompress:function(k){if(k==null){return""}if(k==""){return null}var o=[],j,d=4,l=4,h=3,q="",t="",g,p,r,s,a,b,n,m=LZString._f,e={string:k,val:k.charCodeAt(0),position:32768,index:1};for(g=0;g<3;g+=1){o[g]=g}r=0;a=Math.pow(2,2);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}switch(j=r){case 0:r=0;a=Math.pow(2,8);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}n=m(r);break;case 1:r=0;a=Math.pow(2,16);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}n=m(r);break;case 2:return""}o[3]=n;p=t=n;while(true){if(e.index>e.string.length){return""}r=0;a=Math.pow(2,h);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}switch(n=r){case 0:r=0;a=Math.pow(2,8);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}o[l++]=m(r);n=l-1;d--;break;case 1:r=0;a=Math.pow(2,16);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}o[l++]=m(r);n=l-1;d--;break;case 2:return t}if(d==0){d=Math.pow(2,h);h++}if(o[n]){q=o[n]}else{if(n===l){q=p+p.charAt(0)}else{return null}}t+=q;o[l++]=p+q.charAt(0);d--;p=q;if(d==0){d=Math.pow(2,h);h++}}}};if(typeof module!=="undefined"&&module!=null){module.exports=LZString};
 		bs.$compress = function( $str ){return LZString.compress( $str );},
@@ -1842,8 +1799,14 @@ function init(doc){
 }
 init.len = 0;
 W[N] = function(){init[init.len++] = arguments[0];};
-setTimeout( function(){
-	var i, j;
-	for( W[N] = init( W.document ), i = 0, j = init.len ; i < j ; i++ ) init[i]();
-}, 1 );
+( function(){
+	var id;
+	id = setInterval( function(){
+		var i, j;
+		if( document && document.getElementsByTagName && document.getElementById && document.body ){
+			clearInterval( id );
+			for( W[N] = init( W.document ), i = 0, j = init.len ; i < j ; i++ ) init[i]();
+		}
+	}, 1 );
+})();
 } )( this );
