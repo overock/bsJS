@@ -10,38 +10,32 @@
 ( function( W, N ){
 'use strict';
 N = N ||'bs';
-if( !W['console'] )	W['console'] = {log:function(){alert( arguments.join() );}};
+//0. es5 adapter
+if( !Date.now ) Date.now = function(){return +new Date;};
 if( !Array.prototype.indexOf ) Array.prototype.indexOf = function( $v, $i ){
 	var i, j, k, l;
-	if( j = this.length )
-		for( $i = $i || 0, i = $i, k = parseInt( ( j - i ) * .5 ) + i + 1, j-- ; i < k ; i++ )
-			if( this[l = i] === $v || this[l = j - i + $i] === $v ) return l; 
+	if( j = this.length ) for( $i = $i || 0, i = $i, k = parseInt( ( j - i ) * .5 ) + i + 1, j-- ; i < k ; i++ )
+		if( this[l = i] === $v || this[l = j - i + $i] === $v ) return l; 
 	return -1;
 };
-Date.now || ( Date.now = function(){return +new Date;} );
 if( !W['JSON'] ) W['JSON'] = {
 	parse:function( $str ){return (0,eval)( '(' + $str + ')' );},
 	stringify:(function(){
+		var r = /["]/g;
 		function stringify( $obj ){
 			var t0, i, j;
 			switch( t0 = typeof $obj ){
+			case'string': return '"' + $obj.replace( r, '\\"' ) + '"';
 			case'number':case'boolean': return $obj.toString();
-			//case'function': return undefined;
-			case'undefined': return undefined;
-			case 'null': return t0;
-			case'string': return '"' + $obj + '"';
+			case'null':case'undefined': return t0;
 			case'object':
 				t0 = '';
-				if( $obj && $obj.splice ){
+				if( $obj.splice ){
 					for( i = 0, j = $obj.length ; i < j ; i++ ) t0 += ',' + stringify( $obj[i] );
 					return '[' + t0.substr(1) + ']';
 				}else{
-					for( i in $obj ) if( $obj.hasOwnProperty( i ) ){
-						if ($obj[i] === null )  t0 += ',"'+i+'":' + null;
-						else if ($obj[i] === undefined) continue;
-						else if ('function' === (typeof $obj[i])) continue;
-						else t0 += ',"'+i+'":' + stringify( $obj[i] );
-					}
+					for( i in $obj ) if( $obj.hasOwnProperty( i ) && $obj[i] !== undefined && typeof $obj[i] != 'function' )
+						t0 += ',"'+i+'":' + stringify( $obj[i] );
 					return '{' + t0.substr(1) + '}';
 				}
 			}
@@ -49,9 +43,23 @@ if( !W['JSON'] ) W['JSON'] = {
 		return stringify;
 	})()
 };
+if( !W['console'] ) W['console'] = {
+	log:(function(){
+		var log = [];
+		return function(){log.push( Array.prototype.join( arguments, ', ' ) );};
+	})(),
+	flush:function(){
+		var t0;
+		return t0 = log.slice(0), log.length = 0, t0
+	}
+};
+//1. initializer after DOM loaded
 function init(doc){
-	var bs = (function(doc){
+	var bs;
+	//2. define bs
+	bs = (function(doc){
 		var bs, sel, c, div, nodes;
+		//3. define sel(DOM selector)
 		if( doc.querySelectorAll ) sel = function( $sel ){return doc.querySelectorAll( $sel );};
 		else{
 			c = {}, sel = function( $sel ){
@@ -69,6 +77,7 @@ function init(doc){
 			};
 		}
 		div = doc.createElement( 'div' ), nodes = {},
+		//4. define bs
 		bs = function( $sel, $node ){
 			var r, t0, i, j, k;
 			if( $sel.isDom ) return $sel;
@@ -85,35 +94,44 @@ function init(doc){
 				return r;
 			}
 		},
-		bs.sel = sel;
+		bs.$sel = sel;
 		return bs;
 	})(doc);
+	//5. defined $class
 	(function(bs){
-		function cls( $arg ){
-			var key, factory, t0, k;
-			key = $arg[0], factory = $arg[1],
-			cls[key] = factory.init ? function($key){this.__k = $key,this.__i( $key );} : function($key){this.__k = $key;};
-			t0 = cls[key].prototype, t0.$ = factory.$, t0.__i = factory.init, t0.__d = del, t0.__f = factory;
-			for( k in factory.method ) t0[k] = factory.method[k];
-			return factory;
-		}
-		function del(){return delete this.__f[this.__k], this.__k;}
-		bs.factory = function(){
-			var t0, t1, i;
-			t0 = arguments[0].split(','), arguments[0] = t0[0], t1 = new cls(arguments), i = t0.length;
-			while( i-- ) bs[t0[i]] = t1;
-		},
-		bs.factory.creator = function( $key ){
-			function F(){
-				var t0, t1;
-				return typeof ( t0 = arguments[0] ) == 'string' ? 
-						( t1 = t0.charAt(0) ) == '@' ? ( F[t0=t0.substr(1)] = new cls[$key](t0) ) :
-						t1 == '<' ? new cls[$key](t0) : F[t0] || ( F[t0] = new cls[$key](t0) ) :
-					new cls[$key](t0);
+		function none(){}
+		function factory( $name, $func ){
+			var cls, fn, t0, k;
+			cls = function( $sel ){this.__new( this.__k = $sel );}, fn = cls.prototype,
+			fn.__new = none, fn.instanceOf = bs[$name], fn.del = function(){delete cls[this.__k];};
+			if( typeof $func == 'function' ){
+				$func( t0 = {}, bs );
+				for( k in t0 ) if( t0.hasOwnProperty( k ) ){
+					if( k == 'constructor' ) fn.__new = t0.constructor;
+					else if( fn[k] ) throw 1;
+					else fn[k] = t0[k];
+				}
 			}
-			return F;
+			return function( $sel ){
+				var t0;
+				if( typeof $sel == 'string' ){
+					t0 = $sel.charAt(0);
+					if( t0 == '@' ) $sel = $sel.substr(1);
+					else if( t0 != '<' ) return cls[$sel] || ( cls[$sel] = new cls( $sel ) );
+				}
+				return new cls( $sel );
+			};
+		}
+		bs.$class = function( $name, $func ){
+			var t0, i;
+			$name = bs.$trim( $name.toLowerCase().split(',') ), i = $name.length, t0 = factory( $name[0], $func );
+			while( i-- ){
+				if( bs[$name[i]] ) throw 1;
+				bs[$name[i]] = t0;
+			}
 		};
 	})(bs),
+	//6. define $XXX Utilities
 	(function(){
 		var rc, random;
 		rc = 0, random = function(){return rc = ( rc + 1 ) % 1000, random[rc] || ( random[rc] = Math.random() );};
@@ -304,11 +322,12 @@ function init(doc){
 	bs.$open = function $open( $url ){W.open( $url );},
 	bs.$back = function $back(){history.back();},
 	bs.$reload = function $reload(){location.reload();},
+	//7. define JSloader
 	(function(doc){
 		var id, c, head;
 		function js( $data, $load, $end ){
 			var t0, i;
-			t0 = doc.createElement( 'script' ), t0.type = 'text/javascript', t0.charset = 'utf-8';
+			t0 = doc.createElement( 'script' ), t0.type = 'text/javascript', t0.charset = 'utf-8', head.appendChild( t0 );
 			if( $load ){
 				if( W['addEventListener'] ) t0.onload = function(){t0.onload = null, $load();}
 				else t0.onreadystatechange = function(){(t0.readyState == 'loaded' || t0.readyState == 'complete') && ( t0.onreadystatechange = null, $load() );}
@@ -318,7 +337,7 @@ function init(doc){
 				}
 				t0.src = $data;
 			}else t0.text = $data;
-			head.appendChild( t0 );
+			
 		}
 		id = 0, bs.__callback = c = {}, head = doc.getElementsByTagName( 'head' )[0],
 		bs.$js = function( $end ){
@@ -328,6 +347,7 @@ function init(doc){
 			else while( i < j ) js( bs.$get( null, arg[i++] ) );
 		};
 	})(doc),
+	//8. defined ajax
 	(function(){
 		var	_timeout = 5000, _cgiA = [], _cgiH = [];
 		var rq = W['XMLHttpRequest'] ? function rq(){ return new XMLHttpRequest; } : ( function(){
@@ -418,148 +438,8 @@ function init(doc){
 		}
 		return t2 ? decodeURIComponent( t2 ) : null;
 	},
-	(function(){
-		var rules, set, rule, group;
-		group = {},
-		rules = {
-			ip:parseRule('/^((([0-9]{1,2})|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\\.){3}(([0-9]{1,2})|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))$/'),
-			url:parseRule('/^https?:\\/\\/[-\\w.]+(:[0-9]+)?(\\/([\\w\\/_.]*)?)?$/'),
-			email:parseRule('/^(\\w+\\.)*\\w+@(\\w+\\.)+[A-Za-z]+$/'),
-			korean:parseRule('/^[ㄱ-힣]+$/'),
-			japanese:parseRule('/^[ぁ-んァ-ヶー一-龠！-ﾟ・～「」“”‘’｛｝〜−]+$/'),
-			alpha:parseRule('/^[a-z]+$/'),
-			ALPHA:parseRule('/^[A-Z]+$/'),
-			num:parseRule('/^[0-9]+$/'),
-			alphanum:parseRule('/^[a-z0-9]+$/'),
-			'1alpha':parseRule('/^[a-z]/'),
-			'1ALPHA':parseRule('/^[A-Z]/'),
-			float:function( $v ){return '' + parseFloat( $v ) === $v;},
-			int:function( $v ){return '' + parseInt( $v, 10 ) === $v;},
-			length:function( $v, $a ){return $v.length === +$a[0];},
-			range:function( $v, $a ){return $v = $v.length, +$a[0] <= $v && $v <= +$a[1];},
-			indexOf:function( $v, $a ){
-				var i, j;
-				i = $a.length;
-				while( i-- ) if( $v.indexOf( $a[i] ) == -1 ) j = 1;
-				return j ? 0 : 1;
-			},
-			ssn:(function(){
-				var r, key;
-				r = /\s|-/g, key = [2,3,4,5,6,7,8,9,2,3,4,5];
-				return function( $v ){
-					var t0, v, i;
-					v = $v.replace( r, '' );
-					if( v.length != 13 ) return;
-					for( t0 = i = 0 ; i < 12 ; i++ ) t0 += key[i] * v.charAt(i);
-					return parseInt( v.charAt(12) ) == ( ( 11 - ( t0 % 11 ) ) % 10);
-				};
-			})(),
-			biz:(function(){
-				var r, key;
-				r = /\s|-/g, key = [1,3,7,1,3,7,1,3,5,1];
-				return function( $v ){
-					var t0, t1, v, i;
-					v = $v.replace( r, '' );
-					if( v.length != 10 ) return;
-					for( t0 = i = 0 ; i < 8 ; i++ ) t0 += key[i] * v.charAt(i);
-					t1 = "0" + ( key[8] * v.charAt(8) ), t1 = t1.substr( t1.length - 2 ),
-					t0 += parseInt( t1.charAt(0) ) + parseInt( t1.charAt(1) );
-					return parseInt( v.charAt(9) ) == ( 10 - ( t0 % 10)) % 10;
-				};
-			})()
-		},
-		set = {};
-		function arg( k, $v, $list ){
-			$v = bs.$trim( $v.substring(0,k).split('|') ),
-			$list[$list.length++] = parseRule( $v.shift() ),
-			$list[$list.length++] = $v;
-		}
-		function parse( $data ){
-			var s, t0, t1, t2, i, j, k, l;
-			s = {}, $data = $data.split('\n'), l = $data.length;
-			while( l-- ){
-				t0 = $data[l].split('='), t1 = {length:0};
-				while( ( j = 0, k = t0[1].indexOf( 'AND' ) ) > -1 || ( j = 1, k = t0[1].indexOf( 'OR' ) ) > -1 )
-					arg( k, t0[1], t1 ), t1[t1.length++] = j ? ( (k += 2), 'OR' ) : ( (k += 3), 'AND' ), t0[1] = t0[1].substr( k );
-				arg( t0[1].length, t0[1], t1 ), t2 = bs.$trim( t0[0].split( ',' ) ), i = t2.length;
-				while( i-- ) s[t2[i]] = t1;
-			}
-			return rule = s;
-		}
-		function parseRule( k ){
-			if( typeof k == 'function' ) return k;
-			if( k.charAt(0) == '/' && k.charAt(k.length - 1) == '/' ){
-				k = new RegExp( k.substring( 1, k.length - 1 ) );
-				return function( $val ){return k.test( $val );};
-			}else if( rules[k] ) return rules[k];
-			else return function( $val ){ return $val === k; };
-		}
-		function val( $val ){
-			if( typeof $val == 'function' ) return $val();
-			if( $val.indexOf( '|' ) > -1 ){
-				$val = bs.$trim($val.split('|'));
-				return bs.$trim( bs.d( $val[0] ).$( $val[1] || '@value' ) );
-			}else return bs.$trim( $val );
-		}
-		(function(){
-			var t0, i;
-			t0 = 'group,set,rule'.split(','), i = t0.length;
-			while( i-- ) test[t0[i]] = 1;
-		})();
-		function test( $rule ){
-			var t0, t1, t2, i, j, k, l, v, m, n;
-			i = 1, j = arguments.length;
-			if( test[$rule] ){
-				if( $rule == 'group' ) group[arguments[1]] = Array.prototype.slice.call( arguments, 2 );
-				else if( $rule == 'set' ) while( i < j ){
-					k = arguments[i++], v = arguments[i++]
-					if( v.substr(0,2) == '#T' ) set[k] = parse( bs.d( v ).$('@text') );
-					else if( v.substr(v.length-5) == '.html' ) set[k] = parse( bs.$get( null, v ) );
-					else set[k] = parse( v );
-				}else if( $rule == 'rule' ) while( i < j ) rules[arguments[i++]] = parseRule(arguments[i++]);
-				return;
-			}else if( !$rule ){
-				if( !(t0 = rule) ) throw 'no prevRule';
-			}else if( $rule.charAt(0) == '@' ){ //rule
-				t0 = $rule.substr(1).split('|');
-				if( !( t1 = rules[t0[0]] ) ) throw 'no rule';
-				t0 = t0.slice(1);
-				while( i < j ) if( !t1( val( arguments[i++] ), t0 ) ) return;
-				return 1;
-			}else if( set[$rule] ) t0 = set[$rule];
-			else if( $rule.substr(0,2) == '#T' ) t0 = parse( bs.d( $rule ).$('@text') );
-			else if( $rule.substr($rule.length-5) == '.html' ) t0 = parse( bs.$get( null, $rule ) );
-			else t0 = parse( $rule );
-			//ruleset
-			while( i < j ){
-				k = arguments[i++];
-				if( k.charAt(0) == '@' ){//group
-					if( !(t1 = group[k.substr(1)]) ) throw 'no group';
-					m = 0, n = t1.length;
-					while( m < n ){
-						if( !( t2 = t0[t1[m++]] ) ) throw 'no rule';
-						k = 0, l = t2.length, v = val( t1[m++] );
-						while( k < l ){
-							if( !t2[k++]( v, t2[k++] ) ){
-								if( t2[k++] != 'OR' ) return;
-							}else if( t2[k++] == 'OR' ) break;
-						}
-					}
-				}else{
-					if( !( t2 = t0[k] ) ) throw 'no rule';
-					k = 0, l = t2.length, v = val( arguments[i++] );
-					while( k < l ){
-						if( !t2[k++]( v, t2[k++] ) ){
-							if( t2[k++] != 'OR' ) return;
-						}else if( t2[k++] == 'OR' ) break;
-					}
-				}
-			}
-			return 1;
-		}
-		bs.$test = test;
-	})(),
-	( function( doc ){
+	//9. defined browser Detector
+	(function( doc ){
 		var platform, app, agent, device,
 			flash, browser, bVersion, os, osVersion, cssPrefix, stylePrefix, transform3D,
 			b, bStyle, div, keyframe,
@@ -719,6 +599,7 @@ function init(doc){
 			db:W.openDatabase, socket:W.WebSocket
 		};
 	} )( doc );
+	//10. defined style, css, dom, WIN, KEY
 	(function( doc ){
 		var style;
 		style = (function(){
@@ -817,8 +698,10 @@ function init(doc){
 			}
 			return style;
 		})();
-		bs.factory( 'c,css', ( function( doc, style ){
-			var css, sheet, rule, ruleSet, idx, add, del, ruleKey, keyframe;
+		//11. define css
+		bs.$class( 'css,c', function( $fn, bs ){
+			var sheet, rule, ruleSet, idx, add, del, ruleKey, keyframe,
+				r, parser;
 			doc.getElementsByTagName( 'head' )[0].appendChild( sheet = doc.createElement( 'style' ) ),
 			sheet = sheet.styleSheet || sheet.sheet, ruleSet = sheet.cssRules || sheet.rules,
 			ruleKey = {'keyframes':bs.DETECT.keyframe}, keyframe = bs.DETECT.keyframe,
@@ -827,16 +710,12 @@ function init(doc){
 				for( i = 0, j = ruleSet.length, k = parseInt( j * .5 ) + 1, j-- ; i < k ; i++ )
 					if( ruleSet[l = i] === $rule || ruleSet[l = j - i] === $rule ) return l;
 			};
-			if( sheet.insertRule ){
-				add = function( $k, $v ){sheet.insertRule( $k + ($v?'{'+$v+'}':'{}'), ruleSet.length ); return ruleSet[ruleSet.length - 1];}
+			if( sheet.insertRule ) add = function( $k, $v ){sheet.insertRule( $k + ($v?'{'+$v+'}':'{}'), ruleSet.length ); return ruleSet[ruleSet.length - 1];},
 				del = function( $v ){sheet.deleteRule( idx( $v ) );};
-			}else{
-				add = function( $k, $v ){sheet.addRule( $k, $v||' ' );return ruleSet[ruleSet.length - 1];};
+			else add = function( $k, $v ){sheet.addRule( $k, $v||' ' );return ruleSet[ruleSet.length - 1];},
 				del = function( $v ){sheet.removeRule( idx( $v ) );};
-			}
-			rule = function( $rule ){this.r = $rule, this.s = new style( $rule );}
-			css = bs.factory.creator( 'c' );
-			css.init = function( $key ){
+			rule = function( $rule ){this.r = $rule, this.s = new style( $rule );},
+			$fn.constructor = function( $key ){
 				var t0, v;
 				if( $key.indexOf('@') > -1 ){
 					$key = $key.split('@');
@@ -869,11 +748,11 @@ function init(doc){
 				}else this.type = 1;
 				this.r = add( $key, v );
 				if( this.type == 1 ) this.s = new style( this.r.style );
-			};
-			css.$ = function css$(){
+			},
+			$fn.$ = function(){
 				var type, t0, r;
 				t0 = arguments[0], type = this.type;
-				if( t0 === null ) return del( type < 0 ? 0 : this.__d(), this.r );
+				if( t0 === null ) return del( type < 0 ? 0 : this.del(), this.r );
 				else if( type == 1 ) return this.s.$( arguments );
 				else if( type == 7 ){
 					if( !this[t0] ){
@@ -886,12 +765,9 @@ function init(doc){
 					else this[t0].s.$( arguments, 1 );
 				}
 				return this;
-			};
-			return css;
-		})( doc, style ) );
-		(function(){
-			var r = /^[0-9.-]+$/;
-			function parse( $data ){
+			},
+			r = /^[0-9.-]+$/,
+			parser = function( $data ){
 				var t0, t1, t2, c, i, j, k, v;
 				t2 = [], t0 = $data.split('}');
 				for( i = 0, j = t0.length ; i < j ; i++ ){
@@ -909,30 +785,41 @@ function init(doc){
 						}
 					}
 				}
-			}
+			},
 			bs.$css = function( $v ){
-				if( $v.substr( $v.length - 4 ) == '.css' ) bs.$get( parse, $v ); 
-				else parse( $v );
+				if( $v.substr( $v.length - 4 ) == '.css' ) bs.$get( parser, $v ); 
+				else parser( $v );
 			};
-		})();
-		bs.factory( 'd,dom', (function( bs, style, doc ){
-			var d, ds, ds0, ev, t, nodes, drill;
+		} );
+		//12. define dom
+		bs.$class( 'dom,d', function( $fn, bs ){
+			var ds, ds0, ev, t, x, y, nodes, drill, childNodes,
+				win, wine, hash, sizer;
 			t = /^\s*|\s*$/g;
-			function x( $dom ){
-				var i = 0; do i += $dom.offsetLeft; while( $dom = $dom.offsetParent )
-				return i;
-			}
-			function y( $dom ){
-				var i = 0; do i += $dom.offsetTop; while( $dom = $dom.offsetParent )
-				return i;
-			}
-			d = bs.factory.creator( 'd' ),
-			d.init = function( $key ){
+			$fn.constructor = function( $key ){
 				var t0, i;
 				t0 = bs( $key ), this.length = i = t0.length;
 				while( i-- ) this[i] = t0[i];
 			},
-			d.$ = function d$(){
+			$fn._ = function(){
+				var dom, i, j, k;
+				i = this.length;
+				while( i-- ){
+					dom = this[i];
+					if( dom.nodeType == 3 ) continue;
+					if( dom.bsE ) dom.bsE = dom.bsE._();
+					if( dom.bsS ) dom.bsS = null;
+					dom.parentNode.removeChild( dom ),
+					j = dom.attributes.length;
+					while( j-- )
+						switch( typeof dom.getAttribute( k = dom.attributes[j].nodeName ) ){
+						case'object':case'function': dom.removeAttribute( k );
+						}
+					this[i] = null;
+				}
+				if( this.del ) this.del();
+			},
+			$fn.$ = function d$(){
 				var dom, target, t0, l, s, i, j, k, v;
 				j = arguments.length, typeof arguments[0] == 'number' ? ( s = l = 1, target = this[arguments[0]] ) : ( l = this.length, s = 0 );
 				while( l-- ){
@@ -944,12 +831,12 @@ function init(doc){
 							return ev[k] ? ev( dom, k ) :
 								( t0 = ds[k.charAt(0)] ) ? t0( dom, k.substr(1) ) :
 								k == 'this' ? ( ds.length ? ( dom.bsS || ( dom.bsS = new style( dom.style ) ) ).$( ds ) : undefined, this ) :
-								d[k] ? d[k]( dom ) :
+								$fn[k] ? $fn[k]( dom ) :
 								dom.bsS ? ( ds.length = 1, ds[0] = k, ds[1] = undefined, dom.bsS.$( ds ) ) : undefined;
 						}else{
 							v = ev[k] ? ev( dom, k, v ) :
 								( t0 = ds[k.charAt(0)] ) ? ( v = t0( dom, k.substr(1), v, arguments, i ), i = t0.i || i, v ) :
-								d[k] ? d[k]( dom, v ) : ( ds[ds.length++] = k, ds[ds.length++] = v );
+								$fn[k] ? $fn[k]( dom, v ) : ( ds[ds.length++] = k, ds[ds.length++] = v );
 						}
 					}
 					if( ds.length ) ( dom.bsS || ( dom.bsS = new style( dom.style ) ) ).$( ds );
@@ -957,34 +844,54 @@ function init(doc){
 				}
 				return v;
 			},
-			d.method = {
-				isDom:1,
-				'_': function(){
-					var dom, i, j, k;
-					i = this.length;
-					while( i-- ){
-						dom = this[i];
-						if( dom.nodeType == 3 ) continue;
-						if( dom.bsE ) dom.bsE = dom.bsE._();
-						if( dom.bsS ) dom.bsS = null;
-						dom.parentNode.removeChild( dom ),
-						j = dom.attributes.length;
-						while( j-- )
-							switch( typeof dom.getAttribute( k = dom.attributes[j].nodeName ) ){
-							case'object':case'function': dom.removeAttribute( k );
-							}
-						this[i] = null;
-					}
-					if( this.__d ) this.__d();
-				}
-			};
-			function childNodes( $nodes ){
+			$fn.isDom = 1,
+			$fn.id = function( $dom, $v ){ return $v === undefined ? $dom.id : ($dom.id = $v); },
+			$fn.src = function( $dom ){ return $dom.src; },
+			$fn.style = function( $dom ){return $dom.bsS;},
+			$fn.x = x = function( $dom ){var i = 0; do i += $dom.offsetLeft; while( $dom = $dom.offsetParent ) return i;},
+			$fn.y = y = function( $dom ){var i = 0; do i += $dom.offsetTop; while( $dom = $dom.offsetParent ) return i;},
+			$fn.lx = function( $dom ){return x( $dom ) - x( $dom.parentNode );},
+			$fn.ly = function( $dom ){return y( $dom ) - y( $dom.parentNode );},
+			$fn.w = function( $dom ){return $dom.offsetWidth;},
+			$fn.h = function( $dom ){return $dom.offsetHeight;},
+			$fn.s = function( $dom ){$dom.submit();},
+			$fn.f = function( $dom ){$dom.focus();},
+			$fn.b = function( $dom ){$dom.blur();},
+			$fn['<'] =function( $dom, $v ){
+				var t0;
+				if( $v ){
+					if( $dom.parentNode ) $dom.parentNode.removeChild( $dom );
+					return t0 = bs( $v ), t0[0].appendChild( $dom ), t0;
+				}else return $dom.parentNode;
+			},		
+			$fn.html = function( $dom, $v ){return $v === undefined ? $dom.innerHTML : ( $dom.innerHTML = $v );},
+			$fn['html+'] = function( $dom, $v ){return $dom.innerHTML += $v;},
+			$fn['+html'] = function( $dom, $v ){return $dom.innerHTML = $v + $dom.innerHTML;},
+			(function(){
+				var t = bs.DETECT.text;
+				$fn.text = function( $dom, $v ){return $v === undefined ? $dom[t] : ($dom[t]=$v);},
+				$fn['text+'] = function( $dom, $v ){return $dom[t] += $v;},
+				$fn['+text'] = function( $dom, $v ){return $dom[t] = $v + $dom[t];};
+			})(),			
+			$fn['class'] = function( $dom, $v ){return $v === undefined ? $dom.className : ($dom.className = $v);},
+			$fn['class+'] = function( $dom, $v ){
+				var t0;
+				return !( t0 = $dom.className.replace(t,'') ) ? ( $dom.className = $v ) :
+					t0.split( ' ' ).indexOf( $v ) == -1 ? ($dom.className = $v+' '+t0 ) : t0;
+			},
+			$fn['class-'] = function( $dom, $v ){
+				var t0, i;
+				if( !( t0 = bs.$trim( $dom.className ) ) ) return t0;
+				t0 = t0.split( ' ' ); 
+				if( ( i = t0.indexOf( $v ) ) > -1 ) t0.splice( i, 1 );
+				return $dom.className = t0.join(' ');
+			},
+			childNodes = function( $nodes ){
 				var i, j;
 				for( nodes.length = i = 0, j = $nodes.length ; i < j ; i++ )
 					if( $nodes[i].nodeType == 1 ) nodes[nodes.length++] = $nodes[i];
 				return nodes;
-			}
-			nodes = {length:0},
+			},
 			drill = function( $dom, $k ){
 				var i, j;
 				if( $k.indexOf( '>' ) > -1 ){
@@ -994,8 +901,7 @@ function init(doc){
 				}else $dom = childNodes( $dom.childNodes )[$k];
 				return $dom;
 			},
-			ds0 = {},
-			ds = {
+			nodes = {length:0}, ds0 = {}, ds = {
 				'@':function( $dom, $k, $v ){
 					if( $v === undefined ) return $dom[$k] || $dom.getAttribute($k);
 					else if( $v === null ){
@@ -1022,7 +928,7 @@ function init(doc){
 								if( style[$v] ) return $dom = drill( $dom, $k ), $dom.bsS ? ( ds.length=1,ds[0]=$v,ds[1]=undefined, $dom.bsS.$( ds ) ) : $dom.style[style[$v]];
 								else if( ev[$v] ) return $dom = drill( $dom, $k ), ev( $dom, $v );
 								else if( t0 = ds[$v.charAt(0)] ) return $dom = drill( $dom, $k ), t0( $dom, $v.substr(1), $arg[$i], $arg, $i+1 );
-								else if( t0 = d[$v] ) return $dom = drill( $dom, $k ), t0( $dom, v );
+								else if( t0 = $fn[$v] ) return $dom = drill( $dom, $k ), t0( $dom, v );
 							}
 							$v = bs( $v );
 							t0 = $dom.childNodes, ds0.length = i = t0.length;
@@ -1034,58 +940,15 @@ function init(doc){
 									else if( i == $k ) for( k = 0, l = $v.length ; k < l ; k++ ) $dom.appendChild( $v[k] );
 									else $dom.appendChild( ds0[i+1] );
 								}
-							}else for( i = 0, j = $v.length ; i < j ; i++ )$dom.appendChild( $v[i] );
+							}else for( i = 0, j = $v.length ; i < j ; i++ ) $dom.appendChild( $v[i] );
 						}else for( $v = bs( $v ), i = 0, j = $v.length ; i < j ; i++ ) $dom.appendChild( $v[i] );
 					}else if( $v === null ){
-						if( $k ) d.method._.call( childNodes( $dom.childNodes ), nodes[0] = nodes[$k], nodes.length = 1, nodes );
-						else if( $dom.childNodes && childNodes( $dom.childNodes ).length ) d.method._.call( nodes );
+						if( $k ) $fn._.call( childNodes( $dom.childNodes ), nodes[0] = nodes[$k], nodes.length = 1, nodes );
+						else if( $dom.childNodes && childNodes( $dom.childNodes ).length ) $fn._.call( nodes );
 					}else return childNodes( $dom.childNodes ), $k ? nodes[$k] : nodes;
 				}
 			},
-			d.x = x, d.y = y,
-			d.lx = function( $dom ){ return x( $dom ) - x( $dom.parentNode ); },
-			d.ly = function( $dom ){ return y( $dom ) - y( $dom.parentNode ); },
-			d.w = function( $dom ){ return $dom.offsetWidth; },
-			d.h = function( $dom ){ return $dom.offsetHeight; },
-			d.s = function( $dom ){ $dom.submit(); },
-			d.f = function( $dom ){ $dom.focus(); },
-			d.b = function( $dom ){ $dom.blur(); },
-			d['<'] =function( $dom, $v ){
-				var t0;
-				if( $v ){
-					if( $dom.parentNode ) $dom.parentNode.removeChild( $dom );
-					return t0 = bs( $v ), t0[0].appendChild( $dom ), t0;
-				}else return $dom.parentNode;
-			},
-			d.html = function( $dom, $v ){return $v === undefined ? $dom.innerHTML : ( $dom.innerHTML = $v );},
-			d['html+'] = function( $dom, $v ){return $dom.innerHTML += $v;},
-			d['+html'] = function( $dom, $v ){return $dom.innerHTML = $v + $dom.innerHTML;},
-			(function(){
-				var t = bs.DETECT.text;
-				d.text = function( $dom, $v ){return $v === undefined ? $dom[t] : ($dom[t]=$v);},
-				d['text+'] = function( $dom, $v ){return $dom[t] += $v;},
-				d['+text'] = function( $dom, $v ){return $dom[t] = $v + $dom[t];};
-			})(),
-			d.style = function( $dom ){return $dom.bsS;},
-			d['class'] = function( $dom, $v ){return $v === undefined ? $dom.className : ($dom.className = $v);},
-			(function(){
-				var t = /^\s*|\s*$/g;
-				d['class+'] = function( $dom, $v ){
-					var t0;
-					return !( t0 = $dom.className.replace(t,'') ) ? ( $dom.className = $v ) :
-						t0.split( ' ' ).indexOf( $v ) == -1 ? ($dom.className = $v+' '+t0 ) : t0;
-				},
-				d['class-'] = function( $dom, $v ){
-					var t0, i;
-					if( !( t0 = bs.$trim( $dom.className ) ) ) return t0;
-					t0 = t0.split( ' ' ); 
-					if( ( i = t0.indexOf( $v ) ) > -1 ) t0.splice( i, 1 );
-					return $dom.className = t0.join(' ');
-				};
-			})(),
-			d.id = function( $dom, $v ){ return $v === undefined ? $dom.id : ($dom.id = $v); },
-			d.src = function( $dom ){ return $dom.src; },
-			bs._ev = ev = (function(){
+			ev = (function(){
 				var k, ev, i;
 				function ev$( $dom, $k, $v ){
 					var t0;
@@ -1109,9 +972,15 @@ function init(doc){
 					if( W['TransitionEvent'] && !ev$.transitionend ) ev$.transitionend = 1;
 				}
 				ev = ( function( ev$, x, y ){
-					var ev, pageX, pageY, evType, prevent, keycode, add, del, eventName;
+					var ev, pageX, pageY, evType, prevent, keycode, add, del, eventName, isChild;
 					if( bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 9 ) pageX = 'x', pageY = 'y';
 					else pageX = 'pageX', pageY = 'pageY';
+					if( W['addEventListener'] ) add = function($ev,$k){$ev.target.addEventListener( $k, $ev.listener, false );},
+						del = function($ev,$k){$ev.target.removeEventListener( $k, $ev.listener, false );};
+					else if( W['attachEvent'] ) add = function($ev,$k){$ev.target.attachEvent( 'on'+$k, $ev.listener );},
+						del = function($ev,$k){$ev.target.detachEvent( 'on'+$k, $ev.listener );};
+					else add = function($ev,$k){$ev.target['on'+$k] = $ev.listener;},
+						del = function($ev,$k){$ev.target['on'+$k] = null;};
 					evType = {'touchstart':2,'touchend':1,'touchmove':1,'mousedown':4,'mouseup':3,'mousemove':3,'click':3,'mouseover':3,'mouseout':3},
 					bs.keycode = keycode = (function(){
 						var t0, t1, i, j, k, v;
@@ -1124,6 +993,10 @@ function init(doc){
 					(function(){
 						eventName = {webkitTransitionEnd:'transitionend'};
 					})(),
+					isChild = function( $p, $c ){
+						if( $c ) do if( $c == $p ) return 1; while( $c = $c.parentNode )
+						return 0;
+					},
 					ev = function( $dom ){
 						var self;
 						self = this,
@@ -1160,21 +1033,11 @@ function init(doc){
 					},
 					ev.prototype.prevent = bs.DETECT.event ? function(){this.event.preventDefault(), this.event.stopPropagation();} :
 						function( $e ){this.event.returnValue = false, this.event.cancelBubble = true;},
-					ev.prototype.key = function( $key ){return this.code == keycode[$key];},
+					ev.prototype.key = function( $key ){return this.keyCode == keycode[$key];},
 					ev.prototype._ = function(){
 						for( var k in this ) if( this.hasOwnProperty[k] && typeof this[k] == 'function' ) dom['on'+k] = null;
 						return null;
 					},
-					function isChild( $p, $c ){
-						if( $c ) do if( $c == $p ) return 1; while( $c = $c.parentNode )
-						return 0;
-					};
-					if( W['addEventListener'] ) add = function($ev,$k){$ev.target.addEventListener( $k, $ev.listener, false );},
-						del = function($ev,$k){$ev.target.removeEventListener( $k, $ev.listener, false );};
-					else if( W['attachEvent'] ) add = function($ev,$k){$ev.target.attachEvent( 'on'+$k, $ev.listener );},
-						del = function($ev,$k){$ev.target.detachEvent( 'on'+$k, $ev.listener );};
-					else add = function($ev,$k){$ev.target['on'+$k] = $ev.listener;},
-						del = function($ev,$k){$ev.target['on'+$k] = null;};
 					ev.prototype.$ = function( $k, $v ){
 						var t0;
 						t0 = $k;
@@ -1188,74 +1051,73 @@ function init(doc){
 					return ev;
 				} )( ev$, x, y );
 				return ev$;
-			})();
-			return d;
-		})( bs, style, doc ) );
-		bs.WIN = (function(){
-			var win, ev;
-			ev = (function( doc ){
-				var ev, d, w, make;
-				ev = bs._ev, delete bs._ev, d = {}, w = {};
-				make = function( $data ){
+			})(),
+			//13. define WIN
+			wine = (function( doc, ev ){
+				var d, w, make;
+				d = {}, w = {};
+				make = function( $target, $data ){
 					if( !$data.v ) $data.v = function( $e ){
-						var i, j;
-						for( i = 0, j = $data.length ; i < j ; i++ ) $data[i]( $e );
+						var t0, t1, t2, i, j;
+						for( i = 0, j = $data.length ; i < j ; i++ ){
+							t0 = $data[i];
+							if( typeof t0 == 'function' ) t0.call( $target, $e );
+							else if( t0.splice ) t1 = t0[0], t2 = t0[1], t0 = t0.slice( 1 ), t0[0] = $e, t2.apply( t1, t0 );
+							else if( $e['@'+$e.type] ) t0[$e['@'+$e.type]]( $e );
+						}
 					};
 					return $data.v;
 				};
 				return function( e, k, v, t ){
 					var t0, i, j, target;
-					if( t ) t0 = w, target = W;
-					else t0 = d, target = doc;
+					if( t ) t0 = d, target = t;
+					else t0 = w, target = W;
 					if( v ){
 						t0 = t0[e] || ( t0[e] = [] ),
 						t0[t0.length] = t0[k] = v;
-						ev( target, e, make( t0 ) );
+						ev( target, e, make( target, t0 ) );
 					}else if( ( t0 = t0[e] ) && t0[k] ){
 						t0.splice( t0.indexOf( t0[k] ), 1 );
 						if( !t0.length ) ev( target, e, null );
 					}
 				};
-			})( doc );
-			function hash( e, k, v ){
+			})( doc, ev ),
+			hash = function( e, k, v ){
 				var t0, old, w, h;
+				t0 = hash.listener;
 				if( v ){
-					t0 = ev[e] || ( ev[e] = [] );
 					t0[t0.length] = t0[k] = v;
-					if( !ev['@'+e] ){
+					if( !hash.id ){
 						old = location.hash;
-						ev['@'+e] = setInterval( function(){
+						hash.id = setInterval( function(){
 							var t0, i, j;
 							if( old != location.hash ){
-								ev.type = 'hashchange'; ev.event = event, old = location.hash, t0 = ev[e], i = t0.length;
+								ev.type = 'hashchange'; ev.event = event, old = location.hash, t0 = hash.listener, i = t0.length;
 								while( i-- ) t0[i]( ev );
 							}
 						}, 1 );
 					}
-				}else if( ( t0 = ev[e] ) && t0[k] ){
+				}else if( t0[k] ){
 					t0.splice( t0.indexOf( t0[k] ), 1 );
-					if( !t0.length ) clearInterval( this['@'+e] ), this['@'+e] = null;
+					if( !t0.length ) clearInterval( hash.id ), hash.id = null;
 				}
-			}
-			function sizer( $wh ){
+			}, hash.listener = [],
+			sizer = function( $wh ){
 				win.on( 'resize', 'wh', $wh );
 				if( bs.DETECT.eventRotate ) win.on( 'orientationchange', 'wh', $wh );
 				$wh();
-			}
-			win = {
+			},
+			bs.WIN = win = {
 				on:function( e, k, v ){
 					if( e == 'hashchange' && !'onhashchange' in W ) return hash( e, k, v );
 					if( e == 'orientationchange' && !'onorientationchange' in W ) return 0;
-					if( e.substr(0,3) == 'key' ) return ev( e, k, v, doc );
-					ev( e, k, v );
+					if( e.substr(0,3) == 'key' ) return wine( e, k, v, doc );
+					wine( e, k, v );
 				},
-				is:(function( sel ){
-					bs.sel = null;
-					return function( $sel ){
-						var t0 = sel( $sel );
-						return t0 && t0.length;
-					};
-				} )( bs.sel ),
+				is:function( $sel ){
+					var t0 = bs.$sel( $sel );
+					return t0 && t0.length;
+				},
 				touchScroll:(function( doc, isTouch ){
 					var i;
 					function prevent( e ){
@@ -1311,63 +1173,16 @@ function init(doc){
 					}
 				})( W, doc )
 			};
-			return win;
-		})();
-		bs.KEY = (function () {
+		} ),
+		bs.KEY = (function(){
 			var buffer, keycode;
 			return keycode = bs.keycode, delete bs.keycode, 
-				bs.WIN.on("keydown", '@bsKD', function($e){buffer[keycode[$e.keyCode]] = 1;}),
-				bs.WIN.on("keyup", '@bsKU', function($e){buffer[keycode[$e.keyCode]] = 0;}),
+				bs.WIN.on( 'keydown', '@bsKD', function($e){buffer[keycode[$e.keyCode]] = 1;}),
+				bs.WIN.on( 'keyup', '@bsKU', function($e){buffer[keycode[$e.keyCode]] = 0;}),
 				buffer = {};
 		})();
 	})( doc );
-	bs.ROUTER =(function(){
-		var s, e, t, h, count;
-		s = {'#':[]}, e = {'#':[]}, t = {}, h = [], count = 5;
-		function make( t ){
-			return function( $path, $func ){
-				var t0, i, j, k, v;
-				i = 0, j = arguments.length;
-				while( i < j ){
-					k = arguments[i++], v = arguments[i++];
-					if( !( t0 = t[k] ) ) t[k] = t0 = [];
-					t0[t0.length] = v;
-				}
-			};
-		}
-		function router(){
-			var uri, t0, i, j, k;
-			if( !( uri = location.hash ) ) uri = location.hash = '#';
-			h[h.length] = uri;
-			if( h.length > count ) h.splice( 0, h.length - count );
-			t0 = s['#'], i = 0, j = t0.length;
-			while( i < j ) t0[i++]( uri );
-			if( uri != '#' )
-				for( k in s ) if( k != '#' && uri.indexOf( k ) > -1 ){
-					t0 = s[k], i = 0, j = t0.length;
-					while( i < j ) t0[i++]( uri );
-				}
-			for( i in t ) if( uri.indexOf( i ) > -1 ) t[i](uri);
-			t0 = e['#'], i = 0, j = t0.length;
-			while( i < j ) t0[i++]( uri );
-			if( uri != '#' )
-				for( k in e ) if( k != '#' && uri.indexOf( k ) > -1 ){
-					t0 = e[k], i = 0, j = t0.length;
-					while( i < j ) t0[i++]( uri );
-				}
-		}
-		return {
-			start:make(s),end:make(e),
-			table:function(){
-				var i, j;
-				i = 0, j = arguments.length;
-				while( i < j ) t[arguments[i++]] = arguments[i++];
-			},
-			go:function( $str ){location.hash = $str;},
-			route:function(){arguments[0] === null ? bs.WIN.on( 'hash', '@ROUTER' ) : ( bs.WIN.on( 'hashchange', '@ROUTER', router ), router() );},
-			historyMax:function($len){count=$len;}, history:h
-		};
-	})();
+	//14. define ANI, tween
 	bs.ANI = ( function(){
 		var style, filter, timer, start, end, loop, ease, ANI, ani, len, time, isLive, isPause, tween, tweenPool;
 		style = bs.style, filter = bs.filter, bs.style = bs.filter = null, ani = [], time = len = 0,
@@ -1416,8 +1231,7 @@ function init(doc){
 				quadraticOut:function(a,c,b){return -b*a*(a-2)+c}
 			};
 		})();
-		tweenPool = {length:0},
-		tween = function(){},
+		tweenPool = {length:0}, tween = function(){},
 		(function(){
 			var t0, i;
 			t0 = 'id,time,ease,delay,loop,end,update,native'.split(','), i = t0.length;
@@ -1447,50 +1261,6 @@ function init(doc){
 			this.stime = Date.now() + this.delay, this.etime = this.stime + this.time,
 			this.ANI = isDom ? ANIstyle : ANIobj, ani[ani.length] = this, start();
 		};
-		function CSS3style( $time, $pause ){
-			var t0, t1, term, time, rate, i, j, l, k, v, e, s, u;
-		
-			if( this.stop ) return this.t.$( 'transition', null ), this.css3 = 6, 0;
-			if( $pause ){
-				if( $pause == 1 && this.pause == 0 ) this.t.$( 'transition', null ), this.css3 = 5;
-				else if( $pause == 2 && this.pause ){
-					t0 = this.transition.split(' '), t0[1] = (this.etime - this.pause)*.001 + 's';
-					if( t0.length == 4 ) t0.length = 3;
-					this.t.$( 'transition', t0.join(' ') ), this.css3 = 1, t0 = $time - this.pause, this.stime += t0, this.etime += t0, this.pause = 0;
-				}
-				return;
-			}
-			if( this.pause || term < 0 ) return;
-			switch( this.css3 ){
-			case 1:while( l-- ){
-					t0 = this[l], t1 = this[l][0], s = t1.s, u = t1.u, i = 1;
-					while( i < j ) k = t0[i++], v = t0[i++] + t0[i++],
-						typeof k == 'function' ? k( t1, v ) : s[k] = v + u[k], t1[k] = v;
-				}
-				this.css3 = 2; break;
-			case 2: if( term > this.time )
-					if( --this.loopC ) return this.stime=$time+this.delay,this.etime=this.stime+this.time,this.t.$( 'transition', null ),this.css3 = 3,0;
-					else{
-						this.t.$( 'transition', null ),tweenPool[tweenPool.length++] = this;
-						if( this.end ) this.end( this.t );
-						return 1;
-					}
-				if( this.update ) this.update( rate, $time, this );
-				break;
-			case 3: while( l-- ){
-					t0 = this[l], t1 = this[l][0], s = t1.s, u = t1.u, i = 1;
-					while( i < j ) k = t0[i++], v = t0[i++], i++, typeof k == 'function' ? k( t1, v ) : s[k] = v + u[k], t1[k] = v;
-				}
-				this.css3 = 4; break;
-			case 4: this.t.$( 'transition', this.transition ), this.css3 = 1; break;
-			case 5:case 6: while( l-- ){//pause
-					t0 = this[l], t1 = this[l][0], s = t1.s, u = t1.u, i = 1;
-					while( i < j ) k = t0[i++], v = e( rate, t0[i++], t0[i++], term, time ), typeof k == 'function' ? k( t1, v ) : s[k] = v + u[k], t1[k] = v;
-				}
-				if( this.css3 == 6 ) return 1;
-				this.pause = $time;
-			}
-		}
 		function ANIstyle( $time, $pause ){
 			var t0, t1, term, time, rate, i, j, l, k, v, e, s, u;
 			if( this.stop ) return 1;
@@ -1642,171 +1412,12 @@ function init(doc){
 			})()
 		};
 	})();
-	bs.factory( 'sprite', (function( bs ){
-		var d, ani, key, ANI;
-		bs.c( '.SPRITE' ).$( 'overflow', 'hidden', 'display', 'none' ),
-		bs.c( '.SPRITE img' ).$( 'display', 'block', 'border', 0, 'margin', 0 ),
-		ANI = bs.ANI.ani,
-		(function(){
-			var t0, i;
-			t0 = 'width,height,col,row,time,delay,loop,first,last,end,src'.split(','),
-			key = {}, i = t0.length;
-			while( i-- ) key[t0[i]] = 1;
-		})(),
-		d = bs.factory.creator( 'sprite' ),
-		d.init = function( $key ){this.time = this.row = this.col = 1;},
-		ani = function( $time ){
-			var term, time, rate, curr;
-			if( ( term = $time - this.stime ) < 0 ) return;
-			time = this.t, rate = term / time;
-			if( term > this.t )
-				if( --this.loop ) return this.stime=$time+this.d,this.etime=this.stime+this.t,0;
-				else{
-					this.div.$( 'display', 'none' );
-					if( this.end ) this.end( this );
-					return 1;
-				}
-			curr = this.first + parseInt( rate * ( this.last - this.first ) );
-			this.img.$( 'margin-left', -(curr%this.col)*this.width, 'margin-top', -parseInt(curr/this.col)*this.height );
-		},
-		d.$ = function(){
-			var t0, i, j, k, v;
-			if( ( t0 = arguments[0] ).charAt(0) == '@' ){
-				if( this[t0] ) t0 = this[t0];
-				else ( t0 = this[t0] = {
-					width:this.width||100, height:this.height||100, ANI:ani,
-					div:bs.d( '<div class="SPRITE"></div>' ),
-					img:bs.d( '<img src="'+this.src+'"/>' ),
-					col:this.col, row:this.row,
-					time:this.time||1, first:this.first||0, last:this.last||this.row*this.col
-				} ).div.$( '>', t0.img );
-				i = 1, j = arguments.length;
-				if( j == 1 ) return t0;
-				while( i < j ){
-					k = arguments[i++], v = arguments[i++];
-					if( key[k] ) t0[k] = v;
-					else if( k == 'div' ) return t0.div;
-					else if( k == 'img' ) return t0.img;
-					else if( k == '@' || k == 'ani' ) return t0.img.$( 'margin-left', 0, 'margin-top', 0,
-						'width', t0.width*t0.col, 'height', t0.height*t0.row ), 
-						t0.div.$( 'width', t0.width, 'height', t0.height, 'display', 'block' ),
-						t0.t = t0.time*1000, t0.d = t0.delay*1000, t0.stime = Date.now() + (t0.delay||0), t0.etime = t0.stime + t0.t,
-						ANI( t0 );
-					else if( k == 'frame') return t0.img.$( 'width', t0.width*t0.col, 'height', t0.height*t0.row, 
-						'margin-left', -(v%t0.col)*t0.width, 'margin-top', -parseInt(v/t0.col)*t0.height ),
-						t0.div.$( 'width', t0.width, 'height', t0.height, 'display', 'block' );
-					else t0.div.$( k, v );
-				}
-			}else{
-				i = 0, j = arguments.length;
-				while( i < j ){
-					if( !key[k = arguments[i++]] ) throw 1;
-					this[k] = arguments[i++];
-				}
-			}
-		};
-		return d;
-	})(bs) );
-    ////////////////////////////////////////////////////////////////////
-    // bs.world 팩토리 프로토타입
-    bs.factory( 'world', (function( bs ){
-        var d, ani, key, ANI,bskey=bs.KEY, inited=false;
-        bs.c( '.WORLD' ).$( 'overflow', 'hidden'),
-            ANI = bs.ANI.ani,
-            (function(){
-                var t0, i;
-                t0 = 'width,height,farclip,pan, tilt, camx, camy, camz,camspeed'.split(','),
-                    key = {}, i = t0.length;
-                while( i-- ) key[t0[i]] = 1;
-            })(),
-            d = bs.factory.creator( 'world' ),
-            d.init = function( $key ){},
-            ani = function( $time ){
-                // TODO 키바인딩 외부에서 지정가능하도록 변경
-                var speed = this.camspeed, keys = bs.KEY,sin = Math.sin(this.pan), cos = Math.cos(this.pan)
-                if (keys['w']) this.camx -= 10 * sin,this.camz += cos * speed;
-                if (keys['s']) this.camx += speed * sin, this.camz -= cos * speed;
-                if (keys['a']) this.camx -= speed * cos,this.camz -= speed * sin;
-                if (keys['d']) this.camx += speed * cos,this.camz += speed * sin;
-                if (keys['r']) this.camy -= speed
-                if (keys['f']) this.camy += speed
-                if (keys['q']) this.pan += speed / 1000
-                if (keys['e']) this.pan -= speed / 1000
-                if (keys['t']) this.tilt += speed
-                if (keys['g']) this.tilt -= speed
-                this.div.$('width',this.width,'height',this.height)
-            },
-            d.$ = function(){
-                var t0, i, j, k, v;
-                if( ( t0 = arguments[0] ).charAt(0) == '@' ){
-                    if( this[t0] ) t0 = this[t0]
-                    else ( t0 = this[t0] = {
-                        ANI:ani,
-                        div:bs.d( '<div class="WORLD"></div>'),
-                        pan:this.pan||0, tilt:this.tilt||0,
-                        camx:this.camx||0, camy:this.camy||0, camz:this.camz||0,camspeed:this.camspeed||10,
-                        farclip:this.farclip||2500
-                    } )
-                    i = 1, j = arguments.length;
-                    if( j == 1 ) return t0;
-                    while( i < j ){
-                        k = arguments[i++], v = arguments[i++];
-                        if( key[k] ) t0[k] = v;
-                        else if( k == 'div' ) return t0.div;
-                        else if( k == 'pan' ) return t0.pan;
-                        else if( k == 'tilt' ) return t0.tilt;
-                        else if( k == 'camx' ) return t0.camx;
-                        else if( k == 'camy' ) return t0.camy;
-                        else if( k == 'camz' ) return t0.camz;
-                        else if( k == 'farclip' ) return t0.farclip;
-                        else if( k == 'width' ) return t0.width;
-                        else if( k == 'height' ) return t0.height;
-                        else if( k == 'camspeed' ) return t0.camspeed;
-                        else t0.div.$( k, v );
-                    }
-                    if(!inited) ANI(t0);
-                    inited = true;
-                }else{
-                    i = 0, j = arguments.length;
-                    while( i < j ){
-                        if( !key[k = arguments[i++]] ) throw 1;
-                        this[k] = arguments[i++];
-                    }
-                }
-            };
-        return d;
-    })(bs) );
-	(function(bs){
-		var LZString={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",_f:String.fromCharCode,compressToBase64:function(c){if(c==null){return""}var a="";var k,h,f,j,g,e,d;var b=0;c=LZString.compress(c);while(b<c.length*2){if(b%2==0){k=c.charCodeAt(b/2)>>8;h=c.charCodeAt(b/2)&255;if(b/2+1<c.length){f=c.charCodeAt(b/2+1)>>8}else{f=NaN}}else{k=c.charCodeAt((b-1)/2)&255;if((b+1)/2<c.length){h=c.charCodeAt((b+1)/2)>>8;f=c.charCodeAt((b+1)/2)&255}else{h=f=NaN}}b+=3;j=k>>2;g=((k&3)<<4)|(h>>4);e=((h&15)<<2)|(f>>6);d=f&63;if(isNaN(h)){e=d=64}else{if(isNaN(f)){d=64}}a=a+LZString._keyStr.charAt(j)+LZString._keyStr.charAt(g)+LZString._keyStr.charAt(e)+LZString._keyStr.charAt(d)}return a},decompressFromBase64:function(g){if(g==null){return""}var a="",d=0,e,o,m,k,n,l,j,h,b=0,c=LZString._f;g=g.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(b<g.length){n=LZString._keyStr.indexOf(g.charAt(b++));l=LZString._keyStr.indexOf(g.charAt(b++));j=LZString._keyStr.indexOf(g.charAt(b++));h=LZString._keyStr.indexOf(g.charAt(b++));o=(n<<2)|(l>>4);m=((l&15)<<4)|(j>>2);k=((j&3)<<6)|h;if(d%2==0){e=o<<8;if(j!=64){a+=c(e|m)}if(h!=64){e=k<<8}}else{a=a+c(e|o);if(j!=64){e=m<<8}if(h!=64){a+=c(e|k)}}d+=3}return LZString.decompress(a)},compressToUTF16:function(d){if(d==null){return""}var b="",e,j,h,a=0,g=LZString._f;d=LZString.compress(d);for(e=0;e<d.length;e++){j=d.charCodeAt(e);switch(a++){case 0:b+=g((j>>1)+32);h=(j&1)<<14;break;case 1:b+=g((h+(j>>2))+32);h=(j&3)<<13;break;case 2:b+=g((h+(j>>3))+32);h=(j&7)<<12;break;case 3:b+=g((h+(j>>4))+32);h=(j&15)<<11;break;case 4:b+=g((h+(j>>5))+32);h=(j&31)<<10;break;case 5:b+=g((h+(j>>6))+32);h=(j&63)<<9;break;case 6:b+=g((h+(j>>7))+32);h=(j&127)<<8;break;case 7:b+=g((h+(j>>8))+32);h=(j&255)<<7;break;case 8:b+=g((h+(j>>9))+32);h=(j&511)<<6;break;case 9:b+=g((h+(j>>10))+32);h=(j&1023)<<5;break;case 10:b+=g((h+(j>>11))+32);h=(j&2047)<<4;break;case 11:b+=g((h+(j>>12))+32);h=(j&4095)<<3;break;case 12:b+=g((h+(j>>13))+32);h=(j&8191)<<2;break;case 13:b+=g((h+(j>>14))+32);h=(j&16383)<<1;break;case 14:b+=g((h+(j>>15))+32,(j&32767)+32);a=0;break}}return b+g(h+32)},decompressFromUTF16:function(d){if(d==null){return""}var b="",h,j,a=0,e=0,g=LZString._f;while(e<d.length){j=d.charCodeAt(e)-32;switch(a++){case 0:h=j<<1;break;case 1:b+=g(h|(j>>14));h=(j&16383)<<2;break;case 2:b+=g(h|(j>>13));h=(j&8191)<<3;break;case 3:b+=g(h|(j>>12));h=(j&4095)<<4;break;case 4:b+=g(h|(j>>11));h=(j&2047)<<5;break;case 5:b+=g(h|(j>>10));h=(j&1023)<<6;break;case 6:b+=g(h|(j>>9));h=(j&511)<<7;break;case 7:b+=g(h|(j>>8));h=(j&255)<<8;break;case 8:b+=g(h|(j>>7));h=(j&127)<<9;break;case 9:b+=g(h|(j>>6));h=(j&63)<<10;break;case 10:b+=g(h|(j>>5));h=(j&31)<<11;break;case 11:b+=g(h|(j>>4));h=(j&15)<<12;break;case 12:b+=g(h|(j>>3));h=(j&7)<<13;break;case 13:b+=g(h|(j>>2));h=(j&3)<<14;break;case 14:b+=g(h|(j>>1));h=(j&1)<<15;break;case 15:b+=g(h|j);a=0;break}e++}return LZString.decompress(b)},compress:function(e){if(e==null){return""}var h,l,n={},m={},o="",c="",r="",d=2,g=3,b=2,q="",a=0,j=0,p,k=LZString._f;for(p=0;p<e.length;p+=1){o=e.charAt(p);if(!Object.prototype.hasOwnProperty.call(n,o)){n[o]=g++;m[o]=true}c=r+o;if(Object.prototype.hasOwnProperty.call(n,c)){r=c}else{if(Object.prototype.hasOwnProperty.call(m,r)){if(r.charCodeAt(0)<256){for(h=0;h<b;h++){a=(a<<1);if(j==15){j=0;q+=k(a);a=0}else{j++}}l=r.charCodeAt(0);for(h=0;h<8;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}else{l=1;for(h=0;h<b;h++){a=(a<<1)|l;if(j==15){j=0;q+=k(a);a=0}else{j++}l=0}l=r.charCodeAt(0);for(h=0;h<16;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}delete m[r]}else{l=n[r];for(h=0;h<b;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}n[c]=g++;r=String(o)}}if(r!==""){if(Object.prototype.hasOwnProperty.call(m,r)){if(r.charCodeAt(0)<256){for(h=0;h<b;h++){a=(a<<1);if(j==15){j=0;q+=k(a);a=0}else{j++}}l=r.charCodeAt(0);for(h=0;h<8;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}else{l=1;for(h=0;h<b;h++){a=(a<<1)|l;if(j==15){j=0;q+=k(a);a=0}else{j++}l=0}l=r.charCodeAt(0);for(h=0;h<16;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}delete m[r]}else{l=n[r];for(h=0;h<b;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}}l=2;for(h=0;h<b;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}while(true){a=(a<<1);if(j==15){q+=k(a);break}else{j++}}return q},decompress:function(k){if(k==null){return""}if(k==""){return null}var o=[],j,d=4,l=4,h=3,q="",t="",g,p,r,s,a,b,n,m=LZString._f,e={string:k,val:k.charCodeAt(0),position:32768,index:1};for(g=0;g<3;g+=1){o[g]=g}r=0;a=Math.pow(2,2);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}switch(j=r){case 0:r=0;a=Math.pow(2,8);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}n=m(r);break;case 1:r=0;a=Math.pow(2,16);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}n=m(r);break;case 2:return""}o[3]=n;p=t=n;while(true){if(e.index>e.string.length){return""}r=0;a=Math.pow(2,h);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}switch(n=r){case 0:r=0;a=Math.pow(2,8);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}o[l++]=m(r);n=l-1;d--;break;case 1:r=0;a=Math.pow(2,16);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}o[l++]=m(r);n=l-1;d--;break;case 2:return t}if(d==0){d=Math.pow(2,h);h++}if(o[n]){q=o[n]}else{if(n===l){q=p+p.charAt(0)}else{return null}}t+=q;o[l++]=p+q.charAt(0);d--;p=q;if(d==0){d=Math.pow(2,h);h++}}}};if(typeof module!=="undefined"&&module!=null){module.exports=LZString};
-		bs.$compress = function( $str ){return LZString.compress( $str );},
-		bs.$decompress = function( $str ){return LZString.decompress( $str );},
-		bs.$save = bs.DETECT.local ? function(){
-			var t0, i, j, k, v;
-			i = 0, j = arguments.length;
-			while( i < j ){
-				k = arguments[i++], v = arguments[i++];
-				if( v === undefined ) return t0 = localStorage.getItem( k ), t0 && t0.charAt(0) == '@' ? JSON.parse( LZString.decompress(t0.substr(1)) ) : t0;
-				else if( v === null ) return localStorage.removeItem( k );
-				else return localStorage.setItem( k, typeof v == 'object' ? '@' + LZString.compress(JSON.stringify( v )) : v ), v;
-			}
-		} : function(){
-			var t0, i, j, k, v;
-			i = 0, j = arguments.length;
-			while( i < j ){
-				k = arguments[i++], v = arguments[i++];
-				if( v === undefined ) return (t0 = bs.$ck( k )).charAt(0) == '@' ? JSON.parse( LZString.decompress(t0.substr(1)) ) : t0;
-				else if( v === null ) return bs.$ck( k, null );
-				else return bs.$ck( k, typeof v == 'object' ? '@' + LZString.compress(JSON.stringify( v )) : v, 365 ), v;
-			}
-		};
-	})(bs);
 	return bs;
 }
 init.len = 0;
-W[N] = function(){init[init.len++] = arguments[0];};
+//15. DOM loader
 ( function(){
-	var id;
-	id = setInterval( function(){
+	var id = setInterval( function(){
 		var i, j;
 		if( document && document.getElementsByTagName && document.getElementById && document.body ){
 			clearInterval( id );
@@ -1814,4 +1425,6 @@ W[N] = function(){init[init.len++] = arguments[0];};
 		}
 	}, 1 );
 })();
+//16. proxy bs
+W[N] = function(){init[init.len++] = arguments[0];};
 } )( this );
