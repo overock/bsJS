@@ -27,8 +27,9 @@ if( !W['JSON'] ) W['JSON'] = {
 			switch( t0 = typeof $obj ){
 			case'string': return '"' + $obj.replace( r, '\\"' ) + '"';
 			case'number':case'boolean': return $obj.toString();
-			case'null':case'undefined': return t0;
+			case'undefined': return t0;
 			case'object':
+				if( !$obj ) return null;
 				t0 = '';
 				if( $obj.splice ){
 					for( i = 0, j = $obj.length ; i < j ; i++ ) t0 += ',' + stringify( $obj[i] );
@@ -126,35 +127,17 @@ function init(doc){
 					( function(){
 						var plug, t0, e;
 						plug = navigator.plugins;
-						if( agent.indexOf( 'msie' ) > -1 ){
-							try {
-								t0 = new ActiveXObject( 'ShockwaveFlash.ShockwaveFlash' );
-								t0 = t0.GetVariable( '$version' ).substr( 4 ).split( ',' );
-								flash = parseFloat( t0[0] + '.' + t0[1] );
-							}catch( e ){}
-						}else if( plug && plug.length ){
-							if( plug['Shockwave Flash 2.0'] || plug['Shockwave Flash'] ){
-								if( plug['Shockwave Flash 2.0'] ){
-									t0 = plug['Shockwave Flash 2.0'];
-								}else{
-									t0 = plug['Shockwave Flash'];
-								}
-								t0 = t0.description.split( ' ' )[2].split( '.' );
-								flash = parseFloat( t0[0] + '.' + t0[1] );
-							}
-						}else if( agent.indexOf( 'webtv' ) > -1 ){
-							flash = agent.indexOf( 'webtv/2.6' ) > -1 ? 4 : agent.indexOf("webtv/2.5") > -1 ? 3 : 2;
-						}
+						if( browser == 'ie' ) try{t0 = new ActiveXObject( 'ShockwaveFlash.ShockwaveFlash' ).GetVariable( '$version' ).substr( 4 ).split( ',' ), flash = parseFloat( t0[0] + '.' + t0[1] );}catch( e ){}
+						else if( ( t0 = plug['Shockwave Flash 2.0'] ) || ( t0 = plug['Shockwave Flash'] ) ) t0 = t0.description.split( ' ' )[2].split( '.' ), flash = parseFloat( t0[0] + '.' + t0[1] );
+						else if( agent.indexOf( 'webtv' ) > -1 ) flash = agent.indexOf( 'webtv/2.6' ) > -1 ? 4 : agent.indexOf("webtv/2.5") > -1 ? 3 : 2;
 					} )();
 					if( platform.indexOf( 'win' ) > -1 ){
 						os = 'win';
-						if( agent.indexOf( 'windows nt 5.1' ) > -1 || agent.indexOf( 'windows xp' ) > -1 ){
-							osVersion = 'xp';
-						}else if( agent.indexOf( 'windows nt 6.1' ) > -1 || agent.indexOf( 'windows nt 7.0' ) > -1 ){
-							osVersion = '7';
-						}else if( agent.indexOf( 'windows nt 6.2' ) > -1 || agent.indexOf( 'windows nt 8.0' ) > -1 ){
-							osVersion = '8';
-						}
+						if( agent.indexOf( 'windows nt 5.1' ) > -1 || agent.indexOf( 'windows xp' ) > -1 ) osVersion = 'xp';
+						else if( agent.indexOf( 'windows nt 6.0' ) > -1 ) osVersion = 'vista';
+						else if( agent.indexOf( 'windows nt 6.1' ) > -1 || agent.indexOf( 'windows nt 7.0' ) > -1 ) osVersion = '7';
+						else if( agent.indexOf( 'windows nt 6.2' ) > -1 || agent.indexOf( 'windows nt 8.0' ) > -1 ) osVersion = '8';
+						else if( agent.indexOf( 'windows nt 6.3' ) > -1 || agent.indexOf( 'windows nt 8.1' ) > -1 ) osVersion = '8.1';
 						ie() || chrome() || firefox() || safari() || opera();
 					}else if( platform.indexOf( 'mac' ) > -1 ){      
 						os = 'mac';
@@ -784,8 +767,6 @@ function init(doc){
 				return v;
 			},
 			$fn.isDom = 1,
-			$fn.id = function( $dom, $v ){ return $v === undefined ? $dom.id : ($dom.id = $v); },
-			$fn.src = function( $dom ){ return $dom.src; },
 			$fn.style = function( $dom ){return $dom.bsS;},
 			$fn.x = x = function( $dom ){var i = 0; do i += $dom.offsetLeft; while( $dom = $dom.offsetParent ) return i;},
 			$fn.y = y = function( $dom ){var i = 0; do i += $dom.offsetTop; while( $dom = $dom.offsetParent ) return i;},
@@ -965,10 +946,7 @@ function init(doc){
 										( self.dx = self.x - self._x, self.dy = self.y - self._y );
 								}
 							}
-							t0 = self[self.type];
-							if( typeof t0 == 'function' ) t0.call( $dom, self );
-							else if( t0.splice ) t1 = t0[0], t2 = t0[1], t0 = t0.slice( 1 ), t0[0] = self, t2.apply( t1, t0 );
-							else if( self['@'+self.type] ) t0[self['@'+self.type]]( self );
+							t0 = self[self.type], t0.f.apply( t0.c, t0.a );
 						};
 					},
 					ev.prototype.prevent = bs.DETECT.event ? function(){this.event.preventDefault(), this.event.stopPropagation();} :
@@ -979,14 +957,19 @@ function init(doc){
 						return null;
 					},
 					ev.prototype.$ = function( $k, $v ){
-						var t0;
+						var t0, t1;
 						t0 = $k;
 						if( typeof ev$[$k] == 'string' ) $k = ev$[$k];
 						if( $v === null ) del( this, $k ), delete this[$k];
 						else if( $k == 'rollover' ) this.$( 'mouseover', ev$.rollover );
 						else if( $k == 'rollout' ) this.$( 'mouseout', ev$.rollout );
 						else if( !$k ) return;
-						else this[$k] = $v, this['@'+$k] =t0, add( this, $k );
+						else{
+							this['@'+$k] = t0, add( this, $k );
+							if( typeof $v == 'function' ) this[$k] = {f:$v, c:this.target,a:[this]};
+							else if( $v.splice ) this[$k] = {f:$v[1], c:$v[0], a:($v = $v.slice(1), $v[0] = this, $v)};
+							else if( $v[t0] ) this[$k] = {f:$v[t0], c:$v, a:[this]};
+						}
 					};
 					return ev;
 				} )( ev$, x, y );
@@ -998,24 +981,22 @@ function init(doc){
 				d = {}, w = {};
 				make = function( $target, $data ){
 					if( !$data.v ) $data.v = function( $e ){
-						var t0, t1, t2, i, j;
-						for( i = 0, j = $data.length ; i < j ; i++ ){
-							t0 = $data[i];
-							if( typeof t0 == 'function' ) t0.call( $target, $e );
-							else if( t0.splice ) t1 = t0[0], t2 = t0[1], t0 = t0.slice( 1 ), t0[0] = $e, t2.apply( t1, t0 );
-							else if( $e['@'+$e.type] ) t0[$e['@'+$e.type]]( $e );
-						}
+						var t0, i, j;
+						for( i = 0, j = $data.length ; i < j ; i++ ) t0 = $data[i], t0.f.apply( t0.c, t0.a );
 					};
 					return $data.v;
 				};
 				return function( e, k, v, t ){
-					var t0, i, j, target;
+					var t0, t1, i, j, target;
 					if( t ) t0 = d, target = t;
 					else t0 = w, target = W;
 					if( v ){
-						t0 = t0[e] || ( t0[e] = [] ),
-						t0[t0.length] = t0[k] = v;
+						t0 = t0[e] || ( t0[e] = [] );
 						ev( target, e, make( target, t0 ) );
+						if( typeof v == 'function' ) t1 = {f:v, c:target, a:[target.bsE]};
+						else if( v.splice ) t1 = {f:v[1], c:v[0], a:(v = v.slice(1), v[0] = target, v)};
+						else if( v[e] ) t1 = {f:v[e], c:v, a:[target.bsE]};
+						t0[t0.length] = t0[k] = t1;
 					}else if( ( t0 = t0[e] ) && t0[k] ){
 						t0.splice( t0.indexOf( t0[k] ), 1 );
 						if( !t0.length ) ev( target, e, null );
@@ -1084,7 +1065,7 @@ function init(doc){
 				sizer:(function( W, doc ){
 					return function( $end ){
 						var wh, r, s;
-						if( !win.is( '#bsSizer' ) ) bs.d( '<div></div>' ).$( 'id', 'bsSizer', 'display','none','width','100%','height','100%','position','absolute','<','body' );
+						if( !win.is( '#bsSizer' ) ) bs.d( '<div></div>' ).$( '@id', 'bsSizer', 'display','none','width','100%','height','100%','position','absolute','<','body' );
 						s = bs.d('#bsSizer');
 						switch( bs.DETECT.os ){
 						case'iphone':
@@ -1098,8 +1079,7 @@ function init(doc){
 							break;
 						case'android':case'androidTablet':
 							if( bs.DETECT.sony && bs.DETECT.browser != 'chrome' ) sizer( function(){$end( win.w = s.$('w'), win.h = s.$('h') );} );
-							else r = outerWidth == screen.width || screen.width == s.$('w') ? devicePixelRatio : 1,
-								sizer( function wh(){$end( win.w = outerWidth / r, win.h = outerHeight / r + 1 );} );
+							else sizer( function wh(){$end( win.w = outerWidth, win.h = outerHeight + 1 );} );
 							break;
 						default:
 							sizer( W.innerHeight === undefined ? function(){

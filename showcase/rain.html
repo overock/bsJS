@@ -28,8 +28,8 @@
         bs.css("body").$('margin', 0,'overflow','hidden')
         bs.css("div").$('margin', 0,'overflow','hidden')
         //싸이저를 때리면 무려....사이저....DIV가 생성 -0-;;;;
-        bs.dom('<div></div>').$('<', 'body', 'id', 'stage', 'position', 'absolute', 'background-color', '#000000', 'z-index', -1)
-        bs.dom('<div></div>').$('<', '#stage', 'id', 'title', 'position', 'absolute','html','RainDemo','font-size',30,'font-family','Times New Roman')
+        bs.dom('<div></div>').$('<', 'body', '@id', 'stage', 'position', 'absolute', 'background-color', '#000000', 'z-index', -1)
+        bs.dom('<div></div>').$('<', '#stage', '@id', 'title', 'position', 'absolute','html','RainDemo','font-size',30,'font-family','Times New Roman')
         var ex = bs.$ex
         var inited = false
         bs.WIN.sizer(function () {

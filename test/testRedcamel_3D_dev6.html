@@ -31,10 +31,10 @@
     // 2. 현재 plane에서 애니메이션 거는 부분을 전부 camera render로 옮긴다...계산량 줄여야함..
     // 3. farclip 확장 - opacity모드 / png 중첩모드(중첩을 한다면 farclip거리에서 몇장이나 할건지도 지정해야할듯함)
     function setTitle(){
-        bs.dom('<div></div>').$('<', 'body', 'id', 'title', 'html', 'Billboard Factory Prototype', 'left',10,'font-size', 30, 'font-family', 'Times New Roman', 'text-align', 'center', 'color', '#000', 'top', 20,'z-index',10000000000)
+        bs.dom('<div></div>').$('<', 'body', '@id', 'title', 'html', 'Billboard Factory Prototype', 'left',10,'font-size', 30, 'font-family', 'Times New Roman', 'text-align', 'center', 'color', '#000', 'top', 20,'z-index',10000000000)
         var exStrs = ['W : forward / S : backward','A : left / D : right','R : up / F : down','Q : panLeft / E : panRight','T : tiltUp / G : tiltDown']
-        for (var i = 0; i < 6; i++) bs.dom('<div></div>').$('<', 'body', 'id', 'title' + i, 'html', exStrs[i], 'font-size', 10, 'color', '#000', 'top', 60 + 15 * i, 'left', 10,'z-index',10000000000)
-        bs.ANI.fps(bs.dom('<div></div>').$('id', 'fps', 'font-size', 11, 'color', '#000', '<', 'body', 'this')[0]);
+        for (var i = 0; i < 6; i++) bs.dom('<div></div>').$('<', 'body', '@id', 'title' + i, 'html', exStrs[i], 'font-size', 10, 'color', '#000', 'top', 60 + 15 * i, 'left', 10,'z-index',10000000000)
+        bs.ANI.fps(bs.dom('<div></div>').$('@id', 'fps', 'font-size', 11, 'color', '#000', '<', 'body', 'this')[0]);
     }
     function setDebuger(){
         // 디버거 세팅
@@ -53,7 +53,7 @@
                 bs.dom('#debuger').$('html',str)
             }
         }
-        bs.dom('<div></div>').$('<','body','id','debuger','left',10,'top',150,'font-size',10, 'background-color','#ffffff','padding',10,'z-index',10000000000)
+        bs.dom('<div></div>').$('<','body','@id','debuger','left',10,'top',150,'font-size',10, 'background-color','#ffffff','padding',10,'z-index',10000000000)
         bs.ANI.ani(debuger)
     }
 
@@ -88,7 +88,7 @@
 
     bs(function () {
         bs.css("body").$('margin', 0, 'overflow', 'hidden'), bs.css("div").$('margin', 0,'position', 'absolute')
-        bs.dom('<div></div>').$('<','body','id','stage')
+        bs.dom('<div></div>').$('<','body','@id','stage')
 
 
         var inited = false
@@ -119,7 +119,7 @@
             //make plane instance
             bs.plane('planeFactory').$(
                     '@plane'+i,'x',bs.$ex(-1000, "~",1000),'z',bs.$ex(-2000, "~",2000),'width',wh, 'height',wh,
-                    'down',function($e){ alert($e.dom.id)},'id','test'+i
+                    'down',function($e){ alert($e.dom.id)},'@id','test'+i
             )
 
             // 인스턴스명 '@plane'+i으로 플랜을 생성 ( 팩토리에 지정한 빌보드 월드 인스턴스로 자동등록

@@ -38,16 +38,14 @@
 
                 if (bs.DETECT.browser == 'ie') {
                     alert('IE는 안됫!\nCSS말고 가상좌표계로 처리예정..크롬으로보세용~');
-                    return
+                    return 1;
                 }
-                ;
-
                 var virewport = new Viewport()
                 var world = new World()
                 // 뷰포트설정
                 function Viewport() {
                     bs.dom('<div></div>').$(
-                            '<', 'body', 'id', 'viewport', 'position', 'relative',
+                            '<', 'body', '@id', 'viewport', 'position', 'relative',
                             'width', '100%', 'height', '100%',
                             'perspective', w
                     )
@@ -56,16 +54,15 @@
                 // 월드설정
                 function World() {
                     bs.dom('<div></div>').$(
-                            '<', '#viewport', 'id', 'world', 'position', 'absolute',
+                            '<', '#viewport', '@id', 'world', 'position', 'absolute',
                             'top', ' 50%', 'left', '50%',
                             'transform-style', 'preserve-3d',
                             'perspective', w
                     )
                 }
-
                 // TODO 카메라도 나중에 따야겠다..
             }
-            red3d.init(); // 3D환경초기화
+           	if( red3d.init() ) return; // 3D환경초기화
 
             var planes = {
                 imgs: [], // 텍스쳐로 쓸 이미지공간
@@ -77,7 +74,7 @@
                     for (var i = 0; i < len; i++) {
                         this.imgs.push('redcamel_test_demo2_asset/006.jpg')
                         bs.dom("<div><img src=" + this.imgs[0] + " width='100%' height='100%'></div>").$(
-                                '<', '#world', 'position', 'absolute', 'id', 'plane' + i,
+                                '<', '#world', 'position', 'absolute', '@id', 'plane' + i,
                                 'width', 100, 'height', 100, // 나중엔 자동으로 받을수있게..해야하것고...
                                 'transform-origin', '100 100 0'
                         )
