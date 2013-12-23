@@ -70,36 +70,29 @@ function init(doc){
 			app = navigator.appVersion.toLowerCase(),
 			flash = 0, device = 'pc',
 			( function(){
+				var i;
 				function ie(){
-					if ( agent.indexOf( 'msie' ) < 0 && agent.indexOf( 'trident' ) < 0 ) return;
+					if( agent.indexOf( 'msie' ) < 0 && agent.indexOf( 'trident' ) < 0 ) return;
 					if( agent.indexOf( 'iemobile' ) > -1 ) os = 'winMobile';
-					browser = 'ie';
-					if( agent.indexOf( 'msie' ) < 0 ) return bVersion = 11;
-					return bVersion = parseFloat( /msie ([\d]+)/.exec( agent )[1] );
+					return browser = 'ie', bVersion = agent.indexOf( 'msie' ) < 0 ? 11 : parseFloat( /msie ([\d]+)/.exec( agent )[1] );
 				}
 				function chrome( i ){
-					if( agent.indexOf( i = 'chrome' ) > -1 || agent.indexOf( i = 'crios' ) > -1 ){
-						browser = 'chrome';
-						return bVersion = parseFloat( ( i == 'chrome' ? /chrome\/([\d]+)/ : /crios\/([\d]+)/ ).exec( agent )[1] );
-					}
+					if( agent.indexOf( i = 'chrome' ) < 0 && agent.indexOf( i = 'crios' ) < 0 ) return;
+					return browser = 'chrome', bVersion = parseFloat( ( i == 'chrome' ? /chrome\/([\d]+)/ : /crios\/([\d]+)/ ).exec( agent )[1] );
 				}
 				function firefox(){
 					if( agent.indexOf( 'firefox' ) < 0 ) return;
-					browser = 'firefox';
-					return bVersion = parseFloat( /firefox\/([\d]+)/.exec( agent )[1] );
+					return browser = 'firefox', bVersion = parseFloat( /firefox\/([\d]+)/.exec( agent )[1] );
 				}
 				function safari(){
 					if( agent.indexOf( 'safari' ) < 0 ) return;
-					browser = 'safari';
-					return bVersion = parseFloat( /safari\/([\d]+)/.exec( agent )[1] );
+					return browser = 'safari', bVersion = parseFloat( /safari\/([\d]+)/.exec( agent )[1] );
 				}
 				function opera(){
 					if( agent.indexOf( 'opera' ) < 0 ) return;
-					browser = 'opera';
-					return bVersion = parseFloat( /version\/([\d]+)/.exec( agent )[1] );
+					return browser = 'opera', bVersion = parseFloat( /version\/([\d]+)/.exec( agent )[1] );
 				}
 				function naver(){if( agent.indexOf( 'naver' ) > -1 ) return browser = 'naver';}
-				var i;
 				if( agent.indexOf( 'android' ) > -1 ){
 					browser = os = 'android';
 					if( agent.indexOf( 'mobile' ) == -1 ) browser += 'Tablet', device = 'tablet';
@@ -111,18 +104,11 @@ function init(doc){
 					if( i ) bVersion = parseFloat( i[1] );
 					naver() || chrome() || firefox() || opera();
 				}else if( agent.indexOf( i = 'ipad' ) > -1 || agent.indexOf( i = 'iphone' ) > -1 ){
-					device = i == 'ipad' ? 'tablet' : 'mobile';
-					browser = os = i;
-					i = /os ([\d_]+)/.exec( agent );
-					if( i ){
-						i = i[1].split('_');
-						osVersion = parseFloat( i[0] + '.' + i[1] );
-					}else{
-						osVersion = 0;
-					}
-					i = /mobile\/10a([\d]+)/.exec( agent );
-					if( i ) bVersion = parseFloat( i[1] );
-					naver() || chrome() || opera();
+					device = i == 'ipad' ? 'tablet' : 'mobile', browser = os = i;
+					if( i = /os ([\d_]+)/.exec( agent ) ) i = i[1].split('_'), osVersion = parseFloat( i[0] + '.' + i[1] );
+					else osVersion = 0;
+					if( i = /mobile\/10a([\d]+)/.exec( agent ) ) bVersion = parseFloat( i[1] );
+					naver() || chrome() || firefox() || opera();
 				}else{
 					( function(){
 						var plug, t0, e;
@@ -182,7 +168,7 @@ function init(doc){
 				eventTouch:div.ontouchstart === undefined ? 0 : 1, eventRotate:'onorientationchange' in W,
 				//css3
 				cssPrefix:cssPrefix, stylePrefix:stylePrefix, filterFix:browser == 'ie' && bVersion == 8 ? ';-ms-' : ';',
-				transition:stylePrefix + 'Transition' in bStyle || 'transition' in bStyle, transform3D:transform3D, keyframe: keyframe,
+				transition:stylePrefix + 'Transition' in bStyle || 'transition' in bStyle, transform3D:transform3D, keyframe:keyframe,
 				//html5
 				canvas:c, canvasText:c && c.getContext('2d').fillText,
 				audio:a,

@@ -21,7 +21,7 @@
 <script>
 bs(function(){
 bs.css("body").$("background", "#000", "overflow", "hidden", "margin", 0, "padding", 0);
-bs.ANI.fps( bs.dom("<div></div>" ).$( "id", "fps", "position","absolute", "font-size", 11, "color", "#fff", "<", "body", "this" )[0] );
+bs.ANI.fps( bs.dom("<div></div>" ).$( "@id", "fps", "position","absolute", "font-size", 11, "color", "#fff", "<", "body", "this" )[0] );
 var game = {
     balls:[], 
     w:0, h:0,
@@ -30,7 +30,6 @@ var game = {
     init:function(w, h) {
         this.w = w;
         this.h = h;
-
         if ( this.started == false) {
             this.started = true;
 
@@ -44,7 +43,7 @@ var game = {
                 vy = bs.$ex(-5, "~", 5);
 
                 bs.dom("<div></div>").$(
-                    "id", "ball" + i, 
+                    "@id", "ball" + i, 
                     "position", "absolute", 
                     "background", (i == 0) ? "#FF0000" : "#FFF", 
                     "width", r * 2, "height", r * 2, 
@@ -65,7 +64,6 @@ var game = {
                     vy:vy
                 };
             }
-
             bs.ANI.ani(this);
         }
     },
@@ -86,7 +84,6 @@ var game = {
     ANI:function() {
         var i, j, b0, b1, dx, dy, a, s, c, p0, p1, v0, v1, vxt,
             va, ol, pf0, pf1, vf0, vf1;
-
         for (i = 0; i < this.numBalls; i++) {
             b0 = this.balls[i];
             b0.x = b0.x + b0.vx;
