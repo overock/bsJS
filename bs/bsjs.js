@@ -1339,6 +1339,11 @@ init.len = 0;
 ( function(){
 	var id = setInterval( function(){
 		var i, j;
+		switch( i = document.readyState ){
+		case'complete':case'loaded':break;
+		case'interactive':if( document.documentElement.doScroll ) try{document.documentElement.doScroll('left');}catch(e){return;}
+		default:return;
+		}
 		if( document && document.getElementsByTagName && document.getElementById && document.body ){
 			clearInterval( id );
 			for( W[N] = init( W.document ), i = 0, j = init.len ; i < j ; i++ ) init[i]();

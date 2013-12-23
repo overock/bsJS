@@ -1,4 +1,5 @@
 bs( function(){
+	console.log( 'd3' );
     bs.factory( 'plane', function( $cls ){
         var ani, key, ANI;
         bs.c( '.PLANE' ).$( 'position', 'absolute'),

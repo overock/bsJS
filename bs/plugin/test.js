@@ -1,4 +1,5 @@
 bs( function(){
+	console.log( '$test' );
 	var rules, set, rule, group;
 	group = {},
 	rules = {

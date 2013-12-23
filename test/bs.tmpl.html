@@ -20,19 +20,6 @@
 <div id="stage"></div>
 <div id="result"></div>
 <div id="test"></div>
-<script id="tmpl_a" type="text/tmpl">
-<div id="label0">
-	<h1>@label.0@</h1>
-	<div id="@user.id@">@user.id@' comment: @user.comment@</div>
-</div>
-<div id="label1">
-	<h1>@label.1@</h1>
-	<div id="age">age : @0@</div>
-	<div id="sex">sex : @1@</div>
-	<div id="addr">addr : @2.address@</div>
-	<div id="group">group : @2.group@</div>
-</div>
-</script>
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
 <script src="./printer.js"></script>
@@ -108,6 +95,18 @@ bs( function(){
 	);
 } );
 </script>
-
+<script id="tmpl_a" type="text/tmpl">
+<div id="label0">
+	<h1>@label.0@</h1>
+	<div id="@user.id@">@user.id@' comment: @user.comment@</div>
+</div>
+<div id="label1">
+	<h1>@label.1@</h1>
+	<div id="age">age : @0@</div>
+	<div id="sex">sex : @1@</div>
+	<div id="addr">addr : @2.address@</div>
+	<div id="group">group : @2.group@</div>
+</div>
+</script>
 </body>
 </html>

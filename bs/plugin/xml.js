@@ -1,4 +1,5 @@
 bs( function(){
+	console.log( '$xml' );
 	var type, parser, t;
 	t = /^\s*|\s*$/g;
 	function _xml( $node ){

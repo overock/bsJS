@@ -1,4 +1,5 @@
 bs( function(){
+	console.log( 'sprite' );
 	bs.$class( 'sprite', function( $fn ){
 		var ani, key, ANI;
 		bs.c( '.SPRITE' ).$( 'overflow', 'hidden', 'display', 'none' ),
