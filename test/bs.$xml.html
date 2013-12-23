@@ -39,6 +39,7 @@
 <script src="./printer.js"></script>
 <script>
 bs( function(){
+	bs.$js( null, '../bs/plugin/xml.js' );
 	/*
 		config
 	*/
@@ -51,15 +52,15 @@ bs( function(){
 	/*
 		test case
 	*/
-	bs.$xml( document.getElementById('xml').text, function( $d ){
+	bs.$xml( function( $d ){
 		bsTest( printer, 'async xml parsing',
 			"$d.topics.volume[0].title", 'title1', $d.topics.volume[0].title.value
 		);
 
-	} );
+	}, document.getElementById('xml').text );
 
 	bsTest( printer, 'sync xml parsing',
-		"bs.$xml(xml).topics.volume[1].title.value", 'title2', bs.$xml( document.getElementById('xml').text ).topics.volume[1].title.value
+		"bs.$xml(xml).topics.volume[1].title.value", 'title2', bs.$xml( null, document.getElementById('xml').text ).topics.volume[1].title.value
 	);
 
 } );
