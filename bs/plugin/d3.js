@@ -2,21 +2,29 @@ bs(function () {
     // d3카메라세팅
     var d3Camera = {
         pan: 0.01, tilt: 0.01, x: 0, y: 0, z: 0, farclip: 2500, speed: 10, list: [],
+        forward : undefined, backward : undefined,left : undefined,right : undefined, panleft : undefined, panright : undefined , tiltup : undefined, tiltdown : undefined, up: undefined, down : undefined,
+        $ : function(){
+            var i, j, k, v;
+            i = 0, j = arguments.length;
+            if (j == 1) return this[arguments[0]];
+            while (i < j) k = arguments[i++], v = arguments[i++], this[k] = v
+        },
         ANI: function ($time) {
             var list = this.list, i = list.length, keys = bs.KEY, sin = Math.sin(this.pan) , cos = Math.cos(this.pan), speed = this.speed
             if (!i) return
-            if (keys['w']) this.x -= speed * sin, this.z += cos * speed
-            if (keys['s']) this.x += speed * sin, this.z -= cos * speed
-            if (keys['a']) this.x -= speed * cos, this.z -= speed * sin
-            if (keys['d']) this.x += speed * cos, this.z += speed * sin
 
-            if (keys['r']) this.y -= speed
-            if (keys['f']) this.y += speed
+            if (keys[this.forward]) this.x -= speed * sin, this.z += cos * speed
+            if (keys[this.backward]) this.x += speed * sin, this.z -= cos * speed
+            if (keys[this.left]) this.x -= speed * cos, this.z -= speed * sin
+            if (keys[this.right]) this.x += speed * cos, this.z += speed * sin
 
-            if (keys['q']) this.pan += speed / 500
-            if (keys['e']) this.pan -= speed / 500
-            if (keys['t']) this.tilt += speed
-            if (keys['g']) this.tilt -= speed
+            if (keys[this.up]) this.y -= speed
+            if (keys[this.down]) this.y += speed
+
+            if (keys[this.panleft]) this.pan += speed / 500
+            if (keys[this.panright]) this.pan -= speed / 500
+            if (keys[this.tiltup]) this.tilt += speed
+            if (keys[this.tiltdown]) this.tilt -= speed
 
             var world = bs.d('#' + list[0].div.$('<').id), w = world.$('w'), h = world.$('h')
             while (i--) {
@@ -50,11 +58,11 @@ bs(function () {
             var i, j, k, v;
             i = 0, j = arguments.length;
             if (j == 1) return this[arguments[0]];
-            while (i < j) k = arguments[i++], v = arguments[i++],this.dom.$(k, v);
+            while (i < j) k = arguments[i++], v = arguments[i++], this.dom.$(k, v);
             for (var i in this.__list) this.__list[i].$('html', this.dom.$('html'))
         }
     });
-    // d3m
+    // d3
     bs.$class('d3', function ($fn) {
         var key, type = {"doom": 1};
         bs.c('.D3').$('position', 'absolute'), bs.c('.D3 img').$('width', '100%', 'height', '100%', 'position', 'absolute'),
