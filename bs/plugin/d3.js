@@ -1,66 +1,95 @@
-bs( function(){
-	console.log( 'd3' );
-    bs.factory( 'plane', function( $cls ){
-        var ani, key, ANI;
-        bs.c( '.PLANE' ).$( 'position', 'absolute'),
-		bs.c( '.PLANE img' ).$( 'width', '100%', 'height','100%'),
-		ANI = bs.ANI.ani,
-		(function(){
-			var t0, i;
-			t0 = 'x,y,z,width,height,src,world,@'.split(','),
-				key = {}, i = t0.length;
-			while( i-- ) key[t0[i]] = 1;
-		})(),
-		ani = function( $time ){
-			var div = this.div,zIndex,tx,tz,tScale
-			var world = this.world, pan = world.pan, tilt = world.tilt,farclip = world.farclip, w = world.width,h = world.height
-			var dx, sz, sin = Math.sin(pan) , cos = Math.cos(pan)
-			dx = this.x -  world.camx,sz = this.z -  world.camz
-			// 카메라를 중심으로 플랜의 위치를 구함
-			tx = cos * dx + sin * sz, tz = -sin * dx + cos * sz;
-			tScale = w / tz *.5// 대충거리로...크기비율을 결정
-			if (tz < 0.1 || tz > farclip) div.$('display', 'none')
-			else{
-				zIndex = parseInt(tz * 100000 - tz * 100)  // 안겹치게...제트축만들고... 혹시나 살짝빼서 또 겹치는걸 없앰
-				div.$(
-					'display','block','z-index', parseInt(100 * tScale),
-					'margin-left', (tx - this.width / 4)*tScale*2 +w/2,
-					'margin-top', tilt - tScale * world.camy - (tScale  + this.height * tScale ) / 2+h/2,
-					'width', tScale + this.width * tScale, 'height', tScale  + this.height * tScale,
-					'opacity', (farclip - tz) > farclip/5 ? 1 : (farclip - tz + farclip/5) / farclip
-				)
-			}
-		},
-		$cls.init = function( $key ){},
-		$cls.$ = function(){
-			var t0, i, j, k, v;
-			if( ( t0 = arguments[0] ).charAt(0) == '@' ){
-				if( this[t0] ) t0 = this[t0];
-				else ( t0 = this[t0] = {
-					ANI:ani,
-					div:bs.d('<div class="PLANE"></div>').$('display','none','this'),
-					img:bs.d('<img '+'src="'+this.src+'"/>'),
-					world : bs.world(this.world).$(this['@']),
-					width:100, height:100
-				}).div.$( '>', t0.img);
-				bs.world(this.world).$(this['@'],'div').$('>',t0.div); // 지정된 월드에 박는다.
-				i = 1, j = arguments.length;
-				if( j == 1 ) return t0;
-				while( i < j ){
-					k = arguments[i++], v = arguments[i++];
-					if( key[k] ) t0[k] = v;
-					else if( k == 'div' ) return t0.div;
-					else if( k == 'img' ) return t0.img;
-					else t0.div.$( k, v );
-				};
-				ANI(t0);
-			}else{
-				i = 0, j = arguments.length;
-				while( i < j ){
-					if( !key[k = arguments[i++]] ) throw 1;
-					this[k] = arguments[i++];
-				}
-			}
-		};
-    } );
-} );
+bs(function () {
+    // d3카메라세팅
+    var d3Camera = {
+        pan: 0.01, tilt: 0.01, x: 0, y: 0, z: 0, farclip: 2500, speed: 10, list: [],
+        ANI: function ($time) {
+            var list = this.list, i = list.length, keys = bs.KEY, sin = Math.sin(this.pan) , cos = Math.cos(this.pan), speed = this.speed
+            if (!i) return
+            if (keys['w']) this.x -= speed * sin, this.z += cos * speed
+            if (keys['s']) this.x += speed * sin, this.z -= cos * speed
+            if (keys['a']) this.x -= speed * cos, this.z -= speed * sin
+            if (keys['d']) this.x += speed * cos, this.z += speed * sin
+
+            if (keys['r']) this.y -= speed
+            if (keys['f']) this.y += speed
+
+            if (keys['q']) this.pan += speed / 500
+            if (keys['e']) this.pan -= speed / 500
+            if (keys['t']) this.tilt += speed
+            if (keys['g']) this.tilt -= speed
+
+            var world = bs.d('#' + list[0].div.$('<').id), w = world.$('w'), h = world.$('h')
+            while (i--) {
+                var t = list[i], dx, dz, tx, tz, tScale, zIndex, width = t.width, height = t.height, farclip = this.farclip;
+                dx = t.x - this.x, dz = t.z - this.z;
+                // 카메라를 중심으로 플랜의 위치를 구함
+                tx = cos * dx + sin * dz;
+                tz = -sin * dx + cos * dz;
+                tScale = w / tz // 대충거리로...크기비율을 결정
+                if (tz < 0.1 || tz > this.farclip) t.div.$('display', 'none')
+                else zIndex = parseInt(tz * 100000 - tz * 100),  // 안겹치게...제트축만들고... 혹시나 살짝빼서 또 겹치는걸 없앰
+                    t.div.$(
+                        'display', 'block',
+                        // 멀리있는건 거리에 대해 스케일 비율이 달라짐
+                        'width', tScale * .5 + width * tScale / 2, 'height', tScale * .5 + height * tScale / 2,
+                        'margin-left', (tx - width / 4) * tScale + w / 2, 'margin-top', this.tilt - tScale * this.y - (tScale + height / 2 * tScale ) / 2 + h / 2,// this.tilt+(this.y-height/4)* tScale-this.y*tScale+h/2,
+                        'opacity', (farclip - tz) > farclip / 5 ? 1 : (farclip - tz + farclip / 5) / farclip,
+                        // z소팅
+                        'z-index', parseInt(100 * tScale)
+                    )
+            }
+        }
+    };
+    // d3m
+    bs.$class('d3m', function ($fn) {
+        $fn.constructor = function ($key) {
+            this.__list = {};
+            this.dom = bs.dom("<div></div>").$('<', 'body', 'top', -100000, 'display', 'none', 'this'); // 안불러져서 박았음 -_-
+        }
+        $fn.$ = function () {
+            var i, j, k, v;
+            i = 0, j = arguments.length;
+            if (j == 1) return this[arguments[0]];
+            while (i < j) k = arguments[i++], v = arguments[i++],this.dom.$(k, v);
+            for (var i in this.__list) this.__list[i].$('html', this.dom.$('html'))
+        }
+    });
+    // d3m
+    bs.$class('d3', function ($fn) {
+        var key, type = {"doom": 1};
+        bs.c('.D3').$('position', 'absolute'), bs.c('.D3 img').$('width', '100%', 'height', '100%', 'position', 'absolute'),
+            (function () {
+                var t0, i;
+                t0 = 'x,y,z,width,height,material'.split(','), key = {}, i = t0.length;
+                while (i--) key[t0[i]] = 1;
+            })(),
+            $fn.constructor = function ($key) {
+                var tname = $key.split('@')[1];
+                if ($key.indexOf('camera@') > -1) type[tname] ? console.log('cameraMode :', tname) : console.log('존재하지않는 카메라타입입니다'), bs.ANI.ani(d3Camera), this.camera = d3Camera
+                else if ($key.indexOf('plane@') > -1) this.x = this.y = this.z = this.width = this.height = 0, this.div = bs.d("<div class='D3' id='" + tname + "'>재질적용전</div>"), d3Camera.list.push(this), this.material = undefined
+            },
+            $fn.$ = function () {
+                var i, j, k, v;
+                i = 0, j = arguments.length;
+                if (j == 1) return this[arguments[0]];
+                var prevMaterial = this.material
+                while (i < j) {
+                    k = arguments[i++], v = arguments[i++];
+                    if (key[k]) this[k] = v;
+                    else if (k == 'div') return this.div;
+                    else if (k == 'material') return this.material;
+                    else if (k == 'camera') return this.camera;
+                    else this.div.$(k, v);
+                    if (k == 'material') {
+                        // 기존에 적용된 재질이 있으면 적용취소함
+                        if (prevMaterial != this.material) if (bs.d3m(prevMaterial)) delete bs.d3m(prevMaterial).__list[this.__k ];
+                        bs.d3m(this.material).__list[this.__k] = this.div
+//                        console.log(bs.d3m(this.material).__list)
+//                        console.log('this.materialName으로 검색 ' ,bs.d3m(this.material))
+//                        console.log('재질 dom검색 ' ,bs.d3m(this.material).$('dom').$('html'))
+                        this.div.$('html', bs.d3m(this.material).$('dom').$('html'))
+                    }
+                }
+            }
+    })
+});
