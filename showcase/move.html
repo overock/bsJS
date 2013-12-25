@@ -16,6 +16,7 @@
 <div id="stage"></div>
 <script src="../bs/bsjs.js"></script> 
 <script>
+bs.$import( 'fps', 'last' );
 bs( function(){
 
 	var game = {
@@ -81,7 +82,7 @@ bs( function(){
 		}
 	};
     game.init();
-	bs.ANI.fps( bs.dom('<div></div>' ).$( '@id', 'fps', 'position','absolute', 'font-size', 11, 'color', '#900', '<', 'body', 'this' )[0] );
+	bs.$fps( bs.dom('<div></div>' ).$( '@id', 'fps', 'position','absolute', 'font-size', 11, 'color', '#900', '<', 'body', 'this' )[0] );
     bs.ANI.ani( game );
 } );
 

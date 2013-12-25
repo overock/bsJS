@@ -167,7 +167,7 @@ bs( function(){
 			this.dom.$( 'left', this.px, 'top', this.py );
 			if( this.pcount++ % 2 ){
 				var s = bs.$ex( 30, '~', 50 );
-				var d = digit.div.length ? digit.div[--digit.div.length] : bs.d('<div></div>' ).$( 'position','absolute', '<', 'body', 'this' );
+				var d = digit.div.length ? digit.div[--digit.div.length] : bs.dom('<div></div>' ).$( 'position','absolute', '<', 'body', 'this' );
 				d.$( 'visibility', 'visible', 'background', this.c, 'transform', 'rotateX(0)', 
 					'width',10, 'height',10, 'border-radius', 10, 'left',this.px,'top',this.py, 'opacity', 1 
 				);
@@ -179,18 +179,18 @@ bs( function(){
 			}
 		}else this.stat = $num, this.step = 0, this.px = this.x, this.py = this.y;
 	};
-	bs.c('body').$('background','#fff', 'margin', 0, 'padding', 0);
+	bs.css('body').$('background','#fff', 'margin', 0, 'padding', 0);
 	var mode;
-	bs.d('body').$('down', function(){
+	bs.dom('body').$('down', function(){
 		if( mode ){
-			bs.d('body').$('background','#fff');
+			bs.dom('body').$('background','#fff');
 			time[0].c = '#a66';
 			time[1].c = '#a66';
 			time[2].c = '#66a';
 			time[3].c = '#66a';
 			mode = 0;
 		}else{
-			bs.d('body').$('background','#000');
+			bs.dom('body').$('background','#000');
 			mode = 1;
 			time[0].c = '#ff0';
 			time[1].c = '#ff0';
@@ -198,15 +198,15 @@ bs( function(){
 			time[3].c = '#9f0';
 		}
 	} );
-	bs.c('.time').$('position','absolute','width',10,'height',10,'background','#fff','border-radius',5);
+	bs.css('.time').$('position','absolute','width',10,'height',10,'background','#fff','border-radius',5);
 	var w = window.innerWidth;
 	var h = window.innerHeight;
 	var H = h/2 < 170 ? h/2-20 : 150;
 	var time = [
-		new digit( bs.d('<div class="time"></div>').$('<','body','this'), w/2 - 120, h/2 - H - 20, 100, H, 15, '#a66', 20 ),
-		new digit( bs.d('<div class="time"></div>').$('<','body','this'), w/2 + 20, h/2 - H - 20, 100, H, 15, '#a66', 20 ),
-		new digit( bs.d('<div class="time"></div>').$('<','body','this'), w/2 - 120, h/2 + 20, 100, H, 12, '#66a', 15 ),
-		new digit( bs.d('<div class="time"></div>').$('<','body','this'), w/2 + 20, h/2 + 20, 100, H, 10, '#66a', 15 )
+		new digit( bs.dom('<div class="time"></div>').$('<','body','this'), w/2 - 120, h/2 - H - 20, 100, H, 15, '#a66', 20 ),
+		new digit( bs.dom('<div class="time"></div>').$('<','body','this'), w/2 + 20, h/2 - H - 20, 100, H, 15, '#a66', 20 ),
+		new digit( bs.dom('<div class="time"></div>').$('<','body','this'), w/2 - 120, h/2 + 20, 100, H, 12, '#66a', 15 ),
+		new digit( bs.dom('<div class="time"></div>').$('<','body','this'), w/2 + 20, h/2 + 20, 100, H, 10, '#66a', 15 )
 	];
 	bs.ANI.ani( {ANI:function($time){
 		var h, m, s;

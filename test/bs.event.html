@@ -26,13 +26,13 @@
 bs( function(){
 	bsTest.tear( 'init', function(){
 		//set stage
-		bs.c( '#stage' ).$( 'border', '1px solid #f00', 'margin-top', 30, 'width', '50:%', 'padding', 10 );
+		bs.css( '#stage' ).$( 'border', '1px solid #f00', 'margin-top', 30, 'width', '50:%', 'padding', 10 );
 		bs.css( '#stage' ).$( 'width', 100 );
-		bs.d( '#stage' ).$( 'background-color', '#eee' );
+		bs.dom( '#stage' ).$( 'background-color', '#eee' );
 		
 		//basic test
 		var i = 0;
-		bs.d( '#stage' ).$(
+		bs.dom( '#stage' ).$(
 			'mousedown', function( $e ){
 				i = 1;
 				console.log("this.offsetWidth : ", this.offsetWidth);
@@ -56,13 +56,13 @@ bs( function(){
 					"this.id", 'stage', this.id, 
 					"$e.x", bsTest.RANGE(0,this.offsetWidth), $e.x
 				);
-				bs.d( '#stage' ).$( 'mousedown', null, 'mousemove', null, 'mouseup', null );
+				bs.dom( '#stage' ).$( 'mousedown', null, 'mousemove', null, 'mouseup', null );
 			}
 		);
 		
 		//test other listener type : array, object
 		var testbox = bs.dom( '<div></div>' ).$( 'width', 300, 'height', 300, 'background', '#ff0000', '@id', 'testbox', 'this' );
-		bs.d( '#stage' ).$( '>', testbox );
+		bs.dom( '#stage' ).$( '>', testbox );
 		var test = {
 			down:function( $e ){
 				bsTest( 'down-objectType listener',
@@ -75,8 +75,8 @@ bs( function(){
 				);
 			}
 		};
-		bs.d( '#testbox' ).$( 'mouseup', [test, test.up] );
-		bs.d( '#testbox' ).$( 'down', test );
+		bs.dom( '#testbox' ).$( 'mouseup', [test, test.up] );
+		bs.dom( '#testbox' ).$( 'down', test );
 	} );
 	
 	

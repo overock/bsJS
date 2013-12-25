@@ -66,7 +66,7 @@ function jq2CreateDom(){
 function bs5CreateDom(){
 	benchmark.mark('bs5CreateDomStart');
 	for (var i=0; i < domLen; i++) {
-		bs.d('<div class="bs5">bs5 '+i+'</div>').$("<", '#bs');
+		bs.dom('<div class="bs5">bs5 '+i+'</div>').$("<", '#bs');
 	};
 	benchmark.mark('bs5CreateDomFin');
 	benchmark.fin('bs5CreateDomStart', 'bs5CreateDomFin');
@@ -103,7 +103,7 @@ function jq2ChangeCssDom(){
 // bsJS
 function bs5ChangeCssDom(){
 	benchmark.mark('bs5ChangeCssDomStart');
-	bs.d('.bs5').$(
+	bs.dom('.bs5').$(
 		'border', '1px solid blue',
 		'background', '#ccc',
 		'color', '#555'

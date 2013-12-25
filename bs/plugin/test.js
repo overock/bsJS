@@ -1,5 +1,4 @@
-bs( function(){
-	console.log( '$test' );
+bs.$register( 'method', 'test', (function(){ console.log( 'test' );
 	var rules, set, rule, group;
 	group = {},
 	rules = {
@@ -79,7 +78,7 @@ bs( function(){
 		if( typeof $val == 'function' ) return $val();
 		if( $val.indexOf( '|' ) > -1 ){
 			$val = bs.$trim($val.split('|'));
-			return bs.$trim( bs.d( $val[0] ).$( $val[1] || '@value' ) );
+			return bs.$trim( bs.dom( $val[0] ).$( $val[1] || '@value' ) );
 		}else return bs.$trim( $val );
 	}
 	(function(){
@@ -94,7 +93,7 @@ bs( function(){
 			if( $rule == 'group' ) group[arguments[1]] = Array.prototype.slice.call( arguments, 2 );
 			else if( $rule == 'set' ) while( i < j ){
 				k = arguments[i++], v = arguments[i++]
-				if( v.substr(0,2) == '#T' ) set[k] = parse( bs.d( v ).$('@text') );
+				if( v.substr(0,2) == '#T' ) set[k] = parse( bs.dom( v ).$('@text') );
 				else if( v.substr(v.length-5) == '.html' ) set[k] = parse( bs.$get( null, v ) );
 				else set[k] = parse( v );
 			}else if( $rule == 'rule' ) while( i < j ) rules[arguments[i++]] = parseRule(arguments[i++]);
@@ -108,7 +107,7 @@ bs( function(){
 			while( i < j ) if( !t1( val( arguments[i++] ), t0 ) ) return;
 			return 1;
 		}else if( set[$rule] ) t0 = set[$rule];
-		else if( $rule.substr(0,2) == '#T' ) t0 = parse( bs.d( $rule ).$('@text') );
+		else if( $rule.substr(0,2) == '#T' ) t0 = parse( bs.dom( $rule ).$('@text') );
 		else if( $rule.substr($rule.length-5) == '.html' ) t0 = parse( bs.$get( null, $rule ) );
 		else t0 = parse( $rule );
 		//ruleset
@@ -138,5 +137,5 @@ bs( function(){
 		}
 		return 1;
 	}
-	bs.$test = test;
-} );
+	return test;
+})(), 1.0 );

@@ -26,11 +26,11 @@
 <script src="./printer.js"></script>
 <script>
 bs( function(){
-	bs.c( '#stage' ).$( 'border', '1px solid #f00', 'margin-top', 30, 'width', '50:%', 'padding', 10 );
+	bs.css( '#stage' ).$( 'border', '1px solid #f00', 'margin-top', 30, 'width', '50:%', 'padding', 10 );
 	bs.css( '#stage' ).$( 'width', 100 );
 
 	bsTest( printer, 'css',
-	"bs.c( '#stage' ).$( 'width' )", 100, bs.c( '#stage' ).$( 'width' ),
+	"bs.css( '#stage' ).$( 'width' )", 100, bs.css( '#stage' ).$( 'width' ),
 	"bs.css( '#stage' ).$( 'padding' )", 10, bs.css( '#stage' ).$( 'padding' )
 	);
 

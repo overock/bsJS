@@ -87,7 +87,7 @@ bs.$ex = (function(){
 		return t2;
 	}
 	bs.$tmpl = function( $str ){
-		if( $str.substr(0,2) == '#T' ) $str = bs.d( $str ).$('@text');
+		if( $str.substr(0,2) == '#T' ) $str = bs.dom( $str ).$('@text');
 		else if( $str.substr($str.length-5) == '.html' ) $str = bs.$get( null, $str );
 		return arg = arguments, bs.$trim( $str.replace( reg, r ) );
 	};

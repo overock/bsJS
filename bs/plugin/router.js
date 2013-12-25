@@ -1,5 +1,4 @@
-bs( function(){
-	console.log('router')
+bs.$register( 'static', 'router', (function(){console.log( 'router' );
 	var s, e, t, h, count;
 	s = {'#':[]}, e = {'#':[]}, t = {}, h = [], count = 5;
 	function make( t ){
@@ -34,7 +33,7 @@ bs( function(){
 				while( i < j ) t0[i++]( uri );
 			}
 	}
-	bs.ROUTER = {
+	return {
 		start:make(s),end:make(e),
 		table:function(){
 			var i, j;
@@ -45,4 +44,4 @@ bs( function(){
 		route:function(){arguments[0] === null ? bs.WIN.on( 'hash', '@ROUTER' ) : ( bs.WIN.on( 'hashchange', '@ROUTER', router ),router() );},
 		historyMax:function($len){count=$len;}, history:h
 	};
-} );
+})(), 1.0 );

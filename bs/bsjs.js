@@ -1,6 +1,6 @@
 /*
  * bsJS - OpenSource JavaScript library
- * version 0.1.0 / 2013.12.4 by projectBS committee
+ * version 0.2.0 / 2013.12.25 by projectBS committee
  * 
  * Copyright 2013.10 projectBS committee.
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -8,8 +8,11 @@
  * Facebook group: https://www.facebook.com/groups/bs5js/
  */
 ( function( W, N ){
-'use strict';
-N = N ||'bs';
+'use strict';N = N ||'bs';
+var VERSION, PLUGIN_REPO, bs, domLoaded;
+VERSION = 0.2,
+PLUGIN_REPO = '../bs/plugin/'; //'http://projectbs.github.io/bsJS/bs/plugin/'
+
 //0. es5 adapter
 if( !Date.now ) Date.now = function(){return +new Date;};
 if( !Array.prototype.indexOf ) Array.prototype.indexOf = function( $v, $i ){
@@ -29,7 +32,7 @@ if( !W['JSON'] ) W['JSON'] = {
 			case'number':case'boolean': return $obj.toString();
 			case'undefined': return t0;
 			case'object':
-				if( !$obj ) return null;
+				if( !$obj ) return 'null';
 				t0 = '';
 				if( $obj.splice ){
 					for( i = 0, j = $obj.length ; i < j ; i++ ) t0 += ',' + stringify( $obj[i] );
@@ -44,195 +47,42 @@ if( !W['JSON'] ) W['JSON'] = {
 		return stringify;
 	})()
 };
-if( !W['console'] ) W['console'] = {
-	log:(function(){
-		var log = [];
-		return function(){log.push( Array.prototype.join( arguments, ', ' ) );};
-	})(),
-	flush:function(){
-		var t0;
-		return t0 = log.slice(0), log.length = 0, t0
-	}
-};
-//1. initializer after DOM loaded
-function init(doc){
+if( !W['console'] ) (function(){
+	var log = [], t0;
+	W['console'] = {
+		log:function(){log.push( Array.prototype.join( arguments, ', ' ) );},
+		flush:function(){return t0 = log.slice(0), log.length = 0, t0;}
+	};
+})();
+W[N] = bs = (function(domLoaded){
 	var bs;
-	bs = (function(doc){
-		var bs, sel, c, div, nodes, detect;
-		//2. defined browser Detector
-		detect = (function( doc ){
-			var platform, app, agent, device,
-				flash, browser, bVersion, os, osVersion, cssPrefix, stylePrefix, transform3D,
-				b, bStyle, div, keyframe,
-				v, a, c;
-			agent = navigator.userAgent.toLowerCase(),
-			platform = navigator.platform.toLowerCase(),
-			app = navigator.appVersion.toLowerCase(),
-			flash = 0, device = 'pc',
-			( function(){
-				var i;
-				function ie(){
-					if( agent.indexOf( 'msie' ) < 0 && agent.indexOf( 'trident' ) < 0 ) return;
-					if( agent.indexOf( 'iemobile' ) > -1 ) os = 'winMobile';
-					return browser = 'ie', bVersion = agent.indexOf( 'msie' ) < 0 ? 11 : parseFloat( /msie ([\d]+)/.exec( agent )[1] );
-				}
-				function chrome( i ){
-					if( agent.indexOf( i = 'chrome' ) < 0 && agent.indexOf( i = 'crios' ) < 0 ) return;
-					return browser = 'chrome', bVersion = parseFloat( ( i == 'chrome' ? /chrome\/([\d]+)/ : /crios\/([\d]+)/ ).exec( agent )[1] );
-				}
-				function firefox(){
-					if( agent.indexOf( 'firefox' ) < 0 ) return;
-					return browser = 'firefox', bVersion = parseFloat( /firefox\/([\d]+)/.exec( agent )[1] );
-				}
-				function safari(){
-					if( agent.indexOf( 'safari' ) < 0 ) return;
-					return browser = 'safari', bVersion = parseFloat( /safari\/([\d]+)/.exec( agent )[1] );
-				}
-				function opera(){
-					if( agent.indexOf( 'opera' ) < 0 ) return;
-					return browser = 'opera', bVersion = parseFloat( /version\/([\d]+)/.exec( agent )[1] );
-				}
-				function naver(){if( agent.indexOf( 'naver' ) > -1 ) return browser = 'naver';}
-				if( agent.indexOf( 'android' ) > -1 ){
-					browser = os = 'android';
-					if( agent.indexOf( 'mobile' ) == -1 ) browser += 'Tablet', device = 'tablet';
-					else device = 'mobile';
-					i = /android ([\d.]+)/.exec( agent );
-					if( i ) i = i[1].split('.'), osVersion = parseFloat( i[0] + '.' + i[1] );
-					else osVersion = 0;
-					i = /safari\/([\d.]+)/.exec( agent );
-					if( i ) bVersion = parseFloat( i[1] );
-					naver() || chrome() || firefox() || opera();
-				}else if( agent.indexOf( i = 'ipad' ) > -1 || agent.indexOf( i = 'iphone' ) > -1 ){
-					device = i == 'ipad' ? 'tablet' : 'mobile', browser = os = i;
-					if( i = /os ([\d_]+)/.exec( agent ) ) i = i[1].split('_'), osVersion = parseFloat( i[0] + '.' + i[1] );
-					else osVersion = 0;
-					if( i = /mobile\/10a([\d]+)/.exec( agent ) ) bVersion = parseFloat( i[1] );
-					naver() || chrome() || firefox() || opera();
-				}else{
-					( function(){
-						var plug, t0, e;
-						plug = navigator.plugins;
-						if( browser == 'ie' ) try{t0 = new ActiveXObject( 'ShockwaveFlash.ShockwaveFlash' ).GetVariable( '$version' ).substr( 4 ).split( ',' ), flash = parseFloat( t0[0] + '.' + t0[1] );}catch( e ){}
-						else if( ( t0 = plug['Shockwave Flash 2.0'] ) || ( t0 = plug['Shockwave Flash'] ) ) t0 = t0.description.split( ' ' )[2].split( '.' ), flash = parseFloat( t0[0] + '.' + t0[1] );
-						else if( agent.indexOf( 'webtv' ) > -1 ) flash = agent.indexOf( 'webtv/2.6' ) > -1 ? 4 : agent.indexOf("webtv/2.5") > -1 ? 3 : 2;
-					} )();
-					if( platform.indexOf( 'win' ) > -1 ){
-						os = 'win';
-						if( agent.indexOf( 'windows nt 5.1' ) > -1 || agent.indexOf( 'windows xp' ) > -1 ) osVersion = 'xp';
-						else if( agent.indexOf( 'windows nt 6.0' ) > -1 ) osVersion = 'vista';
-						else if( agent.indexOf( 'windows nt 6.1' ) > -1 || agent.indexOf( 'windows nt 7.0' ) > -1 ) osVersion = '7';
-						else if( agent.indexOf( 'windows nt 6.2' ) > -1 || agent.indexOf( 'windows nt 8.0' ) > -1 ) osVersion = '8';
-						else if( agent.indexOf( 'windows nt 6.3' ) > -1 || agent.indexOf( 'windows nt 8.1' ) > -1 ) osVersion = '8.1';
-						ie() || chrome() || firefox() || safari() || opera();
-					}else if( platform.indexOf( 'mac' ) > -1 ){      
-						os = 'mac';
-						i = /os x ([\d._]+)/.exec(agent)[1].replace( '_', '.' ).split('.');
-						osVersion = parseFloat( i[0] + '.' + i[1] );
-						chrome() || firefox() || safari() || opera();
-					}else{
-						os = app.indexOf( 'x11' ) > -1 ? 'unix' : app.indexOf( 'linux' ) > -1 ? 'linux' : 0;
-						chrome() || firefox();
-					}
-				}
-			})(),
-			b = doc.body, bStyle = b.style, div = doc.createElement( 'div' ),
-			div.innerHTML = '<div style="opacity:.55;position:fixed;top:100px;visibility:hidden;-webkit-overflow-scrolling:touch">a</div>',
-			div = div.getElementsByTagName( 'div' )[0],
-			c = doc.createElement( 'canvas' ), c = 'getContext' in c ? c : null,
-			a = doc.createElement( 'audio' ), a = 'canPlayType' in a ? a : null,
-			v = doc.createElement( 'video' ), v = 'canPlayType' in v ? v : null;
-			switch( browser ){
-			case'ie': cssPrefix = '-ms-', stylePrefix = 'ms'; transform3D = bVersion > 9 ? 1 : 0;
-				if( bVersion == 6 ) doc.execCommand( 'BackgroundImageCache', false, true ), b.style.position = 'relative';
-				break;
-			case'firefox': cssPrefix = '-moz-', stylePrefix = 'Moz'; transform3D = 1; break;
-			case'opera': cssPrefix = '-o-', stylePrefix = 'O'; transform3D = 0; break;
-			default: cssPrefix = '-webkit-', stylePrefix = 'webkit'; transform3D = os == 'android' ? ( osVersion < 4 ? 0 : 1 ) : 0;
+	bs = (function(domLoaded){
+		var r = /^\s*|\s*$/g;
+		function dependency( $arg ){
+			var t0, t1, i, j, k, v;
+			if( $arg.length < 4 ) return;
+			$arg = Array.prototype.slice.call( $arg, 3 );
+			i = 0, j = $arg.length;
+			while( i < j ){
+				k = $arg[i++], v = $arg[i++], t0 = bs[k];
+				if( !t0 || t0.VERSION < v ) throw new Error( 0, 'dependency:'+k+'('+v+'), '+ ( t0 && t0.VERSION ) );
 			}
-			if( keyframe = W['CSSRule'] ){
-				if( keyframe.WEBKIT_KEYFRAME_RULE ) keyframe = '-webkit-keyframes';
-				else if( keyframe.MOZ_KEYFRAME_RULE ) keyframe = '-moz-keyframes';
-				else if( keyframe.KEYFRAME_RULE ) keyframe = 'keyframes';
-				else keyframe = null;
-			}
-			return {
-				'device':device, 'browser':browser, 'browserVer':bVersion, 'os':os, 'osVer':osVersion, 'flash':flash, 'sony':agent.indexOf( 'sony' ) > -1,
-				//dom
-				root:b.scrollHeight ? b : doc.documentElement,
-				scroll:doc.documentElement && typeof doc.documentElement.scrollLeft == 'number' ? 'scroll' : 'page',
-				selector:doc.querySelectorAll, insertBefore:div.insertBefore, png:browser == 'ie' && bVersion > 7, 
-				opacity:div.style.opacity == '0.55' ? 1 : 0, text:div.textContent ? 'textContent' : div.innerText ? 'innerText' : 'innerHTML',
-				cstyle:doc.defaultView && doc.defaultView.getComputedStyle,
-				//event
-				eventTouch:div.ontouchstart === undefined ? 0 : 1, eventRotate:'onorientationchange' in W,
-				//css3
-				cssPrefix:cssPrefix, stylePrefix:stylePrefix, filterFix:browser == 'ie' && bVersion == 8 ? ';-ms-' : ';',
-				transition:stylePrefix + 'Transition' in bStyle || 'transition' in bStyle, transform3D:transform3D, keyframe:keyframe,
-				//html5
-				canvas:c, canvasText:c && c.getContext('2d').fillText,
-				audio:a,
-				audioMp3:a && a.canPlayType( 'audio/mpeg;' ).indexOf( 'no' ) < 0 ? 1 : 0,
-				audioOgg:a && a.canPlayType( 'audio/ogg;' ).indexOf( 'no' ) < 0 ? 1 : 0,
-				audioWav:a && a.canPlayType( 'audio/wav;' ).indexOf( 'no' ) < 0 ? 1 : 0,
-				audioMp4:a && a.canPlayType( 'audio/mp4;' ).indexOf( 'no' ) < 0 ? 1 : 0,
-				video:v,
-				videoCaption:'track' in doc.createElement('track') ? 1 : 0,
-				videoPoster:v && 'poster' in v ? 1 : 0,
-				videoWebm:v && v.canPlayType( 'video/webm; codecs="vp8,mp4a.40.2"' ).indexOf( 'no' ) == -1 ? 1 : 0,
-				videH264:v && v.canPlayType( 'video/mp4; codecs="avc1.42E01E,m4a.40.2"' ).indexOf( 'no' ) == -1 ? 1 : 0,
-				videoTeora:v && v.canPlayType( 'video/ogg; codecs="theora,vorbis"' ).indexOf( 'no' ) == -1 ? 1 : 0,
-				local:W.localStorage && 'setItem' in localStorage,
-				geo:navigator.geolocation, worker:W.Worker, file:W.FileReader, message:W.postMessage,
-				history:'pushState' in history, offline:W.applicationCache,
-				db:W.openDatabase, socket:W.WebSocket
-			};
-		} )( doc );
-		//3. define sel(DOM selector)
-		if( doc.querySelectorAll ) sel = function( $sel ){return doc.querySelectorAll( $sel );};
-		else{
-			c = {}, sel = function( $sel ){
-				var t0, i;
-				if( ( t0 = $sel.charAt(0) ) == '#' ){
-					if( c[0] = doc.getElementById($sel.substr(1)) ) return c.length = 1, c;
-					return null;
-				}
-				if( t0 == '.' ){
-					$sel = $sel.substr(1), t0 = doc.getElementsByTagName('*'), c.length = 0, i = t0.length;
-					while( i-- ) if( t0[i].className.indexOf( $sel ) > -1 ) c[c.length++] = t0[i];
-					return c;
-				}
-				return doc.getElementsByTagName($sel);
-			};
+			return $arg;
 		}
-		div = doc.createElement( 'div' ), nodes = {},
-		//4. define bs
-		bs = function( $sel, $node ){
-			var r, t0, i, j, k;
-			if( $sel.isDom ) return $sel;
-			t0 = typeof $sel;
-			if( t0 == 'string' ) return $sel.charAt(0) == '<' ? ( div.innerHTML = $sel, bs.$reverse(div.childNodes) ) : sel( $sel );
-			if( t0 == 'function' ) return $sel();
-			r = $node ? {} : nodes;
-			if( $sel.nodeType == 1 ) return r[0] = $sel, r.length = 1, r;
-			if( j = $sel.length ){
-				for( r.length = i = 0 ; i < j ; i++ ){
-					t0 = bs( $sel[i], 1 ), r.length = k = t0.length;
-					while( k-- ) r[k] = t0[k];
-				}
-				return r;
-			}
-		},
-		bs.DETECT = detect, bs.$sel = sel;
-		return bs;
-	})(doc);
-	//5. defined $class
-	(function(bs){
 		function none(){}
 		function factory( $name, $func ){
-			var cls, fn, t0, k;
+			var cls, fn, t0, k, f;
+			function f( $sel ){
+				var t0;
+				if( typeof $sel == 'string' ){
+					t0 = $sel.charAt(0);
+					if( t0 == '@' ) $sel = $sel.substr(1);
+					else if( t0 != '<' ) return cls[$sel] || ( cls[$sel] = new cls( $sel ) );
+				}
+				return new cls( $sel );
+			}
 			cls = function( $sel ){this.__new( this.__k = $sel );}, fn = cls.prototype,
-			fn.__new = none, fn.instanceOf = bs[$name], fn.del = function(){delete cls[this.__k];};
+			fn.__new = none, fn.instanceOf = bs[$name] = f, fn.del = function(){delete cls[this.__k];};
 			if( typeof $func == 'function' ){
 				$func( t0 = {}, bs );
 				for( k in t0 ) if( t0.hasOwnProperty( k ) ){
@@ -241,30 +91,83 @@ function init(doc){
 					else fn[k] = t0[k];
 				}
 			}
-			return function( $sel ){
-				var t0;
-				if( typeof $sel == 'string' ){
-					t0 = $sel.charAt(0);
-					if( t0 == '@' ) $sel = $sel.substr(1);
-					else if( t0 != '<' ) return cls[$sel] || ( cls[$sel] = new cls( $sel ) );
-				}
-				return new cls( $sel );
-			};
+			return f;
 		}
-		bs.$class = function( $name, $func ){
-			var t0, i;
-			$name = bs.$trim( $name.toLowerCase().split(',') ), i = $name.length, t0 = factory( $name[0], $func );
-			while( i-- ){
-				if( bs[$name[i]] ) throw 1;
-				bs[$name[i]] = t0;
+		//1. define bs, $method, $class, $static, $import, $importPath
+		function bs(){domLoaded ? ( domLoaded[domLoaded.len++] = arguments[0] ) : arguments[0]();}
+		bs.$method = function( $name, $func, $version/*, $dependency*/ ){
+			$name = $name.toLowerCase().replace( r, '' );
+			if( $name.charAt(0) == '@' ) $name = '$' + $name.substr(1);
+			else if( bs[$name = '$' + $name] ) throw new Error( 2, 'method exist:' + $name );
+			$func.VERSION = $version || -1, $func.DEPENDENCY = dependency( arguments ) || [], bs[$name] = $func;
+		},
+		bs.$method( 'class', function( $name, $func, $version/*, $dependency*/ ){
+			var t0, t1;
+			$name = $name.toLowerCase().replace( r, '' );
+			if( $name.charAt(0) == '@' ) $name = $name.substr(1);
+			else if( bs[$name] ) throw new Error( 2, 'class exist:' + $name );
+			t0 = dependency( arguments ), t1 = factory( $name, $func ), t1.VERSION = $version || VERSION, t1.DEPENDENCY = t0 || [];
+		} ),
+		bs.$method( 'static', function( $name, $obj, $version/*, $dependency*/ ){
+			$name = $name.toUpperCase().replace( r, '' );
+			if( $name.charAt(0) == '@' ) $name = $name.substr(1);
+			else if( bs[$name] ) throw new Error( 3, 'static exist:' + $name );
+			$obj.VERSION = $version || -1, $obj.DEPENDENCY = dependency( arguments ) || [], bs[$name] = $obj;
+		} ),
+		bs.$method( 'importPath', function( $path ){bs.$import.path = $path;} ),
+		bs.$method( 'import', (function(){
+			var r = {};
+			bs.$method( 'register', function( $type, $name, $obj, $version/*, $dependency*/ ){
+				if( !r[$name] ) throw new Error( 5, 'register undefined :' + $name );
+				r[$name].apply( null, arguments ), delete r[$name];
+			} );
+			function f(){
+				var id, isLoaded, list, path, loader, end, i, j, k, v;
+				if( typeof ( end = arguments[0] ) == 'function' ){
+					end = arguments[0], path = f.path || PLUGIN_REPO,
+					list = Array.prototype.slice.call( arguments, 1 ), i = 0, j = list.length,
+					( loader = function(){
+						if( i < j ){
+							k = list[i++].toLowerCase(), v = list[i++], v = v == 'last' || !v ? '' : v;
+							if( !bs[k] || bs[k].VERSION < v ){
+								r[k] = function( $type, $name, $obj, $version/*, $dependency*/ ){
+									var t0, t1, i, j, k, v, arg;
+									isLoaded = 1, clearTimeout( id );
+									if( $version === undefined ) throw new Error( 4, 'import undefined version' );
+									function register(){
+										switch( $type ){
+										case'class':case'method':case'static':bs['$'+$type]( '@' + $name, $obj, $version ); break;
+										default:throw new Error( 4, 'import type:' + $type );
+										}
+										loader();
+									}
+									if( arguments.length > 4 ){
+										t1 = [register], arg = Array.prototype.slice.call( arguments, 4 ), i = 0, j = arg.length;
+										while( i < j ){
+											k = arg[i++], v = arg[i++], t0 = bs[k];
+											if( !t0 || t0.VERSION < v ) t1[t1.length] = k, t1[t1.length] = v;
+										}
+										if( t1.length > 1 ) return bs.$import.apply( null, t1 );
+									}
+									register();
+								};
+								bs.$js( none, path + k + v + '.js' ), isLoaded = 0,
+								id = setTimeout( function(){if( !isLoaded ) throw new Error( 4, 'import timeout' );}, 5000 );
+							}else loader();
+						}else if( typeof end == 'function' ) end();
+					} )();
+				}else for( i = 0, j = arguments.length ; i < j ; i++ ) f.list[f.list.length] = arguments[i];
 			}
-		};
-	})(bs),
-	//6. define $XXX Utilities
+			f.list = [];
+			return f;
+		})() );
+		return bs;
+	})(domLoaded),
+	//2. define core
 	(function(){
 		var rc, random;
 		rc = 0, random = function(){return rc = ( rc + 1 ) % 1000, random[rc] || ( random[rc] = Math.random() );};
-		bs.$ex = function ex(){
+		bs.$method( 'ex', function(){
 			var t0, i, j;
 			t0 = arguments[0], i = 1, j = arguments.length;
 			while( i < j ){
@@ -274,9 +177,7 @@ function init(doc){
 				}
 			}
 			return t0;
-		};
-	})(),
-	(function(){
+		}, 0.0 );
 		function deco( $v, $t, $f, $r, $isEnd ){
 			var t0 = $v;
 			switch( $t ){
@@ -285,7 +186,7 @@ function init(doc){
 			case'r': if( typeof t0 == 'string' ) t0 = t0.replace( $f, $r ); return t0;
 			}
 		}
-		bs.$deco = function( $obj, $start, $end ){
+		bs.$method( 'deco', function( $obj, $start, $end ){
 			var type0, reg0, type1, reg1, t0, i;
 			type0 = ( typeof $start ).charAt(0), i = 3;
 			if( $start instanceof RegExp ) type0 = 'r', reg0 = $end,  $end = arguments[3], i = 4;
@@ -302,8 +203,8 @@ function init(doc){
 				for( i in $obj ) t0[i] = deco( deco( $obj[i], type0, $start, reg0 ), type1, $end, reg1, 1 );
 			}
 			return t0;
-		},
-		bs.$reverse = function( $obj ){
+		} ),
+		bs.$method( 'reverse', function( $obj ){
 			var t0, i;
 			i = $obj.length;
 			if( $obj.splice ){
@@ -314,7 +215,7 @@ function init(doc){
 				while( i-- ) t0[t0.length++] = $obj[i];
 			}
 			return t0;
-		};
+		} );
 	})();
 	(function(){
 		var arg, reg;
@@ -337,11 +238,13 @@ function init(doc){
 			else if( i == 'function' ) return t2( $0 );
 			return t2;
 		}
-		bs.$tmpl = function( $str ){
-			if( $str.substr(0,2) == '#T' ) $str = bs.d( $str ).$('@text');
+		bs.$method( 'tmpl', function( $str ){
+			if( $str.substr(0,2) == '#T' ) $str = bs.dom( $str ).$('@text');
 			else if( $str.substr($str.length-5) == '.html' ) $str = bs.$get( null, $str );
 			return arg = arguments, bs.$trim( $str.replace( reg, r ) );
-		};
+		} );
+	})();
+	(function(){
 		function factory( r, v ){	
 			function f( $v ){
 				var t0, i;
@@ -361,10 +264,10 @@ function init(doc){
 			};
 			return f;
 		}
-		bs.$stripTag = factory( /[<][^>]+[>]/g, '' );
-		bs.$trim = factory( /^\s*|\s*$/g, '' );
+		bs.$method( 'stripTag', factory( /[<][^>]+[>]/g, '' ) ),
+		bs.$method( 'trim', factory( /^\s*|\s*$/g, '' ) );
 	})();
-	bs.$img = (function(){
+	bs.$method( 'img', (function(){
 		function _load( $src, $data ){
 			var t0, t1;
 			t0 = new Image;
@@ -386,12 +289,12 @@ function init(doc){
 			};
 			while( i < j ) t0[t0.length++] = _load( path[i++], t0 );
 		};
-	})(),
-	bs.$url = function $url( $url_ ){location.href = $url_;},
-	bs.$open = function $open( $url ){W.open( $url );},
-	bs.$back = function $back(){history.back();},
-	bs.$reload = function $reload(){location.reload();},
-	//7. define JSloader
+	})() ),
+	bs.$method( 'url', function( $url ){location.href = $url;} ),
+	bs.$method( 'open', function( $url ){W.open( $url );} ),
+	bs.$method( 'back', function(){history.back();} ),
+	bs.$method( 'reload', function(){location.reload();} ),
+	//3. define JSloader
 	(function(doc){
 		var id, c, head;
 		function js( $data, $load, $end ){
@@ -409,17 +312,17 @@ function init(doc){
 			
 		}
 		id = 0, bs.__callback = c = {}, head = doc.getElementsByTagName( 'head' )[0],
-		bs.$js = function( $end ){
+		bs.$method( 'js', function( $end ){
 			var i, j, arg, load;
 			arg = arguments, i = 1, j = arg.length;
 			if( $end )(load = function(){i < j ? js( arg[i++], load, $end ) : load.callBack ? 0 : $end();})();
 			else while( i < j ) js( bs.$get( null, arg[i++] ) );
-		};
-	})(doc),
-	//8. defined ajax
+		} );
+	})(document),
+	//4. defined ajax
 	(function(){
 		var	_timeout = 5000, _cgiA = [], _cgiH = [];
-		var rq = W['XMLHttpRequest'] ? function rq(){ return new XMLHttpRequest; } : ( function(){
+		var rq = W['XMLHttpRequest'] ? function(){return new XMLHttpRequest;} : (function(){
 			var t0, i, j;
 			t0 = 'MSXML2.XMLHTTP', t0 = ['Microsoft.XMLHTTP',t0,t0+'.3.0',t0+'.4.0',t0+'.5.0'],
 			i = t0.length;
@@ -427,8 +330,8 @@ function init(doc){
 				try{ new ActiveXObject( j = t0[i] ); }catch( $e ){ continue; }
 				break;
 			}
-			return function rq(){ return new ActiveXObject( j ); };
-		} )();
+			return function(){return new ActiveXObject( j );};
+		})();
 		function xhrSend( $type, $xhr, $data ){
 			var i, j;
 			i = 0, j = _cgiH.length,
@@ -448,8 +351,7 @@ function init(doc){
 				},
 				t1 = setTimeout( function(){
 					if( t1 < 0 ) return;
-					t1 = -1;
-					$end( null );
+					t1 = -1, $end( null );
 				}, _timeout );
 			}
 			return t0;
@@ -471,8 +373,8 @@ function init(doc){
 			xhrSend( $type, t0, cgi( $args, 2 ) || '' );
 			if( !$end )	return t0.responseText;
 		}
-		bs.$timeout = function timeout( $time ){_timeout = parseInt( $time * 1000 );},
-		bs.$get = function get( $end, $url ){
+		bs.$method( 'timeout', function timeout( $time ){_timeout = parseInt( $time * 1000 );} ),
+		bs.$method( 'get', function get( $end, $url ){
 			var t0;
 			t0 = xhr( $end ),
 			$url = $url.split( '#' ),
@@ -480,37 +382,203 @@ function init(doc){
 			t0.open( 'GET', $url, $end ? true : false ),
 			xhrSend( 'GET', t0, '' );
 			if( !$end )	return t0.responseText;
-		},
-		bs.$post = function post( $end, $url ){return httpMethod( 'POST', arguments, $end, $url );},
-		bs.$put = function put( $end, $url ){return httpMethod( 'PUT', arguments, $end, $url );},
-		bs.$delete = function post( $end, $url ){return httpMethod( 'DELETE', arguments, $end, $url );};
+		} ),
+		bs.$method( 'post', function post( $end, $url ){return httpMethod( 'POST', arguments, $end, $url );} ),
+		bs.$method( 'put', function put( $end, $url ){return httpMethod( 'PUT', arguments, $end, $url );} ),
+		bs.$method( 'delete', function post( $end, $url ){return httpMethod( 'DELETE', arguments, $end, $url );} );
 	} )(),
-	bs.$ck = function ck( $key ){
-		var r, t0, t1, t2, key, val, i, j;
-		t0 =  doc.cookie.split(';');
-		i = t0.length;
+	bs.$method( 'ck', function ck( $key/*, $val, $expire, $path*/ ){
+		var t0, t1, t2, i, v;
+		t0 = document.cookie.split(';'), i = t0.length;
 		if( arguments.length == 1 ){
-			while( i-- ) if( ( t1 = t0[i] ) && t1.substring( 0, j = t1.indexOf('=') ).replace( /\s/, '' ) == $key ) t2 = t1.substr( j + 1);
+			while( i-- ) if( ( t1 = bs.$trim(t0[i].split('=')), t1[0] ) == $key ) return decodeURIComponent( t1[1] );
+			return null;
 		}else{
-			val = arguments[1],
-			t1 = $key + '=' + ( val || '' ) + ';domain='+document.domain+';path='+ (arguments[3] || '/');
-			if( val === null ){
-				t0 = new Date,
-				t0.setTime( t0.getTime() - 86400000 ),
-				t1 += ';expires=' + t0.toUTCString();
-			}else if( arguments[2] ){
-				t0 = new Date,
-				t0.setTime( t0.getTime() + arguments[2] * 86400000 ),
-				t1 += ';expires=' + t0.toUTCString();
-			}
-			doc.cookie = t1, t2 = '' + val;
+			v = arguments[1], t1 = $key + '=' + ( v ? encodeURIComponent( v ) : '' ) + ';domain='+document.domain+';path='+ (arguments[3] || '/');
+			if( v === null ) t0 = new Date, t0.setTime( t0.getTime() - 86400000 ), t1 += ';expires=' + t0.toUTCString();
+			else if( arguments[2] ) t0 = new Date, t0.setTime( t0.getTime() + arguments[2] * 86400000 ), t1 += ';expires=' + t0.toUTCString();
+			return document.cookie = t1, v;
 		}
-		return t2 ? decodeURIComponent( t2 ) : null;
-	},
+	} );
+	return bs.VERSION = VERSION, bs;
+})(
+
+domLoaded = function(doc){
+	//7. defined DETECT
+	(function(doc){
+		var platform, app, agent, device,
+			flash, browser, bVersion, os, osVersion, cssPrefix, stylePrefix, transform3D,
+			b, bStyle, div, keyframe,
+			v, a, c;
+		agent = navigator.userAgent.toLowerCase(),
+		platform = navigator.platform.toLowerCase(),
+		app = navigator.appVersion.toLowerCase(),
+		flash = 0, device = 'pc',
+		( function(){
+			var i;
+			function ie(){
+				if( agent.indexOf( 'msie' ) < 0 && agent.indexOf( 'trident' ) < 0 ) return;
+				if( agent.indexOf( 'iemobile' ) > -1 ) os = 'winMobile';
+				return browser = 'ie', bVersion = agent.indexOf( 'msie' ) < 0 ? 11 : parseFloat( /msie ([\d]+)/.exec( agent )[1] );
+			}
+			function chrome( i ){
+				if( agent.indexOf( i = 'chrome' ) < 0 && agent.indexOf( i = 'crios' ) < 0 ) return;
+				return browser = 'chrome', bVersion = parseFloat( ( i == 'chrome' ? /chrome\/([\d]+)/ : /crios\/([\d]+)/ ).exec( agent )[1] );
+			}
+			function firefox(){
+				if( agent.indexOf( 'firefox' ) < 0 ) return;
+				return browser = 'firefox', bVersion = parseFloat( /firefox\/([\d]+)/.exec( agent )[1] );
+			}
+			function safari(){
+				if( agent.indexOf( 'safari' ) < 0 ) return;
+				return browser = 'safari', bVersion = parseFloat( /safari\/([\d]+)/.exec( agent )[1] );
+			}
+			function opera(){
+				if( agent.indexOf( 'opera' ) < 0 ) return;
+				return browser = 'opera', bVersion = parseFloat( /version\/([\d]+)/.exec( agent )[1] );
+			}
+			function naver(){if( agent.indexOf( 'naver' ) > -1 ) return browser = 'naver';}
+			if( agent.indexOf( 'android' ) > -1 ){
+				browser = os = 'android';
+				if( agent.indexOf( 'mobile' ) == -1 ) browser += 'Tablet', device = 'tablet';
+				else device = 'mobile';
+				i = /android ([\d.]+)/.exec( agent );
+				if( i ) i = i[1].split('.'), osVersion = parseFloat( i[0] + '.' + i[1] );
+				else osVersion = 0;
+				i = /safari\/([\d.]+)/.exec( agent );
+				if( i ) bVersion = parseFloat( i[1] );
+				naver() || chrome() || firefox() || opera();
+			}else if( agent.indexOf( i = 'ipad' ) > -1 || agent.indexOf( i = 'iphone' ) > -1 ){
+				device = i == 'ipad' ? 'tablet' : 'mobile', browser = os = i;
+				if( i = /os ([\d_]+)/.exec( agent ) ) i = i[1].split('_'), osVersion = parseFloat( i[0] + '.' + i[1] );
+				else osVersion = 0;
+				if( i = /mobile\/10a([\d]+)/.exec( agent ) ) bVersion = parseFloat( i[1] );
+				naver() || chrome() || firefox() || opera();
+			}else{
+				( function(){
+					var plug, t0, e;
+					plug = navigator.plugins;
+					if( browser == 'ie' ) try{t0 = new ActiveXObject( 'ShockwaveFlash.ShockwaveFlash' ).GetVariable( '$version' ).substr( 4 ).split( ',' ), flash = parseFloat( t0[0] + '.' + t0[1] );}catch( e ){}
+					else if( ( t0 = plug['Shockwave Flash 2.0'] ) || ( t0 = plug['Shockwave Flash'] ) ) t0 = t0.description.split( ' ' )[2].split( '.' ), flash = parseFloat( t0[0] + '.' + t0[1] );
+					else if( agent.indexOf( 'webtv' ) > -1 ) flash = agent.indexOf( 'webtv/2.6' ) > -1 ? 4 : agent.indexOf("webtv/2.5") > -1 ? 3 : 2;
+				} )();
+				if( platform.indexOf( 'win' ) > -1 ){
+					os = 'win', i = 'windows nt ';
+					if( agent.indexOf( i + '5.1' ) > -1 ) osVersion = 'xp';
+					else if( agent.indexOf( i + '6.0' ) > -1 ) osVersion = 'vista';
+					else if( agent.indexOf( i + '6.1' ) > -1 ) osVersion = '7';
+					else if( agent.indexOf( i + '6.2' ) > -1 ) osVersion = '8';
+					else if( agent.indexOf( i + '6.3' ) > -1 ) osVersion = '8.1';
+					ie() || chrome() || firefox() || safari() || opera();
+				}else if( platform.indexOf( 'mac' ) > -1 ){      
+					os = 'mac';
+					i = /os x ([\d._]+)/.exec(agent)[1].replace( '_', '.' ).split('.');
+					osVersion = parseFloat( i[0] + '.' + i[1] );
+					chrome() || firefox() || safari() || opera();
+				}else{
+					os = app.indexOf( 'x11' ) > -1 ? 'unix' : app.indexOf( 'linux' ) > -1 ? 'linux' : 0;
+					chrome() || firefox();
+				}
+			}
+		})(),
+		b = doc.body, bStyle = b.style, div = doc.createElement( 'div' ),
+		div.innerHTML = '<div style="opacity:.55;position:fixed;top:100px;visibility:hidden;-webkit-overflow-scrolling:touch">a</div>',
+		div = div.getElementsByTagName( 'div' )[0],
+		c = doc.createElement( 'canvas' ), c = 'getContext' in c ? c : null,
+		a = doc.createElement( 'audio' ), a = 'canPlayType' in a ? a : null,
+		v = doc.createElement( 'video' ), v = 'canPlayType' in v ? v : null;
+		switch( browser ){
+		case'ie': cssPrefix = '-ms-', stylePrefix = 'ms'; transform3D = bVersion > 9 ? 1 : 0;
+			if( bVersion == 6 ) doc.execCommand( 'BackgroundImageCache', false, true ), b.style.position = 'relative';
+			break;
+		case'firefox': cssPrefix = '-moz-', stylePrefix = 'Moz'; transform3D = 1; break;
+		case'opera': cssPrefix = '-o-', stylePrefix = 'O'; transform3D = 0; break;
+		default: cssPrefix = '-webkit-', stylePrefix = 'webkit'; transform3D = os == 'android' ? ( osVersion < 4 ? 0 : 1 ) : 0;
+		}
+		if( keyframe = W['CSSRule'] ){
+			if( keyframe.WEBKIT_KEYFRAME_RULE ) keyframe = '-webkit-keyframes';
+			else if( keyframe.MOZ_KEYFRAME_RULE ) keyframe = '-moz-keyframes';
+			else if( keyframe.KEYFRAME_RULE ) keyframe = 'keyframes';
+			else keyframe = null;
+		}
+		bs.$static( 'DETECT', {
+			'device':device, 'browser':browser, 'browserVer':bVersion, 'os':os, 'osVer':osVersion, 'flash':flash, 'sony':agent.indexOf( 'sony' ) > -1,
+			//dom
+			root:b.scrollHeight ? b : doc.documentElement,
+			scroll:doc.documentElement && typeof doc.documentElement.scrollLeft == 'number' ? 'scroll' : 'page',
+			insertBefore:div.insertBefore, png:browser == 'ie' && bVersion > 7, 
+			opacity:div.style.opacity == '0.55' ? 1 : 0, text:div.textContent ? 'textContent' : div.innerText ? 'innerText' : 'innerHTML',
+			cstyle:doc.defaultView && doc.defaultView.getComputedStyle,
+			//css3
+			cssPrefix:cssPrefix, stylePrefix:stylePrefix, filterFix:browser == 'ie' && bVersion == 8 ? ';-ms-' : ';',
+			transition:stylePrefix + 'Transition' in bStyle || 'transition' in bStyle, transform3D:transform3D, keyframe:keyframe,
+			//html5
+			canvas:c, canvasText:c && c.getContext('2d').fillText,
+			audio:a,
+			audioMp3:a && a.canPlayType( 'audio/mpeg;' ).indexOf( 'no' ) < 0 ? 1 : 0,
+			audioOgg:a && a.canPlayType( 'audio/ogg;' ).indexOf( 'no' ) < 0 ? 1 : 0,
+			audioWav:a && a.canPlayType( 'audio/wav;' ).indexOf( 'no' ) < 0 ? 1 : 0,
+			audioMp4:a && a.canPlayType( 'audio/mp4;' ).indexOf( 'no' ) < 0 ? 1 : 0,
+			video:v,
+			videoCaption:'track' in doc.createElement('track') ? 1 : 0,
+			videoPoster:v && 'poster' in v ? 1 : 0,
+			videoWebm:v && v.canPlayType( 'video/webm; codecs="vp8,mp4a.40.2"' ).indexOf( 'no' ) == -1 ? 1 : 0,
+			videH264:v && v.canPlayType( 'video/mp4; codecs="avc1.42E01E,m4a.40.2"' ).indexOf( 'no' ) == -1 ? 1 : 0,
+			videoTeora:v && v.canPlayType( 'video/ogg; codecs="theora,vorbis"' ).indexOf( 'no' ) == -1 ? 1 : 0,
+			local:W.localStorage && 'setItem' in localStorage,
+			geo:navigator.geolocation, worker:W.Worker, file:W.FileReader, message:W.postMessage,
+			history:'pushState' in history, offline:W.applicationCache,
+			db:W.openDatabase, socket:W.WebSocket
+		} );
+	})(doc);
+	//8. define $dom
+	bs.$method( 'domquery', (function(doc){
+		var c;
+		if( doc.querySelectorAll ) return function( $sel ){return doc.querySelectorAll( $sel );};
+		else return c = {}, function( $sel ){
+			var t0, i;
+			if( ( t0 = $sel.charAt(0) ) == '#' ){
+				if( c[0] = doc.getElementById($sel.substr(1)) ) return c.length = 1, c;
+				return null;
+			}
+			if( t0 == '.' ){
+				$sel = $sel.substr(1), t0 = doc.getElementsByTagName('*'), c.length = 0, i = t0.length;
+				while( i-- ) if( t0[i].className.indexOf( $sel ) > -1 ) c[c.length++] = t0[i];
+				return c;
+			}
+			return doc.getElementsByTagName($sel);
+		};
+	})(doc) );
+	bs.$method( 'domfromhtml', (function(doc){
+		var div;
+		div = doc.createElement( 'div' );
+		return function( $sel ){
+			return div.innerHTML = $sel, bs.$reverse( div.childNodes );
+		};
+	})(doc) ),
+	bs.$method( 'dom', (function( sel, html ){
+		var nodes = {};
+		function dom( $sel, $node ){
+			var r, t0, i, j, k;
+			t0 = typeof $sel;
+			if( t0 == 'function' ) return $sel();
+			if( t0 == 'string' ) return $sel.charAt(0) == '<' ? html( $sel ) : sel( $sel );
+			if( $sel.instanceOf == bs.dom ) return $sel;
+			r = $node ? {} : nodes;
+			if( $sel.nodeType == 1 ) return r[0] = $sel, r.length = 1, r;
+			if( j = $sel.length ){
+				for( r.length = i = 0 ; i < j ; i++ ){
+					t0 = dom( $sel[i], 1 ), r.length = k = t0.length;
+					while( k-- ) r[k] = t0[k];
+				}
+				return r;
+			}
+		}
+		return dom;
+	})( bs.$domquery, bs.$domfromhtml ) ),
 	(function( doc ){
-		var style;
 		//9. defined style
-		style = (function(){
+		var style = (function(){
 			var style, nopx, b, pf, reg, regf;
 			b = doc.body.style,
 			reg = /-[a-z]/g, regf = function($0){return $0.charAt(1).toUpperCase();},
@@ -588,9 +656,7 @@ function init(doc){
 				}
 				return k;
 			},
-			style.float = 'styleFloat' in b ? 'styleFloat' : 'cssFloat' in b ? 'cssFloat' : 'float',
-			style['url('] = function($v){return $v;},
-			bs.style = style;
+			style.float = 'styleFloat' in b ? 'styleFloat' : 'cssFloat' in b ? 'cssFloat' : 'float', style['url('] = function($v){return $v;};
 			if( !( 'opacity' in b ) ){
 				style.opacity = function(s){
 					var v = arguments[1];
@@ -604,10 +670,10 @@ function init(doc){
 					return 'rgb('+parseInt((255+t0[0]*t0[3])*.5)+','+parseInt((255+t0[1]*t0[3])*.5)+','+parseInt((255+t0[2]*t0[3])*.5)+')';
 				};
 			}
-			return style;
+			return bs.style = style;
 		})();
 		//10. define css
-		bs.$class( 'css,c', function( $fn, bs ){
+		bs.$class( 'css', function( $fn, bs ){
 			var sheet, rule, ruleSet, idx, add, del, ruleKey, keyframe,
 				r, parser;
 			doc.getElementsByTagName( 'head' )[0].appendChild( sheet = doc.createElement( 'style' ) ),
@@ -628,30 +694,19 @@ function init(doc){
 				if( $key.indexOf('@') > -1 ){
 					$key = $key.split('@');
 					if( $key[0] == 'font-face' ){
-						$key = $key[1].split(' '),
-						v = 'font-family:'+$key[0]+";src:url('"+$key[1]+".eot');src:"+
-							"url('"+$key[1]+".eot?#iefix') format('embedded-opentype'),"+
-							"url('"+$key[1]+".woff') format('woff'),"+
-							"url('"+$key[1]+".ttf') format('truetype'),"+
-							"url('"+$key[1]+".svg') format('svg');",
-						$key = '@font-face',
-						this.type = 5;
-						try{ 
-							this.r = add( $key, v );
+						$key = $key[1].split(' '), v = 'font-family:'+$key[0]+";src:url('"+$key[1]+".eot');src:"+
+							"url('"+$key[1]+".eot?#iefix') format('embedded-opentype'),url('"+$key[1]+".woff') format('woff'),"+
+							"url('"+$key[1]+".ttf') format('truetype'),url('"+$key[1]+".svg') format('svg');",
+						$key = '@font-face', this.type = 5;
+						try{this.r = add( $key, v ); 
 						}catch($e){
-							t0 = doc.createElement( 'style' );
-							doc.getElementsByTagName( 'head' )[0].appendChild( t0 );
+							doc.getElementsByTagName( 'head' )[0].appendChild( t0 = doc.createElement( 'style' ) ),
 							(t0.styleSheet||t0.sheet).cssText = $key + '{' +v+'}';
 						}
 						return;
 					}else if( $key[0] == 'keyframes' ){
-						if( !keyframe ){
-							this.type = -1;
-							return;
-						}else{
-							$key = '@' + ( ruleKey[$key[0]] || $key[0] )+ ' ' + $key[1],
-							this.type = 7;
-						}
+						if( !keyframe )return this.type = -1;
+						else $key = '@' + ( ruleKey[$key[0]] || $key[0] )+ ' ' + $key[1], this.type = 7;
 					}
 				}else this.type = 1;
 				this.r = add( $key, v );
@@ -666,15 +721,12 @@ function init(doc){
 					if( !this[t0] ){
 						if( this.r.appendRule ) this.r.appendRule( t0+'{}' );
 						else this.r.insertRule( t0+'{}' );
-						r = this.r.cssRules[this.r.cssRules.length - 1];
-						this[t0] = {r:r, s:new style( r.style )};
+						r = this.r.cssRules[this.r.cssRules.length - 1], this[t0] = {r:r, s:new style( r.style )};
 					}
-					if( arguments[1] == null ) this[t0].s.init();
-					else this[t0].s.$( arguments, 1 );
+					arguments[1] == null ? this[t0].s.init() : this[t0].s.$( arguments, 1 );
 				}
 				return this;
-			},
-			r = /^[0-9.-]+$/,
+			}, r = /^[0-9.-]+$/,
 			parser = function( $data ){
 				var t0, t1, t2, c, i, j, k, v;
 				t2 = [], t0 = $data.split('}');
@@ -682,31 +734,22 @@ function init(doc){
 					if( t0[i] ){
 						t0[i] = bs.$trim( t0[i].split('{') );
 						if( t0[i][0].charAt(0) != '@' ){
-							c = bs.c( t0[i][0] ),
-							t1 = bs.$trim( t0[i][1].split(';') ),
-							k = t1.length, t2.length = 0;
-							while( k-- ){
-								v = bs.$trim( t1[k].split(':') ),
-								t2[t2.length] = v[0], t2[t2.length] = r.test(v[1]) ? parseFloat(v[1]) : v[1];
-							}
+							c = bs.css( t0[i][0] ), t1 = bs.$trim( t0[i][1].split(';') ), k = t1.length, t2.length = 0;
+							while( k-- ) v = bs.$trim( t1[k].split(':') ), t2[t2.length] = v[0], t2[t2.length] = r.test(v[1]) ? parseFloat(v[1]) : v[1];
 							c.$.apply( c, t2 );
 						}
 					}
 				}
-			},
-			bs.$css = function( $v ){
-				if( $v.substr( $v.length - 4 ) == '.css' ) bs.$get( parser, $v ); 
-				else parser( $v );
-			};
+			}, bs.$method( 'css', function( $v ){$v.substr( $v.length - 4 ) == '.css' ? bs.$get( parser, $v ) : parser( $v );} );
 		} );
 		//11. define dom
-		bs.$class( 'dom,d', function( $fn, bs ){
-			var ds, ds0, ev, t, x, y, nodes, drill, childNodes,
+		bs.$class( 'dom', function( $fn, bs ){
+			var dom, ds, ds0, ev, t, x, y, nodes, drill, childNodes,
 				win, wine, hash, sizer;
-			t = /^\s*|\s*$/g;
+			t = /^\s*|\s*$/g, dom = bs.$dom,
 			$fn.constructor = function( $key ){
 				var t0, i;
-				t0 = bs( $key ), this.length = i = t0.length;
+				t0 = dom( $key ), this.length = i = t0.length;
 				while( i-- ) this[i] = t0[i];
 			},
 			$fn._ = function(){
@@ -752,7 +795,6 @@ function init(doc){
 				}
 				return v;
 			},
-			$fn.isDom = 1,
 			$fn.style = function( $dom ){return $dom.bsS;},
 			$fn.x = x = function( $dom ){var i = 0; do i += $dom.offsetLeft; while( $dom = $dom.offsetParent ) return i;},
 			$fn.y = y = function( $dom ){var i = 0; do i += $dom.offsetTop; while( $dom = $dom.offsetParent ) return i;},
@@ -767,7 +809,7 @@ function init(doc){
 				var t0;
 				if( $v ){
 					if( $dom.parentNode ) $dom.parentNode.removeChild( $dom );
-					return t0 = bs( $v ), t0[0].appendChild( $dom ), t0;
+					return t0 = dom( $v ), t0[0].appendChild( $dom ), t0;
 				}else return $dom.parentNode;
 			},		
 			$fn.html = function( $dom, $v ){return $v === undefined ? $dom.innerHTML : ( $dom.innerHTML = $v );},
@@ -836,7 +878,7 @@ function init(doc){
 								else if( t0 = ds[$v.charAt(0)] ) return $dom = drill( $dom, $k ), t0( $dom, $v.substr(1), $arg[$i], $arg, $i+1 );
 								else if( t0 = $fn[$v] ) return $dom = drill( $dom, $k ), t0( $dom, v );
 							}
-							$v = bs( $v );
+							$v = dom( $v );
 							t0 = $dom.childNodes, ds0.length = i = t0.length;
 							while( i-- ) ds0[i] = t0[i];
 							if( j = ds0.length ){
@@ -847,7 +889,7 @@ function init(doc){
 									else $dom.appendChild( ds0[i+1] );
 								}
 							}else for( i = 0, j = $v.length ; i < j ; i++ ) $dom.appendChild( $v[i] );
-						}else for( $v = bs( $v ), i = 0, j = $v.length ; i < j ; i++ ) $dom.appendChild( $v[i] );
+						}else for( $v = dom( $v ), i = 0, j = $v.length ; i < j ; i++ ) $dom.appendChild( $v[i] );
 					}else if( $v === null ){
 						if( $k ) $fn._.call( childNodes( $dom.childNodes ), nodes[0] = nodes[$k], nodes.length = 1, nodes );
 						else if( $dom.childNodes && childNodes( $dom.childNodes ).length ) $fn._.call( nodes );
@@ -1014,7 +1056,7 @@ function init(doc){
 				if( bs.DETECT.eventRotate ) win.on( 'orientationchange', 'wh', $wh );
 				$wh();
 			},
-			bs.WIN = win = {
+			bs.$static( 'WIN', win = {
 				on:function( e, k, v ){
 					if( e == 'hashchange' && !'onhashchange' in W ) return hash( e, k, v );
 					if( e == 'orientationchange' && !'onorientationchange' in W ) return 0;
@@ -1022,20 +1064,9 @@ function init(doc){
 					wine( e, k, v );
 				},
 				is:function( $sel ){
-					var t0 = bs.$sel( $sel );
+					var t0 = bs.$domquery( $sel );
 					return t0 && t0.length;
 				},
-				touchScroll:(function( doc, isTouch ){
-					var i;
-					function prevent( e ){
-						e.preventDefault();
-						return false;
-					}
-					return function(v){
-						if( v ) doc.removeEventListener( 'touchmove', prevent, true);
-						else if( isTouch && !i++ ) doc.addEventListener( 'touchmove', prevent, true);
-					};
-				})( doc, bs.DETECT.eventTouch ),
 				scroll:(function( W, doc, root ){
 					return function scroll(){
 						switch( arguments[0].charAt(0) ){
@@ -1051,8 +1082,8 @@ function init(doc){
 				sizer:(function( W, doc ){
 					return function( $end ){
 						var wh, r, s;
-						if( !win.is( '#bsSizer' ) ) bs.d( '<div></div>' ).$( '@id', 'bsSizer', 'display','none','width','100%','height','100%','position','absolute','<','body' );
-						s = bs.d('#bsSizer');
+						if( !win.is( '#bsSizer' ) ) bs.dom( '<div></div>' ).$( '@id', 'bsSizer', 'display','none','width','100%','height','100%','position','absolute','<','body' );
+						s = bs.dom('#bsSizer');
 						switch( bs.DETECT.os ){
 						case'iphone':
 							s.$( 'display', 'block', 'height', '120%' ),
@@ -1078,20 +1109,20 @@ function init(doc){
 						}
 					}
 				})( W, doc )
-			};
+			} );
 		} ),
-		bs.KEY = (function(){
+		bs.$static( 'KEY', (function(){
 			var buffer, keycode;
 			return keycode = bs.keycode, delete bs.keycode, 
 				bs.WIN.on( 'keydown', '@bsKD', function($e){buffer[keycode[$e.keyCode]] = 1;}),
 				bs.WIN.on( 'keyup', '@bsKU', function($e){buffer[keycode[$e.keyCode]] = 0;}),
 				buffer = {};
-		})();
+		})() );
 	})( doc );
 	//14. define ANI, tween
-	bs.ANI = ( function(){
-		var style, filter, timer, start, end, loop, ease, ANI, ani, len, time, isLive, isPause, tween, tweenPool;
-		style = bs.style, filter = bs.filter, bs.style = bs.filter = null, ani = [], time = len = 0,
+	bs.$static( 'ANI', ( function(){
+		var style, timer, start, end, loop, ease, ANI, ani, len, time, isLive, isPause, tween, tweenPool;
+		style = bs.style, bs.style = null, ani = [], time = len = 0,
 		timer = W['requestAnimationFrame'] || W['webkitRequestAnimationFrame'] || W['msRequestAnimationFrame'] || W['mozRequestAnimationFrame'] || W['oRequestAnimationFrame'];
 		if( timer ){
 			start = function(){if( !isLive ) isPause = 0, isLive = 1, loop();},
@@ -1145,7 +1176,7 @@ function init(doc){
 		})(),
 		tween.prototype.init = function( $arg ){
 			var t0, l, i, j, k, v, isDom, v0;
-			this.t = t0 = $arg[0].nodeType == 1 ? bs.dom( $arg[0] ) : $arg[0], this.isDom = isDom = t0.isDom,
+			this.t = t0 = $arg[0].nodeType == 1 ? bs.dom( $arg[0] ) : $arg[0], this.isDom = isDom = ( t0.instanceOf == bs.dom ),
 			this.delay = this.stop = this.pause = 0, this.id = this.end = this.update = null, this.ease = ease.linear,
 			this.time = 1000, this.timeR = .001, this.loop = this.loopC = 1, this.length = l = t0.length || 1;
 			while(l--) ( this[l] ? (this[l].length=0) : (this[l]=[]) ), ( this[l][0] = isDom ? t0[l].bsS : (t0[l] || t0) );
@@ -1202,8 +1233,7 @@ function init(doc){
 				else if( $pause == 2 && this.pause ) t0 = $time - this.pause, this.stime += t0, this.etime += t0, this.pause = 0;
 			if( this.pause ) return;
 			if( ( term = $time - this.stime ) < 0 ) return;
-			e = this.ease, time = this.time, rate = term * this.timeR, 
-			l = this.length, j = this[0].length;
+			e = this.ease, time = this.time, rate = term * this.timeR, l = this.length, j = this[0].length;
 			if( term > this.time )
 				if( --this.loopC ) return this.stime=$time+this.delay,this.etime=this.stime+this.time,0;
 				else{
@@ -1261,81 +1291,47 @@ function init(doc){
 			},
 			pause:function(){
 				var i, t;
-				isPause = 1;
-				t = Date.now(), i = len;
+				isPause = 1, t = Date.now(), i = len;
 				while( i-- ) ani[i].ANI( t, 1 );
 			},
 			resume:function(){
 				var i, t;
-				isPause = 0;
-				t = Date.now(), i = len;
+				isPause = 0, t = Date.now(), i = len;
 				while( i-- ) ani[i].ANI( t, 2 );
 				loop();
 			},
-			toggle:function(){
-				isPause ? ANI.resume() : ANI.pause();
-				return isPause;
-			},
+			toggle:function(){return isPause ? ANI.resume() : ANI.pause(), isPause;},
 			stop:function(){end();},
 			delay:(function(){
 				var delay = [];
 				return function( $f ){
 					var i;
-					if( (i = delay.indexOf( $f ) ) == -1 ){
-						delay[delay.length] = $f;
-						$f.bsDelay = setTimeout( $f, ( arguments[1] || 1 ) * 1000 );
-					}else{
-						delay.splice( i, 1 );
-						clearTimeout( $f.bsDelay );
-						delete $f.bsDelay;
-					}
+					if( (i = delay.indexOf( $f ) ) == -1 ) delay[delay.length] = $f, $f.bsDelay = setTimeout( $f, ( arguments[1] || 1 ) * 1000 );
+					else delay.splice( i, 1 ), clearTimeout( $f.bsDelay ), delete $f.bsDelay;
 				};
-			})(),
-			fps:(function(){
-				var printer, prev, sum, cnt, isStop;
-				prev = sum = cnt = 0;
-				function fps(){
-					if( arguments.length ){
-						if( printer ) throw 'fps is running';
-						isStop = 0,
-						printer = arguments[0],
-						bs.ANI.ani( fps );
-					}else{
-						isStop = 1,
-						printer = null;
-					}
-				}
-				fps.ANI = function( $time ){
-					var i;
-					i = parseInt(1000/(($time - prev)||1)),
-					sum += i, cnt++,
-					printer.innerHTML = "fps("+i+"/"+parseInt( sum / cnt )+')',
-					prev = $time;
-					if( cnt > 60000 ) cnt = sum = 0;
-					return isStop;
-				};
-				return fps;
 			})()
 		};
-	})();
+	})() );
 	return bs;
-}
-init.len = 0;
-//15. DOM loader
+}, domLoaded.len = 0, domLoaded
+);
+//6. DOM loader
 ( function(){
 	var id = setInterval( function(){
-		var i, j;
+		var start, i;
 		switch( i = document.readyState ){
 		case'complete':case'loaded':break;
 		case'interactive':if( document.documentElement.doScroll ) try{document.documentElement.doScroll('left');}catch(e){return;}
-		default:return;
-		}
+		default:return;}
 		if( document && document.getElementsByTagName && document.getElementById && document.body ){
-			clearInterval( id );
-			for( W[N] = init( W.document ), i = 0, j = init.len ; i < j ; i++ ) init[i]();
+			clearInterval( id ), domLoaded( W.document ), start = function(){
+				var i, j;
+				for( i = 0, j = domLoaded.len ; i < j ; i++ ) domLoaded[i]();
+				domLoaded = null;
+			};
+			if( bs.$import.list.length ) bs.$import.list.unshift( start ), bs.$import.apply( null, bs.$import.list ), bs.$import.list.length = 0;
+			else start();
 		}
 	}, 1 );
 })();
-//16. proxy bs
-W[N] = function(){init[init.len++] = arguments[0];};
 } )( this );

@@ -1,5 +1,4 @@
-bs( function(){
-	console.log( '$xml' );
+bs.$register( 'method', 'xml', (function(){ console.log( 'xml' );
 	var type, parser, t;
 	t = /^\s*|\s*$/g;
 	function _xml( $node ){
@@ -22,13 +21,12 @@ bs( function(){
 	function xml0( $data, $end ){
 		var r, t0, t1, nn, i, j;
 		t0 = $data.childNodes, r = {}, i = 0, j = t0.length;
-		if( $end ){
-			( nn = function(){
+		if( $end )( nn = function(){
 				var k, t1;
 				for( var k = 0 ; i < j && k < 5000 ; i++, k++ ) t1 = type ? t0[i] : t0.nextNode(), r[t1.nodeName] = _xml( t1 );
 				i < j ? setTimeout( nn, 16 ) : $end( r );
 			} )();
-		}else{
+		else{
 			for( ; i < j ; i++ ) t1 = type ? t0[i] : t0.nextNode(), r[t1.nodeName] = _xml( t1 );
 			return r;
 		}
@@ -38,24 +36,20 @@ bs( function(){
 		if( $data.substr( $data.length - 5 ).indexOf( ']]>' ) > -1 ) $data = $data.substring( 0, $data.length - 5 ) + $data.substr( $data.length - 5 ).replace( ']]>', '' );
 		return $data.replace( t, '' );
 	}
-	if( DOMParser ){
-		type = 1, parser = new DOMParser;
-		bs.$xml = function( $end, $data ){return xml0( parser.parseFromString( filter( $data ), "text/xml" ), $end );};
-	}else{
+	if( DOMParser ) return type = 1, parser = new DOMParser, function( $end, $data ){return xml0( parser.parseFromString( filter( $data ), "text/xml" ), $end );};
+	else{
 		type = 0, parser = (function(){
 			var t0, i, j;
-			t0 = 'MSXML2.DOMDocument', t0 = ['Microsoft.XMLDOM', 'MSXML.DOMDocument', t0, t0+'.3.0', t0+'.4.0', t0+'.5.0', t0+'.6.0'],
-			i = t0.length;
+			t0 = 'MSXML2.DOMDocument', t0 = ['Microsoft.XMLDOM', 'MSXML.DOMDocument', t0, t0+'.3.0', t0+'.4.0', t0+'.5.0', t0+'.6.0'], i = t0.length;
 			while( i-- ){
-				try{ new ActiveXObject( j = t0[i] ); }catch( $e ){ continue; }
+				try{new ActiveXObject( j = t0[i] );}catch( $e ){continue;}
 				break;
 			}
 			return function(){return new ActiveXObject( j );};
 		})();
-		bs.$xml = function xml( $end, $data ){
+		return function xml( $end, $data ){
 			var p = parser();
-			p.loadXML( filter( $data ) );
-			return xml0( p, $end );
+			return p.loadXML( filter( $data ) ), xml0( p, $end );
 		};
 	}
-} );
+})(), 1.0 );

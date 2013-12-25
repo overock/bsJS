@@ -28,8 +28,8 @@ bs( function(){
 	var temp, obj0, obj1;
 	bsTest.tear( 'template init', function(){
 		//get template string
-		temp = bs.d( '#tmpl_a' ).$( '@text' );
-		console.log(bs.d( '#tmpl_a' ), temp);
+		temp = bs.dom( '#tmpl_a' ).$( '@text' );
+		console.log(bs.dom( '#tmpl_a' ), temp);
 		/*
 		<div id="label0">
 			<h1>@label.0@</h1>
@@ -60,13 +60,13 @@ bs( function(){
 	} );
 	bsTest( '템플릿테스트',
 		function(){
-			return bs.d('#label0').$('>0', 'html' );
+			return bs.dom('#label0').$('>0', 'html' );
 		},obj0.label[0],
 		function(){
-			return bs.d('#'+obj0.user.id).$('html').substr(0,obj0.user.id.length);
+			return bs.dom('#'+obj0.user.id).$('html').substr(0,obj0.user.id.length);
 		},obj0.user.id,
 		function(){
-			return bs.d('#group').$('html');
+			return bs.dom('#group').$('html');
 		},'group : '+obj1[2].group
 	);
 	bsTest.tear( 'template sync load', function(){
@@ -84,13 +84,13 @@ bs( function(){
 	} );
 	bsTest( '템플릿테스트',
 		function(){
-			return bs.d('#label2').$('>0', 'html' );
+			return bs.dom('#label2').$('>0', 'html' );
 		},obj0.label[1],
 		function(){
-			return bs.d('#'+obj0.user.id).$('html').substr(0,obj0.user.id.length);
+			return bs.dom('#'+obj0.user.id).$('html').substr(0,obj0.user.id.length);
 		},obj0.user.id,
 		function(){
-			return bs.d('#age').$('html');
+			return bs.dom('#age').$('html');
 		},'age : '+obj1[0]
 	);
 } );

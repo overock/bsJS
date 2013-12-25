@@ -168,7 +168,7 @@ bs( function(){
 			this.dom.$( 'left', this.px, 'top', this.py );
 			if( this.pcount++ % 2 ){
 				var s = bs.$ex( 30, '~', 50 );
-				var d = digit.div.length ? digit.div[--digit.div.length] : bs.d('<div></div>' ).$( 'position','absolute', '<', '#stage', 'this' );
+				var d = digit.div.length ? digit.div[--digit.div.length] : bs.dom('<div></div>' ).$( 'position','absolute', '<', '#stage', 'this' );
 				d.$( 'visibility', 'visible', 'background', this.c, 
 					'width',10, 'height',10, 'border-radius', 10, 'left',this.px,'top',this.py, 'opacity', 1 
 				);
@@ -180,12 +180,12 @@ bs( function(){
 			}
 		}else this.stat = $num, this.step = 0, this.px = this.x, this.py = this.y;
 	};
-	bs.c('.time').$('position','absolute','width',10,'height',10,'background','#f00','border-radius',5);
+	bs.css('.time').$('position','absolute','width',10,'height',10,'background','#f00','border-radius',5);
 	var time = [
-		new digit( bs.d('<div class="time"></div>').$('<','#stage','this'), 50, 50, 100, 150, 15, '#a66', 20 ),
-		new digit( bs.d('<div class="time"></div>').$('<','#stage','this'), 200, 50, 100, 150, 15, '#a66', 20 ),
-		new digit( bs.d('<div class="time"></div>').$('<','#stage','this'), 50, 250, 80, 120, 12, '#66a', 15 ),
-		new digit( bs.d('<div class="time"></div>').$('<','#stage','this'), 200, 250, 80, 120, 10, '#66a', 15 )
+		new digit( bs.dom('<div class="time"></div>').$('<','#stage','this'), 50, 50, 100, 150, 15, '#a66', 20 ),
+		new digit( bs.dom('<div class="time"></div>').$('<','#stage','this'), 200, 50, 100, 150, 15, '#a66', 20 ),
+		new digit( bs.dom('<div class="time"></div>').$('<','#stage','this'), 50, 250, 80, 120, 12, '#66a', 15 ),
+		new digit( bs.dom('<div class="time"></div>').$('<','#stage','this'), 200, 250, 80, 120, 10, '#66a', 15 )
 	];
 	bs.ANI.ani( {ANI:function($time){
 		var h, m, s;
