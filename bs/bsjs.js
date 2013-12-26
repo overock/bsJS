@@ -9,7 +9,7 @@
  */
 ( function( W, N ){
 'use strict';N = N ||'bs';
-var VERSION, PLUGIN_REPO, bs, domLoaded;
+var VERSION, PLUGIN_REPO, bs, beforeLoading, domLoaded;
 VERSION = 0.2,
 PLUGIN_REPO = '../bs/plugin/'; //'http://projectbs.github.io/bsJS/bs/plugin/'
 
@@ -54,9 +54,9 @@ if( !W['console'] ) (function(){
 		flush:function(){return t0 = log.slice(0), log.length = 0, t0;}
 	};
 })();
-W[N] = bs = (function(domLoaded){
+W[N] = bs = (function(){
 	var bs;
-	bs = (function(domLoaded){
+	bs = (function( beforeLoading ){
 		var r = /^\s*|\s*$/g;
 		function dependency( $arg ){
 			var t0, t1, i, j, k, v;
@@ -82,7 +82,7 @@ W[N] = bs = (function(domLoaded){
 				return new cls( $sel );
 			}
 			cls = function( $sel ){this.__new( this.__k = $sel );}, fn = cls.prototype,
-			fn.__new = none, fn.instanceOf = bs[$name] = f, fn.del = function(){delete cls[this.__k];};
+			fn.__new = none, fn.instanceOf = bs[$name] = f, fn.destroyer = function(){delete cls[this.__k];};
 			if( typeof $func == 'function' ){
 				$func( t0 = {}, bs );
 				for( k in t0 ) if( t0.hasOwnProperty( k ) ){
@@ -94,12 +94,12 @@ W[N] = bs = (function(domLoaded){
 			return f;
 		}
 		//1. define bs, $method, $class, $static, $import, $importPath
-		function bs(){domLoaded ? ( domLoaded[domLoaded.len++] = arguments[0] ) : arguments[0]();}
+		function bs(){beforeLoading ? ( beforeLoading[beforeLoading.length] = arguments[0] ) : arguments[0]();}
 		bs.$method = function( $name, $func, $version/*, $dependency*/ ){
 			$name = $name.toLowerCase().replace( r, '' );
 			if( $name.charAt(0) == '@' ) $name = '$' + $name.substr(1);
 			else if( bs[$name = '$' + $name] ) throw new Error( 2, 'method exist:' + $name );
-			$func.VERSION = $version || -1, $func.DEPENDENCY = dependency( arguments ) || [], bs[$name] = $func;
+			$func.VERSION = $version || VERSION, $func.DEPENDENCY = dependency( arguments ) || [], bs[$name] = $func;
 		},
 		bs.$method( 'class', function( $name, $func, $version/*, $dependency*/ ){
 			var t0, t1;
@@ -112,7 +112,7 @@ W[N] = bs = (function(domLoaded){
 			$name = $name.toUpperCase().replace( r, '' );
 			if( $name.charAt(0) == '@' ) $name = $name.substr(1);
 			else if( bs[$name] ) throw new Error( 3, 'static exist:' + $name );
-			$obj.VERSION = $version || -1, $obj.DEPENDENCY = dependency( arguments ) || [], bs[$name] = $obj;
+			$obj.VERSION = $version || VERSION, $obj.DEPENDENCY = dependency( arguments ) || [], bs[$name] = $obj;
 		} ),
 		bs.$method( 'importPath', function( $path ){bs.$import.path = $path;} ),
 		bs.$method( 'import', (function(){
@@ -162,7 +162,7 @@ W[N] = bs = (function(domLoaded){
 			return f;
 		})() );
 		return bs;
-	})(domLoaded),
+	})( beforeLoading = [] ),
 	//2. define core
 	(function(){
 		var rc, random;
@@ -327,7 +327,7 @@ W[N] = bs = (function(domLoaded){
 			t0 = 'MSXML2.XMLHTTP', t0 = ['Microsoft.XMLHTTP',t0,t0+'.3.0',t0+'.4.0',t0+'.5.0'],
 			i = t0.length;
 			while( i-- ){
-				try{ new ActiveXObject( j = t0[i] ); }catch( $e ){ continue; }
+				try{new ActiveXObject( j = t0[i] );}catch( $e ){continue;}
 				break;
 			}
 			return function(){return new ActiveXObject( j );};
@@ -401,8 +401,7 @@ W[N] = bs = (function(domLoaded){
 		}
 	} );
 	return bs.VERSION = VERSION, bs;
-})(
-
+})();
 domLoaded = function(doc){
 	//7. defined DETECT
 	(function(doc){
@@ -715,7 +714,7 @@ domLoaded = function(doc){
 			$fn.$ = function(){
 				var type, t0, r;
 				t0 = arguments[0], type = this.type;
-				if( t0 === null ) return del( type < 0 ? 0 : this.del(), this.r );
+				if( t0 === null ) return del( type < 0 ? 0 : this.destroyer(), this.r );
 				else if( type == 1 ) return this.s.$( arguments );
 				else if( type == 7 ){
 					if( !this[t0] ){
@@ -768,7 +767,7 @@ domLoaded = function(doc){
 						}
 					this[i] = null;
 				}
-				if( this.del ) this.del();
+				if( this.destroyer ) this.destroyer();
 			},
 			$fn.$ = function d$(){
 				var dom, target, t0, l, s, i, j, k, v;
@@ -921,7 +920,7 @@ domLoaded = function(doc){
 					if( W['TransitionEvent'] && !ev$.transitionend ) ev$.transitionend = 1;
 				}
 				ev = ( function( ev$, x, y ){
-					var ev, pageX, pageY, evType, prevent, keycode, add, del, eventName, isChild;
+					var ev, pageX, pageY, evType, prevent, keycode, add, del, eventName, isChild, keyName;
 					if( bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 9 ) pageX = 'x', pageY = 'y';
 					else pageX = 'pageX', pageY = 'pageY';
 					if( W['addEventListener'] ) add = function($ev,$k){$ev.target.addEventListener( $k, $ev.listener, false );},
@@ -931,14 +930,14 @@ domLoaded = function(doc){
 					else add = function($ev,$k){$ev.target['on'+$k] = $ev.listener;},
 						del = function($ev,$k){$ev.target['on'+$k] = null;};
 					evType = {'touchstart':2,'touchend':1,'touchmove':1,'mousedown':4,'mouseup':3,'mousemove':3,'click':3,'mouseover':3,'mouseout':3},
-					bs.keycode = keycode = (function(){
+					bs.$static( 'KEYCODE', keycode = (function(){
 						var t0, t1, i, j, k, v;
 						t0 = 'a,65,b,66,c,67,d,68,e,69,f,70,g,71,h,72,i,73,j,74,k,75,l,76,m,77,n,78,o,79,p,80,q,81,r,82,s,83,t,84,u,85,v,86,w,87,x,88,y,88,z,90,back,8,tab,9,enter,13,shift,16,control,17,alt,18,pause,19,caps,20,esc,27,space,32,pageup,33,pagedown,34,end,35,home,36,left,37,up,38,right,39,down,40,insert,45,delete,46,numlock,144,scrolllock,145,0,48,1,49,2,50,3,51,4,52,5,53,6,54,7,55,8,56,9,57'.split(','),
-						t1 = {},
+						t1 = {}, keyName = {},
 						i = 0, j = t0.length;
-						while( i < j )k = t0[i++], v = parseInt(t0[i++]), t1[k] = v, t1[v] = k;
+						while( i < j ) k = t0[i++], v = parseInt(t0[i++]), t1[k] = v, t1[v] = k, keyName[v] = k;
 						return t1;
-					})(),
+					})() ),
 					(function(){
 						eventName = {webkitTransitionEnd:'transitionend'};
 					})(),
@@ -952,7 +951,7 @@ domLoaded = function(doc){
 						self.target = $dom,
 						self.listener = function( $e ){
 							var type, start, dx, dy, t0, t1, t2, id, i, j, X, Y;
-							self.event = $e || ( $e = event ), self.type = eventName[$e.type] || $e.type, self.keyCode = $e.keyCode, self.value = $dom.value && bs.$trim( $dom.value );
+							self.event = $e || ( $e = event ), self.type = eventName[$e.type] || $e.type, self.keyName = keyName[self.keyCode = $e.keyCode], self.value = $dom.value && bs.$trim( $dom.value );
 							if( type = evType[self.type] ){
 								dx = x( $dom ), dy = y( $dom );
 								if( type < 3 ){
@@ -1102,9 +1101,7 @@ domLoaded = function(doc){
 							sizer( W.innerHeight === undefined ? function(){
 									$end( win.w = doc.documentElement.clientWidth || doc.body.clientWidth,
 										win.h = doc.documentElement.clientHeight || doc.body.clientHeight );
-								} : function(){
-									$end( win.w = W.innerWidth, win.h = W.innerHeight );
-								}
+								} : function(){$end( win.w = W.innerWidth, win.h = W.innerHeight );}
 							);
 						}
 					}
@@ -1113,7 +1110,7 @@ domLoaded = function(doc){
 		} ),
 		bs.$static( 'KEY', (function(){
 			var buffer, keycode;
-			return keycode = bs.keycode, delete bs.keycode, 
+			return keycode = bs.KEYCODE,
 				bs.WIN.on( 'keydown', '@bsKD', function($e){buffer[keycode[$e.keyCode]] = 1;}),
 				bs.WIN.on( 'keyup', '@bsKU', function($e){buffer[keycode[$e.keyCode]] = 0;}),
 				buffer = {};
@@ -1313,8 +1310,7 @@ domLoaded = function(doc){
 		};
 	})() );
 	return bs;
-}, domLoaded.len = 0, domLoaded
-);
+};
 //6. DOM loader
 ( function(){
 	var id = setInterval( function(){
@@ -1326,8 +1322,8 @@ domLoaded = function(doc){
 		if( document && document.getElementsByTagName && document.getElementById && document.body ){
 			clearInterval( id ), domLoaded( W.document ), start = function(){
 				var i, j;
-				for( i = 0, j = domLoaded.len ; i < j ; i++ ) domLoaded[i]();
-				domLoaded = null;
+				for( i = 0, j = beforeLoading.length ; i < j ; i++ ) beforeLoading[i]();
+				beforeLoading = null;
 			};
 			if( bs.$import.list.length ) bs.$import.list.unshift( start ), bs.$import.apply( null, bs.$import.list ), bs.$import.list.length = 0;
 			else start();
