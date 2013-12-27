@@ -14,6 +14,7 @@ bs.tmpl.html
 bs.scroll.html
 bs.sprite.html
 bs.fb.html
+bs.jpage.html
 testHika.html
 testHuns.html
 testRouka.html
