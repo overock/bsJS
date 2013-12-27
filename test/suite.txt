@@ -13,6 +13,7 @@ bs.router.html
 bs.tmpl.html
 bs.scroll.html
 bs.sprite.html
+bs.fb.html
 testHika.html
 testHuns.html
 testRouka.html
