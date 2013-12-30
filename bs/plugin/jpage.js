@@ -3,7 +3,7 @@ bs.$register( 'method', 'jpage', (function(){
 	jp = function( $v ){this.v = $v},
 	r0 = /["]/g, r1 = /\\/g, r2 = /\r\n|\r|\n/g, s = '<%', e = '%>',
 	jpage = function( $str, $data, $render, $end ){
-		var t0, t1, i, j, k, v, $$R;
+		var t0, t1, i, j, k, v;
 		if( $str instanceof jp ) v = $str.v
 		else{
 			$str = ( $str.substr(0,2) == '#T' ? bs.dom( $str ).$('@text') : $str.substr($str.length-5) == '.html' ? bs.$get( null, $str ) : $str ).split( s );
