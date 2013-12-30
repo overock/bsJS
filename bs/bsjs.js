@@ -13,10 +13,9 @@ var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, xh = [], xb = [], depend = {};
 	
 if( doc = W['document'] ) PLUGIN_REPO='../bs/plugin/',que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
-else if( __dirname ) node=require('./node'),bs=exports,PLUGIN_REPO='http://projectbs.github.io/bsJS/bs/plugin/';
+else if( __dirname ) PLUGIN_REPO='http://projectbs.github.io/bsJS/bs/plugin/', node=require('./node'), module.exports = bs = function(f){bs.__root = f;},bs.__root = __dirname;
 else throw new Error( 0, 'not supported platform' );
 bs.VERSION = VERSION = 0.2;
-
 function error( $num, $msg ){if( doc ) throw new Error( $num, $msg ); else console.log( $num, $msg );}
 function dependency( $arg ){
 	var t0, i, j, k, v;
@@ -99,7 +98,7 @@ method( 'importer', function( $end ){
 		}, id = setTimeout( function(){if( !isLoaded ) error( 4, 'import timeout' );}, timeout ),
 		isLoaded = 0, bs.$js( none, path + k + v + '.js' );
 	} )();
-} );
+} ),
 method( 'tmpl', (function(){
 	var arg, reg;
 	reg = /@[^@]+@/g;

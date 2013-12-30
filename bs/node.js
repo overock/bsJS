@@ -8,7 +8,7 @@
  * Facebook group: https://www.facebook.com/groups/bs5js/
  */
 exports.core = function( bs ){
-	var http = require('http');
+	var http = require('http'), site;
 	bs.$class( 'sql', function( $fn, bs ){
 		$fn.$ = function(){
 			var i, j, k, v, t0;
@@ -107,27 +107,26 @@ exports.core = function( bs ){
 			}
 		};
 	})() ),
-	(function( http ){
-		var fs, p, response;
-		fs = require('fs'), p = require( 'path' ), response = function( rs ){
+	(function( ht ){
+		var fs, p, response, path;
+		fs = require('fs'), p = require('path'), path = {},
+		response = function( rs ){
 			var t0 = '';
-			rs.on( 'data', function( $data ){t0 += $data;} ),
-			rs.on( 'end', function(){$end(t0);} );
+			rs.on( 'data', function($v){t0 += $v;} ),
+			rs.on( 'end', function(){$end(t0);t0='';} );
 		},
-		
-		function path(){
+		bs.$method( 'path', function( $path, $context ){
+			var t0;
+			if( $context == 'bs' ) t0 = bs.__root;
+			else if( $context ) t0 = path[$context];
+			else t0 = path[site];
+			return p.resolve( t0, $path );
+		} );
+		function http( $type, $end, $url, $arg ){
+			var t0;
+			return t0 = $end ? xhr( $end ) : rq(), t0.open( $type, $url, $end ? true : false ), xhrSend( $type, t0, bs.$cgi( $arg ) || '' ), $end ? '' : t0.responseText;
 		}
-		_getPath = (function(){
-                var t0;
-                if( isLocal ) return t0 = , function(opts, fname){return t0.join( opts.settings.views, fname );};
-                else return function(opts, fname){return fname;};
-        })();
-		function _renderFile(path, opts){
-                return _render( opts.cache ? cache[path] || ( cache[path] = _reader( path ) ) : _reader( path ), opts, null, path );
-        }
-                if( isLocal ) return rq = require( 'fs' ), function(path){return rq.readFileSync( path, 'utf8' );};
-
-        })();
+		function http(path){return rq.readFileSync( path, 'utf8' );};
 		
 		bs.$method( 'stream', function( $path ){
 		} ),
