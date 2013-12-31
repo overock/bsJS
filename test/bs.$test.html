@@ -19,19 +19,89 @@
 		border:1px solid red;
 	}
 </style>
+<script src="../bs/bsjs.js"></script>
 </head>
 <body>
 <div id="stage"></div>
 <div id="result"></div>
 <div id="test"></div>
-<script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
 <script src="./printer.js"></script>
+ip
+<input id='ip_OK1' type='text' value='255.255.255.255'>
+<input id='ip_OK2' type='text' value='0.0.0.0'>
+<input class='tng' id='ip_NG1' type='text' value='256.256.256.256'>
+<br/>
+url
+<input id='url_OK1' type='text' value='http://google.com'>
+<input id='url_OK2' type='text' value='https://www.google.com'>
+<input class='tng' id='url_NG1' type='text' value='ftp://www.google.com'>
+<input class='tng' id='url_NG2' type='text' value='http://www.google'>
+<br/>
+email
+<input id='email_OK' type='text' value='gmail@gmail.com'>
+<input class='tng' id='email_NG' type='text' value='gmail.gmail.com'>
+<br/>
+korean
+<input id='korean_OK' type='text' value='가나다라마바사'>
+<input class='tng' id='korean_NG' type='text' value='가나다ABCabc123'>
+<br/>
+japanese全角
+<input id='japanese_OK' type='text' value='あいうえお日本語ニホンゴ'>
+<input class='tng' id='japanese_NG' type='text' value='가나다ABCabc123'>
+<br/>
+japanese全角記号
+<input id='japaneseKigo_OK' type='text' value='～「」＋－！＠＃＄％＾＆＊（）：'>
+<br/>
+japanese全角数字
+<input id='japaneseSuuji_OK' type='text' value='１２３４５６７８９０'>
+<br/>
+japanese半角
+<input id='japaneseHan_OK' type='text' value='ｱｲｳｴｵ'>
+<br/>
+alpha
+<input id='alpha_OK' type='text' value='abcdxyz'>
+<input class='tng' id='alpha_NG' type='text' value='abcdxyz123'>
+<br/>
+ALPHA
+<input id='ALPHA_OK' type='text' value='ABCDXYZ'>
+<input class='tng' id='ALPHA_NG' type='text' value='ABCxyz'>
+<br/>
+num
+<input id='num_OK' type='text' value='0123456789'>
+<input class='tng' id='num_NG' type='text' value='0123.456789'>
+<br/>
+alphanum
+<input id='alphanum_OK' type='text' value='0123456789abcdxyz'>
+<br/>
+1alpha
+<input id='_1alpha_OK' type='text' value='abcdxyz0123456789'>
+<input class='tng' id='_1alpha_NG' type='text' value='.abcdxyz0123456789'>
+<br/>
+1ALPHA
+<input id='_1ALPHA_OK' type='text' value='ABCDXYZ0123456789'>
+<br/>
+float
+<input id='float_OK' type='text' value='0.123456789'>
+<br/>
+int
+<input id='int_OK' type='text' value='1234567890'>
+<br/>
+length
+<input id='length_OK' type='text' value='123456789012345678901234567890'>
+<br/>
+range
+<input id='range_OK' type='text' value='99'>
+<br/>
+indexOf
+<input id='indexOf_OK' type='text' value='123ABC456'>
+<br/>
 <script>
+bs.$import( 'test', 'last' );
 bs( function(){
 	bsTest.tear( 'test init', function(){
-		bs.d( '<input id="id" type="text" value="hika00"/>' ).$('<','#stage' );
-		bs.d( '<input id="pw" type="text" value="hika00"/>' ).$('<','#stage' );
+		bs.dom( '<input id="id" type="text" value="hika00"/>' ).$('<','#stage' );
+		bs.dom( '<input id="pw" type="text" value="hika00"/>' ).$('<','#stage' );
 
 		// Define RULEs
 		bs.$test( 'rule',
@@ -186,74 +256,5 @@ bs( function(){
 	
 } );
 </script>
-ip
-<input id='ip_OK1' type='text' value='255.255.255.255'>
-<input id='ip_OK2' type='text' value='0.0.0.0'>
-<input class='tng' id='ip_NG1' type='text' value='256.256.256.256'>
-<br/>
-url
-<input id='url_OK1' type='text' value='http://google.com'>
-<input id='url_OK2' type='text' value='https://www.google.com'>
-<input class='tng' id='url_NG1' type='text' value='ftp://www.google.com'>
-<input class='tng' id='url_NG2' type='text' value='http://www.google'>
-<br/>
-email
-<input id='email_OK' type='text' value='gmail@gmail.com'>
-<input class='tng' id='email_NG' type='text' value='gmail.gmail.com'>
-<br/>
-korean
-<input id='korean_OK' type='text' value='가나다라마바사'>
-<input class='tng' id='korean_NG' type='text' value='가나다ABCabc123'>
-<br/>
-japanese全角
-<input id='japanese_OK' type='text' value='あいうえお日本語ニホンゴ'>
-<input class='tng' id='japanese_NG' type='text' value='가나다ABCabc123'>
-<br/>
-japanese全角記号
-<input id='japaneseKigo_OK' type='text' value='～「」＋－！＠＃＄％＾＆＊（）：'>
-<br/>
-japanese全角数字
-<input id='japaneseSuuji_OK' type='text' value='１２３４５６７８９０'>
-<br/>
-japanese半角
-<input id='japaneseHan_OK' type='text' value='ｱｲｳｴｵ'>
-<br/>
-alpha
-<input id='alpha_OK' type='text' value='abcdxyz'>
-<input class='tng' id='alpha_NG' type='text' value='abcdxyz123'>
-<br/>
-ALPHA
-<input id='ALPHA_OK' type='text' value='ABCDXYZ'>
-<input class='tng' id='ALPHA_NG' type='text' value='ABCxyz'>
-<br/>
-num
-<input id='num_OK' type='text' value='0123456789'>
-<input class='tng' id='num_NG' type='text' value='0123.456789'>
-<br/>
-alphanum
-<input id='alphanum_OK' type='text' value='0123456789abcdxyz'>
-<br/>
-1alpha
-<input id='_1alpha_OK' type='text' value='abcdxyz0123456789'>
-<input class='tng' id='_1alpha_NG' type='text' value='.abcdxyz0123456789'>
-<br/>
-1ALPHA
-<input id='_1ALPHA_OK' type='text' value='ABCDXYZ0123456789'>
-<br/>
-float
-<input id='float_OK' type='text' value='0.123456789'>
-<br/>
-int
-<input id='int_OK' type='text' value='1234567890'>
-<br/>
-length
-<input id='length_OK' type='text' value='123456789012345678901234567890'>
-<br/>
-range
-<input id='range_OK' type='text' value='99'>
-<br/>
-indexOf
-<input id='indexOf_OK' type='text' value='123ABC456'>
-<br/>
 </body>
 </html>

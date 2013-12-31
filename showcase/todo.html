@@ -14,6 +14,7 @@
 <div id="stage"></div>
 <script src="../bs/bsjs.js"></script> 
 <script>
+bs.$import( 'save', 'last' ),
 bs( function(){
 	var M, V, C;
 	M = {
@@ -50,66 +51,66 @@ bs( function(){
 	V = {
 		listLength:0,
 		init:function(){
-			bs.c('font-face@batch batch');
-			bs.c('body').$( 'margin', 0, 'padding', 0, 'background', '#fff', 
+			bs.css('font-face@batch batch');
+			bs.css('body').$( 'margin', 0, 'padding', 0, 'background', '#fff', 
 				'font-family', 'Helvetica,Arial', 'color', '#4d4d4d', 'font-smoothing', 'antialiased' );
-			bs.c('a').$('cursor','pointer');
-			bs.c('h1').$('font-family', 'Helvetica,Arial');
-			bs.c('#list').$('margin-top', 10, 'border-top', '1px solid #999');
-			bs.c('.list').$('width','100%', 'padding', '10px 0', 'border-bottom', '1px dashed #aaa' );
-			bs.c('.check').$('font-family', 'batch', 'font-size', 25 );
-			bs.c('.right').$('float', 'right', 'width', 75, 'text-align', 'right' );
-			bs.c('.left').$('margin-right', 80 );
-			bs.c('.text').$('background','#eee', 'color', '#999', 'font-size', 29, 'padding', '3 10','margin',0,'border', '0','width', '90%', 'height', 35, 'line-height', 35, 'font-family', 'Helvetica,Arial');
-			bs.c('.textL').$('color', '#966', 'font-weight', 'bold', 'font-size', 25, 'padding', '3 10','margin',0,'border', '0','width', '90%', 'height', 35, 'line-height', 35, 'font-family', 'Helvetica,Arial');
-			bs.c('.edit').$('background','#fff','border','1px solid #999', 'color','#000' );
-			bs.c('.clear').$('text-decoration','line-through', 'color', '#a99' );
+			bs.css('a').$('cursor','pointer');
+			bs.css('h1').$('font-family', 'Helvetica,Arial');
+			bs.css('#list').$('margin-top', 10, 'border-top', '1px solid #999');
+			bs.css('.list').$('width','100%', 'padding', '10px 0', 'border-bottom', '1px dashed #aaa' );
+			bs.css('.check').$('font-family', 'batch', 'font-size', 25 );
+			bs.css('.right').$('float', 'right', 'width', 75, 'text-align', 'right' );
+			bs.css('.left').$('margin-right', 80 );
+			bs.css('.text').$('background','#eee', 'color', '#999', 'font-size', 29, 'padding', '3 10','margin',0,'border', '0','width', '90%', 'height', 35, 'line-height', 35, 'font-family', 'Helvetica,Arial');
+			bs.css('.textL').$('color', '#966', 'font-weight', 'bold', 'font-size', 25, 'padding', '3 10','margin',0,'border', '0','width', '90%', 'height', 35, 'line-height', 35, 'font-family', 'Helvetica,Arial');
+			bs.css('.edit').$('background','#fff','border','1px solid #999', 'color','#000' );
+			bs.css('.clear').$('text-decoration','line-through', 'color', '#a99' );
 
-			bs.d('#stage').$( 'margin', '0 auto', 'width', '90%',
-				'>', bs.d('<div id="header"></div>'),
-				'>', bs.d('<div id="list"></div>')
+			bs.dom('#stage').$( 'margin', '0 auto', 'width', '90%',
+				'>', bs.dom('<div id="header"></div>'),
+				'>', bs.dom('<div id="list"></div>')
 			);
-			bs.d('<h1 id="title">Task Do</h1>').$('<', '#header', 'text-align', 'center');
-			bs.d('<div class="right"><a id="c" class="check">\uF164</a></div>' ).$('<', '#header');
-			bs.d('<div class="left"><input id="i" class="text" type="text" placeholder="task.."></div>' ).$( '<', '#header' );
+			bs.dom('<h1 id="title">Task Do</h1>').$('<', '#header', 'text-align', 'center');
+			bs.dom('<div class="right"><a id="c" class="check">\uF164</a></div>' ).$('<', '#header');
+			bs.dom('<div class="left"><input id="i" class="text" type="text" placeholder="task.."></div>' ).$( '<', '#header' );
 			this.eventSet( '' );
 		},
 		list:function( $tasks ){
 			var i, j, k, stat, task;
 			if( !$tasks || $tasks && !$tasks.length ) return this.clean(0);
 			for( i = 0, j = $tasks.length, k = 0 ; i < j ; i += 2, k++ ){
-				if( bs.WIN.is('#list'+k) ) bs.d('#list'+k).$( 'display', 'block', 'class-', 'edit' );
+				if( bs.WIN.is('#list'+k) ) bs.dom('#list'+k).$( 'display', 'block', 'class-', 'edit' );
 				else this.addList( k );
-				bs.d('#i'+k).$( '@value', $tasks[i], 'b' );
-				bs.d('#i'+k).$( 'class' + ( $tasks[i+1] ? '-' : '+' ), 'clear' );
+				bs.dom('#i'+k).$( '@value', $tasks[i], 'b' );
+				bs.dom('#i'+k).$( 'class' + ( $tasks[i+1] ? '-' : '+' ), 'clear' );
 			}
 			this.clean( j );
 		},
 		clean:function( $length ){
 			var i, j;
-			for( i = $length, j = this.listLength ; i < j ; i += 2 ) bs.d('#list'+(i*.5)).$( 'display', 'none' );
+			for( i = $length, j = this.listLength ; i < j ; i += 2 ) bs.dom('#list'+(i*.5)).$( 'display', 'none' );
 			this.listLength = $length;
 		},
 		addList:function( $id ){
-			bs.d('#list').$( '>'+$id, '<div id="list'+$id+'" class="list">' );
-			bs.d('<div class="right"><a id="t'+$id+'" class="check">\uF155</a> &nbsp; <a id="c'+$id+'" class="check">\uF164</a></div>').$('<','#list'+$id);
-			bs.d('<div class="left"><input id="i'+$id+'" class="textL" type="text"></div>').$('<','#list'+$id);
+			bs.dom('#list').$( '>'+$id, '<div id="list'+$id+'" class="list">' );
+			bs.dom('<div class="right"><a id="t'+$id+'" class="check">\uF155</a> &nbsp; <a id="c'+$id+'" class="check">\uF164</a></div>').$('<','#list'+$id);
+			bs.dom('<div class="left"><input id="i'+$id+'" class="textL" type="text"></div>').$('<','#list'+$id);
 			this.eventSet( $id );
 		},
 		eventSet:(function(){
-			function f($e){bs.d(this).$('class+','edit');}
-			function b($e){bs.d(this).$('class-','edit');}
+			function f($e){bs.dom(this).$('class+','edit');}
+			function b($e){bs.dom(this).$('class-','edit');}
 			function t($e){C.input( this.id, '' );}
 			function c($e){C.check( this.id );}
 			function k($e){
 				if( !$e.key('enter') ) return;
-				bs.d( this ).$( '@value', '' ),
+				bs.dom( this ).$( '@value', '' ),
 				C.input( this.id, $e.value );
 			}
 			return function( $id ){
-				bs.d( '#i'+$id ).$( 'focus', f, 'blur', b, 'keydown', k );
-				bs.d( '#c'+$id ).$( 'click', c );
-				if( $id !== '' ) bs.d( '#t'+$id ).$( 'click', t );
+				bs.dom( '#i'+$id ).$( 'focus', f, 'blur', b, 'keydown', k );
+				bs.dom( '#c'+$id ).$( 'click', c );
+				if( $id !== '' ) bs.dom( '#t'+$id ).$( 'click', t );
 			};
 		})()
 	};

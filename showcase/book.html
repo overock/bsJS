@@ -14,6 +14,7 @@
 <div id="stage"></div>
 <script src="../bs/bsjs.js"></script> 
 <script>
+bs.$import( 'router', 'last' ),
 bs( function(){
 	var M,V,C;
 	M = {
@@ -44,7 +45,6 @@ bs( function(){
 		},
 		Rresult:function( $uri ){
 			var t0;
-			console.log( $uri );
 			t0 = $uri.substr( '#result/'.length ).split('/'),
 			C._type = t0[0], C._id = decodeURIComponent(t0[1]), C._back = 'result';
 			if( t0 = M.$( type, C._id ) ) V.result( C._type, C._id, t0 );
@@ -75,28 +75,28 @@ bs( function(){
 	V = {
 		detailTmpl:'',
 		init:function( $type ){
-			bs.c('font-face@batch batch');
+			bs.css('font-face@batch batch');
 			bs.$css( 'book.css' );
 			this.detailTmpl = bs.$get( null, 'book1.html' );
-			bs.d( bs.$tmpl('book0.html', {type:bs.$deco( $type, '<li class="type">', '</li>' ), go:'\uF097', book:'\uF0D0 \uF0D1 \uF0D2 \uF0D3'} ) ).$('<','#stage' );
-			bs.d('.type').$( 'down', function($e){
-				bs.d( '.type' ).$( 'class-', 'selectType' );
-				C.result( bs.d( this ).$( 'class+', 'selectType', 'html' ), bs.d('#query').$('@value') );
+			bs.dom( bs.$tmpl('book0.html', {type:bs.$deco( $type, '<li class="type">', '</li>' ), go:'\uF097', book:'\uF0D0 \uF0D1 \uF0D2 \uF0D3'} ) ).$('<','#stage' );
+			bs.dom('.type').$( 'down', function($e){
+				bs.dom( '.type' ).$( 'class-', 'selectType' );
+				C.result( bs.dom( this ).$( 'class+', 'selectType', 'html' ), bs.dom('#query').$('@value') );
 			});
-			bs.d(bs.d('.type')[0]).$('class+', 'selectType');
-			bs.d('#query').$(
-				'focus', function($e){bs.d(this).$('class+','edit');},
-				'blur', function($e){bs.d(this).$('class-','edit');},
+			bs.dom(bs.dom('.type')[0]).$('class+', 'selectType');
+			bs.dom('#query').$(
+				'focus', function($e){bs.dom(this).$('class+','edit');},
+				'blur', function($e){bs.dom(this).$('class-','edit');},
 				'keydown', function k($e){
 					if( !$e.key('enter') ) return;
-					C.result( bs.d( '@.selectType' ).$('html'), $e.value||'' );
-					bs.d(this).$('b');
+					C.result( bs.dom( '@.selectType' ).$('html'), $e.value||'' );
+					bs.dom(this).$('b');
 				}
 			);
-			bs.d('#go').$(
+			bs.dom('#go').$(
 				'down', function k($e){
-					C.result( bs.d( '@.selectType' ).$('html'), bs.d('#query').$('@value')||'' );
-					bs.d('#query').$('b');
+					C.result( bs.dom( '@.selectType' ).$('html'), bs.dom('#query').$('@value')||'' );
+					bs.dom('#query').$('b');
 				}
 			);
 		},
@@ -104,40 +104,40 @@ bs( function(){
 		result:function( $type, $id, $data ){
 			var t0, i, j, k;
 			this.resultStat = $type+'/'+$id;
-			if( bs.WIN.is('.modal') ) bs.d('@.modal').$(null);
+			if( bs.WIN.is('.modal') ) bs.dom('@.modal').$(null);
 			//summary
-			bs.d('#summary').$('html','page : '+$data.page+' / '+$data.total);
+			bs.dom('#summary').$('html','page : '+$data.page+' / '+$data.total);
 			//type
-			t0 = bs.d( '.type' ), t0.$( 'class-', 'selectType' ), i = t0.length;
+			t0 = bs.dom( '.type' ), t0.$( 'class-', 'selectType' ), i = t0.length;
 			while( i-- ) if( t0[i].innerHTML == $type ){
-				bs.d( t0[i] ).$( 'class+', 'selectType', 'html' );
+				bs.dom( t0[i] ).$( 'class+', 'selectType', 'html' );
 				break;
 			}
 			//id
-			bs.d('#query').$( '@value', $id );
+			bs.dom('#query').$( '@value', $id );
 			//data
 			if( $data == 'nodata' ){
-				bs.d('#result').$('html','데이터가 없습니다');
+				bs.dom('#result').$('html','데이터가 없습니다');
 			}else if( $data == 'wait' ){
-				bs.d('#result').$('html','wait');
+				bs.dom('#result').$('html','wait');
 			}else{
 				for( t0 = '', i = 0, j = $data.length ; i < j ; i++ ) t0 += '<img onerror="this.src=\'noimage.png\'" data="'+$type+'/'+$id+'/'+$data[i].isbn+'" src="'+ $data[i].cover_l_url +'" class="thumb">';
-				bs.d('#result').$( 'html', t0 );
-				bs.d('@.thumb').$( 'mouseover', this.resultOver, 'mouseout', this.resultOut, 'up', this.resultDown );
+				bs.dom('#result').$( 'html', t0 );
+				bs.dom('@.thumb').$( 'mouseover', this.resultOver, 'mouseout', this.resultOut, 'up', this.resultDown );
 			}
 		},
-		resultDown:function($e){C.detail( bs.d( this ).$('@data') );},
-		resultOver:function($e){bs.d(this).$('class+','thumbOver');},
-		resultOut:function($e){bs.d(this).$('class-','thumbOver');},
+		resultDown:function($e){C.detail( bs.dom( this ).$('@data') );},
+		resultOver:function($e){bs.dom(this).$('class+','thumbOver');},
+		resultOut:function($e){bs.dom(this).$('class-','thumbOver');},
 		resultStat:'',
 		//detail
 		detail:function( $type, $id, $isbn, $data ){
 			var t0, i;
 			if( this.resultStat != $type + '/' + $id ) return C.result( $type, $id );
 			if( $data == 'nodata' ){
-				bs.d('@.detail').$('html','데이터가 없습니다');
+				bs.dom('@.detail').$('html','데이터가 없습니다');
 			}else if( $data == 'wait' ){
-				bs.d('@.detail').$('html','wait');
+				bs.dom('@.detail').$('html','wait');
 			}else{
 				i = $data.length;
 				while( i-- ) if( $data[i].isbn == $isbn ){
@@ -147,7 +147,7 @@ bs( function(){
 				if( t0 ){
 					t0 = bs.$deco( t0, this.strip, '' );
 					t0.L = '\uF144';
-					bs.d('<div class="modal"></div>').$( '<', 'body', 'height', bs.WIN.scroll('h'), 'up', V.close, 'mouseover', V.modal, 'mouseout', V.modal,
+					bs.dom('<div class="modal"></div>').$( '<', 'body', 'height', bs.WIN.scroll('h'), 'up', V.close, 'mouseover', V.modal, 'mouseout', V.modal,
 					'>', bs.$tmpl( this.detailTmpl, t0 )
 					);
 				}
@@ -157,7 +157,7 @@ bs( function(){
 		close:function($e){
 			var t0;
 			$e.prevent();
-			bs.d('@.modal').$(null);
+			bs.dom('@.modal').$(null);
 			t0 = V.resultStat.split( '/' );
 			C.result( t0[0], t0[1] );
 		},

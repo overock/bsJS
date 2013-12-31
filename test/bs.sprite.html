@@ -20,14 +20,15 @@
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
 <script>
+bs.$import( 'sprite', 'last' );
 bs( function(){
 	var s0, inited;
 	bs.sprite( 'explosion' ).$( 'src', 'hika/explosion.png', 'col', 29, 'row', 1 );
 	bs.WIN.sizer( function( w, h ){
 		if( inited ) return;
 		inited = 1;
-		bs.d( 'body' ).$( 'margin', 0, 'padding', 0 );
-		bs.d( '#stage' ).$( '>', bs.sprite( 'explosion' ).$( '@0', 'position', 'absolute', 'div' ), 
+		bs.dom( 'body' ).$( 'margin', 0, 'padding', 0 );
+		bs.dom( '#stage' ).$( '>', bs.sprite( 'explosion' ).$( '@0', 'position', 'absolute', 'div' ), 
 			'overflow', 'hidden', 'background', '#000', 'width', w, 'height', h,
 			'down', function( $e ){
 				var s;

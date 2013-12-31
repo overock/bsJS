@@ -1,6 +1,6 @@
 /*
  * bsJS - OpenSource JavaScript library
- * version 0.1.0 / 2013.12.4 by projectBS committee
+ * version 0.2.0 / 2013.12.25 by projectBS committee
  * 
  * Copyright 2013.10 projectBS committee.
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -9,39 +9,218 @@
  */
 ( function( W, N ){
 'use strict';
-N = N ||'bs';
-if( !W['console'] )	W['console'] = {log:function(){alert( arguments.join() );}};
+var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
+	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
+	
+if( doc = W['document'] ) PLUGIN_REPO='../bs/plugin/',que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
+else if( __dirname ) PLUGIN_REPO='http://projectbs.github.io/bsJS/bs/plugin/', node=require('./node'), module.exports = bs = function(f){bs.__root = f;},bs.__root = __dirname;
+else throw new Error( 0, 'not supported platform' );
+bs.VERSION = VERSION = 0.2;
+function error( $num, $msg ){if( doc ) throw new Error( $num, $msg ); else console.log( $num, $msg );}
+function dependency( $arg ){
+	var t0, i, j, k, v;
+	if( $arg.length < 4 ) return;
+	$arg = slice.call( $arg, 3 ), i = 0, j = $arg.length;
+	while( i < j ){
+		k = $arg[i++], t0 = depend[k];
+		if( !t0 || t0 < ( v = $arg[i++] ) ){
+			error( 0, 'dependency:'+k+'('+v+'), '+ t0 );
+			break;
+		}
+	}
+	return $arg;
+}
+function method( $name, $func, $version/*, $dependency*/ ){
+	$name = $name.toLowerCase().replace( trim, '' );
+	if( $name.charAt(0) == '@' ) $name = '$' + $name.substr(1); else if( bs[$name = '$' + $name] ) error( 2, 'method exist:' + $name );
+	$func.DEPENDENCY = dependency( arguments ) || {length:0}, depend[$name.substr(1)] = $func.VERSION = $version || VERSION, bs[$name] = $func;
+}
+method( 'timeout', function( $time ){timeout = parseInt( $time * 1000 );} ),
+method( 'method', method ),
+method( 'class', (function(){
+	function factory( $name, $func ){
+		var cls, fn, t0, k;
+		$func( t0 = {}, bs ), cls = function( $sel ){this.__new( this.__k = $sel );}, fn = cls.prototype, fn.__new = none, fn.destroyer = function(){delete cls[this.__k];};
+		if( typeof $func == 'function' ){for( k in t0 ) if( t0.hasOwnProperty( k ) ) k == 'constructor' ? ( fn.__new = t0.constructor ) : ( fn[k] = t0[k] );}
+		return fn.instanceOf = bs[$name] = function( $sel ){
+			var t0;
+			if( typeof $sel == 'string' ){
+				if( ( t0 = $sel.charAt(0) ) == '@' ) $sel = $sel.substr(1); else if( t0 != '<' ) return cls[$sel] || ( cls[$sel] = new cls( $sel ) );
+			}
+			return new cls( $sel );
+		};
+	}
+	return function( $name, $func, $version/*, $dependency*/ ){
+		var t0, t1;
+		$name = $name.toLowerCase().replace( trim, '' );
+		if( $name.charAt(0) == '@' ) $name = $name.substr(1); else if( bs[$name] ) error( 2, 'class exist:' + $name );
+		t0 = dependency( arguments ), t1 = factory( $name, $func ), depend[$name] = t1.VERSION = $version || VERSION, t1.DEPENDENCY = t0 || {length:0};
+	};
+})() ),
+method( 'static', function( $name, $obj, $version/*, $dependency*/ ){
+	$name = $name.toUpperCase().replace( trim, '' );
+	if( $name.charAt(0) == '@' ) $name = $name.substr(1); else if( bs[$name] ) error( 3, 'static exist:' + $name );
+	$obj.DEPENDENCY = dependency( arguments ) || {length:0}, depend[$name] = $obj.VERSION = $version || VERSION, bs[$name] = $obj;
+} ),
+method( 'importPath', function( $path ){bs.$import.path = $path;} ),
+method( 'register', function( $type, $name, $obj, $version/*, $dependency*/ ){
+	if( !re[$name] ) error( 5, 'register undefined :' + $name );
+	else re[$name].apply( null, arguments ), delete re[$name];
+} ),
+method( 'import', function(){for( var i = 0, j = arguments.length ; i < j ; i++ ) im[im.length] = arguments[i];} ),
+method( 'importer', function( $end ){
+	var id, isLoaded, list, path, loader, i, j, k, v;
+	path = bs.$import.path || PLUGIN_REPO, list = arguments, i = 1, j = list.length,
+	( loader = function(){
+		if( i == j ) return $end();
+		k = list[i++].toLowerCase(), v = list[i++], v = v == 'last' || !v ? '' : v;
+		if( depend[k] && depend[k] >= v ) return loader();
+		re[k] = function( $type, $name, $obj, $version/*, $dependency*/ ){
+			var register, t0, t1, i, j, k, v;
+			isLoaded = 1, clearTimeout( id );
+			if( $version === undefined ) error( 4, 'import undefined version' );
+			register = function(){
+				switch( $type ){
+				case'class':case'method':case'static':bs['$'+$type]( '@' + $name, $obj, $version ); break;
+				default:throw new Error( 4, 'import type:' + $type );
+				}
+				loader();
+			}
+			if( arguments.length > 4 ){
+				t1 = [register], i = 4, j = arg.length;
+				while( i < j ){
+					k = arguments[i++], v = arguments[i++], t0 = depend[k];
+					if( !t0 || t0 < v ) t1[t1.length] = k, t1[t1.length] = v;
+				}
+				if( t1.length > 1 ) return bs.$importer.apply( null, t1 );
+			}
+			register();
+		}, id = setTimeout( function(){if( !isLoaded ) error( 4, 'import timeout' );}, timeout ),
+		isLoaded = 0, bs.$js( none, path + k + v + '.js' );
+	} )();
+} ),
+method( 'tmpl', (function(){
+	var arg, reg;
+	reg = /@[^@]+@/g;
+	function r( $0 ){
+		var t0, t1, t2, i, j, k, l, cnt;
+		$0 = $0.substring( 1, $0.length - 1 ), t0 = $0.split('.'), i = 1, j = arg.length, l = t0.length, cnt = 0;
+		while( i < j ){
+			t1 = arg[i++], k = 0;
+			while( k < l && t1 !== undefined ) t1 = t1[t0[k++]];
+			if( t1 !== undefined ) cnt++, t2 = t1;
+		}
+		if( cnt == 0 ) return $0;
+		if( cnt > 1 ) return '@ERROR matchs '+cnt+'times@'
+		if( ( i = typeof t2 ) == 'object' ){
+			if( t2.TMPL ) return t2.TMPL( $0 );
+			else if( t2.splice ) return t2.join('');
+		}else if( i == 'function' ) return t2( $0 );
+		return t2;
+	}
+	return function( $str ){
+		if( $str.substr(0,2) == '#T' ) $str = bs.dom( $str ).$('@text');
+		else if( $str.substr($str.length-5) == '.html' ) $str = bs.$get( null, $str );
+		return arg = arguments, bs.$trim( $str.replace( reg, r ) );
+	};
+})() );
+function regfactory( r, v ){	
+	function f( $v ){
+		var t0, i;
+		if( typeof $v == 'string' ) return $v.replace( r, v ); else if( !$v ) return $v;
+		if( typeof $v == 'object' ){
+			if( $v.splice ){t0 = [], i = $v.length; while( i-- ) t0[i] = f( $v[i] );}
+			else{t0 = {}; for( i in $v ) t0[i] = f( $v[i] );}
+			return t0;
+		}
+		return $v;
+	};
+	return f;
+}
+method( 'stripTag', regfactory( /[<][^>]+[>]/g, '' ) ),
+method( 'trim', regfactory( /^\s*|\s*$/g, '' ) ),
+method( 'ex', (function(){
+	var rc = 0, random = function(){return rc = ( rc + 1 ) % 1000, random[rc] || ( random[rc] = Math.random() );};
+	return function(){
+		var t0, i, j;
+		t0 = arguments[0], i = 1, j = arguments.length;
+		while( i < j ){
+			switch( arguments[i++] ){
+			case'~': return parseInt( random() * ( arguments[i++] - t0 + 1 ) ) + t0;
+			case'~f': return random() * ( arguments[i++] - t0 ) + t0;
+			}
+		}
+		return t0;
+	};
+})() ),		
+method( 'reverse', function( $obj ){
+	var t0, i;
+	i = $obj.length;
+	if( $obj.splice ){t0 = []; while( i-- ) t0[t0.length] = $obj[i];}else{t0 = {length:0};while( i-- ) t0[t0.length++] = $obj[i];}
+	return t0;
+} ),
+method( 'deco', (function(){
+	function deco( $v, $t, $f, $r, $isEnd ){
+		var t0 = $v;
+		switch( $t ){
+		case's':case'n': return t0 = $isEnd ? t0 + $f : $f + t0, t0;
+		case'f': return t0 = $f( t0, i );
+		case'r': if( typeof t0 == 'string' ) t0 = t0.replace( $f, $r ); return t0;
+		}
+	}
+	return function( $obj, $start, $end ){
+		var type0, reg0, type1, reg1, t0, i;
+		type0 = ( typeof $start ).charAt(0), i = 3;
+		if( $start instanceof RegExp ) type0 = 'r', reg0 = $end, $end = arguments[3], i = 4;
+		if( !$end ) type1 = '-'; else{type1 = ( typeof $end ).charAt(0); if( $end instanceof RegExp ) type1 = 'reg', reg1 = arguments[i];}
+		if( $obj.splice ){t0 = [], i = $obj.length; while( i-- ) t0[i] = deco( deco( $obj[i], type0, $start, reg0 ), type1, $end, reg1 );}
+		else{t0 = {}; for( i in $obj ) t0[i] = deco( deco( $obj[i], type0, $start, reg0 ), type1, $end, reg1, 1 );}
+		return t0;
+	};
+})() ),
+method( 'cgi', function( $arg ){
+	var h, t0, i, j;
+	if( !$arg || ( j = $arg.length ) < 4 ) return '';
+	h = bs.$cgi.header, t0 = bs.$cgi.temp;
+	h.length = t0.length = 0, i = 2;
+	while( i < j )
+		if ( $arg[i].charAt(0) == '@' ) h[h.length] = $arg[i++].substr(1), h[h.length] = $arg[i++];
+		else t0[t0.length] = encodeURIComponent( $arg[i++] ) + '=' + encodeURIComponent( $arg[i++] );
+	return t0.join('&');
+} ),
+bs.$cgi.header = [], bs.$cgi.temp = [],
+method( 'url', function( $url, $arg ){
+	return $url=$url.split( '#' ),$url[0]+($url[0].indexOf('?')>-1?'&':'?')+'bsNC='+bs.$ex(1000,'~',9999)+'&'+bs.$cgi($arg)+($url[1]?'#'+$url[1]:'');
+} );
+if( !doc ) return node( bs );
+(function( doc, bs ){
+//0. es5 adapter
+if( !Date.now ) Date.now = function(){return +new Date;};
 if( !Array.prototype.indexOf ) Array.prototype.indexOf = function( $v, $i ){
 	var i, j, k, l;
-	if( j = this.length )
-		for( $i = $i || 0, i = $i, k = parseInt( ( j - i ) * .5 ) + i + 1, j-- ; i < k ; i++ )
-			if( this[l = i] === $v || this[l = j - i + $i] === $v ) return l; 
+	if( j = this.length ) for( $i = $i || 0, i = $i, k = parseInt( ( j - i ) * .5 ) + i + 1, j-- ; i < k ; i++ )
+		if( this[l = i] === $v || this[l = j - i + $i] === $v ) return l; 
 	return -1;
 };
-Date.now || ( Date.now = function(){return +new Date;} );
 if( !W['JSON'] ) W['JSON'] = {
 	parse:function( $str ){return (0,eval)( '(' + $str + ')' );},
 	stringify:(function(){
+		var r = /["]/g;
 		function stringify( $obj ){
 			var t0, i, j;
 			switch( t0 = typeof $obj ){
+			case'string': return '"' + $obj.replace( r, '\\"' ) + '"';
 			case'number':case'boolean': return $obj.toString();
-			//case'function': return undefined;
-			case'undefined': return undefined;
-			case 'null': return t0;
-			case'string': return '"' + $obj + '"';
+			case'undefined': return t0;
 			case'object':
+				if( !$obj ) return 'null';
 				t0 = '';
-				if( $obj && $obj.splice ){
+				if( $obj.splice ){
 					for( i = 0, j = $obj.length ; i < j ; i++ ) t0 += ',' + stringify( $obj[i] );
 					return '[' + t0.substr(1) + ']';
 				}else{
-					for( i in $obj ) if( $obj.hasOwnProperty( i ) ){
-						if ($obj[i] === null )  t0 += ',"'+i+'":' + null;
-						else if ($obj[i] === undefined) continue;
-						else if ('function' === (typeof $obj[i])) continue;
-						else t0 += ',"'+i+'":' + stringify( $obj[i] );
-					}
+					for( i in $obj ) if( $obj.hasOwnProperty( i ) && $obj[i] !== undefined && typeof $obj[i] != 'function' )
+						t0 += ',"'+i+'":' + stringify( $obj[i] );
 					return '{' + t0.substr(1) + '}';
 				}
 			}
@@ -49,1301 +228,815 @@ if( !W['JSON'] ) W['JSON'] = {
 		return stringify;
 	})()
 };
-function init(doc){
-	var bs = (function(doc){
-		var bs, sel, c, div, nodes;
-		if( doc.querySelectorAll ) sel = function( $sel ){return doc.querySelectorAll( $sel );};
-		else{
-			c = {}, sel = function( $sel ){
-				var t0, i;
-				if( ( t0 = $sel.charAt(0) ) == '#' ){
-					if( c[0] = doc.getElementById($sel.substr(1)) ) return c.length = 1, c;
-					return null;
+if( !W['console'] ) (function(){
+	var log = [], t0;
+	W['console'] = {
+		log:function(){log.push( Array.prototype.join( arguments, ', ' ) );},
+		flush:function(){return t0 = log.slice(0), log.length = 0, t0;}
+	};
+})();
+//3. define JSloader, ajax
+var head, e, rq, js, jid, jc;
+function xhrSend( $type, $xhr, $data ){
+	var h, i, j;
+	$xhr.setRequestHeader( 'Content-Type', $type == 'GET' ? 'text/plain; charset=UTF-8' : 'application/x-www-form-urlencoded; charset=UTF-8' ),
+	$xhr.setRequestHeader( 'Cache-Control', 'no-cache' ),
+	h = bs.$cgi.header, i = 0, j = h.length;
+	while(i < j) $xhr.setRequestHeader( h[i++], h[i++] );
+	$xhr.send( $data );
+}
+function xhr( $end ){
+	var t0, t1;
+	return t0 = rq(), t0.onreadystatechange = function(){
+		if( t0.readyState != 4 || t1 < 0 ) return;
+		t0.onreadystatechange = null, clearTimeout( t1 ), t1 = -1, $end( t0.status == 200 || t0.status == 0 ? t0.responseText : '@'+t0.status );
+	}, t1 = setTimeout( function(){if( t1 > -1 ) t1 = -1, t0.onreadystatechange = null, $end( '@timeout' );}, timeout ), t0;
+}
+function http( $type, $end, $url, $arg ){
+	var t0;
+	return t0 = $end ? xhr( $end ) : rq(), t0.open( $type, $url, $end ? true : false ), xhrSend( $type, t0, bs.$cgi( $arg ) || '' ), $end ? '' : t0.responseText;
+}
+head = doc.getElementsByTagName( 'head' )[0], e = W['addEventListener'],
+rq = W['XMLHttpRequest'] ? function(){return new XMLHttpRequest;} : (function(){
+	var t0, i, j;
+	t0 = 'MSXML2.XMLHTTP', t0 = ['Microsoft.XMLHTTP',t0,t0+'.3.0',t0+'.4.0',t0+'.5.0'], i = t0.length;
+	while( i-- ){try{new ActiveXObject( j = t0[i] );}catch( $e ){continue;}break;}
+	return function(){return new ActiveXObject( j );};
+})(),
+jid = 0, bs.__callback = jc = {},
+js = function( $data, $load, $end ){
+	var t0, i;
+	t0 = doc.createElement( 'script' ), t0.type = 'text/javascript', t0.charset = 'utf-8', head.appendChild( t0 );
+	if( $load ){
+		if( e ) t0.onload = function(){t0.onload = null, $load();};
+		else t0.onreadystatechange = function(){(t0.readyState=='loaded'||t0.readyState=='complete')&&(t0.onreadystatechange=null,$load());};
+		if( $data.charAt($data.length-1)=='=' ) $data += 'bs.__callback.'+(i='c'+(id++)), jc[i] = function(){delete jc[i],$end.apply(null,arguments);};
+		t0.src = $data;
+	}else t0.text = $data;
+},
+method( 'get', function( $end, $url ){return http( 'GET', $end, bs.$url( $url, arguments ) );} ),
+method( 'post', function( $end, $url ){return http( 'POST', $end, bs.$url($url), arguments );} ),
+method( 'put', function( $end, $url ){return http( 'PUT', $end, bs.$url($url), arguments );} ),
+method( 'delete', function( $end, $url ){return http( 'DELETE', $end, bs.$url($url), arguments );} ),
+method( 'js', function( $end ){
+	var i, j, arg, load;
+	arg = arguments, i = 1, j = arg.length;
+	if( $end ) ( load = function(){i < j ? js( arg[i++], load, $end ) : $end();} )();
+	else while( i < j ) js( bs.$get( null, arg[i++] ) );
+} ),
+method( 'img', (function(){
+	function _load( $src, $data ){
+		var t0, t1;
+		t0 = new Image;
+		if( window['HTMLCanvasElement'] ) t0.onload = $data.loaded;
+		else ( t1 = function(){t0.complete ? $data.loaded() : setTimeout( t1, 10 );} )();
+		return t0.src = $src, t0;
+	}
+	return function load( $end ){
+		var t0, path, i, j;
+		arguments.length == 2 && arguments[1][0] ? ( path = arguments[1], i = 0 ) : ( path = arguments, i = 1 ), j = path.length,
+		t0 = {count:0, length:0, loaded:function loaded(){
+				var t1, w, h, i, j;
+				if( ++t0.count == ( j = t0.length ) ){
+					i = 0;
+					while( i < j ) t1 = t0[i++], t1.bsImg = {w:w = t1.width, h:h = t1.height};
+					$end( t0 );
 				}
-				if( t0 == '.' ){
-					$sel = $sel.substr(1), t0 = doc.getElementsByTagName('*'), c.length = 0, i = t0.length;
-					while( i-- ) if( t0[i].className.indexOf( $sel ) > -1 ) c[c.length++] = t0[i];
-					return c;
-				}
-				return doc.getElementsByTagName($sel);
-			};
+			}
+		};
+		while( i < j ) t0[t0.length++] = _load( path[i++], t0 );
+	};
+})() ),
+method( 'go', function( $url ){location.href = $url;} ),
+method( 'open', function( $url ){W.open( $url );} ),
+method( 'back', function(){history.back();} ),
+method( 'reload', function(){location.reload();} ),
+method( 'ck', function ck( $key/*, $val, $expire, $path*/ ){
+	var t0, t1, t2, i, v;
+	t0 = document.cookie.split(';'), i = t0.length;
+	if( arguments.length == 1 ){
+		while( i-- ) if( ( t1 = bs.$trim(t0[i].split('=')), t1[0] ) == $key ) return decodeURIComponent( t1[1] );
+		return null;
+	}else{
+		v = arguments[1], t1 = $key + '=' + ( v ? encodeURIComponent( v ) : '' ) + ';domain='+document.domain+';path='+ (arguments[3] || '/');
+		if( v === null ) t0 = new Date, t0.setTime( t0.getTime() - 86400000 ), t1 += ';expires=' + t0.toUTCString();
+		else if( arguments[2] ) t0 = new Date, t0.setTime( t0.getTime() + arguments[2] * 86400000 ), t1 += ';expires=' + t0.toUTCString();
+		return document.cookie = t1, v;
+	}
+} );
+function DETECT(){
+	var platform, app, agent, device,
+		flash, browser, bVersion, os, osVersion, cssPrefix, stylePrefix, transform3D,
+		b, bStyle, div, keyframe,
+		v, a, c;
+	agent = navigator.userAgent.toLowerCase(),
+	platform = navigator.platform.toLowerCase(),
+	app = navigator.appVersion.toLowerCase(),
+	flash = 0, device = 'pc',
+	(function(){
+		var i;
+		function ie(){
+			if( agent.indexOf( 'msie' ) < 0 && agent.indexOf( 'trident' ) < 0 ) return;
+			if( agent.indexOf( 'iemobile' ) > -1 ) os = 'winMobile';
+			return browser = 'ie', bVersion = agent.indexOf( 'msie' ) < 0 ? 11 : parseFloat( /msie ([\d]+)/.exec( agent )[1] );
 		}
-		div = doc.createElement( 'div' ), nodes = {},
-		bs = function( $sel, $node ){
+		function chrome( i ){
+			if( agent.indexOf( i = 'chrome' ) < 0 && agent.indexOf( i = 'crios' ) < 0 ) return;
+			return browser = 'chrome', bVersion = parseFloat( ( i == 'chrome' ? /chrome\/([\d]+)/ : /crios\/([\d]+)/ ).exec( agent )[1] );
+		}
+		function firefox(){
+			if( agent.indexOf( 'firefox' ) < 0 ) return;
+			return browser = 'firefox', bVersion = parseFloat( /firefox\/([\d]+)/.exec( agent )[1] );
+		}
+		function safari(){
+			if( agent.indexOf( 'safari' ) < 0 ) return;
+			return browser = 'safari', bVersion = parseFloat( /safari\/([\d]+)/.exec( agent )[1] );
+		}
+		function opera(){
+			if( agent.indexOf( 'opera' ) < 0 ) return;
+			return browser = 'opera', bVersion = parseFloat( /version\/([\d]+)/.exec( agent )[1] );
+		}
+		function naver(){if( agent.indexOf( 'naver' ) > -1 ) return browser = 'naver';}
+		if( agent.indexOf( 'android' ) > -1 ){
+			browser = os = 'android';
+			if( agent.indexOf( 'mobile' ) == -1 ) browser += 'Tablet', device = 'tablet';
+			else device = 'mobile';
+			i = /android ([\d.]+)/.exec( agent );
+			if( i ) i = i[1].split('.'), osVersion = parseFloat( i[0] + '.' + i[1] );
+			else osVersion = 0;
+			i = /safari\/([\d.]+)/.exec( agent );
+			if( i ) bVersion = parseFloat( i[1] );
+			naver() || chrome() || firefox() || opera();
+		}else if( agent.indexOf( i = 'ipad' ) > -1 || agent.indexOf( i = 'iphone' ) > -1 ){
+			device = i == 'ipad' ? 'tablet' : 'mobile', browser = os = i;
+			if( i = /os ([\d_]+)/.exec( agent ) ) i = i[1].split('_'), osVersion = parseFloat( i[0] + '.' + i[1] );
+			else osVersion = 0;
+			if( i = /mobile\/10a([\d]+)/.exec( agent ) ) bVersion = parseFloat( i[1] );
+			naver() || chrome() || firefox() || opera();
+		}else{
+			(function(){
+				var plug, t0, e;
+				plug = navigator.plugins;
+				if( browser == 'ie' ) try{t0 = new ActiveXObject( 'ShockwaveFlash.ShockwaveFlash' ).GetVariable( '$version' ).substr( 4 ).split( ',' ), flash = parseFloat( t0[0] + '.' + t0[1] );}catch( e ){}
+				else if( ( t0 = plug['Shockwave Flash 2.0'] ) || ( t0 = plug['Shockwave Flash'] ) ) t0 = t0.description.split( ' ' )[2].split( '.' ), flash = parseFloat( t0[0] + '.' + t0[1] );
+				else if( agent.indexOf( 'webtv' ) > -1 ) flash = agent.indexOf( 'webtv/2.6' ) > -1 ? 4 : agent.indexOf("webtv/2.5") > -1 ? 3 : 2;
+			})();
+			if( platform.indexOf( 'win' ) > -1 ){
+				os = 'win', i = 'windows nt ';
+				if( agent.indexOf( i + '5.1' ) > -1 ) osVersion = 'xp';
+				else if( agent.indexOf( i + '6.0' ) > -1 ) osVersion = 'vista';
+				else if( agent.indexOf( i + '6.1' ) > -1 ) osVersion = '7';
+				else if( agent.indexOf( i + '6.2' ) > -1 ) osVersion = '8';
+				else if( agent.indexOf( i + '6.3' ) > -1 ) osVersion = '8.1';
+				ie() || chrome() || firefox() || safari() || opera();
+			}else if( platform.indexOf( 'mac' ) > -1 ){      
+				os = 'mac';
+				i = /os x ([\d._]+)/.exec(agent)[1].replace( '_', '.' ).split('.');
+				osVersion = parseFloat( i[0] + '.' + i[1] );
+				chrome() || firefox() || safari() || opera();
+			}else{
+				os = app.indexOf( 'x11' ) > -1 ? 'unix' : app.indexOf( 'linux' ) > -1 ? 'linux' : 0;
+				chrome() || firefox();
+			}
+		}
+	})(),
+	b = doc.body, bStyle = b.style, div = doc.createElement( 'div' ),
+	div.innerHTML = '<div style="opacity:.55;position:fixed;top:100px;visibility:hidden;-webkit-overflow-scrolling:touch">a</div>',
+	div = div.getElementsByTagName( 'div' )[0],
+	c = doc.createElement( 'canvas' ), c = 'getContext' in c ? c : null,
+	a = doc.createElement( 'audio' ), a = 'canPlayType' in a ? a : null,
+	v = doc.createElement( 'video' ), v = 'canPlayType' in v ? v : null;
+	switch( browser ){
+	case'ie': cssPrefix = '-ms-', stylePrefix = 'ms'; transform3D = bVersion > 9 ? 1 : 0;
+		if( bVersion == 6 ) doc.execCommand( 'BackgroundImageCache', false, true ), b.style.position = 'relative';
+		break;
+	case'firefox': cssPrefix = '-moz-', stylePrefix = 'Moz'; transform3D = 1; break;
+	case'opera': cssPrefix = '-o-', stylePrefix = 'O'; transform3D = 0; break;
+	default: cssPrefix = '-webkit-', stylePrefix = 'webkit'; transform3D = os == 'android' ? ( osVersion < 4 ? 0 : 1 ) : 0;
+	}
+	if( keyframe = W['CSSRule'] ){
+		if( keyframe.WEBKIT_KEYFRAME_RULE ) keyframe = '-webkit-keyframes';
+		else if( keyframe.MOZ_KEYFRAME_RULE ) keyframe = '-moz-keyframes';
+		else if( keyframe.KEYFRAME_RULE ) keyframe = 'keyframes';
+		else keyframe = null;
+	}
+	bs.$static( 'DETECT', {
+		'device':device, 'browser':browser, 'browserVer':bVersion, 'os':os, 'osVer':osVersion, 'flash':flash, 'sony':agent.indexOf( 'sony' ) > -1,
+		//dom
+		root:b.scrollHeight ? b : doc.documentElement,
+		scroll:doc.documentElement && typeof doc.documentElement.scrollLeft == 'number' ? 'scroll' : 'page',
+		insertBefore:div.insertBefore, png:browser == 'ie' && bVersion > 7, 
+		opacity:div.style.opacity == '0.55' ? 1 : 0, text:div.textContent ? 'textContent' : div.innerText ? 'innerText' : 'innerHTML',
+		cstyle:doc.defaultView && doc.defaultView.getComputedStyle,
+		//css3
+		cssPrefix:cssPrefix, stylePrefix:stylePrefix, filterFix:browser == 'ie' && bVersion == 8 ? ';-ms-' : ';',
+		transition:stylePrefix + 'Transition' in bStyle || 'transition' in bStyle, transform3D:transform3D, keyframe:keyframe,
+		//html5
+		canvas:c, canvasText:c && c.getContext('2d').fillText,
+		audio:a,
+		audioMp3:a && a.canPlayType( 'audio/mpeg;' ).indexOf( 'no' ) < 0 ? 1 : 0,
+		audioOgg:a && a.canPlayType( 'audio/ogg;' ).indexOf( 'no' ) < 0 ? 1 : 0,
+		audioWav:a && a.canPlayType( 'audio/wav;' ).indexOf( 'no' ) < 0 ? 1 : 0,
+		audioMp4:a && a.canPlayType( 'audio/mp4;' ).indexOf( 'no' ) < 0 ? 1 : 0,
+		video:v,
+		videoCaption:'track' in doc.createElement('track') ? 1 : 0,
+		videoPoster:v && 'poster' in v ? 1 : 0,
+		videoWebm:v && v.canPlayType( 'video/webm; codecs="vp8,mp4a.40.2"' ).indexOf( 'no' ) == -1 ? 1 : 0,
+		videH264:v && v.canPlayType( 'video/mp4; codecs="avc1.42E01E,m4a.40.2"' ).indexOf( 'no' ) == -1 ? 1 : 0,
+		videoTeora:v && v.canPlayType( 'video/ogg; codecs="theora,vorbis"' ).indexOf( 'no' ) == -1 ? 1 : 0,
+		local:W.localStorage && 'setItem' in localStorage,
+		geo:navigator.geolocation, worker:W.Worker, file:W.FileReader, message:W.postMessage,
+		history:'pushState' in history, offline:W.applicationCache,
+		db:W.openDatabase, socket:W.WebSocket
+	} );
+}
+function DOM(){
+	var style;
+	method( 'domquery', (function(doc){
+		var c;
+		if( doc.querySelectorAll ) return function( $sel ){return doc.querySelectorAll( $sel );};
+		else return c = {}, function( $sel ){
+			var t0, i;
+			if( ( t0 = $sel.charAt(0) ) == '#' ){
+				if( c[0] = doc.getElementById($sel.substr(1)) ) return c.length = 1, c;
+				return null;
+			}
+			if( t0 == '.' ){
+				$sel = $sel.substr(1), t0 = doc.getElementsByTagName('*'), c.length = 0, i = t0.length;
+				while( i-- ) if( t0[i].className.indexOf( $sel ) > -1 ) c[c.length++] = t0[i];
+				return c;
+			}
+			return doc.getElementsByTagName($sel);
+		};
+	})(doc) );
+	method( 'domfromhtml', (function(doc){
+		var div;
+		div = doc.createElement( 'div' );
+		return function( $sel ){
+			return div.innerHTML = $sel, bs.$reverse( div.childNodes );
+		};
+	})(doc) ),
+	method( 'dom', (function( sel, html ){
+		var nodes = {};
+		function dom( $sel, $node ){
 			var r, t0, i, j, k;
-			if( $sel.isDom ) return $sel;
 			t0 = typeof $sel;
-			if( t0 == 'string' ) return $sel.charAt(0) == '<' ? ( div.innerHTML = $sel, bs.$reverse(div.childNodes) ) : sel( $sel );
 			if( t0 == 'function' ) return $sel();
+			if( t0 == 'string' ) return $sel.charAt(0) == '<' ? html( $sel ) : sel( $sel );
+			if( $sel.instanceOf == bs.dom ) return $sel;
 			r = $node ? {} : nodes;
 			if( $sel.nodeType == 1 ) return r[0] = $sel, r.length = 1, r;
 			if( j = $sel.length ){
 				for( r.length = i = 0 ; i < j ; i++ ){
-					t0 = bs( $sel[i], 1 ), r.length = k = t0.length;
+					t0 = dom( $sel[i], 1 ), r.length = k = t0.length;
 					while( k-- ) r[k] = t0[k];
 				}
 				return r;
 			}
-		},
-		bs.sel = sel;
-		return bs;
-	})(doc);
-	(function(bs){
-		function cls( $arg ){
-			var key, factory, t0, k;
-			key = $arg[0], factory = $arg[1],
-			cls[key] = factory.init ? function($key){this.__k = $key,this.__i( $key );} : function($key){this.__k = $key;};
-			t0 = cls[key].prototype, t0.$ = factory.$, t0.__i = factory.init, t0.__d = del, t0.__f = factory;
-			for( k in factory.method ) t0[k] = factory.method[k];
-			return factory;
 		}
-		function del(){return delete this.__f[this.__k], this.__k;}
-		bs.factory = function(){
-			var t0, t1, i;
-			t0 = arguments[0].split(','), arguments[0] = t0[0], t1 = new cls(arguments), i = t0.length;
-			while( i-- ) bs[t0[i]] = t1;
-		},
-		bs.factory.creator = function( $key ){
-			function F(){
-				var t0, t1;
-				return typeof ( t0 = arguments[0] ) == 'string' ?
-						( t1 = t0.charAt(0) ) == '@' ? ( F[t0=t0.substr(1)] = new cls[$key](t0) ) :
-						t1 == '<' ? new cls[$key](t0) : F[t0] || ( F[t0] = new cls[$key](t0) ) :
-					new cls[$key](t0);
-			}
-			return F;
-		};
-	})(bs),
-	(function(){
-		var rc, random;
-		rc = 0, random = function(){return rc = ( rc + 1 ) % 1000, random[rc] || ( random[rc] = Math.random() );};
-		bs.$ex = function ex(){
-			var t0, i, j;
-			t0 = arguments[0], i = 1, j = arguments.length;
+		return dom;
+	})( bs.$domquery, bs.$domfromhtml ) );
+	style = (function(){
+		var style, nopx, b, pf, reg, regf;
+		b = doc.body.style,
+		reg = /-[a-z]/g, regf = function($0){return $0.charAt(1).toUpperCase();},
+		pf = bs.DETECT.stylePrefix, nopx = {'opacity':1,'zIndex':1},
+		style = function(){this.s = arguments[0], this.u = {};},
+		style.prototype.init = function(){this.s.cssText = '';},
+		style.prototype.$ = function( $arg, i ){
+			var t0, j, k, v, v0, u, s;
+			u = this.u, s = this.s, i = i || 0, j = $arg.length;
 			while( i < j ){
-				switch( arguments[i++] ){
-				case'~': return parseInt( random() * ( arguments[i++] - t0 + 1 ) ) + t0;
-				case'~f': return random() * ( arguments[i++] - t0 ) + t0;
-				}
-			}
-			return t0;
-		};
-	})(),
-	(function(){
-		function deco( $v, $t, $f, $r, $isEnd ){
-			var t0 = $v;
-			switch( $t ){
-			case's':case'n': return t0 = $isEnd ? t0 + $f : $f + t0, t0;
-			case'f': return t0 = $f( t0, i );
-			case'r': if( typeof t0 == 'string' ) t0 = t0.replace( $f, $r ); return t0;
-			}
-		}
-		bs.$deco = function( $obj, $start, $end ){
-			var type0, reg0, type1, reg1, t0, i;
-			type0 = ( typeof $start ).charAt(0), i = 3;
-			if( $start instanceof RegExp ) type0 = 'r', reg0 = $end,  $end = arguments[3], i = 4;
-			if( !$end ) type1 = '-';
-			else{
-				type1 = ( typeof $end ).charAt(0);
-				if( $end instanceof RegExp ) type1 = 'reg', reg1 = arguments[i];
-			}
-			if( $obj.splice ){
-				t0 = [], i = $obj.length;
-				while( i-- ) t0[i] = deco( deco( $obj[i], type0, $start, reg0 ), type1, $end, reg1 );
-			}else{
-				t0 = {};
-				for( i in $obj ) t0[i] = deco( deco( $obj[i], type0, $start, reg0 ), type1, $end, reg1, 1 );
-			}
-			return t0;
-		},
-		bs.$reverse = function( $obj ){
-			var t0, i;
-			i = $obj.length;
-			if( $obj.splice ){
-				t0 = [];
-				while( i-- ) t0[t0.length] = $obj[i];
-			}else{
-				t0 = {length:0};
-				while( i-- ) t0[t0.length++] = $obj[i];
-			}
-			return t0;
-		};
-	})();
-	(function(){
-		var arg, reg;
-		reg = /@[^@]+@/g;
-		function r( $0 ){
-			var t0, t1, t2, i, j, k, l, cnt;
-			$0 = $0.substring( 1, $0.length - 1 );
-			t0 = $0.split('.'), i = 1, j = arg.length, l = t0.length, cnt = 0;
-			while( i < j ){
-				t1 = arg[i++], k = 0;
-				while( k < l && t1 !== undefined ) t1 = t1[t0[k++]];
-				if( t1 !== undefined ) cnt++, t2 = t1;
-			}
-			if( cnt == 0 ) return $0;
-			if( cnt > 1 ) return '@ERROR matchs '+cnt+'times@'
-			i = typeof t2;
-			if( i == 'object' )
-				if( t2.TMPL ) return t2.TMPL( $0 );
-				else if( t2.splice ) return t2.join('');
-			else if( i == 'function' ) return t2( $0 );
-			return t2;
-		}
-		bs.$tmpl = function( $str ){
-			if( $str.substr(0,2) == '#T' ) $str = bs.d( $str ).$('@text');
-			else if( $str.substr($str.length-5) == '.html' ) $str = bs.$get( null, $str );
-			return arg = arguments, bs.$trim( $str.replace( reg, r ) );
-		};
-		function factory( r, v ){
-			function f( $v ){
-				var t0, i;
-				if( typeof $v == 'string' ) return $v.replace( r, v );
-				else if( !$v ) return $v;
-				if( typeof $v == 'object' ){
-					if( $v.splice ){
-						t0 = [], i = $v.length;
-						while( i-- ) t0[i] = f( $v[i] );
-					}else{
-						t0 = {};
-						for( i in $v ) t0[i] = f( $v[i] );
+				t0 = $arg[i++], v = $arg[i++];
+				if( !( k = style[t0] ) ){
+					k = t0.replace( reg, regf );
+					if( k in b ) style[t0] = k;
+					else{
+						k = pf+k.charAt(0).toUpperCase()+k.substr(1);
+						if( k in b ) style[t0] = k;
+						else continue;
 					}
-					return t0;
+				}else if( typeof k == 'function' ){
+					v = k( this, v );
+					continue;
 				}
-				return $v;
-			};
-			return f;
-		}
-		bs.$stripTag = factory( /[<][^>]+[>]/g, '' );
-		bs.$trim = factory( /^\s*|\s*$/g, '' );
-	})();
-	bs.$xml = (function(){
-		var type, parser, t;
-		t = /^\s*|\s*$/g;
-		function _xml( $node ){
-			var node, r, n, t0, t1, i, j;
-			node = $node.childNodes, r = {};
-			for( i = 0, j = node.length ; i < j ; i++ ){
-				t0 = type ? node[i] : node.nextNode();
-				if( t0.nodeType == 3 ) r.value = (type ? t0.textContent : t0.text).replace( t, '' );
+				if( v || v === 0 ){ 
+					if( this[k] === undefined ){ //add
+						if( ( t0 = typeof v ) == 'number' ) this[k] = v, u[k] = nopx[k] ? '' : 'px';
+						else if( t0 == 'string' ){
+							if( v0 = style[v.substr(0,4)] ) this[k] = v = v0(v), u[k]='';
+							else if( ( v0 = v.indexOf( ':' ) ) == -1 ) this[k] = v, u[k] = '';
+							else this[k] = parseFloat( v.substr( 0, v0 ) ), u[k] = v.substr( v0 + 1 ), v = this[k];
+						}
+					}else this[k] = (typeof v == 'string' && (v0 = style[v.substr(0,4)])) ? v0(v) : v; //set
+					s[k] = v + u[k];
+				}else if( v === null ) delete this[k], delete u[k], s[k] = '';//del
+				else return this[k]; //get
+			}
+			return v;
+		},
+		style.prototype.$g = function( t0 ){
+			var k = style[t0];
+			if( !k ){
+				k = t0.replace( reg, regf );
+				if( k in b ) style[t0] = k;
 				else{
-					n = t0.nodeName, t0 = _xml( t0 );
-					if( t1 = r[n] ){
-						if( t1.length === undefined ) r[n] = {length:2,0:t1,1:t0};
-						else r[n][t1.length++] = t0;
-					}else r[n] = t0;
+					k = pf+k.charAt(0).toUpperCase()+k.substr(1);
+					if( k in b ) style[t0] = k;
+					else return 0;
+				}
+			}else if( typeof k == 'function' ) return k( this );
+			return this[k];
+		},
+		style.prototype.$s = function( t0, v ){
+			var k = style[t0];
+			if( !k ){
+				k = t0.replace( reg, regf );
+				if( k in b ) style[t0] = k;
+				else{
+					k = pf+k.charAt(0).toUpperCase()+k.substr(1);
+					if( k in b ) style[t0] = k;
+					else return 0;
+				}
+			}else if( typeof k == 'function' ) return k( this, v );
+			return this[k] = v;
+		},
+		style.key = function( t0 ){
+			var k = style[t0];
+			if( !k ){
+				k = t0.replace( reg, regf );
+				if( k in b ) style[t0] = k;
+				else{
+					k = pf+k.charAt(0).toUpperCase()+k.substr(1);
+					if( k in b ) style[t0] = k;
+					else return 0;
 				}
 			}
-			if( t0 = $node.attributes ) for( i = 0, j = t0.length ; i < j ; i++ ) r['$'+t0[i].name] = t0[i].value;
-			return r;
-		}
-		function xml0( $data, $end ){
-			var r, t0, t1, nn, i, j;
-			t0 = $data.childNodes, r = {}, i = 0, j = t0.length;
-			if( $end ){
-				( nn = function(){
-					var k, t1;
-					for( var k = 0 ; i < j && k < 5000 ; i++, k++ ) t1 = type ? t0[i] : t0.nextNode(), r[t1.nodeName] = _xml( t1 );
-					i < j ? setTimeout( nn, 16 ) : $end( r );
-				} )();
-			}else{
-				for( ; i < j ; i++ ) t1 = type ? t0[i] : t0.nextNode(), r[t1.nodeName] = _xml( t1 );
-				return r;
-			}
-		}
-		function filter( $data ){
-			if( $data.substr( 0, 20 ).indexOf( '<![CDATA[' ) > -1 ) $data = $data.substring( 0, 20 ).replace( '<![CDATA[', '' ) + $data.substr( 20 );
-			if( $data.substr( $data.length - 5 ).indexOf( ']]>' ) > -1 ) $data = $data.substring( 0, $data.length - 5 ) + $data.substr( $data.length - 5 ).replace( ']]>', '' );
-			return $data.replace( t, '' );
-		}
-		if( W['DOMParser'] ){
-			type = 1, parser = new DOMParser;
-			return function( $data, $end ){return xml0( parser.parseFromString( filter( $data ), "text/xml" ), $end );};
-		}else{
-			type = 0, parser = (function(){
-				var t0, i, j;
-				t0 = 'MSXML2.DOMDocument', t0 = ['Microsoft.XMLDOM', 'MSXML.DOMDocument', t0, t0+'.3.0', t0+'.4.0', t0+'.5.0', t0+'.6.0'],
-				i = t0.length;
-				while( i-- ){
-					try{ new ActiveXObject( j = t0[i] ); }catch( $e ){ continue; }
-					break;
-				}
-				return function(){return new ActiveXObject( j );};
-			})();
-			return function xml( $data, $end ){
-				var p = parser();
-				p.loadXML( filter( $data ) );
-				return xml0( p, $end );
+			return k;
+		},
+		style.float = 'styleFloat' in b ? 'styleFloat' : 'cssFloat' in b ? 'cssFloat' : 'float', style['url('] = function($v){return $v;};
+		if( !( 'opacity' in b ) ){
+			style.opacity = function(s){
+				var v = arguments[1];
+				if( v === undefined ) return s.opacity;
+				else if( v === null ) return delete s.opacity, s.s.filter = '', v;
+				else return s.opacity = v, s.s.filter = 'alpha(opacity=' + parseInt( v * 100 ) + ')', v;
+			};
+			style['rgba'] = function($v){
+				var t0 = $v.substring( 5, $v.length - 1 ).split(',');
+				t0[3] = parseFloat(t0[3]);
+				return 'rgb('+parseInt((255+t0[0]*t0[3])*.5)+','+parseInt((255+t0[1]*t0[3])*.5)+','+parseInt((255+t0[2]*t0[3])*.5)+')';
 			};
 		}
+		return bs.style = style;
 	})();
-	bs.$img = (function(){
-		function _load( $src, $data ){
-			var t0, t1;
-			t0 = new Image;
-			if( window['HTMLCanvasElement'] ) t0.onload = $data.loaded;
-			else ( t1 = function(){t0.complete ? $data.loaded() : setTimeout( t1, 10 );} )();
-			return t0.src = $src, t0;
-		}
-		return function load( $end ){
-			var t0, path, i, j;
-			arguments.length == 2 && arguments[1][0] ? ( path = arguments[1], i = 0 ) : ( path = arguments, i = 1 ), j = path.length,
-			t0 = {count:0, length:0, loaded:function loaded(){
-					var t1, w, h, i, j;
-					if( ++t0.count == ( j = t0.length ) ){
-						i = 0;
-						while( i < j ) t1 = t0[i++], t1.bsImg = {w:w = t1.width, h:h = t1.height};
-						$end( t0 );
+	bs.$class( 'css', function( $fn, bs ){
+		var sheet, rule, ruleSet, idx, add, del, ruleKey, keyframe,
+			r, parser;
+		doc.getElementsByTagName( 'head' )[0].appendChild( sheet = doc.createElement( 'style' ) ),
+		sheet = sheet.styleSheet || sheet.sheet, ruleSet = sheet.cssRules || sheet.rules,
+		ruleKey = {'keyframes':bs.DETECT.keyframe}, keyframe = bs.DETECT.keyframe,
+		idx = function( $rule ){
+			var i, j, k, l;
+			for( i = 0, j = ruleSet.length, k = parseInt( j * .5 ) + 1, j-- ; i < k ; i++ )
+				if( ruleSet[l = i] === $rule || ruleSet[l = j - i] === $rule ) return l;
+		};
+		if( sheet.insertRule ) add = function( $k, $v ){sheet.insertRule( $k + ($v?'{'+$v+'}':'{}'), ruleSet.length ); return ruleSet[ruleSet.length - 1];},
+			del = function( $v ){sheet.deleteRule( idx( $v ) );};
+		else add = function( $k, $v ){sheet.addRule( $k, $v||' ' );return ruleSet[ruleSet.length - 1];},
+			del = function( $v ){sheet.removeRule( idx( $v ) );};
+		rule = function( $rule ){this.r = $rule, this.s = new style( $rule );},
+		$fn.constructor = function( $key ){
+			var t0, v;
+			if( $key.indexOf('@') > -1 ){
+				$key = $key.split('@');
+				if( $key[0] == 'font-face' ){
+					$key = $key[1].split(' '), v = 'font-family:'+$key[0]+";src:url('"+$key[1]+".eot');src:"+
+						"url('"+$key[1]+".eot?#iefix') format('embedded-opentype'),url('"+$key[1]+".woff') format('woff'),"+
+						"url('"+$key[1]+".ttf') format('truetype'),url('"+$key[1]+".svg') format('svg');",
+					$key = '@font-face', this.type = 5;
+					try{this.r = add( $key, v ); 
+					}catch($e){
+						doc.getElementsByTagName( 'head' )[0].appendChild( t0 = doc.createElement( 'style' ) ),
+						(t0.styleSheet||t0.sheet).cssText = $key + '{' +v+'}';
+					}
+					return;
+				}else if( $key[0] == 'keyframes' ){
+					if( !keyframe )return this.type = -1;
+					else $key = '@' + ( ruleKey[$key[0]] || $key[0] )+ ' ' + $key[1], this.type = 7;
+				}
+			}else this.type = 1;
+			this.r = add( $key, v );
+			if( this.type == 1 ) this.s = new style( this.r.style );
+		},
+		$fn.$ = function(){
+			var type, t0, r;
+			t0 = arguments[0], type = this.type;
+			if( t0 === null ) return del( type < 0 ? 0 : this.destroyer(), this.r );
+			else if( type == 1 ) return this.s.$( arguments );
+			else if( type == 7 ){
+				if( !this[t0] ){
+					if( this.r.appendRule ) this.r.appendRule( t0+'{}' );
+					else this.r.insertRule( t0+'{}' );
+					r = this.r.cssRules[this.r.cssRules.length - 1], this[t0] = {r:r, s:new style( r.style )};
+				}
+				arguments[1] == null ? this[t0].s.init() : this[t0].s.$( arguments, 1 );
+			}
+			return this;
+		}, r = /^[0-9.-]+$/,
+		parser = function( $data ){
+			var t0, t1, t2, c, i, j, k, v;
+			t2 = [], t0 = $data.split('}');
+			for( i = 0, j = t0.length ; i < j ; i++ ){
+				if( t0[i] ){
+					t0[i] = bs.$trim( t0[i].split('{') );
+					if( t0[i][0].charAt(0) != '@' ){
+						c = bs.css( t0[i][0] ), t1 = bs.$trim( t0[i][1].split(';') ), k = t1.length, t2.length = 0;
+						while( k-- ) v = bs.$trim( t1[k].split(':') ), t2[t2.length] = v[0], t2[t2.length] = r.test(v[1]) ? parseFloat(v[1]) : v[1];
+						c.$.apply( c, t2 );
 					}
 				}
-			};
-			while( i < j ) t0[t0.length++] = _load( path[i++], t0 );
-		};
-	})(),
-	bs.$url = function $url( $url_ ){location.href = $url_;},
-	bs.$open = function $open( $url ){W.open( $url );},
-	bs.$back = function $back(){history.back();},
-	bs.$reload = function $reload(){location.reload();},
-	(function(doc){
-		var id, c, head;
-		function js( $data, $load, $end ){
+			}
+		}, bs.$method( 'css', function( $v ){$v.substr( $v.length - 4 ) == '.css' ? bs.$get( parser, $v ) : parser( $v );} );
+	} );
+	bs.$class( 'dom', function( $fn, bs ){
+		var dom, ds, ds0, ev, t, x, y, nodes, drill, childNodes,
+			win, wine, hash, sizer;
+		t = /^\s*|\s*$/g, dom = bs.$dom,
+		$fn.constructor = function( $key ){
 			var t0, i;
-			t0 = doc.createElement( 'script' ), t0.type = 'text/javascript', t0.charset = 'utf-8';
-			if( $load ){
-				if( W['addEventListener'] ) t0.onload = function(){t0.onload = null, $load();}
-				else t0.onreadystatechange = function(){(t0.readyState == 'loaded' || t0.readyState == 'complete') && ( t0.onreadystatechange = null, $load() );}
-				if( $data.charAt( $data.length - 1 ) == '=' ){
-					$data += 'bs.__callback.' + ( i = 'c' + (id++) ), c[i] = function(){delete c[i], $end.apply( null, arguments );};
-					$load.callBack = 1;
-				}
-				t0.src = $data;
-			}else t0.text = $data;
-			head.appendChild( t0 );
-		}
-		id = 0, bs.__callback = c = {}, head = doc.getElementsByTagName( 'head' )[0],
-		bs.$js = function( $end ){
-			var i, j, arg, load;
-			arg = arguments, i = 1, j = arg.length;
-			if( $end )(load = function(){i < j ? js( arg[i++], load, $end ) : load.callBack ? 0 : $end();})();
-			else while( i < j ) js( bs.$get( null, arg[i++] ) );
-		};
-	})(doc),
-	(function(){
-		var	_timeout = 5000, _cgiA = [], _cgiH = [];
-		var rq = W['XMLHttpRequest'] ? function rq(){ return new XMLHttpRequest; } : ( function(){
-			var t0, i, j;
-			t0 = 'MSXML2.XMLHTTP', t0 = ['Microsoft.XMLHTTP',t0,t0+'.3.0',t0+'.4.0',t0+'.5.0'],
-			i = t0.length;
+			t0 = dom( $key ), this.length = i = t0.length;
+			while( i-- ) this[i] = t0[i];
+		},
+		$fn._ = function(){
+			var dom, i, j, k;
+			i = this.length;
 			while( i-- ){
-				try{ new ActiveXObject( j = t0[i] ); }catch( $e ){ continue; }
-				break;
+				dom = this[i];
+				if( dom.nodeType == 3 ) continue;
+				if( dom.bsE ) dom.bsE = dom.bsE._();
+				if( dom.bsS ) dom.bsS = null;
+				dom.parentNode.removeChild( dom ),
+				j = dom.attributes.length;
+				while( j-- )
+					switch( typeof dom.getAttribute( k = dom.attributes[j].nodeName ) ){
+					case'object':case'function': dom.removeAttribute( k );
+					}
+				this[i] = null;
 			}
-			return function rq(){ return new ActiveXObject( j ); };
-		} )();
-		function xhrSend( $type, $xhr, $data ){
-			var i, j;
-			i = 0, j = _cgiH.length,
-			$xhr.setRequestHeader( 'Content-Type', $type == 'GET' ? 'text/plain; charset=UTF-8' : 'application/x-www-form-urlencoded; charset=UTF-8' ),
-			$xhr.setRequestHeader( 'Cache-Control', 'no-cache' );
-			while(i < j) $xhr.setRequestHeader( _cgiH[i++], _cgiH[i++] );
-			$xhr.send( $data );
-		}
-		function xhr( $end ){
-			var t0, t1;
-			t0 = rq();
-			if( typeof $end == 'function' ){
-				t0.onreadystatechange = function(){
-					if( t0.readyState != 4 || t1 < 0 ) return;
-					clearTimeout( t1 ), t1 = -1;
-					$end( t0.status == 200 || t0.status == 0 ? t0.responseText : null );
-				},
-				t1 = setTimeout( function(){
-					if( t1 < 0 ) return;
-					t1 = -1;
-					$end( null );
-				}, _timeout );
-			}
-			return t0;
-		}
-		function cgi( $arguments, $idx ){
-			var t0, t1, i, j;
-			t0 = _cgiA, t0.length = 0, _cgiH.length = 0,
-			i = $idx ? $idx : 0, j = $arguments.length;
-			if( j - i > 1 ) while( i < j )
-				if ( $arguments[i].charAt(0) == '@' ) _cgiH[_cgiH.length] = $arguments[i++].substr(1), _cgiH[_cgiH.length] = $arguments[i++];
-				else t0[t0.length] = encodeURIComponent( $arguments[i++] ) + '=' + encodeURIComponent( $arguments[i++] );
-			t0[t0.length] = 'bsNoCache=' + bs.$ex( 1000, '~' ,9999 );
-			return t0.join( '&' );
-		}
-		function httpMethod( $type, $args, $end, $url ){
-			var t0;
-			t0 = xhr( $end ),
-			t0.open( $type, $url, $end ? true : false ),
-			xhrSend( $type, t0, cgi( $args, 2 ) || '' );
-			if( !$end )	return t0.responseText;
-		}
-		bs.$timeout = function timeout( $time ){_timeout = parseInt( $time * 1000 );},
-		bs.$get = function get( $end, $url ){
-			var t0;
-			t0 = xhr( $end ),
-			$url = $url.split( '#' ),
-			$url = $url[0] + ( $url[0].indexOf( '?' ) > -1 ? '&' : '?' ) + cgi( arguments, 2 ) + ( $url[1] ? '#' + $url[1] : '' ),
-			t0.open( 'GET', $url, $end ? true : false ),
-			xhrSend( 'GET', t0, '' );
-			if( !$end )	return t0.responseText;
+			if( this.destroyer ) this.destroyer();
 		},
-		bs.$post = function post( $end, $url ){return httpMethod( 'POST', arguments, $end, $url );},
-		bs.$put = function put( $end, $url ){return httpMethod( 'PUT', arguments, $end, $url );},
-		bs.$delete = function post( $end, $url ){return httpMethod( 'DELETE', arguments, $end, $url );};
-	} )(),
-	bs.$ck = function ck( $key ){
-		var r, t0, t1, t2, key, val, i, j;
-		t0 =  doc.cookie.split(';');
-		i = t0.length;
-		if( arguments.length == 1 ){
-			while( i-- ) if( ( t1 = t0[i] ) && t1.substring( 0, j = t1.indexOf('=') ).replace( /\s/, '' ) == $key ) t2 = t1.substr( j + 1);
-		}else{
-			val = arguments[1],
-			t1 = $key + '=' + ( val || '' ) + ';domain='+document.domain+';path='+ (arguments[3] || '/');
-			if( val === null ){
-				t0 = new Date,
-				t0.setTime( t0.getTime() - 86400000 ),
-				t1 += ';expires=' + t0.toUTCString();
-			}else if( arguments[2] ){
-				t0 = new Date,
-				t0.setTime( t0.getTime() + arguments[2] * 86400000 ),
-				t1 += ';expires=' + t0.toUTCString();
-			}
-			doc.cookie = t1, t2 = '' + val;
-		}
-		return t2 ? decodeURIComponent( t2 ) : null;
-	},
-	(function(){
-		var rules, set, rule, group;
-		group = {},
-		rules = {
-			ip:parseRule('/^((([0-9]{1,2})|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\\.){3}(([0-9]{1,2})|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))$/'),
-			url:parseRule('/^https?:\\/\\/[-\\w.]+(:[0-9]+)?(\\/([\\w\\/_.]*)?)?$/'),
-			email:parseRule('/^(\\w+\\.)*\\w+@(\\w+\\.)+[A-Za-z]+$/'),
-			korean:parseRule('/^[ㄱ-힣]+$/'),
-			japanese:parseRule('/^[ぁ-んァ-ヶー一-龠！-ﾟ・～「」“”‘’｛｝〜−]+$/'),
-			alpha:parseRule('/^[a-z]+$/'),
-			ALPHA:parseRule('/^[A-Z]+$/'),
-			num:parseRule('/^[0-9]+$/'),
-			alphanum:parseRule('/^[a-z0-9]+$/'),
-			'1alpha':parseRule('/^[a-z]/'),
-			'1ALPHA':parseRule('/^[A-Z]/'),
-			float:function( $v ){return '' + parseFloat( $v ) === $v;},
-			int:function( $v ){return '' + parseInt( $v, 10 ) === $v;},
-			length:function( $v, $a ){return $v.length === +$a[0];},
-			range:function( $v, $a ){return $v = $v.length, +$a[0] <= $v && $v <= +$a[1];},
-			indexOf:function( $v, $a ){
-				var i, j;
-				i = $a.length;
-				while( i-- ) if( $v.indexOf( $a[i] ) == -1 ) j = 1;
-				return j ? 0 : 1;
-			},
-			ssn:(function(){
-				var r, key;
-				r = /\s|-/g, key = [2,3,4,5,6,7,8,9,2,3,4,5];
-				return function( $v ){
-					var t0, v, i;
-					v = $v.replace( r, '' );
-					if( v.length != 13 ) return;
-					for( t0 = i = 0 ; i < 12 ; i++ ) t0 += key[i] * v.charAt(i);
-					return parseInt( v.charAt(12) ) == ( ( 11 - ( t0 % 11 ) ) % 10);
-				};
-			})(),
-			biz:(function(){
-				var r, key;
-				r = /\s|-/g, key = [1,3,7,1,3,7,1,3,5,1];
-				return function( $v ){
-					var t0, t1, v, i;
-					v = $v.replace( r, '' );
-					if( v.length != 10 ) return;
-					for( t0 = i = 0 ; i < 8 ; i++ ) t0 += key[i] * v.charAt(i);
-					t1 = "0" + ( key[8] * v.charAt(8) ), t1 = t1.substr( t1.length - 2 ),
-					t0 += parseInt( t1.charAt(0) ) + parseInt( t1.charAt(1) );
-					return parseInt( v.charAt(9) ) == ( 10 - ( t0 % 10)) % 10;
-				};
-			})()
-		},
-		set = {};
-		function arg( k, $v, $list ){
-			$v = bs.$trim( $v.substring(0,k).split('|') ),
-			$list[$list.length++] = parseRule( $v.shift() ),
-			$list[$list.length++] = $v;
-		}
-		function parse( $data ){
-			var s, t0, t1, t2, i, j, k, l;
-			s = {}, $data = $data.split('\n'), l = $data.length;
+		$fn.$ = function d$(){
+			var dom, target, t0, l, s, i, j, k, v;
+			j = arguments.length, typeof arguments[0] == 'number' ? ( s = l = 1, target = this[arguments[0]] ) : ( l = this.length, s = 0 );
 			while( l-- ){
-				t0 = $data[l].split('='), t1 = {length:0};
-				while( ( j = 0, k = t0[1].indexOf( 'AND' ) ) > -1 || ( j = 1, k = t0[1].indexOf( 'OR' ) ) > -1 )
-					arg( k, t0[1], t1 ), t1[t1.length++] = j ? ( (k += 2), 'OR' ) : ( (k += 3), 'AND' ), t0[1] = t0[1].substr( k );
-				arg( t0[1].length, t0[1], t1 ), t2 = bs.$trim( t0[0].split( ',' ) ), i = t2.length;
-				while( i-- ) s[t2[i]] = t1;
+				dom = target || this[l], i = s, ds.length = 0;
+				while( i < j ){
+					k = arguments[i++];
+					if( k === null ) this._();
+					else if( ( v = arguments[i++] ) === undefined ){ //get
+						return ev[k] ? ev( dom, k ) :
+							( t0 = ds[k.charAt(0)] ) ? t0( dom, k.substr(1) ) :
+							k == 'this' ? ( ds.length ? ( dom.bsS || ( dom.bsS = new style( dom.style ) ) ).$( ds ) : undefined, this ) :
+							$fn[k] ? $fn[k]( dom ) :
+							dom.bsS ? ( ds.length = 1, ds[0] = k, ds[1] = undefined, dom.bsS.$( ds ) ) : undefined;
+					}else{
+						v = ev[k] ? ev( dom, k, v ) :
+							( t0 = ds[k.charAt(0)] ) ? ( v = t0( dom, k.substr(1), v, arguments, i ), i = t0.i || i, v ) :
+							$fn[k] ? $fn[k]( dom, v ) : ( ds[ds.length++] = k, ds[ds.length++] = v );
+					}
+				}
+				if( ds.length ) ( dom.bsS || ( dom.bsS = new style( dom.style ) ) ).$( ds );
+				if( target ) break;
 			}
-			return rule = s;
-		}
-		function parseRule( k ){
-			if( typeof k == 'function' ) return k;
-			if( k.charAt(0) == '/' && k.charAt(k.length - 1) == '/' ){
-				k = new RegExp( k.substring( 1, k.length - 1 ) );
-				return function( $val ){return k.test( $val );};
-			}else if( rules[k] ) return rules[k];
-			else return function( $val ){ return $val === k; };
-		}
-		function val( $val ){
-			if( typeof $val == 'function' ) return $val();
-			if( $val.indexOf( '|' ) > -1 ){
-				$val = bs.$trim($val.split('|'));
-				return bs.$trim( bs.d( $val[0] ).$( $val[1] || '@value' ) );
-			}else return bs.$trim( $val );
-		}
+			return v;
+		},
+		$fn.style = function( $dom ){return $dom.bsS;},
+		$fn.x = x = function( $dom ){var i = 0; do i += $dom.offsetLeft; while( $dom = $dom.offsetParent ) return i;},
+		$fn.y = y = function( $dom ){var i = 0; do i += $dom.offsetTop; while( $dom = $dom.offsetParent ) return i;},
+		$fn.lx = function( $dom ){return x( $dom ) - x( $dom.parentNode );},
+		$fn.ly = function( $dom ){return y( $dom ) - y( $dom.parentNode );},
+		$fn.w = function( $dom ){return $dom.offsetWidth;},
+		$fn.h = function( $dom ){return $dom.offsetHeight;},
+		$fn.s = function( $dom ){$dom.submit();},
+		$fn.f = function( $dom ){$dom.focus();},
+		$fn.b = function( $dom ){$dom.blur();},
+		$fn['<'] =function( $dom, $v ){
+			var t0;
+			if( $v ){
+				if( $dom.parentNode ) $dom.parentNode.removeChild( $dom );
+				return t0 = dom( $v ), t0[0].appendChild( $dom ), t0;
+			}else return $dom.parentNode;
+		},		
+		$fn.html = function( $dom, $v ){return $v === undefined ? $dom.innerHTML : ( $dom.innerHTML = $v );},
+		$fn['html+'] = function( $dom, $v ){return $dom.innerHTML += $v;},
+		$fn['+html'] = function( $dom, $v ){return $dom.innerHTML = $v + $dom.innerHTML;},
 		(function(){
+			var t = bs.DETECT.text;
+			$fn.text = function( $dom, $v ){return $v === undefined ? $dom[t] : ($dom[t]=$v);},
+			$fn['text+'] = function( $dom, $v ){return $dom[t] += $v;},
+			$fn['+text'] = function( $dom, $v ){return $dom[t] = $v + $dom[t];};
+		})(),			
+		$fn['class'] = function( $dom, $v ){return $v === undefined ? $dom.className : ($dom.className = $v);},
+		$fn['class+'] = function( $dom, $v ){
+			var t0;
+			return !( t0 = $dom.className.replace(t,'') ) ? ( $dom.className = $v ) :
+				t0.split( ' ' ).indexOf( $v ) == -1 ? ($dom.className = $v+' '+t0 ) : t0;
+		},
+		$fn['class-'] = function( $dom, $v ){
 			var t0, i;
-			t0 = 'group,set,rule'.split(','), i = t0.length;
-			while( i-- ) test[t0[i]] = 1;
-		})();
-		function test( $rule ){
-			var t0, t1, t2, i, j, k, l, v, m, n;
-			i = 1, j = arguments.length;
-			if( test[$rule] ){
-				if( $rule == 'group' ) group[arguments[1]] = Array.prototype.slice.call( arguments, 2 );
-				else if( $rule == 'set' ) while( i < j ){
-					k = arguments[i++], v = arguments[i++]
-					if( v.substr(0,2) == '#T' ) set[k] = parse( bs.d( v ).$('@text') );
-					else if( v.substr(v.length-5) == '.html' ) set[k] = parse( bs.$get( null, v ) );
-					else set[k] = parse( v );
-				}else if( $rule == 'rule' ) while( i < j ) rules[arguments[i++]] = parseRule(arguments[i++]);
-				return;
-			}else if( !$rule ){
-				if( !(t0 = rule) ) throw 'no prevRule';
-			}else if( $rule.charAt(0) == '@' ){ //rule
-				t0 = $rule.substr(1).split('|');
-				if( !( t1 = rules[t0[0]] ) ) throw 'no rule';
-				t0 = t0.slice(1);
-				while( i < j ) if( !t1( val( arguments[i++] ), t0 ) ) return;
-				return 1;
-			}else if( set[$rule] ) t0 = set[$rule];
-			else if( $rule.substr(0,2) == '#T' ) t0 = parse( bs.d( $rule ).$('@text') );
-			else if( $rule.substr($rule.length-5) == '.html' ) t0 = parse( bs.$get( null, $rule ) );
-			else t0 = parse( $rule );
-			//ruleset
-			while( i < j ){
-				k = arguments[i++];
-				if( k.charAt(0) == '@' ){//group
-					if( !(t1 = group[k.substr(1)]) ) throw 'no group';
-					m = 0, n = t1.length;
-					while( m < n ){
-						if( !( t2 = t0[t1[m++]] ) ) throw 'no rule';
-						k = 0, l = t2.length, v = val( t1[m++] );
-						while( k < l ){
-							if( !t2[k++]( v, t2[k++] ) ){
-								if( t2[k++] != 'OR' ) return;
-							}else if( t2[k++] == 'OR' ) break;
-						}
-					}
-				}else{
-					if( !( t2 = t0[k] ) ) throw 'no rule';
-					k = 0, l = t2.length, v = val( arguments[i++] );
-					while( k < l ){
-						if( !t2[k++]( v, t2[k++] ) ){
-							if( t2[k++] != 'OR' ) return;
-						}else if( t2[k++] == 'OR' ) break;
-					}
-				}
-			}
-			return 1;
-		}
-		bs.$test = test;
-	})(),
-	( function( doc ){
-		var platform, app, agent, device,
-			flash, browser, bVersion, os, osVersion, cssPrefix, stylePrefix, transform3D,
-			b, bStyle, div, keyframe,
-			v, a, c;
-		agent = navigator.userAgent.toLowerCase(),
-		platform = navigator.platform.toLowerCase(),
-		app = navigator.appVersion.toLowerCase(),
-		flash = 0, device = 'pc',
-		( function(){
-			function ie(){
-				if ( agent.indexOf( 'msie' ) < 0 && agent.indexOf( 'trident' ) < 0 ) return;
-				if( agent.indexOf( 'iemobile' ) > -1 ) os = 'winMobile';
-				browser = 'ie';
-				if( agent.indexOf( 'msie' ) < 0 ) return bVersion = 11;
-				return bVersion = parseFloat( /msie ([\d]+)/.exec( agent )[1] );
-			}
-			function chrome( i ){
-				if( agent.indexOf( i = 'chrome' ) > -1 || agent.indexOf( i = 'crios' ) > -1 ){
-					browser = 'chrome';
-					return bVersion = parseFloat( ( i == 'chrome' ? /chrome\/([\d]+)/ : /crios\/([\d]+)/ ).exec( agent )[1] );
-				}
-			}
-			function firefox(){
-				if( agent.indexOf( 'firefox' ) < 0 ) return;
-				browser = 'firefox';
-				return bVersion = parseFloat( /firefox\/([\d]+)/.exec( agent )[1] );
-			}
-			function safari(){
-				if( agent.indexOf( 'safari' ) < 0 ) return;
-				browser = 'safari';
-				return bVersion = parseFloat( /safari\/([\d]+)/.exec( agent )[1] );
-			}
-			function opera(){
-				if( agent.indexOf( 'opera' ) < 0 ) return;
-				browser = 'opera';
-				return bVersion = parseFloat( /version\/([\d]+)/.exec( agent )[1] );
-			}
-			function naver(){if( agent.indexOf( 'naver' ) > -1 ) return browser = 'naver';}
-			var i;
-			if( agent.indexOf( 'android' ) > -1 ){
-				browser = os = 'android';
-				if( agent.indexOf( 'mobile' ) == -1 ) browser += 'Tablet', device = 'tablet';
-				else device = 'mobile';
-				i = /android ([\d.]+)/.exec( agent );
-				if( i ) i = i[1].split('.'), osVersion = parseFloat( i[0] + '.' + i[1] );
-				else osVersion = 0;
-				i = /safari\/([\d.]+)/.exec( agent );
-				if( i ) bVersion = parseFloat( i[1] );
-				naver() || chrome() || firefox() || opera();
-			}else if( agent.indexOf( i = 'ipad' ) > -1 || agent.indexOf( i = 'iphone' ) > -1 ){
-				device = i == 'ipad' ? 'tablet' : 'mobile';
-				browser = os = i;
-				i = /os ([\d_]+)/.exec( agent );
-				if( i ){
-					i = i[1].split('_');
-					osVersion = parseFloat( i[0] + '.' + i[1] );
-				}else{
-					osVersion = 0;
-				}
-				i = /mobile\/10a([\d]+)/.exec( agent );
-				if( i ) bVersion = parseFloat( i[1] );
-				naver() || chrome() || opera();
-			}else{
-				( function(){
-					var plug, t0, e;
-					plug = navigator.plugins;
-					if( agent.indexOf( 'msie' ) > -1 ){
-						try {
-							t0 = new ActiveXObject( 'ShockwaveFlash.ShockwaveFlash' );
-							t0 = t0.GetVariable( '$version' ).substr( 4 ).split( ',' );
-							flash = parseFloat( t0[0] + '.' + t0[1] );
-						}catch( e ){}
-					}else if( plug && plug.length ){
-						if( plug['Shockwave Flash 2.0'] || plug['Shockwave Flash'] ){
-							if( plug['Shockwave Flash 2.0'] ){
-								t0 = plug['Shockwave Flash 2.0'];
-							}else{
-								t0 = plug['Shockwave Flash'];
-							}
-							t0 = t0.description.split( ' ' )[2].split( '.' );
-							flash = parseFloat( t0[0] + '.' + t0[1] );
-						}
-					}else if( agent.indexOf( 'webtv' ) > -1 ){
-						flash = agent.indexOf( 'webtv/2.6' ) > -1 ? 4 : agent.indexOf("webtv/2.5") > -1 ? 3 : 2;
-					}
-				} )();
-				if( platform.indexOf( 'win' ) > -1 ){
-					os = 'win';
-					if( agent.indexOf( 'windows nt 5.1' ) > -1 || agent.indexOf( 'windows xp' ) > -1 ){
-						osVersion = 'xp';
-					}else if( agent.indexOf( 'windows nt 6.1' ) > -1 || agent.indexOf( 'windows nt 7.0' ) > -1 ){
-						osVersion = '7';
-					}else if( agent.indexOf( 'windows nt 6.2' ) > -1 || agent.indexOf( 'windows nt 8.0' ) > -1 ){
-						osVersion = '8';
-					}
-					ie() || chrome() || firefox() || safari() || opera();
-				}else if( platform.indexOf( 'mac' ) > -1 ){
-					os = 'mac';
-					i = /os x ([\d._]+)/.exec(agent)[1].replace( '_', '.' ).split('.');
-					osVersion = parseFloat( i[0] + '.' + i[1] );
-					chrome() || firefox() || safari() || opera();
-				}else{
-					os = app.indexOf( 'x11' ) > -1 ? 'unix' : app.indexOf( 'linux' ) > -1 ? 'linux' : 0;
-					chrome() || firefox();
-				}
-			}
-		})(),
-		b = doc.body, bStyle = b.style, div = doc.createElement( 'div' ),
-		div.innerHTML = '<div style="opacity:.55;position:fixed;top:100px;visibility:hidden;-webkit-overflow-scrolling:touch">a</div>',
-		div = div.getElementsByTagName( 'div' )[0],
-		c = doc.createElement( 'canvas' ), c = 'getContext' in c ? c : null,
-		a = doc.createElement( 'audio' ), a = 'canPlayType' in a ? a : null,
-		v = doc.createElement( 'video' ), v = 'canPlayType' in v ? v : null;
-		switch( browser ){
-		case'ie': cssPrefix = '-ms-', stylePrefix = 'ms'; transform3D = bVersion > 9 ? 1 : 0;
-			if( bVersion == 6 ) doc.execCommand( 'BackgroundImageCache', false, true ), b.style.position = 'relative';
-			break;
-		case'firefox': cssPrefix = '-moz-', stylePrefix = 'Moz'; transform3D = 1; break;
-		case'opera': cssPrefix = '-o-', stylePrefix = 'O'; transform3D = 0; break;
-		default: cssPrefix = '-webkit-', stylePrefix = 'webkit'; transform3D = os == 'android' ? ( osVersion < 4 ? 0 : 1 ) : 0;
-		}
-		if( keyframe = W['CSSRule'] ){
-			if( keyframe.WEBKIT_KEYFRAME_RULE ) keyframe = '-webkit-keyframes';
-			else if( keyframe.MOZ_KEYFRAME_RULE ) keyframe = '-moz-keyframes';
-			else if( keyframe.KEYFRAME_RULE ) keyframe = 'keyframes';
-			else keyframe = null;
-		}
-		bs.DETECT = {
-			'device':device, 'browser':browser, 'browserVer':bVersion, 'os':os, 'osVer':osVersion, 'flash':flash, 'sony':agent.indexOf( 'sony' ) > -1,
-			//dom
-			root:b.scrollHeight ? b : doc.documentElement,
-			scroll:doc.documentElement && typeof doc.documentElement.scrollLeft == 'number' ? 'scroll' : 'page',
-			selector:doc.querySelectorAll, insertBefore:div.insertBefore, png:browser == 'ie' && bVersion > 7, 
-			opacity:div.style.opacity == '0.55' ? 1 : 0, text:div.textContent ? 'textContent' : div.innerText ? 'innerText' : 'innerHTML',
-			cstyle:doc.defaultView && doc.defaultView.getComputedStyle,
-			//event
-			eventTouch:div.ontouchstart === undefined ? 0 : 1, eventRotate:'onorientationchange' in W,
-			//css3
-			cssPrefix:cssPrefix, stylePrefix:stylePrefix, filterFix:browser == 'ie' && bVersion == 8 ? ';-ms-' : ';',
-			transition:stylePrefix + 'Transition' in bStyle || 'transition' in bStyle, transform3D:transform3D, keyframe: keyframe,
-			//html5
-			canvas:c, canvasText:c && c.getContext('2d').fillText,
-			audio:a,
-			audioMp3:a && a.canPlayType( 'audio/mpeg;' ).indexOf( 'no' ) < 0 ? 1 : 0,
-			audioOgg:a && a.canPlayType( 'audio/ogg;' ).indexOf( 'no' ) < 0 ? 1 : 0,
-			audioWav:a && a.canPlayType( 'audio/wav;' ).indexOf( 'no' ) < 0 ? 1 : 0,
-			audioMp4:a && a.canPlayType( 'audio/mp4;' ).indexOf( 'no' ) < 0 ? 1 : 0,
-			video:v,
-			videoCaption:'track' in doc.createElement('track') ? 1 : 0,
-			videoPoster:v && 'poster' in v ? 1 : 0,
-			videoWebm:v && v.canPlayType( 'video/webm; codecs="vp8,mp4a.40.2"' ).indexOf( 'no' ) == -1 ? 1 : 0,
-			videH264:v && v.canPlayType( 'video/mp4; codecs="avc1.42E01E,m4a.40.2"' ).indexOf( 'no' ) == -1 ? 1 : 0,
-			videoTeora:v && v.canPlayType( 'video/ogg; codecs="theora,vorbis"' ).indexOf( 'no' ) == -1 ? 1 : 0,
-			local:W.localStorage && 'setItem' in localStorage,
-			geo:navigator.geolocation, worker:W.Worker, file:W.FileReader, message:W.postMessage,
-			history:'pushState' in history, offline:W.applicationCache,
-			db:W.openDatabase, socket:W.WebSocket
-		};
-	} )( doc );
-	(function( doc ){
-		var style;
-		style = (function(){
-			var style, nopx, b, pf, reg, regf;
-			b = doc.body.style,
-			reg = /-[a-z]/g, regf = function($0){return $0.charAt(1).toUpperCase();},
-			pf = bs.DETECT.stylePrefix, nopx = {'opacity':1,'zIndex':1},
-			style = function(){this.s = arguments[0], this.u = {};},
-			style.prototype.init = function(){this.s.cssText = '';},
-			style.prototype.$ = function( $arg, i ){
-				var t0, j, k, v, v0, u, s;
-				u = this.u, s = this.s, i = i || 0, j = $arg.length;
-				while( i < j ){
-					t0 = $arg[i++], v = $arg[i++];
-					if( !( k = style[t0] ) ){
-						k = t0.replace( reg, regf );
-						if( k in b ) style[t0] = k;
-						else{
-							k = pf+k.charAt(0).toUpperCase()+k.substr(1);
-							if( k in b ) style[t0] = k;
-							else continue;
-						}
-					}else if( typeof k == 'function' ){
-						v = k( this, v );
-						continue;
-					}
-					if( v || v === 0 ){
-						if( this[k] === undefined ){ //add
-							if( ( t0 = typeof v ) == 'number' ) this[k] = v, u[k] = nopx[k] ? '' : 'px';
-							else if( t0 == 'string' ){
-								if( v0 = style[v.substr(0,4)] ) this[k] = v = v0(v), u[k]='';
-								else if( ( v0 = v.indexOf( ':' ) ) == -1 ) this[k] = v, u[k] = '';
-								else this[k] = parseFloat( v.substr( 0, v0 ) ), u[k] = v.substr( v0 + 1 ), v = this[k];
-							}
-						}else this[k] = (typeof v == 'string' && (v0 = style[v.substr(0,4)])) ? v0(v) : v; //set
-						s[k] = v + u[k];
-					}else if( v === null ) delete this[k], delete u[k], s[k] = '';//del
-					else return this[k]; //get
-				}
-				return v;
+			if( !( t0 = bs.$trim( $dom.className ) ) ) return t0;
+			t0 = t0.split( ' ' ); 
+			if( ( i = t0.indexOf( $v ) ) > -1 ) t0.splice( i, 1 );
+			return $dom.className = t0.join(' ');
+		},
+		childNodes = function( $nodes ){
+			var i, j;
+			for( nodes.length = i = 0, j = $nodes.length ; i < j ; i++ )
+				if( $nodes[i].nodeType == 1 ) nodes[nodes.length++] = $nodes[i];
+			return nodes;
+		},
+		drill = function( $dom, $k ){
+			var i, j;
+			if( $k.indexOf( '>' ) > -1 ){
+				$k = $k.split('>');
+				i = 0, j = $k.length;
+				do $dom = childNodes( $dom.childNodes )[$k[i++]]; while( i < j )
+			}else $dom = childNodes( $dom.childNodes )[$k];
+			return $dom;
+		},
+		nodes = {length:0}, ds0 = {}, ds = {
+			'@':function( $dom, $k, $v ){
+				if( $v === undefined ) return $dom[$k] || $dom.getAttribute($k);
+				else if( $v === null ){
+					$dom.removeAttribute($k);
+					try{delete $dom[$k];}catch(e){};
+				}else $dom[$k] = $v, $dom.setAttribute($k, $v);
+				return $v;
 			},
-			style.prototype.$g = function( t0 ){
-				var k = style[t0];
-				if( !k ){
-					k = t0.replace( reg, regf );
-					if( k in b ) style[t0] = k;
-					else{
-						k = pf+k.charAt(0).toUpperCase()+k.substr(1);
-						if( k in b ) style[t0] = k;
-						else return 0;
-					}
-				}else if( typeof k == 'function' ) return k( this );
-				return this[k];
-			},
-			style.prototype.$s = function( t0, v ){
-				var k = style[t0];
-				if( !k ){
-					k = t0.replace( reg, regf );
-					if( k in b ) style[t0] = k;
-					else{
-						k = pf+k.charAt(0).toUpperCase()+k.substr(1);
-						if( k in b ) style[t0] = k;
-						else return 0;
-					}
-				}else if( typeof k == 'function' ) return k( this, v );
-				return this[k] = v;
-			},
-			style.key = function( t0 ){
-				var k = style[t0];
-				if( !k ){
-					k = t0.replace( reg, regf );
-					if( k in b ) style[t0] = k;
-					else{
-						k = pf+k.charAt(0).toUpperCase()+k.substr(1);
-						if( k in b ) style[t0] = k;
-						else return 0;
-					}
-				}
-				return k;
-			},
-			style.float = 'styleFloat' in b ? 'styleFloat' : 'cssFloat' in b ? 'cssFloat' : 'float',
-			style['url('] = function($v){return $v;},
-			bs.style = style;
-			if( !( 'opacity' in b ) ){
-				style.opacity = function(s){
-					var v = arguments[1];
-					if( v === undefined ) return s.opacity;
-					else if( v === null ) return delete s.opacity, s.s.filter = '', v;
-					else return s.opacity = v, s.s.filter = 'alpha(opacity=' + parseInt( v * 100 ) + ')', v;
+			'_':( function( view, style ){
+				return bs.DETECT.cstyle ? function( $dom, $k ){
+					var t0 = view.getComputedStyle($dom,'').getPropertyValue($k);
+					return t0.substr( t0.length - 2 ) == 'px' ? parseFloat( t0.substring( 0, t0.length - 2 ) ) : t0;
+				} : function( $dom, $k ){
+					var t0 = $dom.currentStyle[style.key($k)];
+					return t0.substr( t0.length - 2 ) == 'px' ? parseFloat( t0.substring( 0, t0.length - 2 ) ) : t0;
 				};
-				style['rgba'] = function($v){
-					var t0 = $v.substring( 5, $v.length - 1 ).split(',');
-					t0[3] = parseFloat(t0[3]);
-					return 'rgb('+parseInt((255+t0[0]*t0[3])*.5)+','+parseInt((255+t0[1]*t0[3])*.5)+','+parseInt((255+t0[2]*t0[3])*.5)+')';
-				};
-			}
-			return style;
-		})();
-		bs.factory( 'c,css', ( function( doc, style ){
-			var css, sheet, rule, ruleSet, idx, add, del, ruleKey, keyframe;
-			doc.getElementsByTagName( 'head' )[0].appendChild( sheet = doc.createElement( 'style' ) ),
-			sheet = sheet.styleSheet || sheet.sheet, ruleSet = sheet.cssRules || sheet.rules,
-			ruleKey = {'keyframes':bs.DETECT.keyframe}, keyframe = bs.DETECT.keyframe,
-			idx = function( $rule ){
-				var i, j, k, l;
-				for( i = 0, j = ruleSet.length, k = parseInt( j * .5 ) + 1, j-- ; i < k ; i++ )
-					if( ruleSet[l = i] === $rule || ruleSet[l = j - i] === $rule ) return l;
-			};
-			if( sheet.insertRule ){
-				add = function( $k, $v ){sheet.insertRule( $k + ($v?'{'+$v+'}':'{}'), ruleSet.length ); return ruleSet[ruleSet.length - 1];}
-				del = function( $v ){sheet.deleteRule( idx( $v ) );};
-			}else{
-				add = function( $k, $v ){sheet.addRule( $k, $v||' ' );return ruleSet[ruleSet.length - 1];};
-				del = function( $v ){sheet.removeRule( idx( $v ) );};
-			}
-			rule = function( $rule ){this.r = $rule, this.s = new style( $rule );}
-			css = bs.factory.creator( 'c' );
-			css.init = function( $key ){
-				var t0, v;
-				if( $key.indexOf('@') > -1 ){
-					$key = $key.split('@');
-					if( $key[0] == 'font-face' ){
-						$key = $key[1].split(' '),
-						v = 'font-family:'+$key[0]+";src:url('"+$key[1]+".eot');src:"+
-							"url('"+$key[1]+".eot?#iefix') format('embedded-opentype'),"+
-							"url('"+$key[1]+".woff') format('woff'),"+
-							"url('"+$key[1]+".ttf') format('truetype'),"+
-							"url('"+$key[1]+".svg') format('svg');",
-						$key = '@font-face',
-						this.type = 5;
-						try{
-							this.r = add( $key, v );
-						}catch($e){
-							t0 = doc.createElement( 'style' );
-							doc.getElementsByTagName( 'head' )[0].appendChild( t0 );
-							(t0.styleSheet||t0.sheet).cssText = $key + '{' +v+'}';
-						}
-						return;
-					}else if( $key[0] == 'keyframes' ){
-						if( !keyframe ){
-							this.type = -1;
-							return;
-						}else{
-							$key = '@' + ( ruleKey[$key[0]] || $key[0] )+ ' ' + $key[1],
-							this.type = 7;
-						}
-					}
-				}else this.type = 1;
-				this.r = add( $key, v );
-				if( this.type == 1 ) this.s = new style( this.r.style );
-			};
-			css.$ = function css$(){
-				var type, t0, r;
-				t0 = arguments[0], type = this.type;
-				if( t0 === null ) return del( type < 0 ? 0 : this.__d(), this.r );
-				else if( type == 1 ) return this.s.$( arguments );
-				else if( type == 7 ){
-					if( !this[t0] ){
-						if( this.r.appendRule ) this.r.appendRule( t0+'{}' );
-						else this.r.insertRule( t0+'{}' );
-						r = this.r.cssRules[this.r.cssRules.length - 1];
-						this[t0] = {r:r, s:new style( r.style )};
-					}
-					if( arguments[1] == null ) this[t0].s.init();
-					else this[t0].s.$( arguments, 1 );
-				}
-				return this;
-			};
-			return css;
-		})( doc, style ) );
-		(function(){
-			var r = /^[0-9.-]+$/;
-			function parse( $data ){
-				var t0, t1, t2, c, i, j, k, v;
-				t2 = [], t0 = $data.split('}');
-				for( i = 0, j = t0.length ; i < j ; i++ ){
-					if( t0[i] ){
-						t0[i] = bs.$trim( t0[i].split('{') );
-						if( t0[i][0].charAt(0) != '@' ){
-							c = bs.c( t0[i][0] ),
-							t1 = bs.$trim( t0[i][1].split(';') ),
-							k = t1.length, t2.length = 0;
-							while( k-- ){
-								v = bs.$trim( t1[k].split(':') ),
-								t2[t2.length] = v[0], t2[t2.length] = r.test(v[1]) ? parseFloat(v[1]) : v[1];
-							}
-							c.$.apply( c, t2 );
-						}
-					}
-				}
-			}
-			bs.$css = function( $v ){
-				if( $v.substr( $v.length - 4 ) == '.css' ) bs.$get( parse, $v );
-				else parse( $v );
-			};
-		})();
-		bs.factory( 'd,dom', (function( bs, style, doc ){
-			var d, ds, ds0, ev, t, nodes, drill;
-			t = /^\s*|\s*$/g;
-			function x( $dom ){
-				var i = 0; do i += $dom.offsetLeft; while( $dom = $dom.offsetParent )
-				return i;
-			}
-			function y( $dom ){
-				var i = 0; do i += $dom.offsetTop; while( $dom = $dom.offsetParent )
-				return i;
-			}
-			d = bs.factory.creator( 'd' ),
-			d.init = function( $key ){
-				var t0, i;
-				t0 = bs( $key ), this.length = i = t0.length;
-				while( i-- ) this[i] = t0[i];
-			},
-			d.$ = function d$(){
-				var dom, target, t0, l, s, i, j, k, v;
-				j = arguments.length, typeof arguments[0] == 'number' ? ( s = l = 1, target = this[arguments[0]] ) : ( l = this.length, s = 0 );
-				while( l-- ){
-					dom = target || this[l], i = s, ds.length = 0;
-					while( i < j ){
-						k = arguments[i++];
-						if( k === null ) this._();
-						else if( ( v = arguments[i++] ) === undefined ){ //get
-							return ev[k] ? ev( dom, k ) :
-								( t0 = ds[k.charAt(0)] ) ? t0( dom, k.substr(1) ) :
-								k == 'this' ? ( ds.length ? ( dom.bsS || ( dom.bsS = new style( dom.style ) ) ).$( ds ) : undefined, this ) :
-								d[k] ? d[k]( dom ) :
-								dom.bsS ? ( ds.length = 1, ds[0] = k, ds[1] = undefined, dom.bsS.$( ds ) ) : undefined;
-						}else{
-							v = ev[k] ? ev( dom, k, v ) :
-								( t0 = ds[k.charAt(0)] ) ? ( v = t0( dom, k.substr(1), v, arguments, i ), i = t0.i || i, v ) :
-								d[k] ? d[k]( dom, v ) : ( ds[ds.length++] = k, ds[ds.length++] = v );
-						}
-					}
-					if( ds.length ) ( dom.bsS || ( dom.bsS = new style( dom.style ) ) ).$( ds );
-					if( target ) break;
-				}
-				return v;
-			},
-			d.method = {
-				isDom:1,
-				'_': function(){
-					var dom, i, j, k;
-					i = this.length;
-					while( i-- ){
-						dom = this[i];
-						if( dom.nodeType == 3 ) continue;
-						if( dom.bsE ) dom.bsE = dom.bsE._();
-						if( dom.bsS ) dom.bsS = null;
-						dom.parentNode.removeChild( dom ),
-						j = dom.attributes.length;
-						while( j-- )
-							switch( typeof dom.getAttribute( k = dom.attributes[j].nodeName ) ){
-							case'object':case'function': dom.removeAttribute( k );
-							}
-						this[i] = null;
-					}
-					if( this.__d ) this.__d();
-				}
-			};
-			function childNodes( $nodes ){
-				var i, j;
-				for( nodes.length = i = 0, j = $nodes.length ; i < j ; i++ )
-					if( $nodes[i].nodeType == 1 ) nodes[nodes.length++] = $nodes[i];
-				return nodes;
-			}
-			nodes = {length:0},
-			drill = function( $dom, $k ){
-				var i, j;
-				if( $k.indexOf( '>' ) > -1 ){
-					$k = $k.split('>');
-					i = 0, j = $k.length;
-					do $dom = childNodes( $dom.childNodes )[$k[i++]]; while( i < j )
-				}else $dom = childNodes( $dom.childNodes )[$k];
-				return $dom;
-			},
-			ds0 = {},
-			ds = {
-				'@':function( $dom, $k, $v ){
-					if( $v === undefined ) return $dom[$k] || $dom.getAttribute($k);
-					else if( $v === null ){
-						$dom.removeAttribute($k);
-						try{delete $dom[$k];}catch(e){};
-					}else $dom[$k] = $v, $dom.setAttribute($k, $v);
-					return $v;
-				},
-				'_':( function( view, style ){
-					return bs.DETECT.cstyle ? function( $dom, $k ){
-						var t0 = view.getComputedStyle($dom,'').getPropertyValue($k);
-						return t0.substr( t0.length - 2 ) == 'px' ? parseFloat( t0.substring( 0, t0.length - 2 ) ) : t0;
-					} : function( $dom, $k ){
-						var t0 = $dom.currentStyle[style.key($k)];
-						return t0.substr( t0.length - 2 ) == 'px' ? parseFloat( t0.substring( 0, t0.length - 2 ) ) : t0;
-					};
-				} )( doc.defaultView, style ),
-				'>':function( $dom, $k, $v, $arg, $i ){
-					var t0, i, j, k, l, v;
-					ds['>'].i = 0;
-					if( $v ){
-						if( $k ){
-							if( typeof $v == 'string' ){
-								if( style[$v] ) return $dom = drill( $dom, $k ), $dom.bsS ? ( ds.length=1,ds[0]=$v,ds[1]=undefined, $dom.bsS.$( ds ) ) : $dom.style[style[$v]];
-								else if( ev[$v] ) return $dom = drill( $dom, $k ), ev( $dom, $v );
-								else if( t0 = ds[$v.charAt(0)] ) return $dom = drill( $dom, $k ), t0( $dom, $v.substr(1), $arg[$i], $arg, $i+1 );
-								else if( t0 = d[$v] ) return $dom = drill( $dom, $k ), t0( $dom, v );
-							}
-							$v = bs( $v );
-							t0 = $dom.childNodes, ds0.length = i = t0.length;
-							while( i-- ) ds0[i] = t0[i];
-							if( j = ds0.length ){
-								if( j - 1 < $k ) for( k = 0, l = $v.length ; k < l ; k++ ) $dom.appendChild( $v[k] );
-								else for( i = 0, j = ds0.length ; i < j ; i++ ){
-									if( i < $k ) $dom.appendChild( ds0[i] );
-									else if( i == $k ) for( k = 0, l = $v.length ; k < l ; k++ ) $dom.appendChild( $v[k] );
-									else $dom.appendChild( ds0[i+1] );
-								}
-							}else for( i = 0, j = $v.length ; i < j ; i++ )$dom.appendChild( $v[i] );
-						}else for( $v = bs( $v ), i = 0, j = $v.length ; i < j ; i++ ) $dom.appendChild( $v[i] );
-					}else if( $v === null ){
-						if( $k ) d.method._.call( childNodes( $dom.childNodes ), nodes[0] = nodes[$k], nodes.length = 1, nodes );
-						else if( $dom.childNodes && childNodes( $dom.childNodes ).length ) d.method._.call( nodes );
-					}else return childNodes( $dom.childNodes ), $k ? nodes[$k] : nodes;
-				}
-			},
-			d.x = x, d.y = y,
-			d.lx = function( $dom ){ return x( $dom ) - x( $dom.parentNode ); },
-			d.ly = function( $dom ){ return y( $dom ) - y( $dom.parentNode ); },
-			d.w = function( $dom ){ return $dom.offsetWidth; },
-			d.h = function( $dom ){ return $dom.offsetHeight; },
-			d.s = function( $dom ){ $dom.submit(); },
-			d.f = function( $dom ){ $dom.focus(); },
-			d.b = function( $dom ){ $dom.blur(); },
-			d['<'] =function( $dom, $v ){
-				var t0;
+			} )( doc.defaultView, style ),
+			'>':function( $dom, $k, $v, $arg, $i ){
+				var t0, i, j, k, l, v;
+				ds['>'].i = 0;
 				if( $v ){
-					if( $dom.parentNode ) $dom.parentNode.removeChild( $dom );
-					return t0 = bs( $v ), t0[0].appendChild( $dom ), t0;
-				}else return $dom.parentNode;
-			},
-			d.html = function( $dom, $v ){return $v === undefined ? $dom.innerHTML : ( $dom.innerHTML = $v );},
-			d['html+'] = function( $dom, $v ){return $dom.innerHTML += $v;},
-			d['+html'] = function( $dom, $v ){return $dom.innerHTML = $v + $dom.innerHTML;},
-			(function(){
-				var t = bs.DETECT.text;
-				d.text = function( $dom, $v ){return $v === undefined ? $dom[t] : ($dom[t]=$v);},
-				d['text+'] = function( $dom, $v ){return $dom[t] += $v;},
-				d['+text'] = function( $dom, $v ){return $dom[t] = $v + $dom[t];};
-			})(),
-			d.style = function( $dom ){return $dom.bsS;},
-			d['class'] = function( $dom, $v ){return $v === undefined ? $dom.className : ($dom.className = $v);},
-			(function(){
-				var t = /^\s*|\s*$/g;
-				d['class+'] = function( $dom, $v ){
-					var t0;
-					return !( t0 = $dom.className.replace(t,'') ) ? ( $dom.className = $v ) :
-						t0.split( ' ' ).indexOf( $v ) == -1 ? ($dom.className = $v+' '+t0 ) : t0;
+					if( $k ){
+						if( typeof $v == 'string' ){
+							if( style[$v] ) return $dom = drill( $dom, $k ), $dom.bsS ? ( ds.length=1,ds[0]=$v,ds[1]=undefined, $dom.bsS.$( ds ) ) : $dom.style[style[$v]];
+							else if( ev[$v] ) return $dom = drill( $dom, $k ), ev( $dom, $v );
+							else if( t0 = ds[$v.charAt(0)] ) return $dom = drill( $dom, $k ), t0( $dom, $v.substr(1), $arg[$i], $arg, $i+1 );
+							else if( t0 = $fn[$v] ) return $dom = drill( $dom, $k ), t0( $dom, v );
+						}
+						$v = dom( $v );
+						t0 = $dom.childNodes, ds0.length = i = t0.length;
+						while( i-- ) ds0[i] = t0[i];
+						if( j = ds0.length ){
+							if( j - 1 < $k ) for( k = 0, l = $v.length ; k < l ; k++ ) $dom.appendChild( $v[k] );
+							else for( i = 0, j = ds0.length ; i < j ; i++ ){
+								if( i < $k ) $dom.appendChild( ds0[i] );
+								else if( i == $k ) for( k = 0, l = $v.length ; k < l ; k++ ) $dom.appendChild( $v[k] );
+								else $dom.appendChild( ds0[i+1] );
+							}
+						}else for( i = 0, j = $v.length ; i < j ; i++ ) $dom.appendChild( $v[i] );
+					}else for( $v = dom( $v ), i = 0, j = $v.length ; i < j ; i++ ) $dom.appendChild( $v[i] );
+				}else if( $v === null ){
+					if( $k ) $fn._.call( childNodes( $dom.childNodes ), nodes[0] = nodes[$k], nodes.length = 1, nodes );
+					else if( $dom.childNodes && childNodes( $dom.childNodes ).length ) $fn._.call( nodes );
+				}else return childNodes( $dom.childNodes ), $k ? nodes[$k] : nodes;
+			}
+		},
+		//12. define event
+		ev = (function(){
+			var k, ev, i, isChild;
+			function ev$( $dom, $k, $v ){
+				var t0;
+				if( $v ) return ( $dom.bsE || ( $dom.bsE = new ev( $dom ) ) ).$( $k, $v );
+				if( $v === undefined ) return ( t0 = $dom.bsE ) ? t0[$k] : $dom[$k];
+				if( $v === null ) return ( t0 = $dom.bsE ) ? t0.$( $k, null ) : ( $dom[$k] = null );
+			}
+			for( k in doc ) k.substr(0,2) == 'on' ? ( i = 1,ev$[k.substr(2).toLowerCase()] = 1 ) : 0;
+			for( k in doc.createElement('input') ) k.substr(0,2) == 'on' ? ( i = 1,ev$[k.substr(2).toLowerCase()] = 1 ) : 0;
+			if( !i ){
+				k = Object.getOwnPropertyNames(doc)
+					.concat(Object.getOwnPropertyNames(Object.getPrototypeOf(Object.getPrototypeOf(doc))))
+					.concat(Object.getOwnPropertyNames(Object.getPrototypeOf(W))), i = k.length;
+				while( i-- ) k[i].substr(0,2) == 'on' ? ( ev$[k[i].substr(2).toLowerCase()] = 1 ) : 0;
+			}
+			if( bs.DETECT.device =='tablet' || bs.DETECT.device=='mobile' ) ev$.down = 'touchstart', ev$.up = 'touchend', ev$.move = 'touchmove';
+			else{
+				isChild = function( $p, $c ){
+					if( $c ) do if( $c == $p ) return 1; while( $c = $c.parentNode )
+					return 0;
+				}
+				ev$.down = 'mousedown', ev$.up = 'mouseup', ev$.move = 'mousemove',
+				ev$.rollover = function( $e ){if( !isChild( this, $e.event.fromElement || $e.event.relatedTarget ) ) $e.type = 'rollover', $e.RV.call( this, $e );},
+				ev$.rollout = function( $e ){if( !isChild( this, $e.event.toElement || $e.event.explicitOriginalTarget ) ) $e.type = 'rollout', $e.RU.call( this, $e );};
+				if( W['TransitionEvent'] && !ev$.transitionend ) ev$.transitionend = 1;
+			}
+			ev = ( function( ev$, x, y ){
+				var ev, pageX, pageY, evType, prevent, keycode, add, del, eventName, isChild, keyName;
+				if( bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 9 ) pageX = 'x', pageY = 'y';
+				else pageX = 'pageX', pageY = 'pageY';
+				if( W['addEventListener'] ) add = function($ev,$k){$ev.target.addEventListener( $k, $ev.listener, false );},
+					del = function($ev,$k){$ev.target.removeEventListener( $k, $ev.listener, false );};
+				else if( W['attachEvent'] ) add = function($ev,$k){$ev.target.attachEvent( 'on'+$k, $ev.listener );},
+					del = function($ev,$k){$ev.target.detachEvent( 'on'+$k, $ev.listener );};
+				else add = function($ev,$k){$ev.target['on'+$k] = $ev.listener;},
+					del = function($ev,$k){$ev.target['on'+$k] = null;};
+				evType = {'touchstart':2,'touchend':1,'touchmove':1,'mousedown':4,'mouseup':3,'mousemove':3,'click':3,'mouseover':3,'mouseout':3},
+				bs.$static( 'KEYCODE', keycode = (function(){
+					var t0, t1, i, j, k, v;
+					t0 = 'a,65,b,66,c,67,d,68,e,69,f,70,g,71,h,72,i,73,j,74,k,75,l,76,m,77,n,78,o,79,p,80,q,81,r,82,s,83,t,84,u,85,v,86,w,87,x,88,y,88,z,90,back,8,tab,9,enter,13,shift,16,control,17,alt,18,pause,19,caps,20,esc,27,space,32,pageup,33,pagedown,34,end,35,home,36,left,37,up,38,right,39,down,40,insert,45,delete,46,numlock,144,scrolllock,145,0,48,1,49,2,50,3,51,4,52,5,53,6,54,7,55,8,56,9,57'.split(','),
+					t1 = {}, keyName = {},
+					i = 0, j = t0.length;
+					while( i < j ) k = t0[i++], v = parseInt(t0[i++]), t1[k] = v, t1[v] = k, keyName[v] = k;
+					return t1;
+				})() ),
+				(function(){
+					eventName = {webkitTransitionEnd:'transitionend'};
+				})(),
+				ev = function( $dom ){
+					var self;
+					self = this,
+					self.target = $dom,
+					self.listener = function( $e ){
+						var type, start, dx, dy, t0, t1, t2, id, i, j, X, Y;
+						self.event = $e || ( $e = event ), self.type = eventName[$e.type] || $e.type, self.keyName = keyName[self.keyCode = $e.keyCode], self.value = $dom.value && bs.$trim( $dom.value );
+						if( type = evType[self.type] ){
+							dx = x( $dom ), dy = y( $dom );
+							if( type < 3 ){
+								t0 = $e.changedTouches, self.length = i = t0.length;
+								while( i-- ) self[i] = t1 = t0[i], id = t1.identifier,
+									self['lx'+id] = ( self['x'+id] = X = t1[pageX] ) - dx,
+									self['ly'+id] = ( self['y'+id] = Y = t1[pageY] ) - dy,
+									self['cx'+id] = t1.clientX, self['cy'+id] = t1.clientY,
+									type == 2 ?
+										( self['_x'+id] = X, self['_y'+id] = Y ) :
+										( self['dx'+id] = X - self['_x'+id], self['dy'+id] = Y - self['_y'+id] );
+								self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
+							}else{
+								self.length = 0,
+								self.lx = ( self.x = $e[pageX] ) - dx, self.ly = ( self.y = $e[pageY] ) - dy,
+								self.cx = $e.clientX, self.cy = $e.clientY,
+								type == 4 ?
+									( self._x = self.x, self._y = self.y ) :
+									( self.dx = self.x - self._x, self.dy = self.y - self._y );
+							}
+						}
+						t0 = self[self.type], t0.f.apply( t0.c, t0.a );
+					};
 				},
-				d['class-'] = function( $dom, $v ){
-					var t0, i;
-					if( !( t0 = bs.$trim( $dom.className ) ) ) return t0;
-					t0 = t0.split( ' ' );
-					if( ( i = t0.indexOf( $v ) ) > -1 ) t0.splice( i, 1 );
-					return $dom.className = t0.join(' ');
+				ev.prototype.prevent = bs.DETECT.event ? function(){this.event.preventDefault(), this.event.stopPropagation();} :
+					function( $e ){this.event.returnValue = false, this.event.cancelBubble = true;},
+				ev.prototype.key = function( $key ){return this.keyCode == keycode[$key];},
+				ev.prototype._ = function(){
+					for( var k in this ) if( this.hasOwnProperty[k] && typeof this[k] == 'function' ) dom['on'+k] = null;
+					return null;
+				},
+				ev.prototype.$ = function( $k, $v ){
+					var t0, t1;
+					t0 = $k;
+					if( typeof ev$[$k] == 'string' ) $k = ev$[$k];
+					if( $v === null ) del( this, $k ), delete this[$k], delete this.RV, delete this.RU;
+					else if( $k == 'rollover' ) this.RV = $v, this.$( 'mouseover', ev$.rollover );
+						else if( $k == 'rollout' ) this.RU = $v, this.$( 'mouseout', ev$.rollout );
+					else if( !$k ) return;
+					else{
+						this['@'+$k] = t0, add( this, $k );
+						if( typeof $v == 'function' ) this[$k] = {f:$v, c:this.target,a:[this]};
+						else if( $v.splice ) this[$k] = {f:$v[1], c:$v[0], a:($v = $v.slice(1), $v[0] = this, $v)};
+						else if( $v[t0] ) this[$k] = {f:$v[t0], c:$v, a:[this]};
+					}
 				};
-			})(),
-			d.id = function( $dom, $v ){ return $v === undefined ? $dom.id : ($dom.id = $v); },
-			d.src = function( $dom ){ return $dom.src; },
-			ev = (function(){
-				var k, ev, i;
-				function ev$( $dom, $k, $v ){
-					var t0;
-					if( $v ) return ( $dom.bsE || ( $dom.bsE = new ev( $dom ) ) ).$( $k, $v );
-					if( $v === undefined ) return ( t0 = $dom.bsE ) ? t0[$k] : $dom[$k];
-					if( $v === null ) return ( t0 = $dom.bsE ) ? t0.$( $k, null ) : ( $dom[$k] = null );
-				}
-				for( k in doc ) k.substr(0,2) == 'on' ? ( i = 1,ev$[k.substr(2).toLowerCase()] = 1 ) : 0;
-				for( k in doc.createElement('input') ) k.substr(0,2) == 'on' ? ( i = 1,ev$[k.substr(2).toLowerCase()] = 1 ) : 0;
-				if( !i ){
-					k = Object.getOwnPropertyNames(doc)
-						.concat(Object.getOwnPropertyNames(Object.getPrototypeOf(Object.getPrototypeOf(doc))))
-						.concat(Object.getOwnPropertyNames(Object.getPrototypeOf(W))), i = k.length;
-					while( i-- ) k[i].substr(0,2) == 'on' ? ( ev$[k[i].substr(2).toLowerCase()] = 1 ) : 0;
-				}
-				if( bs.DETECT.device =='tablet' || bs.DETECT.device=='mobile' ) ev$.down = 'touchstart', ev$.up = 'touchend', ev$.move = 'touchmove';
-				else{
-					ev$.down = 'mousedown', ev$.up = 'mouseup', ev$.move = 'mousemove',
-					ev$.rollover = function( $e ){if( !isChild( this, $e.event.fromElement || $e.event.relatedTarget ) ) $.type = 'rollover', $v.call( this, $e );},
-					ev$.rollout = function( $e ){if( !isChild( this, $e.event.toElement || $e.event.explicitOriginalTarget ) ) $.type = 'rollout', $v.call( this, $e );};
-				}
-				ev = ( function( ev$, x, y ){
-					var ev, pageX, pageY, evType, prevent, keycode;
-					if( bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 9 ) pageX = 'x', pageY = 'y';
-					else pageX = 'pageX', pageY = 'pageY';
-					evType = {'touchstart':2,'touchend':1,'touchmove':1,'mousedown':4,'mouseup':3,'mousemove':3,'click':3,'mouseover':3,'mouseout':3},
-					bs.keycode = keycode = (function(){
-						var t0, t1, i, j, k, v;
-						t0 = 'a,65,b,66,c,67,d,68,e,69,f,70,g,71,h,72,i,73,j,74,k,75,l,76,m,77,n,78,o,79,p,80,q,81,r,82,s,83,t,84,u,85,v,86,w,87,x,88,y,88,z,90,back,8,tab,9,enter,13,shift,16,control,17,alt,18,pause,19,caps,20,esc,27,space,32,pageup,33,pagedown,34,end,35,home,36,left,37,up,38,right,39,down,40,insert,45,delete,46,numlock,144,scrolllock,145,0,48,1,49,2,50,3,51,4,52,5,53,6,54,7,55,8,56,9,57'.split(','),
-						t1 = {},
-						i = 0, j = t0.length;
-						while( i < j )k = t0[i++], v = parseInt(t0[i++]), t1[k] = v, t1[v] = k;
-						return t1;
-					})(),
-					ev = function( $dom ){this.dom = $dom;},
-					ev.prototype.prevent = bs.DETECT.event ? function(){this.event.preventDefault(), this.event.stopPropagation();} :
-						function( $e ){this.event.returnValue = false, this.event.cancelBubble = true;},
-					ev.prototype.key = function( $key ){return this.code == keycode[$key];},
-					ev.prototype._ = function(){
-						for( var k in this ) if( this.hasOwnProperty[k] && typeof this[k] == 'function' ) dom['on'+k] = null;
-						return null;
-					},
-					function isChild( $p, $c ){
-						if( $c ) do if( $c == $p ) return 1; while( $c = $c.parentNode )
-						return 0;
-					},
-					ev.prototype.$ = function( $k, $v ){
-						var self, dom, type;
-						self = this, dom = self.dom;
-						if( typeof ev$[$k] == 'string' ) $k = ev$[$k];
-						if( $v === null ) dom['on'+$k] = null, delete self[$k];
-						else if( $k == 'rollover' ) self.$( 'mouseover', ev$.rollover );
-						else if( $k == 'rollout' ) self.$( 'mouseout', ev$.rollout );
-						else if( !$k ) return;
-						else self[$k] = $v, dom['on'+$k] = function( $e ){
-							var type, start, dx, dy, t0, t1, t2, id, i, j, X, Y;
-							self.event = $e || ( $e = event ), self.type = $e.type, self.code = $e.keyCode, self.value = dom.value && bs.$trim( dom.value );
-							if( type = evType[$k] ){
-								dx = x( dom ), dy = y( dom );
-								if( type < 3 ){
-									t0 = $e.changedTouches, self.length = i = t0.length;
-									while( i-- ) self[i] = t1 = t0[i], id = t1.identifier,
-										self['lx'+id] = ( self['x'+id] = X = t1[pageX] ) - dx,
-										self['ly'+id] = ( self['y'+id] = Y = t1[pageY] ) - dy,
-										type == 2 ?
-											( self['_x'+id] = X, self['_y'+id] = Y ) :
-											( self['dx'+id] = X - self['_x'+id], self['dy'+id] = Y - self['_y'+id] );
-									self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0;
-								}else{
-									self.length = 0,
-									self.lx = ( self.x = $e[pageX] ) - dx,
-									self.ly = ( self.y = $e[pageY] ) - dy,
-									type == 4 ?
-										( self._x = self.x, self._y = self.y ) :
-										( self.dx = self.x - self._x, self.dy = self.y - self._y );
-								}
-							}
-							$v.call( dom, self );
-						};
-					};
-					return ev;
-				} )( ev$, x, y );
-				return ev$;
-			})();
-			return d;
-		})( bs, style, doc ) );
-    	bs.WIN = (function(){
-			var win;
-			function ev( e, k, v, t ){
-				var t0, i, j, target;
-				target = t || W;
-				if( v ){
-					t0 = ev[e] || ( ev[e] = [] ),
-					t0[t0.length] = t0[k] = v;
-					if( !target['on'+e] ) target['on'+e] = ev['@'+e] || ( ev['@'+e] = function( $e ){
-						var t0, i, E;
-						ev.event = $e || event, ev.type = ev.event.type, ev.code = ev.event.keyCode, t0 = ev[e], i = t0.length;
-						while( i-- ) t0[i]( ev );
-					} );
-				}else if( ( t0 = ev[e] ) && t0[k] ){
-					t0.splice( t0.indexOf( t0[k] ), 1 );
-					if( !t0.length ) target['on'+e] = null;
-				}
-			}
-			function hash( e, k, v ){
-				var t0, old, w, h;
-				if( v ){
-					t0 = ev[e] || ( ev[e] = [] );
-					t0[t0.length] = t0[k] = v;
-					if( !ev['@'+e] ){
-						old = location.hash;
-						ev['@'+e] = setInterval( function(){
-							var t0, i, j;
-							if( old != location.hash ){
-								ev.type = 'hashchange'; ev.event = event, old = location.hash, t0 = ev[e], i = t0.length;
-								while( i-- ) t0[i]( ev );
-							}
-						}, 50 );
-					}
-				}else if( ( t0 = ev[e] ) && t0[k] ){
-					t0.splice( t0.indexOf( t0[k] ), 1 );
-					if( !t0.length ) clearInterval( this['@'+e] ), this['@'+e] = null;
-				}
-			}
-			function sizer( $wh ){
-				win.on( 'resize', 'wh', $wh );
-				if( bs.DETECT.eventRotate ) win.on( 'orientationchange', 'wh', $wh );
-				$wh();
-			}
-			win = {
-				on:function( e, k, v ){
-					if( e == 'hashchange' && !'onhashchange' in W ) return hash( e, k, v );
-					if( e == 'orientationchange' && !'onorientationchange' in W ) return 0;
-					if( e.substr(0,3) == 'key' ) return ev( e, k, v, doc );
-					ev( e, k, v );
-				},
-				is:(function( sel ){
-					bs.sel = null;
-					return function( $sel ){
-						var t0 = sel( $sel );
-						return t0 && t0.length;
-					};
-				} )( bs.sel ),
-				touchScroll:(function( doc, isTouch ){
-					var i;
-					function prevent( e ){
-						e.preventDefault();
-						return false;
-					}
-					return function(v){
-						if( v ) doc.removeEventListener( 'touchmove', prevent, true);
-						else if( isTouch && !i++ ) doc.addEventListener( 'touchmove', prevent, true);
-					};
-				})( doc, bs.DETECT.eventTouch ),
-				scroll:(function( W, doc, root ){
-					return function scroll(){
-						switch( arguments[0].charAt(0) ){
-						case'w': return root.scrollWidth;
-						case'h': return root.scrollHeight;
-						case'l': return doc.documentElement.scrollLeft || W.pageXOffset || 0;
-						case't': return doc.documentElement.scrollTop || W.pageYOffset || 0;
-						}
-						W.scrollTo( arguments[0], arguments[1] );
-					};
-				})( W, doc, bs.DETECT.root ),
-				w:0, h:0,
-				sizer:(function( W, doc ){
-					return function( $end ){
-						var wh, r, s;
-						if( !win.is( '#bsSizer' ) ) bs.d( '<div></div>' ).$( 'id', 'bsSizer', 'display','none','width','100%','height','100%','position','absolute','<','body' );
-						s = bs.d('#bsSizer');
-						switch( bs.DETECT.os ){
-						case'iphone':
-							s.$( 'display', 'block', 'height', '120%' ),
-							W.onscroll = function( $e ){
-								W.onscroll = null, W.scrollTo( 0, 0 ),
-								s.$( 'display', 'none', 'height', W.innerHeight+1 ),
-								sizer( function wh( $e ){$end( win.w = innerWidth, win.h = innerHeight );} );
-							},
-							W.scrollTo( 0, 1000 );
-							break;
-						case'android':case'androidTablet':
-							if( bs.DETECT.sony && bs.DETECT.browser != 'chrome' ) sizer( function(){$end( win.w = s.$('w'), win.h = s.$('h') );} );
-							else r = outerWidth == screen.width || screen.width == s.$('w') ? devicePixelRatio : 1,
-								sizer( function wh(){$end( win.w = outerWidth / r, win.h = outerHeight / r + 1 );} );
-							break;
-						default:
-							sizer( W.innerHeight === undefined ? function(){
-									$end( win.w = doc.documentElement.clientWidth || doc.body.clientWidth,
-										win.h = doc.documentElement.clientHeight || doc.body.clientHeight );
-								} : function(){
-									$end( win.w = W.innerWidth, win.h = W.innerHeight );
-								}
-							);
-						}
-					}
-				})( W, doc )
+				return ev;
+			} )( ev$, x, y, isChild );
+			return ev$;
+		})(),
+		//13. define WIN
+		wine = (function( doc, ev ){
+			var d, w, make;
+			d = {}, w = {};
+			make = function( $target, $data ){
+				if( !$data.v ) $data.v = function( $e ){
+					var t0, i, j;
+					for( i = 0, j = $data.length ; i < j ; i++ ) t0 = $data[i], t0.f.apply( t0.c, t0.a );
+				};
+				return $data.v;
 			};
-			return win;
-		})();
-		bs.KEY = (function () {
-			var buffer, keycode;
-			return keycode = bs.keycode, delete bs.keycode, 
-				bs.WIN.on("keydown", '@bsKD', function($e){buffer[keycode[$e.code]] = 1;}),
-				bs.WIN.on("keyup", '@bsKU', function($e){buffer[keycode[$e.code]] = 0;}),
-				buffer = {};
-		})();
-	})( doc );
-	bs.ROUTER =(function(){
-		var s, e, t, h, count;
-		s = {'#':[]}, e = {'#':[]}, t = {}, h = [], count = 5;
-		function make( t ){
-			return function( $path, $func ){
-				var t0, i, j, k, v;
-				i = 0, j = arguments.length;
-				while( i < j ){
-					k = arguments[i++], v = arguments[i++];
-					if( !( t0 = t[k] ) ) t[k] = t0 = [];
-					t0[t0.length] = v;
+			return function( e, k, v, t ){
+				var t0, t1, i, j, target;
+				if( t ) t0 = d, target = t;
+				else t0 = w, target = W;
+				if( v ){
+					t0 = t0[e] || ( t0[e] = [] );
+					ev( target, e, make( target, t0 ) );
+					if( typeof v == 'function' ) t1 = {f:v, c:target, a:[target.bsE]};
+					else if( v.splice ) t1 = {f:v[1], c:v[0], a:(v = v.slice(1), v[0] = target, v)};
+					else if( v[e] ) t1 = {f:v[e], c:v, a:[target.bsE]};
+					t0[t0.length] = t0[k] = t1;
+				}else if( ( t0 = t0[e] ) && t0[k] ){
+					t0.splice( t0.indexOf( t0[k] ), 1 );
+					if( !t0.length ) ev( target, e, null );
 				}
 			};
-		}
-		function router(){
-			var uri, t0, i, j, k;
-			if( !( uri = location.hash ) ) uri = location.hash = '#';
-			h[h.length] = uri;
-			if( h.length > count ) h.splice( 0, h.length - count );
-			t0 = s['#'], i = 0, j = t0.length;
-			while( i < j ) t0[i++]( uri );
-			if( uri != '#' )
-				for( k in s ) if( k != '#' && uri.indexOf( k ) > -1 ){
-					t0 = s[k], i = 0, j = t0.length;
-					while( i < j ) t0[i++]( uri );
+		})( doc, ev ),
+		hash = function( e, k, v ){
+			var t0, old, w, h;
+			t0 = hash.listener;
+			if( v ){
+				t0[t0.length] = t0[k] = v;
+				if( !hash.id ){
+					old = location.hash;
+					hash.id = setInterval( function(){
+						var t0, i, j;
+						if( old != location.hash ){
+							ev.type = 'hashchange'; ev.event = event, old = location.hash, t0 = hash.listener, i = t0.length;
+							while( i-- ) t0[i]( ev );
+						}
+					}, 1 );
 				}
-			for( i in t ) if( uri.indexOf( i ) > -1 ) t[i](uri);
-			t0 = e['#'], i = 0, j = t0.length;
-			while( i < j ) t0[i++]( uri );
-			if( uri != '#' )
-				for( k in e ) if( k != '#' && uri.indexOf( k ) > -1 ){
-					t0 = e[k], i = 0, j = t0.length;
-					while( i < j ) t0[i++]( uri );
-				}
-		}
-		return {
-			start:make(s),end:make(e),
-			table:function(){
-				var i, j;
-				i = 0, j = arguments.length;
-				while( i < j ) t[arguments[i++]] = arguments[i++];
+			}else if( t0[k] ){
+				t0.splice( t0.indexOf( t0[k] ), 1 );
+				if( !t0.length ) clearInterval( hash.id ), hash.id = null;
+			}
+		}, hash.listener = [],
+		sizer = function( $wh ){
+			win.on( 'resize', 'wh', $wh );
+			if( bs.DETECT.eventRotate ) win.on( 'orientationchange', 'wh', $wh );
+			$wh();
+		},
+		bs.$static( 'WIN', win = {
+			on:function( e, k, v ){
+				if( e == 'hashchange' && !'onhashchange' in W ) return hash( e, k, v );
+				if( e == 'orientationchange' && !'onorientationchange' in W ) return 0;
+				if( e.substr(0,3) == 'key' ) return wine( e, k, v, doc );
+				wine( e, k, v );
 			},
-			go:function( $str ){location.hash = $str;},
-			route:function(){arguments[0] === null ? bs.WIN.on( 'hash', '@ROUTER' ) : ( bs.WIN.on( 'hashchange', '@ROUTER', router ), router() );},
-			historyMax:function($len){count=$len;}, history:h
-		};
-	})();
-	bs.ANI = ( function(){
-		var style, filter, timer, start, end, loop, ease, ANI, ani, len, time, isLive, isPause, tween, tweenPool;
-		style = bs.style, filter = bs.filter, bs.style = bs.filter = null, ani = [], time = len = 0,
+			is:function( $sel ){
+				var t0 = bs.$domquery( $sel );
+				return t0 && t0.length;
+			},
+			scroll:(function( W, doc, root ){
+				return function scroll(){
+					switch( arguments[0].charAt(0) ){
+					case'w': return root.scrollWidth;
+					case'h': return root.scrollHeight;
+					case'l': return doc.documentElement.scrollLeft || W.pageXOffset || 0;
+					case't': return doc.documentElement.scrollTop || W.pageYOffset || 0;
+					}
+					W.scrollTo( arguments[0], arguments[1] );
+				};
+			})( W, doc, bs.DETECT.root ),
+			w:0, h:0,
+			sizer:(function( W, doc ){
+				return function( $end ){
+					var wh, r, s;
+					if( !win.is( '#bsSizer' ) ) bs.dom( '<div></div>' ).$( '@id', 'bsSizer', 'display','none','width','100%','height','100%','position','absolute','<','body' );
+					s = bs.dom('#bsSizer');
+					switch( bs.DETECT.os ){
+					case'iphone':
+						s.$( 'display', 'block', 'height', '120%' ),
+						W.onscroll = function( $e ){
+							W.onscroll = null, W.scrollTo( 0, 0 ),
+							s.$( 'display', 'none', 'height', W.innerHeight+1 ),
+							sizer( function wh( $e ){$end( win.w = innerWidth, win.h = innerHeight );} );
+						},
+						W.scrollTo( 0, 1000 );
+						break;
+					case'android':case'androidTablet':
+						if( bs.DETECT.sony && bs.DETECT.browser != 'chrome' ) sizer( function(){$end( win.w = s.$('w'), win.h = s.$('h') );} );
+						else sizer( function wh(){$end( win.w = outerWidth, win.h = outerHeight + 1 );} );
+						break;
+					default:
+						sizer( W.innerHeight === undefined ? function(){
+								$end( win.w = doc.documentElement.clientWidth || doc.body.clientWidth,
+									win.h = doc.documentElement.clientHeight || doc.body.clientHeight );
+							} : function(){$end( win.w = W.innerWidth, win.h = W.innerHeight );}
+						);
+					}
+				}
+			})( W, doc )
+		} );
+	} ),
+	bs.$static( 'KEY', (function(){
+		var buffer, keycode;
+		return keycode = bs.KEYCODE,
+			bs.WIN.on( 'keydown', '@bsKD', function($e){buffer[keycode[$e.keyCode]] = 1;}),
+			bs.WIN.on( 'keyup', '@bsKU', function($e){buffer[keycode[$e.keyCode]] = 0;}),
+			buffer = {};
+	})() );
+}
+function ANI(){
+	bs.$static( 'ANI', ( function(){
+		var style, timer, start, end, loop, ease, ANI, ani, len, time, isLive, isPause, tween, tweenPool;
+		style = bs.style, bs.style = null, ani = [], time = len = 0,
 		timer = W['requestAnimationFrame'] || W['webkitRequestAnimationFrame'] || W['msRequestAnimationFrame'] || W['mozRequestAnimationFrame'] || W['oRequestAnimationFrame'];
 		if( timer ){
 			start = function(){if( !isLive ) isPause = 0, isLive = 1, loop();},
@@ -1384,11 +1077,12 @@ function init(doc){
 				sineInOut:function(a,c,b){return 0.5*-b*(Math.cos(PI*a)-1)+c},
 				circleIn:function(a,c,b){return -b*(Math.sqrt(1-a*a)-1)+c},
 				circleOut:function(a,c,b){a-=1;return b*Math.sqrt(1-a*a)+c},
-				circleInOut:function(a,c,b){a*=2;if(1>a)return 0.5*-b*(Math.sqrt(1-a*a)-1)+c;a-=2;return 0.5*b*(Math.sqrt(1-a*a)+1)+c}
+				circleInOut:function(a,c,b){a*=2;if(1>a)return 0.5*-b*(Math.sqrt(1-a*a)-1)+c;a-=2;return 0.5*b*(Math.sqrt(1-a*a)+1)+c},
+				quadraticIn:function(a,c,b){return b*a*a+c},
+				quadraticOut:function(a,c,b){return -b*a*(a-2)+c}
 			};
 		})();
-		tweenPool = {length:0},
-		tween = function(){},
+		tweenPool = {length:0}, tween = function(){},
 		(function(){
 			var t0, i;
 			t0 = 'id,time,ease,delay,loop,end,update,native'.split(','), i = t0.length;
@@ -1396,7 +1090,7 @@ function init(doc){
 		})(),
 		tween.prototype.init = function( $arg ){
 			var t0, l, i, j, k, v, isDom, v0;
-			this.t = t0 = $arg[0].nodeType == 1 ? bs.dom( $arg[0] ) : $arg[0], this.isDom = isDom = t0.isDom,
+			this.t = t0 = $arg[0].nodeType == 1 ? bs.dom( $arg[0] ) : $arg[0], this.isDom = isDom = ( t0.instanceOf == bs.dom ),
 			this.delay = this.stop = this.pause = 0, this.id = this.end = this.update = null, this.ease = ease.linear,
 			this.time = 1000, this.timeR = .001, this.loop = this.loopC = 1, this.length = l = t0.length || 1;
 			while(l--) ( this[l] ? (this[l].length=0) : (this[l]=[]) ), ( this[l][0] = isDom ? t0[l].bsS : (t0[l] || t0) );
@@ -1418,50 +1112,6 @@ function init(doc){
 			this.stime = Date.now() + this.delay, this.etime = this.stime + this.time,
 			this.ANI = isDom ? ANIstyle : ANIobj, ani[ani.length] = this, start();
 		};
-		function CSS3style( $time, $pause ){
-			var t0, t1, term, time, rate, i, j, l, k, v, e, s, u;
-		
-			if( this.stop ) return this.t.$( 'transition', null ), this.css3 = 6, 0;
-			if( $pause ){
-				if( $pause == 1 && this.pause == 0 ) this.t.$( 'transition', null ), this.css3 = 5;
-				else if( $pause == 2 && this.pause ){
-					t0 = this.transition.split(' '), t0[1] = (this.etime - this.pause)*.001 + 's';
-					if( t0.length == 4 ) t0.length = 3;
-					this.t.$( 'transition', t0.join(' ') ), this.css3 = 1, t0 = $time - this.pause, this.stime += t0, this.etime += t0, this.pause = 0;
-				}
-				return;
-			}
-			if( this.pause || term < 0 ) return;
-			switch( this.css3 ){
-			case 1:while( l-- ){
-					t0 = this[l], t1 = this[l][0], s = t1.s, u = t1.u, i = 1;
-					while( i < j ) k = t0[i++], v = t0[i++] + t0[i++],
-						typeof k == 'function' ? k( t1, v ) : s[k] = v + u[k], t1[k] = v;
-				}
-				this.css3 = 2; break;
-			case 2: if( term > this.time )
-					if( --this.loopC ) return this.stime=$time+this.delay,this.etime=this.stime+this.time,this.t.$( 'transition', null ),this.css3 = 3,0;
-					else{
-						this.t.$( 'transition', null ),tweenPool[tweenPool.length++] = this;
-						if( this.end ) this.end( this.t );
-						return 1;
-					}
-				if( this.update ) this.update( rate, $time, this );
-				break;
-			case 3: while( l-- ){
-					t0 = this[l], t1 = this[l][0], s = t1.s, u = t1.u, i = 1;
-					while( i < j ) k = t0[i++], v = t0[i++], i++, typeof k == 'function' ? k( t1, v ) : s[k] = v + u[k], t1[k] = v;
-				}
-				this.css3 = 4; break;
-			case 4: this.t.$( 'transition', this.transition ), this.css3 = 1; break;
-			case 5:case 6: while( l-- ){//pause
-					t0 = this[l], t1 = this[l][0], s = t1.s, u = t1.u, i = 1;
-					while( i < j ) k = t0[i++], v = e( rate, t0[i++], t0[i++], term, time ), typeof k == 'function' ? k( t1, v ) : s[k] = v + u[k], t1[k] = v;
-				}
-				if( this.css3 == 6 ) return 1;
-				this.pause = $time;
-			}
-		}
 		function ANIstyle( $time, $pause ){
 			var t0, t1, term, time, rate, i, j, l, k, v, e, s, u;
 			if( this.stop ) return 1;
@@ -1497,8 +1147,7 @@ function init(doc){
 				else if( $pause == 2 && this.pause ) t0 = $time - this.pause, this.stime += t0, this.etime += t0, this.pause = 0;
 			if( this.pause ) return;
 			if( ( term = $time - this.stime ) < 0 ) return;
-			e = this.ease, time = this.time, rate = term * this.timeR,
-			l = this.length, j = this[0].length;
+			e = this.ease, time = this.time, rate = term * this.timeR, l = this.length, j = this[0].length;
 			if( term > this.time )
 				if( --this.loopC ) return this.stime=$time+this.delay,this.etime=this.stime+this.time,0;
 				else{
@@ -1556,294 +1205,37 @@ function init(doc){
 			},
 			pause:function(){
 				var i, t;
-				isPause = 1;
-				t = Date.now(), i = len;
+				isPause = 1, t = Date.now(), i = len;
 				while( i-- ) ani[i].ANI( t, 1 );
 			},
 			resume:function(){
 				var i, t;
-				isPause = 0;
-				t = Date.now(), i = len;
+				isPause = 0, t = Date.now(), i = len;
 				while( i-- ) ani[i].ANI( t, 2 );
 				loop();
 			},
-			toggle:function(){
-				isPause ? ANI.resume() : ANI.pause();
-				return isPause;
-			},
+			toggle:function(){return isPause ? ANI.resume() : ANI.pause(), isPause;},
 			stop:function(){end();},
 			delay:(function(){
 				var delay = [];
 				return function( $f ){
 					var i;
-					if( (i = delay.indexOf( $f ) ) == -1 ){
-						delay[delay.length] = $f;
-						$f.bsDelay = setTimeout( $f, ( arguments[1] || 1 ) * 1000 );
-					}else{
-						delay.splice( i, 1 );
-						clearTimeout( $f.bsDelay );
-						delete $f.bsDelay;
-					}
+					if( (i = delay.indexOf( $f ) ) == -1 ) delay[delay.length] = $f, $f.bsDelay = setTimeout( $f, ( arguments[1] || 1 ) * 1000 );
+					else delay.splice( i, 1 ), clearTimeout( $f.bsDelay ), delete $f.bsDelay;
 				};
-			})(),
-			fps:(function(){
-				var printer, prev, sum, cnt, isStop;
-				prev = sum = cnt = 0;
-				function fps(){
-					if( arguments.length ){
-						if( printer ) throw 'fps is running';
-						isStop = 0,
-						printer = arguments[0],
-						bs.ANI.ani( fps );
-					}else{
-						isStop = 1,
-						printer = null;
-					}
-				}
-				fps.ANI = function( $time ){
-					var i;
-					i = parseInt(1000/(($time - prev)||1)),
-					sum += i, cnt++,
-					printer.innerHTML = "fps("+i+"/"+parseInt( sum / cnt )+')',
-					prev = $time;
-					if( cnt > 60000 ) cnt = sum = 0;
-					return isStop;
-				};
-				return fps;
 			})()
 		};
-	})();
-	bs.factory( 'sprite', (function( bs ){
-		var d, ani, key, ANI;
-		bs.c( '.SPRITE' ).$( 'overflow', 'hidden', 'display', 'none' ),
-		bs.c( '.SPRITE img' ).$( 'display', 'block', 'border', 0, 'margin', 0 ),
-		ANI = bs.ANI.ani,
-		(function(){
-			var t0, i;
-			t0 = 'width,height,col,row,time,delay,loop,first,last,end,src'.split(','),
-			key = {}, i = t0.length;
-			while( i-- ) key[t0[i]] = 1;
-		})(),
-		d = bs.factory.creator( 'sprite' ),
-		d.init = function( $key ){this.time = this.row = this.col = 1;},
-		ani = function( $time ){
-			var term, time, rate, curr;
-			if( ( term = $time - this.stime ) < 0 ) return;
-			time = this.t, rate = term / time;
-			if( term > this.t )
-				if( --this.loop ) return this.stime=$time+this.d,this.etime=this.stime+this.t,0;
-				else{
-					this.div.$( 'display', 'none' );
-					if( this.end ) this.end( this );
-					return 1;
-				}
-			curr = this.first + parseInt( rate * ( this.last - this.first ) );
-			this.img.$( 'margin-left', -(curr%this.col)*this.width, 'margin-top', -parseInt(curr/this.col)*this.height );
-		},
-		d.$ = function(){
-			var t0, i, j, k, v;
-			if( ( t0 = arguments[0] ).charAt(0) == '@' ){
-				if( this[t0] ) t0 = this[t0];
-				else ( t0 = this[t0] = {
-					width:this.width||100, height:this.height||100, ANI:ani,
-					div:bs.d( '<div class="SPRITE"></div>' ),
-					img:bs.d( '<img src="'+this.src+'"/>' ),
-					col:this.col, row:this.row,
-					time:this.time||1, first:this.first||0, last:this.last||this.row*this.col
-				} ).div.$( '>', t0.img );
-				i = 1, j = arguments.length;
-				if( j == 1 ) return t0;
-				while( i < j ){
-					k = arguments[i++], v = arguments[i++];
-					if( key[k] ) t0[k] = v;
-					else if( k == 'div' ) return t0.div;
-					else if( k == 'img' ) return t0.img;
-					else if( k == '@' || k == 'ani' ) return t0.img.$( 'margin-left', 0, 'margin-top', 0,
-						'width', t0.width*t0.col, 'height', t0.height*t0.row ), 
-						t0.div.$( 'width', t0.width, 'height', t0.height, 'display', 'block' ),
-						t0.t = t0.time*1000, t0.d = t0.delay*1000, t0.stime = Date.now() + (t0.delay||0), t0.etime = t0.stime + t0.t,
-						ANI( t0 );
-					else if( k == 'frame') return t0.img.$( 'width', t0.width*t0.col, 'height', t0.height*t0.row, 
-						'margin-left', -(v%t0.col)*t0.width, 'margin-top', -parseInt(v/t0.col)*t0.height ),
-						t0.div.$( 'width', t0.width, 'height', t0.height, 'display', 'block' );
-					else t0.div.$( k, v );
-				}
-			}else{
-				i = 0, j = arguments.length;
-				while( i < j ){
-					if( !key[k = arguments[i++]] ) throw 1;
-					this[k] = arguments[i++];
-				}
-			}
-		};
-		return d;
-	})(bs) );
-    ////////////////////////////////////////////////////////////////////
-    // bs.world 팩토리 프로토타입
-    bs.factory( 'world', (function( bs ){
-        var d, ani, key, ANI,bskey=bs.KEY, inited=false;
-        bs.c( '.WORLD' ).$( 'overflow', 'hidden'),
-            ANI = bs.ANI.ani,
-            (function(){
-                var t0, i;
-                t0 = 'width,height,farclip,pan, tilt, camx, camy, camz,camspeed'.split(','),
-                    key = {}, i = t0.length;
-                while( i-- ) key[t0[i]] = 1;
-            })(),
-            d = bs.factory.creator( 'world' ),
-            d.init = function( $key ){},
-            ani = function( $time ){
-                // TODO 키바인딩 외부에서 지정가능하도록 변경
-                var speed = this.camspeed, keys = bs.KEY,sin = Math.sin(this.pan), cos = Math.cos(this.pan)
-                if (keys['w']) this.camx -= 10 * sin,this.camz += cos * speed;
-                if (keys['s']) this.camx += speed * sin, this.camz -= cos * speed;
-                if (keys['a']) this.camx -= speed * cos,this.camz -= speed * sin;
-                if (keys['d']) this.camx += speed * cos,this.camz += speed * sin;
-                if (keys['r']) this.camy -= speed
-                if (keys['f']) this.camy += speed
-                if (keys['q']) this.pan += speed / 1000
-                if (keys['e']) this.pan -= speed / 1000
-                if (keys['t']) this.tilt += speed
-                if (keys['g']) this.tilt -= speed
-                this.div.$('width',this.width,'height',this.height)
-            },
-            d.$ = function(){
-                var t0, i, j, k, v;
-                if( ( t0 = arguments[0] ).charAt(0) == '@' ){
-                    if( this[t0] ) t0 = this[t0]
-                    else ( t0 = this[t0] = {
-                        ANI:ani,
-                        div:bs.d( '<div class="WORLD"></div>'),
-                        pan:this.pan||0, tilt:this.tilt||0,
-                        camx:this.camx||0, camy:this.camy||0, camz:this.camz||0,camspeed:this.camspeed||10,
-                        farclip:this.farclip||2500
-                    } )
-                    i = 1, j = arguments.length;
-                    if( j == 1 ) return t0;
-                    while( i < j ){
-                        k = arguments[i++], v = arguments[i++];
-                        if( key[k] ) t0[k] = v;
-                        else if( k == 'div' ) return t0.div;
-                        else if( k == 'pan' ) return t0.pan;
-                        else if( k == 'tilt' ) return t0.tilt;
-                        else if( k == 'camx' ) return t0.camx;
-                        else if( k == 'camy' ) return t0.camy;
-                        else if( k == 'camz' ) return t0.camz;
-                        else if( k == 'farclip' ) return t0.farclip;
-                        else if( k == 'width' ) return t0.width;
-                        else if( k == 'height' ) return t0.height;
-                        else if( k == 'camspeed' ) return t0.camspeed;
-                        else t0.div.$( k, v );
-                    }
-                    if(!inited) ANI(t0);
-                    inited = true;
-                }else{
-                    i = 0, j = arguments.length;
-                    while( i < j ){
-                        if( !key[k = arguments[i++]] ) throw 1;
-                        this[k] = arguments[i++];
-                    }
-                }
-            };
-        return d;
-    })(bs) );
-    // bs.plane 팩토리 프로토타입
-    bs.factory( 'plane', (function( bs ){
-        var d, ani, key, ANI;
-        bs.c( '.PLANE' ).$( 'position', 'absolute'),
-            bs.c( '.PLANE img' ).$( 'width', '100%', 'height','100%'),
-            ANI = bs.ANI.ani,
-            (function(){
-                var t0, i;
-                t0 = 'x,y,z,width,height,src,world,@'.split(','),
-                    key = {}, i = t0.length;
-                while( i-- ) key[t0[i]] = 1;
-            })(),
-            d = bs.factory.creator( 'plane' ),
-            d.init = function( $key ){},
-            ani = function( $time ){
-                var div = this.div,zIndex,tx,tz,tScale
-                var world = this.world, pan = world.pan, tilt = world.tilt,farclip = world.farclip, w = world.width,h = world.height
-                var dx, sz, sin = Math.sin(pan) , cos = Math.cos(pan)
-                dx = this.x -  world.camx,sz = this.z -  world.camz
-                // 카메라를 중심으로 플랜의 위치를 구함
-                tx = cos * dx + sin * sz, tz = -sin * dx + cos * sz;
-                tScale = w / tz *.5// 대충거리로...크기비율을 결정
-                if (tz < 0.1 || tz > farclip) div.$('display', 'none')
-                else{
-                    zIndex = parseInt(tz * 100000 - tz * 100)  // 안겹치게...제트축만들고... 혹시나 살짝빼서 또 겹치는걸 없앰
-                    div.$(
-                        'display','block','z-index', parseInt(100 * tScale),
-                        'margin-left', (tx - this.width / 4)*tScale*2 +w/2,
-                        'margin-top', tilt - tScale * world.camy - (tScale  + this.height * tScale ) / 2+h/2,
-                        'width', tScale + this.width * tScale, 'height', tScale  + this.height * tScale,
-                        'opacity', (farclip - tz) > farclip/5 ? 1 : (farclip - tz + farclip/5) / farclip
-                    )
-                }
-            },
-            d.$ = function(){
-                var t0, i, j, k, v;
-                if( ( t0 = arguments[0] ).charAt(0) == '@' ){
-                    if( this[t0] ) t0 = this[t0];
-                    else ( t0 = this[t0] = {
-                        ANI:ani,
-                        div:bs.d('<div class="PLANE"></div>').$('display','none','this'),
-                        img:bs.d('<img '+'src="'+this.src+'"/>'),
-                        world : bs.world(this.world).$(this['@']),
-                        width:100, height:100
-                    }).div.$( '>', t0.img);
-                    bs.world(this.world).$(this['@'],'div').$('>',t0.div); // 지정된 월드에 박는다.
-                    i = 1, j = arguments.length;
-                    if( j == 1 ) return t0;
-                    while( i < j ){
-                        k = arguments[i++], v = arguments[i++];
-                        if( key[k] ) t0[k] = v;
-                        else if( k == 'div' ) return t0.div;
-                        else if( k == 'img' ) return t0.img;
-                        else t0.div.$( k, v );
-                    };
-                    ANI(t0);
-                }else{
-                    i = 0, j = arguments.length;
-                    while( i < j ){
-                        if( !key[k = arguments[i++]] ) throw 1;
-                        this[k] = arguments[i++];
-                    }
-                }
-            };
-        return d;
-    })(bs) );
-    ////////////////////////////////////////////////////////////////////
-	(function(bs){
-		var LZString={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",_f:String.fromCharCode,compressToBase64:function(c){if(c==null){return""}var a="";var k,h,f,j,g,e,d;var b=0;c=LZString.compress(c);while(b<c.length*2){if(b%2==0){k=c.charCodeAt(b/2)>>8;h=c.charCodeAt(b/2)&255;if(b/2+1<c.length){f=c.charCodeAt(b/2+1)>>8}else{f=NaN}}else{k=c.charCodeAt((b-1)/2)&255;if((b+1)/2<c.length){h=c.charCodeAt((b+1)/2)>>8;f=c.charCodeAt((b+1)/2)&255}else{h=f=NaN}}b+=3;j=k>>2;g=((k&3)<<4)|(h>>4);e=((h&15)<<2)|(f>>6);d=f&63;if(isNaN(h)){e=d=64}else{if(isNaN(f)){d=64}}a=a+LZString._keyStr.charAt(j)+LZString._keyStr.charAt(g)+LZString._keyStr.charAt(e)+LZString._keyStr.charAt(d)}return a},decompressFromBase64:function(g){if(g==null){return""}var a="",d=0,e,o,m,k,n,l,j,h,b=0,c=LZString._f;g=g.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(b<g.length){n=LZString._keyStr.indexOf(g.charAt(b++));l=LZString._keyStr.indexOf(g.charAt(b++));j=LZString._keyStr.indexOf(g.charAt(b++));h=LZString._keyStr.indexOf(g.charAt(b++));o=(n<<2)|(l>>4);m=((l&15)<<4)|(j>>2);k=((j&3)<<6)|h;if(d%2==0){e=o<<8;if(j!=64){a+=c(e|m)}if(h!=64){e=k<<8}}else{a=a+c(e|o);if(j!=64){e=m<<8}if(h!=64){a+=c(e|k)}}d+=3}return LZString.decompress(a)},compressToUTF16:function(d){if(d==null){return""}var b="",e,j,h,a=0,g=LZString._f;d=LZString.compress(d);for(e=0;e<d.length;e++){j=d.charCodeAt(e);switch(a++){case 0:b+=g((j>>1)+32);h=(j&1)<<14;break;case 1:b+=g((h+(j>>2))+32);h=(j&3)<<13;break;case 2:b+=g((h+(j>>3))+32);h=(j&7)<<12;break;case 3:b+=g((h+(j>>4))+32);h=(j&15)<<11;break;case 4:b+=g((h+(j>>5))+32);h=(j&31)<<10;break;case 5:b+=g((h+(j>>6))+32);h=(j&63)<<9;break;case 6:b+=g((h+(j>>7))+32);h=(j&127)<<8;break;case 7:b+=g((h+(j>>8))+32);h=(j&255)<<7;break;case 8:b+=g((h+(j>>9))+32);h=(j&511)<<6;break;case 9:b+=g((h+(j>>10))+32);h=(j&1023)<<5;break;case 10:b+=g((h+(j>>11))+32);h=(j&2047)<<4;break;case 11:b+=g((h+(j>>12))+32);h=(j&4095)<<3;break;case 12:b+=g((h+(j>>13))+32);h=(j&8191)<<2;break;case 13:b+=g((h+(j>>14))+32);h=(j&16383)<<1;break;case 14:b+=g((h+(j>>15))+32,(j&32767)+32);a=0;break}}return b+g(h+32)},decompressFromUTF16:function(d){if(d==null){return""}var b="",h,j,a=0,e=0,g=LZString._f;while(e<d.length){j=d.charCodeAt(e)-32;switch(a++){case 0:h=j<<1;break;case 1:b+=g(h|(j>>14));h=(j&16383)<<2;break;case 2:b+=g(h|(j>>13));h=(j&8191)<<3;break;case 3:b+=g(h|(j>>12));h=(j&4095)<<4;break;case 4:b+=g(h|(j>>11));h=(j&2047)<<5;break;case 5:b+=g(h|(j>>10));h=(j&1023)<<6;break;case 6:b+=g(h|(j>>9));h=(j&511)<<7;break;case 7:b+=g(h|(j>>8));h=(j&255)<<8;break;case 8:b+=g(h|(j>>7));h=(j&127)<<9;break;case 9:b+=g(h|(j>>6));h=(j&63)<<10;break;case 10:b+=g(h|(j>>5));h=(j&31)<<11;break;case 11:b+=g(h|(j>>4));h=(j&15)<<12;break;case 12:b+=g(h|(j>>3));h=(j&7)<<13;break;case 13:b+=g(h|(j>>2));h=(j&3)<<14;break;case 14:b+=g(h|(j>>1));h=(j&1)<<15;break;case 15:b+=g(h|j);a=0;break}e++}return LZString.decompress(b)},compress:function(e){if(e==null){return""}var h,l,n={},m={},o="",c="",r="",d=2,g=3,b=2,q="",a=0,j=0,p,k=LZString._f;for(p=0;p<e.length;p+=1){o=e.charAt(p);if(!Object.prototype.hasOwnProperty.call(n,o)){n[o]=g++;m[o]=true}c=r+o;if(Object.prototype.hasOwnProperty.call(n,c)){r=c}else{if(Object.prototype.hasOwnProperty.call(m,r)){if(r.charCodeAt(0)<256){for(h=0;h<b;h++){a=(a<<1);if(j==15){j=0;q+=k(a);a=0}else{j++}}l=r.charCodeAt(0);for(h=0;h<8;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}else{l=1;for(h=0;h<b;h++){a=(a<<1)|l;if(j==15){j=0;q+=k(a);a=0}else{j++}l=0}l=r.charCodeAt(0);for(h=0;h<16;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}delete m[r]}else{l=n[r];for(h=0;h<b;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}n[c]=g++;r=String(o)}}if(r!==""){if(Object.prototype.hasOwnProperty.call(m,r)){if(r.charCodeAt(0)<256){for(h=0;h<b;h++){a=(a<<1);if(j==15){j=0;q+=k(a);a=0}else{j++}}l=r.charCodeAt(0);for(h=0;h<8;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}else{l=1;for(h=0;h<b;h++){a=(a<<1)|l;if(j==15){j=0;q+=k(a);a=0}else{j++}l=0}l=r.charCodeAt(0);for(h=0;h<16;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}delete m[r]}else{l=n[r];for(h=0;h<b;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}}d--;if(d==0){d=Math.pow(2,b);b++}}l=2;for(h=0;h<b;h++){a=(a<<1)|(l&1);if(j==15){j=0;q+=k(a);a=0}else{j++}l=l>>1}while(true){a=(a<<1);if(j==15){q+=k(a);break}else{j++}}return q},decompress:function(k){if(k==null){return""}if(k==""){return null}var o=[],j,d=4,l=4,h=3,q="",t="",g,p,r,s,a,b,n,m=LZString._f,e={string:k,val:k.charCodeAt(0),position:32768,index:1};for(g=0;g<3;g+=1){o[g]=g}r=0;a=Math.pow(2,2);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}switch(j=r){case 0:r=0;a=Math.pow(2,8);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}n=m(r);break;case 1:r=0;a=Math.pow(2,16);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}n=m(r);break;case 2:return""}o[3]=n;p=t=n;while(true){if(e.index>e.string.length){return""}r=0;a=Math.pow(2,h);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}switch(n=r){case 0:r=0;a=Math.pow(2,8);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}o[l++]=m(r);n=l-1;d--;break;case 1:r=0;a=Math.pow(2,16);b=1;while(b!=a){s=e.val&e.position;e.position>>=1;if(e.position==0){e.position=32768;e.val=e.string.charCodeAt(e.index++)}r|=(s>0?1:0)*b;b<<=1}o[l++]=m(r);n=l-1;d--;break;case 2:return t}if(d==0){d=Math.pow(2,h);h++}if(o[n]){q=o[n]}else{if(n===l){q=p+p.charAt(0)}else{return null}}t+=q;o[l++]=p+q.charAt(0);d--;p=q;if(d==0){d=Math.pow(2,h);h++}}}};if(typeof module!=="undefined"&&module!=null){module.exports=LZString};
-		bs.$compress = function( $str ){return LZString.compress( $str );},
-		bs.$decompress = function( $str ){return LZString.decompress( $str );},
-		bs.$save = bs.DETECT.local ? function(){
-			var t0, i, j, k, v;
-			i = 0, j = arguments.length;
-			while( i < j ){
-				k = arguments[i++], v = arguments[i++];
-				if( v === undefined ) return t0 = localStorage.getItem( k ), t0 && t0.charAt(0) == '@' ? JSON.parse( LZString.decompress(t0.substr(1)) ) : t0;
-				else if( v === null ) return localStorage.removeItem( k );
-				else return localStorage.setItem( k, typeof v == 'object' ? '@' + LZString.compress(JSON.stringify( v )) : v ), v;
-			}
-		} : function(){
-			var t0, i, j, k, v;
-			i = 0, j = arguments.length;
-			while( i < j ){
-				k = arguments[i++], v = arguments[i++];
-				if( v === undefined ) return (t0 = bs.$ck( k )).charAt(0) == '@' ? JSON.parse( LZString.decompress(t0.substr(1)) ) : t0;
-				else if( v === null ) return bs.$ck( k, null );
-				else return bs.$ck( k, typeof v == 'object' ? '@' + LZString.compress(JSON.stringify( v )) : v, 365 ), v;
-			}
-		};
-	})(bs);
-	return bs;
+	})() );
 }
-init.len = 0;
-W[N] = function(){init[init.len++] = arguments[0];};
-setTimeout( function(){
-	var i, j;
-	for( W[N] = init( W.document ), i = 0, j = init.len ; i < j ; i++ ) init[i]();
+id = setInterval( function(){
+	var start, i;
+	switch( i = document.readyState ){
+	case'complete':case'loaded':break;
+	case'interactive':if( document.documentElement.doScroll ) try{document.documentElement.doScroll('left');}catch(e){return;}
+	default:return;}
+	clearInterval( id ), start = function(){for( var i = 0, j = que.length ; i < j ; i++ ) que[i](); que = null;},
+	DETECT(), DOM(), ANI(), im.length ? ( im.unshift( start ), bs.$importer.apply( null, im ), im.length = 0 ) : start();
 }, 1 );
+})( doc, bs );
+
 } )( this );

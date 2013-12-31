@@ -16,6 +16,7 @@
 <div id="stage"></div>
 <script src="../bs/bsjs.js"></script> 
 <script>
+bs.$import( 'fps', 'last' );
 bs( function(){
 
 	var game = {
@@ -33,7 +34,7 @@ bs( function(){
 			bs.dom( '#stage' ).$( 'top', 30, 'position', 'absolute', 'width', '100%', 'height', this.h, 'background', '#eee', 'overflow', 'hidden', 'down', function( $e ){
 				game.vx = ( $e.lx - game.x )*.1, game.vy = ($e.ly - game.y)*.1;
 			} );
-			bs.dom( '<div></div>' ).$( 'id', 'a', 'position', 'absolute', 'background', '#950',
+			bs.dom( '<div></div>' ).$( '@id', 'a', 'position', 'absolute', 'background', '#950',
 				'left', 0, 'top', 0, 'width', 10, 'height', 10, 'border-radius',5,
 				'<', '#stage'
 			);
@@ -81,7 +82,7 @@ bs( function(){
 		}
 	};
     game.init();
-	bs.ANI.fps( bs.dom('<div></div>' ).$( 'id', 'fps', 'position','absolute', 'font-size', 11, 'color', '#900', '<', 'body', 'this' )[0] );
+	bs.$fps( bs.dom('<div></div>' ).$( '@id', 'fps', 'position','absolute', 'font-size', 11, 'color', '#900', '<', 'body', 'this' )[0] );
     bs.ANI.ani( game );
 } );
 

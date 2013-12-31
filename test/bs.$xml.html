@@ -38,30 +38,17 @@
 <script src="../bs/bsTest.js"></script>
 <script src="./printer.js"></script>
 <script>
+bs.$import( 'xml', 'last' );
 bs( function(){
-	/*
-		config
-	*/
-	bsTest.result = function(r){ document.getElementById('result').innerHTML = r; }
-
-	/*
-		pre process
-	*/
-
-	/*
-		test case
-	*/
-	bs.$xml( document.getElementById('xml').text, function( $d ){
-		bsTest( printer, 'async xml parsing',
+	bs.$xml( function( $d ){
+		bsTest( 'async xml parsing',
 			"$d.topics.volume[0].title", 'title1', $d.topics.volume[0].title.value
 		);
 
-	} );
-
-	bsTest( printer, 'sync xml parsing',
-		"bs.$xml(xml).topics.volume[1].title.value", 'title2', bs.$xml( document.getElementById('xml').text ).topics.volume[1].title.value
+	}, document.getElementById('xml').text );
+	bsTest( 'sync xml parsing',
+		"bs.$xml(xml).topics.volume[1].title.value", 'title2', bs.$xml( null, document.getElementById('xml').text ).topics.volume[1].title.value
 	);
-
 } );
 </script>
 </body>

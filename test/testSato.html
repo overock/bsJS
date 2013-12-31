@@ -43,14 +43,14 @@ bs( function(){
       console.log( $dest );
       d = {r:0};
       SCROLL.xs = bs.WIN.scroll( 'left' );
-      SCROLL.xe = bs.d( '#page' + $dest ).$( 'left' );
+      SCROLL.xe = bs.dom( '#page' + $dest ).$( 'left' );
       console.log( 'SCROLL.xs ' + SCROLL.xs);
       console.log( 'SCROLL.xe ' + SCROLL.xe);
       bs.ANI.tween( d, 
               'r', 1,
               'time', 5,
               'ease', 'sineIn',
-              'id', 'c',
+              '@id', 'c',
               'update', SCROLL.update,
               'end', SCROLL.end
             );
