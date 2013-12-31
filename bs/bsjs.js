@@ -10,7 +10,7 @@
 ( function( W, N ){
 'use strict';
 var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
-	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, xh = [], xb = [], depend = {};
+	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
 	
 if( doc = W['document'] ) PLUGIN_REPO='../bs/plugin/',que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
 else if( __dirname ) PLUGIN_REPO='http://projectbs.github.io/bsJS/bs/plugin/', node=require('./node'), module.exports = bs = function(f){bs.__root = f;},bs.__root = __dirname;
@@ -179,18 +179,20 @@ method( 'deco', (function(){
 	};
 })() ),
 method( 'cgi', function( $arg ){
-	var t0, t1, i, j;
+	var h, t0, i, j;
 	if( !$arg || ( j = $arg.length ) < 4 ) return '';
-	xh.length = xb.length = 0, i = 2;
+	h = bs.$cgi.header, t0 = bs.$cgi.temp;
+	h.length = t0.length = 0, i = 2;
 	while( i < j )
-		if ( $arg[i].charAt(0) == '@' ) xh[xh.length] = $arg[i++].substr(1), xh[xh.length] = $arg[i++];
-		else xb[xb.length] = encodeURIComponent( $arg[i++] ) + '=' + encodeURIComponent( $arg[i++] );
-	return xb.join('&');
+		if ( $arg[i].charAt(0) == '@' ) h[h.length] = $arg[i++].substr(1), h[h.length] = $arg[i++];
+		else t0[t0.length] = encodeURIComponent( $arg[i++] ) + '=' + encodeURIComponent( $arg[i++] );
+	return t0.join('&');
 } ),
+bs.$cgi.header = [], bs.$cgi.temp = [],
 method( 'url', function( $url, $arg ){
 	return $url=$url.split( '#' ),$url[0]+($url[0].indexOf('?')>-1?'&':'?')+'bsNC='+bs.$ex(1000,'~',9999)+'&'+bs.$cgi($arg)+($url[1]?'#'+$url[1]:'');
 } );
-if( !doc ) return node.core( bs );
+if( !doc ) return node( bs );
 (function( doc, bs ){
 //0. es5 adapter
 if( !Date.now ) Date.now = function(){return +new Date;};
@@ -236,11 +238,11 @@ if( !W['console'] ) (function(){
 //3. define JSloader, ajax
 var head, e, rq, js, jid, jc;
 function xhrSend( $type, $xhr, $data ){
-	var i, j;
-	i = 0, j = xh.length,
+	var h, i, j;
 	$xhr.setRequestHeader( 'Content-Type', $type == 'GET' ? 'text/plain; charset=UTF-8' : 'application/x-www-form-urlencoded; charset=UTF-8' ),
-	$xhr.setRequestHeader( 'Cache-Control', 'no-cache' );
-	while(i < j) $xhr.setRequestHeader( xh[i++], xh[i++] );
+	$xhr.setRequestHeader( 'Cache-Control', 'no-cache' ),
+	h = bs.$cgi.header, i = 0, j = h.length;
+	while(i < j) $xhr.setRequestHeader( h[i++], h[i++] );
 	$xhr.send( $data );
 }
 function xhr( $end ){

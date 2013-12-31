@@ -1,14 +1,5 @@
-/*
- * bsNode - OpenSource Node.js web framework
- * version 0.1.0 / 2013.12.4 by projectBS committee
- * 
- * Copyright 2013.10 projectBS committee.
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * GitHub: https://github.com/projectBS/bsJS
- * Facebook group: https://www.facebook.com/groups/bs5js/
- */
-exports.core = function( bs ){
-	var http = require('http'), site;
+module.exports = function( bs ){
+	var HTTP = require('http'), site;
 	bs.$class( 'sql', function( $fn, bs ){
 		$fn.$ = function(){
 			var i, j, k, v, t0;
@@ -107,14 +98,9 @@ exports.core = function( bs ){
 			}
 		};
 	})() ),
-	(function( ht ){
-		var fs, p, response, path;
+	(function( HTTP ){
+		var fs, p, path;
 		fs = require('fs'), p = require('path'), path = {},
-		response = function( rs ){
-			var t0 = '';
-			rs.on( 'data', function($v){t0 += $v;} ),
-			rs.on( 'end', function(){$end(t0);t0='';} );
-		},
 		bs.$method( 'path', function( $path, $context ){
 			var t0;
 			if( $context == 'bs' ) t0 = bs.__root;
@@ -122,41 +108,32 @@ exports.core = function( bs ){
 			else t0 = path[site];
 			return p.resolve( t0, $path );
 		} );
-		function http( $type, $end, $url, $arg ){
+		bs.$method( 'stream', function( $path ){ //파일스트림을 출력한다.
+		} ),
+		function response( rs ){
+			var t0 = '';
+			rs.on( 'data', function($v){t0 += $v;} ),
+			rs.on( 'end', function(){$end(t0);t0='';} );
+		}
+		function http( $type, $end, $url, $arg ){ //http를 처리한다.
 			var t0;
+			if( !$end ) return console.log( 'http need callback!' ), null;
+			//HTTP.request( ( t0=bs.$url( $path ), t0.method='GET', t0 ), response ).on('error', function($e){$end( null, $e );});
 			return t0 = $end ? xhr( $end ) : rq(), t0.open( $type, $url, $end ? true : false ), xhrSend( $type, t0, bs.$cgi( $arg ) || '' ), $end ? '' : t0.responseText;
 		}
-		function http(path){return rq.readFileSync( path, 'utf8' );};
-		
-		bs.$method( 'stream', function( $path ){
-		} ),
 		bs.$method( 'get', function( $end, $path ){
 			var t0;
-			if( t0.substr( 0, 5 ) == 'http:' ){
-				if( !$end ) return console.log( '$get need callback!' ), null;
-				http.request( ( t0=bs.$url( $path ), t0.method='GET', t0 ), response ).on('error', function($e){$end( null, $e );});
-			}else{
-				t0 = t0.path.replace( freg, '$1' );
-				if( !$end ) return fs.existsSync( t0 ) ? fs.readFileSync( t0 ) : null;
-				fs.exists( t0, function( $ex ){
-					if( !$ex ) return $end( null );
-					fs.readFile( t0, function( $e, $d ){
-						if( $e ) return $end( $e );
-						return $end( $d );
-					});
-				});
+			if( t0.substr( 0, 5 ) == 'http:' || t0.substr( 0, 6 ) == 'https:' ) http( 'GET', $end, bs.$url( $path, arguments ) );
+			else{
+				if( !fs.existsSync( $path = bs.$path( $path ) ) ) return null;
+				if( !$end ) return  fs.readFileSync( $path );
+				fs.readFile( t0, function( $e, $d ){return $end( $e || $d );});
 			}
 		} ),
-		bs.$method( 'post', function( $end, $path ){
-			http.request( ( t0=bs.$url( $path ), t0.method='POST', t0 ), response ).on('error', function($e){$end( null, $e );});
-		} ),
-		bs.$method( 'put', function( $end, $path ){
-			http.request( ( t0=bs.$url( $path ), t0.method='PUT', t0 ), response ).on('error', function($e){$end( null, $e );});
-		} ),
-		bs.$method( 'delete', function( $end, $path ){
-			http.request( ( t0=bs.$url( $path ), t0.method='DELETE', t0 ), response ).on('error', function($e){$end( null, $e );});
-		} );
-	})( http ),
+		bs.$method( 'post', function( $end, $path ){http( 'POST', $end, bs.$url( $path ), arguments );} ),
+		bs.$method( 'put', function( $end, $path ){http( 'PUT', $end, bs.$url( $path ), arguments );} ),
+		bs.$method( 'delete', function( $end, $path ){http( 'DELETE', $end, bs.$url( $path ), arguments );} );
+	})( HTTP ),
 	(function(){
 		var http, form, sort, next, flush,
 			application,
