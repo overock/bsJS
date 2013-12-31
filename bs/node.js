@@ -78,10 +78,21 @@ module.exports = function( bs ){
 		var os = require('os');
 		return function( $k ){return os[$k]();};
 	})() ),
-	bs.$method( 'url', (function(){
+	bs.$method( 'cgi', function( $arg ){
+		var h, t0, i, j;
+		if( !$arg || ( j = $arg.length ) < 4 ) return '';
+		h = bs.$cgi.header, t0 = bs.$cgi.temp;
+		h.length = t0.length = 0, i = 2;
+		while( i < j )
+			if ( $arg[i].charAt(0) == '@' ) h[h.length] = $arg[i++].substr(1), h[h.length] = $arg[i++];
+			else t0[t0.length] = encodeURIComponent( $arg[i++] ) + '=' + encodeURIComponent( $arg[i++] );
+		return t0.join('&');
+	}),
+	bs.$cgi.header = [], bs.$cgi.temp = [],
+	/*bs.$method( 'url', (function(){
 		var url = require('url');
 		return function( $url ){return url.parse( $url );};
-	})() ),
+	})() ),*/
 	(function(){
 		var query = require('querystring');
 		bs.$method( 'escape', function( $val ){return query.escape( $val );} ),
@@ -99,8 +110,9 @@ module.exports = function( bs ){
 		};
 	})() ),
 	(function( HTTP ){
-		var fs, p, path;
-		fs = require('fs'), p = require('path'), path = {},
+		var fs, p, url, path, htop;
+		fs = require('fs'), p = require('path'), url = require('url'),
+		path = {}, htop = {},
 		bs.$method( 'path', function( $path, $context ){
 			var t0;
 			if( $context == 'bs' ) t0 = bs.__root;
@@ -115,15 +127,29 @@ module.exports = function( bs ){
 			rs.on( 'data', function($v){t0 += $v;} ),
 			rs.on( 'end', function(){$end(t0);t0='';} );
 		}
+		function getHeader( $arg ){
+			var t0, i, j;
+			t0 = {}, i = 0, j = $arg.length;
+			while( i < j ) t0[$arg[i++]] = $arg[i++];
+			return t0;
+		}
 		function http( $type, $end, $url, $arg ){ //http를 처리한다.
 			var t0;
 			if( !$end ) return console.log( 'http need callback!' ), null;
-			//HTTP.request( ( t0=bs.$url( $path ), t0.method='GET', t0 ), response ).on('error', function($e){$end( null, $e );});
-			return t0 = $end ? xhr( $end ) : rq(), t0.open( $type, $url, $end ? true : false ), xhrSend( $type, t0, bs.$cgi( $arg ) || '' ), $end ? '' : t0.responseText;
+			t0 = url.parse($url),
+			htop.hostname = t0.hostname,
+			htop.method = $type,
+			htop.port = t0.port,
+			htop.path = t0.path,
+			htop.headers = getHeader( bs.$cgi.header ),
+			t0 = HTTP.request( htop, response ),
+			t0.on('error', function($e){$end( null, $e );}),
+			// TODO:post, put, delete
+			t0.end();
 		}
 		bs.$method( 'get', function( $end, $path ){
 			var t0;
-			if( t0.substr( 0, 5 ) == 'http:' || t0.substr( 0, 6 ) == 'https:' ) http( 'GET', $end, bs.$url( $path, arguments ) );
+			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'GET', $end, bs.$url( $path, arguments ) );
 			else{
 				if( !fs.existsSync( $path = bs.$path( $path ) ) ) return null;
 				if( !$end ) return  fs.readFileSync( $path );
