@@ -110,9 +110,9 @@ module.exports = function( bs ){
 		};
 	})() ),
 	(function( HTTP ){
-		var fs, p, url, path, htop;
+		var fs, p, url, path, http;
 		fs = require('fs'), p = require('path'), url = require('url'),
-		path = {}, htop = {},
+		path = {},
 		bs.$method( 'path', function( $path, $context ){
 			var t0;
 			if( $context == 'bs' ) t0 = bs.__root;
@@ -122,31 +122,46 @@ module.exports = function( bs ){
 		} );
 		bs.$method( 'stream', function( $path ){ //파일스트림을 출력한다.
 		} ),
-		function response( rs ){
-			var t0 = '';
-			rs.on( 'data', function($v){t0 += $v;} ),
-			rs.on( 'end', function(){$end(t0);t0='';} );
-		}
-		function getHeader( $arg ){
+		function convert( $arg ){
 			var t0, i, j;
 			t0 = {}, i = 0, j = $arg.length;
-			while( i < j ) t0[$arg[i++]] = $arg[i++];
+			while( i < j )
+				if( typeof $arg[i] == 'string' && $arg[i].charAt(0) != '@' ) t0[$arg[i++]] = $arg[i++];
+				else i++, i++;
 			return t0;
 		}
-		function http( $type, $end, $url, $arg ){ //http를 처리한다.
-			var t0;
-			if( !$end ) return console.log( 'http need callback!' ), null;
-			t0 = url.parse($url),
-			htop.hostname = t0.hostname,
-			htop.method = $type,
-			htop.port = t0.port,
-			htop.path = t0.path,
-			htop.headers = getHeader( bs.$cgi.header ),
-			t0 = HTTP.request( htop, response ),
-			t0.on('error', function($e){$end( null, $e );}),
-			// TODO:post, put, delete
-			t0.end();
-		}
+		http = (function(){
+			var htop;
+			htop = {};
+			return function( $type, $end, $url, $arg ){
+				var t0, t1, response;
+				if( !$end ) return console.log( 'http need callback!' ), null;
+				response = function( rs ){
+					var t0 = '';
+					rs.on( 'data', function($v){t0 += $v;} ),
+					rs.on( 'end', function(){$end(t0);t0='';} );
+				};
+				t0 = url.parse($url),
+				htop.hostname = t0.hostname,
+				htop.method = $type,
+				htop.port = t0.port,
+				htop.path = t0.path;
+				if( $type != 'GET' ){
+					bs.$cgi( $arg ),
+					t1 = bs.$cgiStringify( convert( $arg ) ),
+					htop.headers = convert( bs.$cgi.header ),
+					htop.headers['Content-Type'] = 'application/x-www-form-urlencoded',
+					htop.headers['Content-Length'] = Buffer.byteLength( t1 ),
+					t0 = HTTP.request( htop, response ),
+					t0.write( t1 );
+				}else{
+					htop.headers = convert( bs.$cgi.header ),
+					t0 = HTTP.request( htop, response );
+				}
+				t0.on('error', function($e){$end( null, $e );}),
+				t0.end();
+			};
+		})(),
 		bs.$method( 'get', function( $end, $path ){
 			var t0;
 			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'GET', $end, bs.$url( $path, arguments ) );
@@ -156,9 +171,27 @@ module.exports = function( bs ){
 				fs.readFile( t0, function( $e, $d ){return $end( $e || $d );});
 			}
 		} ),
-		bs.$method( 'post', function( $end, $path ){http( 'POST', $end, bs.$url( $path ), arguments );} ),
-		bs.$method( 'put', function( $end, $path ){http( 'PUT', $end, bs.$url( $path ), arguments );} ),
-		bs.$method( 'delete', function( $end, $path ){http( 'DELETE', $end, bs.$url( $path ), arguments );} );
+		bs.$method( 'post', function( $end, $path ){
+			var t0;
+			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'POST', $end, $path, arguments );
+			else{
+				// TODO:파일등록
+			}
+		} ),
+		bs.$method( 'put', function( $end, $path ){
+			var t0;
+			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'PUT', $end, $path, arguments );
+			else{
+				// TODO:파일갱신
+			}
+		} ),
+		bs.$method( 'delete', function( $end, $path ){
+			var t0;
+			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'DELETE', $end, $path, arguments );
+			else{
+				// TODO:파일삭제
+			}
+		} );
 	})( HTTP ),
 	(function(){
 		var http, form, sort, next, flush,
