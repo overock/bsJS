@@ -1,5 +1,8 @@
 module.exports = function( bs ){
 	var HTTP = require('http'), site;
+	bs.$class( 'site', function( $fn, bs ){
+		
+	} ),
 	bs.$class( 'sql', function( $fn, bs ){
 		$fn.$ = function(){
 			var i, j, k, v, t0;
@@ -78,21 +81,6 @@ module.exports = function( bs ){
 		var os = require('os');
 		return function( $k ){return os[$k]();};
 	})() ),
-	bs.$method( 'cgi', function( $arg ){
-		var h, t0, i, j;
-		if( !$arg || ( j = $arg.length ) < 4 ) return '';
-		h = bs.$cgi.header, t0 = bs.$cgi.temp;
-		h.length = t0.length = 0, i = 2;
-		while( i < j )
-			if ( $arg[i].charAt(0) == '@' ) h[h.length] = $arg[i++].substr(1), h[h.length] = $arg[i++];
-			else t0[t0.length] = encodeURIComponent( $arg[i++] ) + '=' + encodeURIComponent( $arg[i++] );
-		return t0.join('&');
-	}),
-	bs.$cgi.header = [], bs.$cgi.temp = [],
-	/*bs.$method( 'url', (function(){
-		var url = require('url');
-		return function( $url ){return url.parse( $url );};
-	})() ),*/
 	(function(){
 		var query = require('querystring');
 		bs.$method( 'escape', function( $val ){return query.escape( $val );} ),
@@ -110,88 +98,71 @@ module.exports = function( bs ){
 		};
 	})() ),
 	(function( HTTP ){
-		var fs, p, url, path, http;
+		var fs, p, url, path, http, arr2obj;
 		fs = require('fs'), p = require('path'), url = require('url'),
 		path = {},
 		bs.$method( 'path', function( $path, $context ){
 			var t0;
-			if( $context == 'bs' ) t0 = bs.__root;
+			if( $context == 'root' ) t0 = bs.__root;
 			else if( $context ) t0 = path[$context];
 			else t0 = path[site];
 			return p.resolve( t0, $path );
 		} );
 		bs.$method( 'stream', function( $path ){ //파일스트림을 출력한다.
 		} ),
-		function convert( $arg ){
+		bs.$method( 'file', function( $path, $v, $opition ){ //파일처리
+			if( !fs.existsSync( $path = bs.$path( $path ) ) ) return null;
+			if( !$end ) return  fs.readFileSync( $path );
+			fs.readFile( t0, function( $e, $d ){return $end( $e || $d );});
+		} ),
+		arr2obj = function( $arg ){
 			var t0, i, j;
 			t0 = {}, i = 0, j = $arg.length;
 			while( i < j )
 				if( typeof $arg[i] == 'string' && $arg[i].charAt(0) != '@' ) t0[$arg[i++]] = $arg[i++];
 				else i++, i++;
 			return t0;
-		}
+		},
 		http = (function(){
-			var htop;
-			htop = {};
+			var htop, maxSize;
+			htop = {},maxSize = 2 * 1024 * 1024;
 			return function( $type, $end, $url, $arg ){
 				var t0, t1, response;
 				if( !$end ) return console.log( 'http need callback!' ), null;
-				response = function( rs ){
-					var t0 = '';
-					rs.on( 'data', function($v){t0 += $v;} ),
-					rs.on( 'end', function(){$end(t0);t0='';} );
-				};
-				t0 = url.parse($url),
-				htop.hostname = t0.hostname,
-				htop.method = $type,
-				htop.port = t0.port,
-				htop.path = t0.path;
-				if( $type != 'GET' ){
-					bs.$cgi( $arg ),
-					t1 = bs.$cgiStringify( convert( $arg ) ),
-					htop.headers = convert( bs.$cgi.header ),
-					htop.headers['Content-Type'] = 'application/x-www-form-urlencoded',
-					htop.headers['Content-Length'] = Buffer.byteLength( t1 ),
-					t0 = HTTP.request( htop, response ),
-					t0.write( t1 );
-				}else{
-					htop.headers = convert( bs.$cgi.header ),
-					t0 = HTTP.request( htop, response );
+				if( $url.substr( 0, 5 ) == 'http:' || $url.substr( 0, 6 ) == 'https:' ){
+					response = function( rs ){
+						var t0 = '';
+						rs.on( 'data', function($v){
+							t0 += $v;
+							if( t0.length > maxSize ){
+								t0 = '', this.pause(), rs.writeHead(413), rs.end( 'Too Large' ), $end( null );
+							}
+						} ).on( 'end', function(){
+							if( !t0 ) rs.end(), $end( null );
+							else $end(t0);t0='';
+						} );
+					},
+					t0 = url.parse($url), htop.hostname = t0.hostname, htop.method = $type, htop.port = t0.port, htop.path = t0.path;
+					if( $type == 'GET' ){
+						htop.headers = arr2obj( bs.$cgi.header ),
+						t0 = HTTP.request( htop, response );
+					}else{
+						t1 = bs.$cgi( $arg ),
+						htop.headers = arr2obj( bs.$cgi.header ),
+						htop.headers['Content-Type'] = 'application/x-www-form-urlencoded',
+						htop.headers['Content-Length'] = Buffer.byteLength( t1 ),
+						t0 = HTTP.request( htop, response ),
+						t0.write( t1 );
+					}
+					t0.on('error', function($e){$end( null, $e );}),
+					t0.end();
 				}
-				t0.on('error', function($e){$end( null, $e );}),
-				t0.end();
 			};
 		})(),
-		bs.$method( 'get', function( $end, $path ){
-			var t0;
-			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'GET', $end, bs.$url( $path, arguments ) );
-			else{
-				if( !fs.existsSync( $path = bs.$path( $path ) ) ) return null;
-				if( !$end ) return  fs.readFileSync( $path );
-				fs.readFile( t0, function( $e, $d ){return $end( $e || $d );});
-			}
-		} ),
-		bs.$method( 'post', function( $end, $path ){
-			var t0;
-			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'POST', $end, $path, arguments );
-			else{
-				// TODO:파일등록
-			}
-		} ),
-		bs.$method( 'put', function( $end, $path ){
-			var t0;
-			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'PUT', $end, $path, arguments );
-			else{
-				// TODO:파일갱신
-			}
-		} ),
-		bs.$method( 'delete', function( $end, $path ){
-			var t0;
-			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'DELETE', $end, $path, arguments );
-			else{
-				// TODO:파일삭제
-			}
-		} );
+		bs.$method( 'get', function( $end, $path ){http( 'GET', $end, bs.$url( $path, arguments ) );} ),
+		bs.$method( 'post', function( $end, $path ){http( 'POST', $end, bs.$url($path), arguments );} ),
+		bs.$method( 'put', function( $end, $path ){http( 'PUT', $end, bs.$url($path), arguments );} ),
+		bs.$method( 'delete', function( $end, $path ){http( 'DELETE', $end, bs.$url($path), arguments );} );
 	})( HTTP ),
 	(function(){
 		var http, form, sort, next, flush,
@@ -341,5 +312,4 @@ module.exports = function( bs ){
 			console.log('server started with port ' + ($data.port || 80)); 
 		};
 	})();
-
 };
