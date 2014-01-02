@@ -11,9 +11,8 @@
 'use strict';
 var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
-	
 if( doc = W['document'] ) PLUGIN_REPO='../bs/plugin/',que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
-else if( __dirname ) PLUGIN_REPO='http://projectbs.github.io/bsJS/bs/plugin/', node=require('./node'), module.exports = bs = function(f){bs.__root = f;},bs.__root = __dirname;
+else if( __dirname ) PLUGIN_REPO='http://projectbs.github.io/bsJS/bs/plugin/', node=require('./node'), module.exports = bs = function(f){bs.__root = f;return bs;};
 else throw new Error( 0, 'not supported platform' );
 bs.VERSION = VERSION = 0.2;
 function error( $num, $msg ){if( doc ) throw new Error( $num, $msg ); else console.log( $num, $msg );}

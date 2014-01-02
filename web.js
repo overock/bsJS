@@ -1,47 +1,17 @@
 var bs = require( './bs/bsjs' )( __dirname );
-/*
-bs.site.load( 'a.json','b.json','a.json','a.json','a.json','a.json' );
-
-{
-	meta:{
-	},
-	sites:{
-		'a':{
-			'url':[...],
-			'root':'./site/a/',
-			'route':b.json,
-			'session':true,
-			'static':true,
-			...
-			...
-			...
-			...
-			...
-		},
-		'b':{
-		}
+bs.site('bsplugin').$(
+	'url', 'js.bsplugin.com', 
+	'root', './noderoot/pluginjs/',
+	'rules', {
+		'/':[
+			'absolute', 'head.bs',
+			'tail', 'JS',
+			'url',
+			'absolute','foot.bs'
+		],
+		'/json':[
+			'url'
+		]
 	}
-
-}
-
-b.json
-{ sites:{'a':{'route':{
-	
-}
-}}
-
-
-
-
-bs.site('a').start();
-bs.site('b').start();
-bs.site('c').start();
-*/
-/*
-var http = require("http");
-http.createServer(function(request, response) {
-response.writeHead(200, {"Content-Type": "text/html"});
-response.write("Hello, World~!!");
-response.end();
-}).listen(8001);
-*/
+);
+bs.site('bsplugin').start();
