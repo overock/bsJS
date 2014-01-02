@@ -108,18 +108,7 @@ bs.$method( 'crypt', (function(){
 		for( k in $v )if( $v.hasOwnProperty( k ) ) t0[k] = $v[k];
 		return t0;
 	},
-	portStart = function( $sites, $port ){
-		HTTP.createServer( function( $rq, $rp ){
-			var t0, t1, i, j, k, v;
-			t0 = URL.parse( $rq.url ), t1 = t0.hostname, i = 0, j = $sites.length;
-			while( i < j ){
-				k = $sites[i++], v = $sites[i++];
-				if( k == t0 ) v.request( t0, $rq, $rp );
-			}
-		} ).listen( $port );
-		console.log( $port + ' started' );
-	},
-	sort = function( a, b ){return a = a.length, b = b.length, a > b ? 1 : a == b ? 0 : -1;},
+	sort = function( a, b ){return a.length - b.length;},
 	staticHeader = {'Content-Type':0},
 	clientCookie = null,
 	ckParser = function(){
@@ -147,10 +136,15 @@ bs.$method( 'crypt', (function(){
 		};
 	})() );
 	bs.$static( 'WEB', (function(){
-		var t0;
+		var flush;
 		head = [], response = [],
 		sessionName = '__bsNode', id = 0,
-		t0 = {
+		flush = {
+			0:['Server', 'projectBS on node.js'],
+			1:['Content-Type', 'text/html; charset=utf-8'],
+			2:['Content-Length', 0]
+		};
+		return {
 			next:function(){next();},
 			flush:function(){
 				var t0, k;
@@ -181,16 +175,23 @@ bs.$method( 'crypt', (function(){
 			post:function( $k ){return postData[$k];},
 			file:function( $k ){return postFile[$k];},
 			data:function( $k, $v ){return $v === undefined ? data[$k] : data[$k] = $v;}
-		},
-		t0.flush[0] = ['Server', 'projectBS on node.js'],
-		t0.flush[1] = ['Content-Type', 'text/html; charset=utf-8'],
-		t0.flush[2] = ['Content-Length', 0];
-		return t0;
+		};
 	})() ),
 	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};
 	bs.$class( 'site', function( $fn, bs ){
-		var sites, ports;
-		sites = {}, ports = {},
+		var ports;
+		ports = {},
+		portStart = function( $sites, $port ){
+			HTTP.createServer( function( $rq, $rp ){
+				var t0, t1, i, j, k, v;
+				t0 = URL.parse( 'http://'+$rq.headers.host+$rq.url ), t1 = t0.hostname, i = 0, j = $sites.length;
+				while( i < j ){
+					k = $sites[i++], v = $sites[i++];
+					if( k == t1 ) v.request( t0, $rq, $rp );
+				}
+			} ).on('error', function($e){console.log($e);}).listen( $port );
+			console.log( $port + ' started' );
+		},
 		$fn.constructor = function(){
 			var self = this, router, nextstep, onData, file, path, currRule, idx;
 			this.form = new form.IncomingForm, this.form.encoding = 'utf-8', this.form.keepExtensions = true;
@@ -206,9 +207,10 @@ bs.$method( 'crypt', (function(){
 				var t0, i, j;
 				rq = $rq, rp = $rp, site = $url.hostname, fileRoot[site] = self.root, getData = $url.query, postData = postFile = null, path = $url.pathname.substr(1);
 				if( path.indexOf( '..' ) > -1 || path.indexOf( './' ) > -1 ) err( 404, 'no file<br>'+ path );
-				else if( path.substr( path.length - 1 ) == '/' ) file = index;
+				else if( !path || path.substr( path.length - 1 ) == '/' ) file = self.index;
 				else{
-					i = path.lastIndexOf( '/' ) + 1, path = path.substring( 0, i ), file = path.substr( i );
+					if( i = path.lastIndexOf( '/' ) + 1 ) path = path.substring( 0, i ), file = path.substr( i );
+					else file = path, path = '';
 					if( ( i = file.indexOf( '.' ) ) > -1 ){
 						if( t0 = self.mime[file.substr( i + 1 )] ) bs.$stream( bs.$path( path+file ),
 								function(){$rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe( $rp );},
@@ -228,8 +230,8 @@ bs.$method( 'crypt', (function(){
 			router = function(){
 				var t0, i;
 				try{
-					if( config ) require( bs.$path( self.config ) )( bs );
-					if( t0 = self._table[path+file] ) require( bs.$path( t0 ) )( bs ), flush();
+					if( self.config ) require( bs.$path( self.config )+'.js' )( bs );
+					if( t0 = self._table[path+file] ) require( bs.$path( t0 ) )( bs ), bs.WEB.flush();
 					else{
 						t0 = self.rulesArr, i = t0.length;
 						while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self._rules[t0[i]], idx = 0, ( next = nextstep )();
@@ -250,7 +252,7 @@ bs.$method( 'crypt', (function(){
 						i == 'tail' ? path + file + currRule[idx++] :
 						i == 'url' ? path + file : 0
 					) )( bs ) ) nextstep();
-				}else flush();
+				}else bs.WEB.flush();
 			};
 		},
 		$fn.table = function(){
@@ -284,7 +286,7 @@ bs.$method( 'crypt', (function(){
 					switch( k ){
 					case'url':
 						v = v.split(':');
-						if( this.url.indexOf( v[0] ) > -1 ) this.url.push( v[0], parseInt( v[1] || bs.$os( 'hostname' ) == 'tony-VirtualBox' ? '80' : '8001' ) );
+						if( this.url.indexOf( v[0] ) == -1 ) this.url.push( v[0], parseInt( v[1] || '8001' ) );
 						break;
 					case'root':this.root = bs.$path( v, 'root' ); break;
 					case'config':case'index':this[k] = v; break;
@@ -295,15 +297,15 @@ bs.$method( 'crypt', (function(){
 						if( k.charAt(0) == '.' ) this.mime[k.substr(1)] = v;
 					}
 				}
-				return this[k];
 			}
+			return this[k];
 		},
 		$fn.start = function(){
 			var domain, port, i, j;
 			this.form.maxFieldsSize = this.postMax;
 			if( this.upload ) this.form.uploadDir = this.upload;
 			this.rulesArr = [];
-			for( k in this._rule ) this.rulesArr[this.rulesArr.length] = k;
+			for( k in this._rules ) this.rulesArr[this.rulesArr.length] = k;
 			this.rulesArr.sort( sort ),
 			i = 0, j = this.url.length;
 			while( i < j ){
