@@ -11,7 +11,7 @@ bs.site( 'bsplugin' ).rules(
 		'url',
 		'absolute','foot'
 	],
-	'/json', [
+	'json', [
 		'url'
 	]
 );
