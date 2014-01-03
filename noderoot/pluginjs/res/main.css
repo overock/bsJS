@@ -3,4 +3,6 @@ body{margin:0;padding:0}
 .top{height:60px;background:#dedede}
 .middle{margin:20px 0}
 .bottom{height:60px;background:#eee}
-#login{float:right;width:150px}
+#menu{float:left;width:700px}
+#login{float:right;width:200px}
+#login img{float:left;margin-right:3px}
