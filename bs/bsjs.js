@@ -12,8 +12,9 @@
 var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
 if( doc = W['document'] ) PLUGIN_REPO='../bs/plugin/',que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
-else if( __dirname ) PLUGIN_REPO='http://projectbs.github.io/bsJS/bs/plugin/', node=require('./node'), module.exports = bs = function(f){bs.__root = f;return bs;};
+else if( __dirname ) PLUGIN_REPO='http://www.bsidesoft.com/bs/bs5/bs/plugin/', node=require('./node'), module.exports = bs = function(f){bs.__root = f;return bs;};
 else throw new Error( 0, 'not supported platform' );
+// PLUGIN_REPO='http://projectbs.github.io/bsJS/bs/plugin/'
 bs.VERSION = VERSION = 0.2;
 function error( $num, $msg ){if( doc ) throw new Error( $num, $msg ); else console.log( $num, $msg );}
 function dependency( $arg ){
@@ -36,6 +37,14 @@ function method( $name, $func, $version/*, $dependency*/ ){
 }
 method( 'timeout', function( $time ){timeout = parseInt( $time * 1000 );} ),
 method( 'method', method ),
+method( 'del', function(){
+	var i, j;
+	i = 0, j = arguments.length;
+	while( i < j ){
+		k = arguments[i++];
+		if( bs[k] ) delete depend[k.charAt(0)=='$'?k.substr(1):k], delete bs[k];
+	}
+} );
 method( 'class', (function(){
 	function factory( $name, $func ){
 		var cls, fn, t0, k;
@@ -1231,7 +1240,7 @@ id = setInterval( function(){
 	case'interactive':if( document.documentElement.doScroll ) try{document.documentElement.doScroll('left');}catch(e){return;}
 	default:return;}
 	clearInterval( id ), start = function(){for( var i = 0, j = que.length ; i < j ; i++ ) que[i](); que = null;},
-	DETECT(), DOM(), ANI(), im.length ? ( im.unshift( start ), bs.$importer.apply( null, im ), im.length = 0 ) : start();
+	DETECT(), DOM(), ANI(), im.length ? ( im.unshift( start ), bs.$importer.apply( null, im ), im = null, bs.$del( '$import' ) ) : start();
 }, 1 );
 })( doc, bs );
 

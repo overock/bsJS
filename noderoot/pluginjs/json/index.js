@@ -1,3 +1,3 @@
 module.exports = function( bs ){
-	bs.WEB.response( 'indexJson<br>' );
+	bs.WEB.data( 'a', 'hello jpage' );
 };
