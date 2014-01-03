@@ -25,7 +25,7 @@ bs.$import( 'fb', 'last' ),
 bs( function(){
 	bs.FB.start( '617106348337323', function( $data, $conn, $disconn ){
 		bs.dom( '#login' ).$( 'html', '<img src="' + $data.url +'"><a href="' + $data.link + '" target="_blank">' + $data.name + '</a>',
-			'>', bs.dom( '<div>logout</div>' ).$( 'html', 'logout', 'down', function( $e ){bs.FB.logout();} )
+			'>', bs.dom( '<div>logout</div>' ).$( 'html', 'logout', 'down', function( $e ){bs.FB.logout();}, 'this' )
 		);
 	}, function( $status, $conn, $disconn ){
 		bs.dom( '#login' ).$( 'html', 'login', 'down', function( $e ){
@@ -36,7 +36,7 @@ bs( function(){
 </script>
 <body>
 <div class="top"><div class="contents">
+	<div><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>
 	<div id="login">login</div>
-	<a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a>
 </div></div>
 <div class="contents"><div class="middle">
