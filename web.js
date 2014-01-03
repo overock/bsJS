@@ -10,15 +10,12 @@ bs.$importer( function(){
 	);
 	bs.site( 'bsplugin' ).rules(
 		'', [
-			'absolute', 'head',
-			'relative', '@',
-			'template', '@T',
-			'absolute','foot'
+			'static', '/head.html',
+			'require', '@',
+			'template', '@.html',
+			'static','/foot.html'
 		],
-		'json', [
-			'relative', '@',
-			'template', '@'		
-		]
+		'json', ['require', '@']
 	);
 	bs.site('bsplugin').start();
 }, 'jpage', 'last' );

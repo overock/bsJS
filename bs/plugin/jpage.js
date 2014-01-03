@@ -16,7 +16,7 @@ bs.$register( 'method', 'jpage', (function(){
 				}
 			}
 			t0 = $str.v ? $str : new jp(v);
-			if( $id ) cache[$id] = t0;
+			if( $id ) cache[$id] = v;
 		}
 		t1 = '';
 		if( $render ){

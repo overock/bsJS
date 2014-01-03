@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="description" content="" />
+<meta name="keyword" content="" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="imagetoolbar" content="no">
+<meta property="og:title" content="bs-plugin"/> 
+<meta property="og:url" content="http://js.bsplugin.com/"/>
+<meta property="og:image" content="i/logo.png"/>
+<meta property="og:description" content="bs-plugin site"/>
+<meta property="og:type" content="website"/>
+<link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+<link href="/res/main.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>
+<script>
+bs.$import( 'fb', 'last' ),
+bs( function(){
+	bs.FB.start( '617106348337323', function( $data, $conn, $disconn ){
+		bs.dom( '#login' ).$( 'html', '<img src="' + $data.url +'"><a href="' + $data.link + '" target="_blank">' + $data.name + '</a>',
+			'>', bs.dom( '<div>logout</div>' ).$( 'html', 'logout', 'down', function( $e ){bs.FB.logout();} )
+		);
+	}, function( $status, $conn, $disconn ){
+		bs.dom( '#login' ).$( 'html', 'login', 'down', function( $e ){
+			bs.FB.login();
+		} );
+	}, function( $status, $conn, $disconn ){} );
+} );
+</script>
+<body>
+<div class="top"><div class="contents">
+	<div id="login">login</div>
+	<a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a>
+</div></div>
+<div class="contents"><div class="middle">

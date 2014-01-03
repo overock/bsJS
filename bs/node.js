@@ -204,7 +204,7 @@ bs.$method( 'crypt', (function(){
 	})() ),
 	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};
 	bs.$class( 'site', function( $fn, bs ){
-		var ports, templateEnd, templates;
+		var ports, templateEnd, templates, statics;
 		ports = {},
 		portStart = function( $sites, $port ){
 			HTTP.createServer( function( $rq, $rp ){
@@ -218,14 +218,13 @@ bs.$method( 'crypt', (function(){
 			console.log( $port + ' started' );
 		},
 		templateEnd = function( $data ){bs.WEB.response( $data ), bs.WEB.next();},
-		templates = {},
+		templates = {}, statics = {},
 		$fn.constructor = function(){
 			var self = this, router, nextstep, onData, file, path, currRule, idx;
 			this.form = new form.IncomingForm, this.form.encoding = 'utf-8', this.form.keepExtensions = true;
 			this.url = [], this.isStarted = 0,
 			this.mime = clone( mime ), this.index = 'index', this.config = 'config',
 			this.fileMax = 2 * 1024 * 1024, this.postMax = .5 * 1024 * 1024,
-			this.templateExt = 'html',
 			this._table = {}, this._rules = {};
 			this.request = function( $url, $rq, $rp ){
 				var t0, i, j;
@@ -253,7 +252,7 @@ bs.$method( 'crypt', (function(){
 			},
 			router = function(){
 				var t0, i;
-				try{
+				//try{
 					if( self.config ) require( bs.$path( self.config )+'.js' )( bs );
 					if( t0 = self._table[path+file] ) require( bs.$path( t0 ) )( bs ), bs.WEB.flush();
 					else{
@@ -261,15 +260,16 @@ bs.$method( 'crypt', (function(){
 						while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self._rules[t0[i]], idx = 0, ( next = nextstep )();
 						throw 1;
 					}
-				}catch( $e ){
-					err( 500, '<h1>server error</h1><div>Error: '+$e+'</div>path: '+path+'<br>file: '+file );
-				}
+				//}catch( $e ){
+				//	err( 500, '<h1>server error</h1><div>Error: '+$e+'</div>path: '+path+'<br>file: '+file );
+				//}
 			},
 			nextstep = function(){
 				var t0, i, j;
 				if( idx < currRule.length ){
-					i = currRule[idx++], j = currRule[idx++].replace( '@', file ), t0 = bs.$path( ( i == 'absolute' ? '' : path ) + j );
-					if( i == 'template' ) self.template( t0, templates[t0] || (templates[t0] = bs.$file( null, t0+'.'+self.templateExt ).toString() ), data, templateEnd );
+					i = currRule[idx++], j = currRule[idx++].replace( '@', file ), t0 = bs.$path( j.charAt(0) == '/' ? j.substr(1) : path + j );
+					if( i == 'template' ) self.template( t0, templates[t0] || (templates[t0] = bs.$file( null, t0 ).toString() ), data, templateEnd );
+					else if( i == 'static' ) bs.WEB.response( statics[t0] || ( statics[t0] = bs.$file( null, t0 ).toString() ) ), nextstep();
 					else if( !require( t0 )( bs ) ) nextstep();
 				}else bs.WEB.flush();
 			};
