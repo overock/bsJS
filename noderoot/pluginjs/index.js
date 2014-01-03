@@ -1,3 +1,3 @@
 module.exports = function( bs ){
-	bs.WEB.response( 'index<br>' );
+	bs.WEB.response( 'index은혜'+bs.WEB.data('k')+'<br>' );
 };

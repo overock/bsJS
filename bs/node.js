@@ -42,11 +42,37 @@ bs.$method( 'crypt', (function(){
 		if( $err ) t0.once( 'error', $err );
 		return t0;
 	} ),
-	bs.$method( 'file', function( $path, $v, $opition ){ //파일처리
+	bs.$method( 'file', function( $end, $path, $v, $opition ){ //파일처리
 		if( !fs.existsSync( $path ) ) return null;
 		if( !$end ) return  fs.readFileSync( $path );
 		fs.readFile( t0, function( $e, $d ){return $end( $e || $d );});
 	} ),
+	bs.$method( 'js', (function(){
+		var js = function( $data, $load, $end ){
+			var t0, i;
+			if( $load ){
+				if( $data.charAt($data.length-1)=='=' ) $data += 'bs.__callback.'+(i='c'+(id++)), jc[i] = function(){delete jc[i],$end.apply(null,arguments);};
+				bs.$get( function( $v ){
+					try{
+						new Function( '', $v )();
+					}catch( $e ){
+						console.log( $e );
+					}
+					$load();
+				}, $data );
+			}else try{
+				new Function( '', $v )();
+			}catch( $e ){
+				console.log( $e );
+			};
+		};
+		return function( $end ){
+			var i, j, arg, load;
+			arg = arguments, i = 1, j = arg.length;
+			if( $end ) ( load = function(){i < j ? js( bs.$path( arg[i++] ), load, $end ) : $end();} )();
+			else while( i < j ) js( bs.$file( null, bs.$path( arg[i++] ) ) );
+		};
+	})() ),
 	arr2obj = function( $arg ){
 		var t0, i, j;
 		t0 = {}, i = 0, j = $arg.length;
@@ -98,7 +124,7 @@ bs.$method( 'crypt', (function(){
 })( HTTP, URL ),
 (function( HTTP, URL ){
 	var form, mime, clone, portStart, sort, staticHeader, err,
-		sessionName, id, cookie, clientCookie, ckParser,
+		sessionName, id, cookie, clientCookie, ckParser, next,
 		head, method, response, rq, rp, getData, postData, postFile, data;
 		
 	mime = require('./mime'), form = require( 'formidable' ),
@@ -209,7 +235,7 @@ bs.$method( 'crypt', (function(){
 				if( path.indexOf( '..' ) > -1 || path.indexOf( './' ) > -1 ) err( 404, 'no file<br>'+ path );
 				else if( !path || path.substr( path.length - 1 ) == '/' ) file = self.index;
 				else{
-					if( i = path.lastIndexOf( '/' ) + 1 ) path = path.substring( 0, i ), file = path.substr( i );
+					if( i = path.lastIndexOf( '/' ) + 1 ) file = path.substr( i ), path = path.substring( 0, i );
 					else file = path, path = '';
 					if( ( i = file.indexOf( '.' ) ) > -1 ){
 						if( t0 = self.mime[file.substr( i + 1 )] ) bs.$stream( bs.$path( path+file ),

@@ -234,55 +234,53 @@ if( !W['console'] ) (function(){
 		flush:function(){return t0 = log.slice(0), log.length = 0, t0;}
 	};
 })();
-//3. define JSloader, ajax
-var head, e, rq, js, jid, jc;
-function xhrSend( $type, $xhr, $data ){
-	var h, i, j;
-	$xhr.setRequestHeader( 'Content-Type', $type == 'GET' ? 'text/plain; charset=UTF-8' : 'application/x-www-form-urlencoded; charset=UTF-8' ),
-	$xhr.setRequestHeader( 'Cache-Control', 'no-cache' ),
-	h = bs.$cgi.header, i = 0, j = h.length;
-	while(i < j) $xhr.setRequestHeader( h[i++], h[i++] );
-	$xhr.send( $data );
-}
-function xhr( $end ){
-	var t0, t1;
-	return t0 = rq(), t0.onreadystatechange = function(){
-		if( t0.readyState != 4 || t1 < 0 ) return;
-		t0.onreadystatechange = null, clearTimeout( t1 ), t1 = -1, $end( t0.status == 200 || t0.status == 0 ? t0.responseText : '@'+t0.status );
-	}, t1 = setTimeout( function(){if( t1 > -1 ) t1 = -1, t0.onreadystatechange = null, $end( '@timeout' );}, timeout ), t0;
-}
-function http( $type, $end, $url, $arg ){
-	var t0;
-	return t0 = $end ? xhr( $end ) : rq(), t0.open( $type, $url, $end ? true : false ), xhrSend( $type, t0, bs.$cgi( $arg ) || '' ), $end ? '' : t0.responseText;
-}
-head = doc.getElementsByTagName( 'head' )[0], e = W['addEventListener'],
-rq = W['XMLHttpRequest'] ? function(){return new XMLHttpRequest;} : (function(){
-	var t0, i, j;
-	t0 = 'MSXML2.XMLHTTP', t0 = ['Microsoft.XMLHTTP',t0,t0+'.3.0',t0+'.4.0',t0+'.5.0'], i = t0.length;
-	while( i-- ){try{new ActiveXObject( j = t0[i] );}catch( $e ){continue;}break;}
-	return function(){return new ActiveXObject( j );};
-})(),
-jid = 0, bs.__callback = jc = {},
-js = function( $data, $load, $end ){
-	var t0, i;
-	t0 = doc.createElement( 'script' ), t0.type = 'text/javascript', t0.charset = 'utf-8', head.appendChild( t0 );
-	if( $load ){
-		if( e ) t0.onload = function(){t0.onload = null, $load();};
-		else t0.onreadystatechange = function(){(t0.readyState=='loaded'||t0.readyState=='complete')&&(t0.onreadystatechange=null,$load());};
-		if( $data.charAt($data.length-1)=='=' ) $data += 'bs.__callback.'+(i='c'+(id++)), jc[i] = function(){delete jc[i],$end.apply(null,arguments);};
-		t0.src = $data;
-	}else t0.text = $data;
-},
-method( 'get', function( $end, $url ){return http( 'GET', $end, bs.$url( $url, arguments ) );} ),
-method( 'post', function( $end, $url ){return http( 'POST', $end, bs.$url($url), arguments );} ),
-method( 'put', function( $end, $url ){return http( 'PUT', $end, bs.$url($url), arguments );} ),
-method( 'delete', function( $end, $url ){return http( 'DELETE', $end, bs.$url($url), arguments );} ),
-method( 'js', function( $end ){
-	var i, j, arg, load;
-	arg = arguments, i = 1, j = arg.length;
-	if( $end ) ( load = function(){i < j ? js( arg[i++], load, $end ) : $end();} )();
-	else while( i < j ) js( bs.$get( null, arg[i++] ) );
-} ),
+(function(){
+	var rq = W['XMLHttpRequest'] ? function(){return new XMLHttpRequest;} : (function(){
+		var t0, i, j;
+		t0 = 'MSXML2.XMLHTTP', t0 = ['Microsoft.XMLHTTP',t0,t0+'.3.0',t0+'.4.0',t0+'.5.0'], i = t0.length;
+		while( i-- ){try{new ActiveXObject( j = t0[i] );}catch( $e ){continue;}break;}
+		return function(){return new ActiveXObject( j );};
+	})(), h = bs.$cgi.header;
+	function http( $type, $end, $url, $arg ){
+		var t0, t1, i, j;
+		t0 = rq();
+		if( $end ) t0.onreadystatechange = function(){
+			if( t0.readyState != 4 || t1 < 0 ) return;
+			t0.onreadystatechange = null, clearTimeout( t1 ), t1 = -1, $end( t0.status == 200 || t0.status == 0 ? t0.responseText : '@'+t0.status );
+		}, t1 = setTimeout( function(){if( t1 > -1 ) t1 = -1, t0.onreadystatechange = null, $end( '@timeout' );}, timeout );
+		t0.open( $type, $url, $end ? true : false ),
+		t0.setRequestHeader( 'Content-Type', ( $type == 'GET' ? 'text/plain' : 'application/x-www-form-urlencoded' ) + 'charset=UTF-8' ),
+		t0.setRequestHeader( 'Cache-Control', 'no-cache' ),
+		i = 0, j = h.length;
+		while(i < j) $xhr.setRequestHeader( h[i++], h[i++] );
+		t0.send( bs.$cgi( $arg ) || '' );
+		if( !$end ) return t0.responseText;
+	}
+	method( 'get', function( $end, $url ){return http( 'GET', $end, bs.$url( $url, arguments ) );} ),
+	method( 'post', function( $end, $url ){return http( 'POST', $end, bs.$url($url), arguments );} ),
+	method( 'put', function( $end, $url ){return http( 'PUT', $end, bs.$url($url), arguments );} ),
+	method( 'delete', function( $end, $url ){return http( 'DELETE', $end, bs.$url($url), arguments );} );
+})();
+method( 'js', (function(){
+	var head, e, jid, jc, js;
+	head = doc.getElementsByTagName( 'head' )[0], e = W['addEventListener'], jid = 0, bs.__callback = jc = {},
+	js = function( $data, $load, $end ){
+		var t0, i;
+		t0 = doc.createElement( 'script' ), t0.type = 'text/javascript', t0.charset = 'utf-8', head.appendChild( t0 );
+		if( $load ){
+			if( e ) t0.onload = function(){t0.onload = null, $load();};
+			else t0.onreadystatechange = function(){(t0.readyState=='loaded'||t0.readyState=='complete')&&(t0.onreadystatechange=null,$load());};
+			if( $data.charAt($data.length-1)=='=' ) $data += 'bs.__callback.'+(i='c'+(id++)), jc[i] = function(){delete jc[i],$end.apply(null,arguments);};
+			t0.src = $data;
+		}else t0.text = $data;
+	};
+	return function( $end ){
+		var i, j, arg, load;
+		arg = arguments, i = 1, j = arg.length;
+		if( $end ) ( load = function(){i < j ? js( arg[i++], load, $end ) : $end();} )();
+		else while( i < j ) js( bs.$get( null, arg[i++] ) );
+	}
+})()),
 method( 'img', (function(){
 	function _load( $src, $data ){
 		var t0, t1;
