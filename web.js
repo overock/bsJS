@@ -8,14 +8,14 @@ bs.$importer( function(){
 			bs.$jpage( $template, $data, null, $end, $url );
 		}
 	);
-	bs.site( 'bsplugin' ).rules(
+	bs.site( 'bsplugin' ).router(
 		'', [
 			'static', '/head.html',
-			'require', '@',
+			'script', '@.js',
 			'template', '@.html',
 			'static','/foot.html'
 		],
 		'json', ['require', '@']
 	);
 	bs.site('bsplugin').start();
-}, 'jpage', 'last' );
+}, 'jpage', 'last', 'fb', 'last' );
