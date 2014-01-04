@@ -8,8 +8,8 @@ bs.$method( 'os', (function(){
 	var query = require('querystring');
 	bs.$method( 'escape', function( $val ){return query.escape( $val );} ),
 	bs.$method( 'unescape', function( $val ){return query.unescape( $val );} ),
-	bs.$method( 'cgiParse', function( $val ){return query.parse( $val );} ),
-	bs.$method( 'cgiStringify', function( $val ){return query.stringify( $val );} );
+	bs.$method( 'cgiparse', function( $val ){return query.parse( $val );} ),
+	bs.$method( 'cgistringify', function( $val ){return query.stringify( $val );} );
 })();
 bs.$method( 'crypt', (function(){
 	var crypto = require('crypto');
@@ -96,7 +96,7 @@ bs.$method( 'crypt', (function(){
 						}
 					} ).on( 'end', function(){
 						if( !t0 ) rs.end(), $end( null );
-						else $end(t0);t0='';
+						else $end( t0, rs );t0='';
 					} );
 				},
 				t0 = URL.parse($url), htop.hostname = t0.hostname, htop.method = $type, htop.port = t0.port, htop.path = t0.path;
@@ -228,7 +228,7 @@ bs.$method( 'crypt', (function(){
 			this.rules = {};
 			this.request = function( $url, $rq, $rp ){
 				var t0, i, j;
-				rq = $rq, rp = $rp, site = $url.hostname, fileRoot[site] = self.root, getData = $url.query, postData = postFile = null, path = $url.pathname.substr(1);
+				rq = $rq, rp = $rp, site = $url.hostname, fileRoot[site] = self.root, getData = bs.$cgiparse( $url.query ), postData = postFile = null, path = $url.pathname.substr(1);
 				if( path.indexOf( '..' ) > -1 || path.indexOf( './' ) > -1 ) err( 404, 'no file<br>'+ path );
 				else if( !path || path.substr( path.length - 1 ) == '/' ) file = self.index;
 				else{
@@ -261,12 +261,14 @@ bs.$method( 'crypt', (function(){
 				var t0, i, j;
 				if( idx < currRule.length ){
 					try{
-						i = currRule[idx++], j = currRule[idx++].replace( '@', file ), t0 = bs.$path( j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ) );
+						i = currRule[idx++], j = currRule[idx++];
+						if( typeof j == 'string' ) j = j.replace( '@', file ), j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ), t0 = bs.$path( j );
 						switch( i ){
 						case'template':self.template( t0, f(t0), data, tEnd ); break;
 						case'static':bs.WEB.response( f(t0) ), nextstep(); break;
 						case'script':if( ! ( new Function( 'bs', f(t0) )(bs) ) ) nextstep(); break;
 						case'require':if( !require( t0 )(bs) ) nextstep(); break;
+						case'function':if( typeof j == 'function' ){if( !j() ) nextstep();}else if( j.splice ){if( !j[0][j[1]]() ) nextstep();}break;
 						default:nextstep();
 						}
 					}catch($e){
@@ -301,7 +303,7 @@ bs.$method( 'crypt', (function(){
 						if( this.url.indexOf( v[0] ) == -1 ) this.url.push( v[0], parseInt( v[1] || '8001' ) );
 						break;
 					case'root':this.root = bs.$path( v, 'root' ); break;
-					case'templateExt':case'template':case'config':case'index':this[k] = v; break;
+					case'init':case'template':case'config':case'index':this[k] = v; break;
 					case'upload':this.upload = bs.$path( v, 'root' ); break;
 					case'postMax':case'fileMax':this[k] = v * 1024 * 1024; break;
 					case'table':case'rules': for( t0 in v ) if( v.hasOwnProperty( t0 ) ) this['_'+k][t0] = v[t0]; break;
@@ -318,8 +320,12 @@ bs.$method( 'crypt', (function(){
 			if( this.upload ) this.form.uploadDir = this.upload;
 			this.rulesArr = [];
 			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
-			this.rulesArr.sort( sort ),
+			this.rulesArr.sort( sort );
 			i = 0, j = this.url.length;
+			switch( typeof this.init ){
+			case'string': new Function( 'bs', bs.$file( null, bs.$path( this.init, this.root ) ) )(bs); break;
+			case'function': this.init(); break;
+			}
 			while( i < j ){
 				domain = this.url[i++], port = this.url[i++];
 				if( !ports[port] ) portStart( ports[port] = [], port );

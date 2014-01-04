@@ -20,20 +20,6 @@
 <link href="/res/main.css" rel="stylesheet" media="screen">
 <!--<script type="text/javascript" src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>-->
 <script type="text/javascript" src="http://www.bsidesoft.com/bs/bs5/bs/bsjs.js"></script>
-<script>
-bs.$import( 'fb', 'last' ),
-bs( function(){
-	bs.FB.start( '617106348337323', function( $data, $conn, $disconn ){
-		bs.dom( '#login' ).$( 'html', '<img src="' + $data.url +'"><a href="' + $data.link + '" target="_blank">' + $data.name + '</a>',
-			'>', bs.dom( '<div>logout</div>' ).$( 'html', 'logout', 'down', function( $e ){bs.FB.logout();}, 'this' )
-		);
-	}, function( $status, $conn, $disconn ){
-		bs.dom( '#login' ).$( 'html', 'login', 'down', function( $e ){
-			bs.FB.login();
-		} );
-	}, function( $status, $conn, $disconn ){} );
-} );
-</script>
 <body>
 <div class="top"><div class="contents">
 	<div id="menu"><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>

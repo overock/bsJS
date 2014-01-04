@@ -255,7 +255,7 @@ if( !W['console'] ) (function(){
 		t0 = rq();
 		if( $end ) t0.onreadystatechange = function(){
 			if( t0.readyState != 4 || t1 < 0 ) return;
-			t0.onreadystatechange = null, clearTimeout( t1 ), t1 = -1, $end( t0.status == 200 || t0.status == 0 ? t0.responseText : '@'+t0.status );
+			t0.onreadystatechange = null, clearTimeout( t1 ), t1 = -1, $end( t0.status == 200 || t0.status == 0 ? t0.responseText : '@'+t0.status, t0.getAllResponseHeaders() );
 		}, t1 = setTimeout( function(){if( t1 > -1 ) t1 = -1, t0.onreadystatechange = null, $end( '@timeout' );}, timeout );
 		t0.open( $type, $url, $end ? true : false ),
 		t0.setRequestHeader( 'Content-Type', ( $type == 'GET' ? 'text/plain' : 'application/x-www-form-urlencoded' ) + 'charset=UTF-8' ),
