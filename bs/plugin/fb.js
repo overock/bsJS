@@ -9,7 +9,13 @@ bs.$register( 'static', 'fb', (function(){
 		while( i < j ) t0[i] = fb.res[arguments[i]], i++;
 		return t0;
 	};
-	if( document ){
+	if( bs.site ){
+		fb.authUrl = function( $appid, $redirect ){
+			return 'http://www.facebook.com/dialog/oauth?client_id='+$appid+'&redirect_uri='+$redirect;
+		},
+		fb.token = function( $str ){
+		}
+	}else{
 		fb.start = function( $appid, $conn, $disconn, $clear ){
 			var res, logined;
 			res = function( $res ){
@@ -34,12 +40,6 @@ bs.$register( 'static', 'fb', (function(){
 			if( !bs.WIN.is( '#facebook-jssdk' )	) bs.$js( function(){}, '//connect.facebook.net/en_US/all.js' );
 		},
 		fb.login = function(){FB.login();}, fb.logout = function(){FB.logout();};
-	}else if( __dirname ){
-		fb.authUrl = function( $appid, $redirect ){
-			return 'http://www.facebook.com/dialog/oauth?client_id='+$appid+'&redirect_uri='+$redirect;
-		},
-		fb.token = function( $str ){
-		}
 	}
 	return fb;
 })(), 1.0 );
