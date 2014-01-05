@@ -199,7 +199,8 @@ bs.$method( 'crypt', (function(){
 			get:function( $k ){return getData[$k];},
 			post:function( $k ){return postData[$k];},
 			file:function( $k ){return postFile[$k];},
-			data:function( $k, $v ){return $v === undefined ? data[$k] : data[$k] = $v;}
+			data:function( $k, $v ){return $v === undefined ? data[$k] : data[$k] = $v;},
+			redirect:function( $url ){rp.writeHead( 301, {Location:$url} ), rp.end();}
 		};
 	})() ),
 	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};

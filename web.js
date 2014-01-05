@@ -13,10 +13,11 @@ bs.$importer( function(){
 				'secret', '528687bfaef64539a2be45a9c52ab95f',
 				'redirect', 'http://js.bsplugin.com/FB/',
 				'login', function( $data ){
-					console.log( 'login', $data );
+					bs.dom('#login').$( 'html', '<img src="' + $data.url +'"><a href="' + $data.link + '" target="_blank">' + $data.name + '</a>' );
 				},
-				'logout', function( $mode, $data ){
-					console.log( 'fb_logout', $mode, $data );
+				'logout', function( $data ){
+					bs.dom('#login').$( 'html', '<a href="'+ $data + '" target="_blank">login</a>' );
+					console.log( 'fb_logout', $data );
 				}
 			);
 		}

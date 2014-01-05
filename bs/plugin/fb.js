@@ -19,10 +19,9 @@ if( bs.site ){
 		},
 		$fn.start = function( $code ){
 			if( this.token || bs.$ck( this.ck ) || ( $token = bs.WEB.request('access_token') ) ) this.profile( $token );
-			else if( $code || ( $code = bs.WEB.request('code') ) ) this.logout( 'access', 'https://graph.facebook.com/oauth/access_token?client_id='+this.appid+
+			else if( $code || ( $code = bs.WEB.request('code') ) ) bs.WEB.redirect( 'https://graph.facebook.com/oauth/access_token?client_id='+this.appid+
 				'&redirect_uri='+this.redirect+'&client_secret='+this.secret+'&code='+$code );
-			else this.logout( 'oauth', 'http://www.facebook.com/dialog/oauth/?client_id=' + this.appid + '&redirect_uri=' + this.redirect );
-				
+			else this.logout( 'http://www.facebook.com/dialog/oauth/?client_id=' + this.appid + '&redirect_uri=' + this.redirect );
 		},
 		$fn.profile = function( $token ){
 			var t0, self;
