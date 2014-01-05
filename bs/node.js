@@ -253,7 +253,7 @@ bs.$method( 'crypt', (function(){
 			},
 			router = function(){
 				var t0, i;
-				if( retry && self.config ) require( bs.$path( self.config )+'.js' )( bs );
+				if( retry && self.config ) new Function( 'bs', f( bs.$path( self.config+'.js' ) ) )(bs);
 				t0 = self.rulesArr, i = t0.length;
 				while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, ( next = nextstep )();
 				err( 500, '<h1>server error</h1><div>Error: no matched rules '+path+file );

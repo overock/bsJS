@@ -1,3 +1,2 @@
-module.exports = function( bs ){
-	
-};
+bs.fb('a').start();
+console.log('config');

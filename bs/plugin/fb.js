@@ -18,16 +18,17 @@ if( bs.site ){
 			}
 		},
 		$fn.start = function( $code ){
-			if( this.token || bs.$ck( this.ck ) || ( $token = bs.WEB.request('access_token') ) ) this.profile( $token );
-			else if( $code || ( $code = bs.WEB.request('code') ) ) bs.WEB.redirect( 'https://graph.facebook.com/oauth/access_token?client_id='+this.appid+
-				'&redirect_uri='+this.redirect+'&client_secret='+this.secret+'&code='+$code );
-			else this.logout( 'http://www.facebook.com/dialog/oauth/?client_id=' + this.appid + '&redirect_uri=' + this.redirect );
+			console.log('f1');
+			if( this.token || bs.$ck( this.ck ) || ( $token = bs.WEB.request('access_token') ) ) this.profile( $token ), console.log('f2');
+			else if( $code = bs.WEB.request('code') ) bs.WEB.redirect( 'https://graph.facebook.com/oauth/access_token?client_id='+this.appid+
+				'&redirect_uri='+bs.$escape( this.redirect )+'&client_secret='+this.secret+'&code='+$code ), console.log('f3');
+			else this.logout( 'http://www.facebook.com/dialog/oauth/?client_id=' + this.appid + '&redirect_uri=' + bs.$escape( this.redirect ) ), console.log('f4');
 		},
 		$fn.profile = function( $token ){
 			var t0, self;
 			self = this;
 			bs.$get( function( $data ){
-				if( !$data ) $disconn( 'http://www.facebook.com/dialog/oauth/?client_id=' + self.appid + '&redirect_uri=' + self.redirect );
+				if( !$data ) $disconn( 'http://www.facebook.com/dialog/oauth/?client_id=' + self.appid + '&redirect_uri=' + bs.$escape( this.redirect ) );
 				t0 = JSON.parse( $data ),
 				bs.$get( function( $data ){
 					bs.$ck( self.ck, self.token = $token ), t0.url = JSON.parse( $data ).data.url, self.login( t0 );

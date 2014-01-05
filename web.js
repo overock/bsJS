@@ -11,12 +11,12 @@ bs.$importer( function(){
 			bs.fb( 'a' ).$(
 				'appid', '617106348337323',
 				'secret', '528687bfaef64539a2be45a9c52ab95f',
-				'redirect', 'http://js.bsplugin.com/FB/',
+				'redirect', 'http://js.bsplugin.com/',
 				'login', function( $data ){
-					bs.dom('#login').$( 'html', '<img src="' + $data.url +'"><a href="' + $data.link + '" target="_blank">' + $data.name + '</a>' );
+					bs.WEB.data( 'login', "bs.dom('#login').$( 'html', '<img src=\"" + $data.url +"\"><a href=\"" + $data.link + "\" target=\"_blank\">" + $data.name + "</a>" );
 				},
 				'logout', function( $data ){
-					bs.dom('#login').$( 'html', '<a href="'+ $data + '" target="_blank">login</a>' );
+					bs.WEB.data( 'login', "bs.dom('#login').$( 'html', '<a href=\""+ $data + "\" target=\"_blank\">login</a>' );" );
 					console.log( 'fb_logout', $data );
 				}
 			);
@@ -24,12 +24,11 @@ bs.$importer( function(){
 	);
 	bs.site( 'bsplugin' ).router(
 		'', [
-			'static', '/head.html',
+			'template', '/head.html',
 			'script', '@.js',
 			'template', '@.html',
 			'static','/foot.html'
 		],
-		'FB', ['function', [bs.fb('a'),'start']],
 		'json', ['require', '@']
 	);
 	bs.site('bsplugin').start();
