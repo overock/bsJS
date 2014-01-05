@@ -200,7 +200,10 @@ bs.$method( 'crypt', (function(){
 			post:function( $k ){return postData[$k];},
 			file:function( $k ){return postFile[$k];},
 			data:function( $k, $v ){return $v === undefined ? data[$k] : data[$k] = $v;},
-			redirect:function( $url ){rp.writeHead( 301, {Location:$url} ), rp.end();}
+			redirect:function( $url, $isClient ){
+				if( $isClient ) rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( '<script>location.href="' + $url + '";</script>');
+				else rp.writeHead( 301, {Location:$url} ), rp.end();
+			}
 		};
 	})() ),
 	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};
