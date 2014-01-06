@@ -18,11 +18,12 @@ if( bs.site ){
 			}
 		},
 		$fn.start = function( $code ){
-			console.log('f1',bs.WEB.get('code'),'::::');
-			if( this.token || bs.$ck( this.ck ) || ( $token = bs.WEB.request('access_token') ) ) this.profile( $token ), console.log('f2');
-			else if( $code = bs.WEB.get('code') ) bs.WEB.redirect( 'https://graph.facebook.com/oauth/access_token?client_id='+this.appid+
-				'&redirect_uri='+bs.$escape( this.redirect )+'&client_secret='+this.secret+'&code='+$code, 1 ), console.log('f3');
-			else this.logout( 'http://www.facebook.com/dialog/oauth/?client_id=' + this.appid + '&redirect_uri=' + bs.$escape( this.redirect ) ), console.log('f4');
+			if( this.token || bs.$ck( this.ck ) ) this.profile( $token );
+			else if( $code = bs.WEB.get('code') ) bs.$get( function( $data ){
+					this.profile( $data.split('&')[0].split('=')[1] );
+				}, 'https://graph.facebook.com/oauth/access_token?client_id='+this.appid+
+				'&redirect_uri='+bs.$escape( this.redirect )+'&client_secret='+this.secret+'&code='+$code );
+			else this.logout( 'http://www.facebook.com/dialog/oauth/?client_id=' + this.appid + '&redirect_uri=' + bs.$escape( this.redirect ) );
 		},
 		$fn.profile = function( $token ){
 			var t0, self;

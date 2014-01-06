@@ -203,7 +203,8 @@ bs.$method( 'crypt', (function(){
 			redirect:function( $url, $isClient ){
 				if( $isClient ) rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( '<script>location.href="' + $url + '";</script>');
 				else rp.writeHead( 301, {Location:$url} ), rp.end();
-			}
+			},
+			exit:function( $html ){rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( $html );}
 		};
 	})() ),
 	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};
@@ -227,7 +228,7 @@ bs.$method( 'crypt', (function(){
 			var self = this, router, nextstep, onData, file, path, currRule, idx;
 			this.form = new form.IncomingForm, this.form.encoding = 'utf-8', this.form.keepExtensions = true;
 			this.url = [], this.isStarted = 0,
-			this.mime = clone( mime ), this.index = 'index', this.config = 'config',
+			this.mime = clone( mime ), this.index = 'index', this.config = 'config.js',
 			this.fileMax = 2 * 1024 * 1024, this.postMax = .5 * 1024 * 1024,
 			this.rules = {};
 			this.request = function( $url, $rq, $rp ){
@@ -255,11 +256,20 @@ bs.$method( 'crypt', (function(){
 				postData = $data, postFile = $file, router();
 			},
 			router = function(){
-				var t0, i;
-				if( retry && self.config ) new Function( 'bs', f( bs.$path( self.config+'.js' ) ) )(bs);
-				t0 = self.rulesArr, i = t0.length;
-				while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, ( next = nextstep )();
-				err( 500, '<h1>server error</h1><div>Error: no matched rules '+path+file );
+				next = function(){
+					var t0, i;
+					t0 = self.rulesArr, i = t0.length;
+					while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, ( next = nextstep )();
+					err( 500, '<h1>server error</h1><div>Error: no matched rules '+path+file );
+				};
+				if( retry && self.config ){
+					switch( typeof self.config ){
+					case'string':if( new Function( 'bs', f( bs.$path( self.config ) ) )(bs) ) return; break;
+					case'function':if( self.config() ) return; break;
+					case'object':if( self.config.splice ){if( self.config[0][self.config[1]]() )return;}
+					}
+				}
+				next();
 			},
 			nextstep = function(){
 				var t0, i, j;
@@ -307,7 +317,8 @@ bs.$method( 'crypt', (function(){
 						if( this.url.indexOf( v[0] ) == -1 ) this.url.push( v[0], parseInt( v[1] || '8001' ) );
 						break;
 					case'root':this.root = bs.$path( v, 'root' ); break;
-					case'init':case'template':case'config':case'index':this[k] = v; break;
+					case'init':case'template':case'index':this[k] = v; break;
+					case'config':this[k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
 					case'upload':this.upload = bs.$path( v, 'root' ); break;
 					case'postMax':case'fileMax':this[k] = v * 1024 * 1024; break;
 					case'table':case'rules': for( t0 in v ) if( v.hasOwnProperty( t0 ) ) this['_'+k][t0] = v[t0]; break;
