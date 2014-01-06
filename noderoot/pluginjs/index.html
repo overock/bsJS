@@ -1,5 +1,53 @@
-<h1><%=$$.a%></h1>
-<% var i = 0;
-while( i++ < 20 ){%>
-	<div><%=i%></div>
+<%IMPORT( 'head.html' );%>
+
+<h1>projectBS - BSJS<br />Plugin</h1>
+<div id="personal">
+<%if( !bs.WEB.session('nick') ){%>
+	<div>email <input type="text" id="Lemail" /></div>
+	<div>pw <input type="password" id="Lpw" /></div>
+	<div><input type="button" id="Llogin" value="login" /> <input type="button" id="Ljoin" value="join" /></div>
+	<div id="Lalert"></div>
+<script>
+bs( function(){
+	bs.dom( '#Llogin' ).$( 'down', function( $e ){
+		var t0;
+		if( t0 = JSON.parse( bs.$get( null, '/login', 'email', bs.dom( '#Lemail' ).$('@value'), 'pw', bs.$md5( bs.dom( '#Lpw' ).$('@value') ) ) ) ){
+			if( t0.result == 'ok' ){
+				bs.dom( '#personal' ).$( 'html', 'logined' );
+				bs.dom( '#menuLogin' ).$( 'html', t0.contents.nick );
+			}else{
+				bs.dom( '#Lalert' ).$( 'html', 'loginFailed:'+ t0.contents );
+			}
+		}else{
+			bs.dom( '#Lalert' ).$( 'html', 'loginFailed: no response' );
+		}
+	} );
+	bs.dom( '#Ljoin' ).$( 'down', function( $e ){bs.$go( '/join' );} );
+} );
+</script>
 <%}%>
+</div>
+<div>
+	<h2>recently updated</h2>
+	<div><h3>title</h3><div>time</div></div>
+	<div><h3>title</h3><div>time</div></div>
+	<div><h3>title</h3><div>time</div></div>
+	<div><h3>title</h3><div>time</div></div>
+</div>
+<div>
+	<h2>new arrival</h2>
+	<div><h3>title</h3><div>thumb, contents</div><div>category, author, date</div></div>
+	<div><h3>title</h3><div>thumb, contents</div><div>category, author, date</div></div>
+	<div><h3>title</h3><div>thumb, contents</div><div>category, author, date</div></div>
+</div>
+<div>
+	<h2>most depended</h2>
+	<div><h3>title</h3><div>count</div></div>
+	<div><h3>title</h3><div>count</div></div>
+	<div><h3>title</h3><div>count</div></div>
+	<div><h3>title</h3><div>count</div></div>
+	<div>authors</div>
+</div>
+
+
+<%IMPORT( 'foot.html' );%>

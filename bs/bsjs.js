@@ -15,7 +15,7 @@ PLUGIN_REPO = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/';//'http://projectbs.g
 if( doc = W['document'] ) que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
 else if( __dirname ) node=require('./node'), module.exports = bs = function(f){bs.__root = f;return bs;};
 else throw new Error( 0, 'not supported platform' );
-bs.VERSION = VERSION = 0.2;
+bs.PLUGIN_REPO = PLUGIN_REPO, bs.VERSION = VERSION = 0.2;
 function error( $num, $msg ){if( doc ) throw new Error( $num, $msg ); else console.log( $num, $msg );}
 function dependency( $arg ){
 	var t0, i, j, k, v;

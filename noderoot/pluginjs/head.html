@@ -20,9 +20,11 @@
 <link href="/res/main.css" rel="stylesheet" media="screen">
 <!--<script type="text/javascript" src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>-->
 <script type="text/javascript" src="http://www.bsidesoft.com/bs/bs5/bs/bsjs.js"></script>
+<script>bs.$import( 'md5', 'last' );</script>
+<script type="text/javascript" src="/res/main.js"></script>
 <body>
 <div class="top"><div class="contents">
 	<div id="menu"><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>
-	<div id="login"><%=bs.WEB.session( 'nick' ) || ''%></div>
+	<div id="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( bs.WEB.session( 'nick' ) );%></div>
 </div></div>
 <div class="contents"><div class="middle">

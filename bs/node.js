@@ -105,16 +105,16 @@ bs.$method( 'crypt', (function(){
 				}
 				t0.on('error', function($e){$end( null, $e );}),
 				t0.end();
-			}else return bs.$file( $end, $url );
+			}else return bs.$file( $end && function($v){return $v.toString();}, bs.$path( $url.split('?')[0] ) ).toString();
 		};
 	})(),
-	bs.$method( 'get', function( $end, $path ){http( 'GET', $end, bs.$url( $path, arguments ) );} ),
-	bs.$method( 'post', function( $end, $path ){http( 'POST', $end, bs.$url($path), arguments );} ),
-	bs.$method( 'put', function( $end, $path ){http( 'PUT', $end, bs.$url($path), arguments );} ),
-	bs.$method( 'delete', function( $end, $path ){http( 'DELETE', $end, bs.$url($path), arguments );} );
+	bs.$method( 'get', function( $end, $path ){return http( 'GET', $end, bs.$url( $path, arguments ) );} ),
+	bs.$method( 'post', function( $end, $path ){return http( 'POST', $end, bs.$url($path), arguments );} ),
+	bs.$method( 'put', function( $end, $path ){return http( 'PUT', $end, bs.$url($path), arguments );} ),
+	bs.$method( 'delete', function( $end, $path ){return http( 'DELETE', $end, bs.$url($path), arguments );} );
 })( HTTP, URL ),
 (function( HTTP, URL ){
-	var form, mime, clone, portStart, sort, staticHeader, err,
+	var form, mime, clone, portStart, staticHeader, err,
 		sessionName, id, cookie, clientCookie, ckParser, next,
 		head, method, response, application, rq, rp, getData, postData, postFile, data;
 		
@@ -125,7 +125,6 @@ bs.$method( 'crypt', (function(){
 		for( k in $v )if( $v.hasOwnProperty( k ) ) t0[k] = $v[k];
 		return t0;
 	},
-	sort = function( a, b ){return a.length - b.length;},
 	staticHeader = {'Content-Type':0},
 	clientCookie = null,
 	ckParser = function(){
@@ -201,7 +200,7 @@ bs.$method( 'crypt', (function(){
 	})() ),
 	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};
 	bs.$class( 'site', function( $fn, bs ){
-		var ports, tEnd, f, runRule, defaultRouter, pass;
+		var ports, tEnd, f, runRule, defaultRouter, pass, sort;
 		ports = {},
 		portStart = function( $sites, $port ){
 			HTTP.createServer( function( $rq, $rp ){
@@ -231,7 +230,7 @@ bs.$method( 'crypt', (function(){
 			this.url = [], this.isStarted = 0, this.retry = 0,
 			this.mime = clone( mime ), this.index = 'index',
 			this.fileMax = 2 * 1024 * 1024, this.postMax = .5 * 1024 * 1024,
-			this.rules = {'':defaultRouter}, this.application = {},
+			this.rules = {'':defaultRouter}, this.application = {}, this.db = [],
 			this.request = function( $url, $rq, $rp ){
 				var t0, i, j;
 				rq = $rq, rp = $rp, site = $url.hostname, fileRoot[site] = self.root, getData = bs.$cgiparse( $url.query ), postData = postFile = null, path = $url.pathname.substr(1);
@@ -295,6 +294,17 @@ bs.$method( 'crypt', (function(){
 			};
 		},
 		$fn.router = function(){
+			/*			
+			bs.site( 'bsplugin' ).router(
+				'', [
+					'template', '/head.html',
+					'script', '@.js',
+					'template', '@.html',
+					'static','/foot.html'
+				],
+				'json', ['require', '@']
+			);
+			*/
 			var i, j, k, v;
 			i = 0, j = arguments.length;
 			while( i < j ){
@@ -314,6 +324,7 @@ bs.$method( 'crypt', (function(){
 					return null;
 				}else if( v !== undefined ){
 					switch( k ){
+					case'db': this.db[this.db.length] = v; break;
 					case'url':
 						v = v.split(':');
 						if( this.url.indexOf( v[0] ) == -1 ) this.url.push( v[0], parseInt( v[1] || '8001' ) );
@@ -323,7 +334,6 @@ bs.$method( 'crypt', (function(){
 					case'siteStart':case'pageStart':case'pageEnd':this[k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
 					case'upload':this.upload = bs.$path( v, 'root' ); break;
 					case'postMax':case'fileMax':this[k] = v * 1024 * 1024; break;
-					case'table':case'rules': for( t0 in v ) if( v.hasOwnProperty( t0 ) ) this['_'+k][t0] = v[t0]; break;
 					default:
 						if( k.charAt(0) == '.' ) this.mime[k.substr(1)] = v;
 					}
@@ -331,24 +341,26 @@ bs.$method( 'crypt', (function(){
 			}
 			return this[k];
 		},
+		sort = function( a, b ){return a.length - b.length;},
 		$fn.start = function(){
-			var domain, port, i, j;
+			var start, t0, self = this;
 			this.form.maxFieldsSize = this.postMax;
 			if( this.upload ) this.form.uploadDir = this.upload;
 			this.rulesArr = [];
 			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
 			this.rulesArr.sort( sort );
-			i = 0, j = this.url.length;
-			switch( typeof this.siteStart ){
-			case'string': new Function( 'bs', bs.$file( null, bs.$path( this.init, this.root ) ) )(bs); break;
-			case'function': this.siteStart(); break;
-			default:
-			}
-			while( i < j ){
-				domain = this.url[i++], port = this.url[i++];
-				if( !ports[port] ) portStart( ports[port] = [], port );
-				if( ports[port].indexOf( domain ) == -1 ) ports[port].push( domain, this );
-			}
+			start = function(){
+				var domain, port, i, j
+				i = 0, j = self.url.length;
+				runRule( self.siteStart );
+				while( i < j ){
+					domain = self.url[i++], port = self.url[i++];
+					if( !ports[port] ) portStart( ports[port] = [], port );
+					if( ports[port].indexOf( domain ) == -1 ) ports[port].push( domain, self );
+				}
+			};			
+			if( this.db.length ) t0 = this.db.slice(0), t0.unshift( start ), bs.$importdbc.apply( null, t0 );
+			else start();
 		},
 		$fn.stop = function(){
 			var domain, port, i, j;
@@ -362,78 +374,49 @@ bs.$method( 'crypt', (function(){
 	bs.site.load = function(){
 	};
 })( HTTP, URL );
-bs.$class( 'sql', function( $fn, bs ){
-	$fn.$ = function(){
-		var i, j, k, v, t0;
-		i = 0, j = arguments.length;
-		while( i < j ){
-			k = arguments[i++], v = arguments[i++];
-			if( v === undefined ) return this[k];
-			if( k == 'run' ){
-				t0 = v ? bs.$tmpl( this.query, v ) : this.query;
-				if( this.type == 'record' ) return bs.db( this.db ).$( 'record', t0, arguments[i++] );
-				return bs.db( this.db ).$( 'rs', t0, arguments[i++] );
-			}else this[k] = v;
-		}
-	};
-} ),
-bs.$class( 'db', (function(){
-	var db = {
-		mysql:(function(){
-			var d, mysql;
-			return d = function(){},
-			d.prototype.open = function(){
-				var t0;
-				t0 = this;
-				if( !this.__conn ) this.__conn = ( mysql || ( mysql = require( 'mysql' ) ) ).createConnection( this ),
-					this.__conn.on( 'error', function( $e ){if( $e.code === 'PROTOCOL_CONNECTION_LOST') t0._conn = null;} );
-				return this.__conn;
-			},
-			d.prototype.close = function(){this.__conn.destroy();},
-			d.prototype.$ = function( $arg ){
-				var t0, t1, i, j, k, v;
-				i = 0, j = $arg.length;
-				while( i < j ){
-					k = $arg[i++], v = $arg[i++];
-					if( k == null ){
-						if( this.__conn ) this.close();
-						return delete db[this.sel];
-					}
-					if( v === undefined ) return k == 'url' ? this.host + ':' + this.port :
-						k == 'id' ? this.user :
-						k == 'pw' ? this.password :
-						k == 'db' ? this.database :
-						k == 'open' ? this.open() :
-						k == 'close' ? this.close() :
-						k == 'rollback' ? this.__conn && this.__conn.rollback() :
-						k == 'commit' ? this.__conn && this.__conn.commit() : 0;
-					else switch( k ){
-						case'url':v = v.split(':'), this.host = v[0], this.port = v[1]; break;
-						case'id':this.user = v; break;
-						case'pw':this.password = v; break;
-						case'db':this.database = v; break;
-						default:
-							t0 = this.open();
-							switch( k ){
-							case'ex':return t0.query( v );
-							case'rs':return t1 = arguments[i++], t0.query( v, function( e, r ){e ? t1( null, e ) : t1( r );} );
-							case'record':return t1 = arguments[i++], t0.query( v ).on('result', function( r ){t1( r );} );
-							}
-							throw 1;
-					}
+(function(){
+	var type, i, db;
+	type = 'execute,recordset,stream'.split(','); for( i in type ) type[type[i]] = 1;
+	db = {};
+	bs.$method( 'importdbc', function( $end ){
+		var path, i, j, dbcnext, arg;
+		i = 1, j = arguments.length, path = bs.$import.path || bs.PLUGIN_REPO, arg = arguments,
+		( dbcnext = function(){i < j ? bs.$js( dbcnext, path + 'dbc_' + arg[i++]+'.js' ) : $end(); } )();
+	} ),
+	bs.$method( 'registerdbc', function( $name, $obj ){db[$name] = $obj;} ),
+	bs.$class( 'sql', function( $fn, bs ){
+		var key, i;
+		key = 'type,query'.split(','); for( i in key ) key[key[i]] = 1;
+		$fn.constructor = function(){this.type = 'recordset';},
+		$fn.$ = function(){
+			var i, j, k, v, t0;
+			i = 0, j = arguments.length;
+			while( i < j ){
+				k = arguments[i++], v = arguments[i++];
+				if( k === null ) return this.destroyer();
+				if( key[k] ){
+					if( v === undefined ) return this[k];
+					if( k != 'type' || type[v] ) this[k] = v;
 				}
-			}, d;
-		})()
-	};
-	return function( $fn, bs ){
-		$fn.constructor = function( $sel ){
-			var i, type;
-			if( i = $sel.indexOf( '@' ) ) $sel = $sel.substring( 0, i ), type = $sel.substr( i );
-			this.__db = new db[$type||'mysql'];
+			}
 		},
-		$fn.$ = function(){return this.__db.$( arguments );},
-		$fn.open = function(){return this.__db.open();},
-		$fn.close = function(){return this.__db.close();};
-	};
-})() );
+		$fn.run = function(){
+			var end, t0, i, j, k;
+			t0 = {}, i = 0, j = arguments.length;
+			while( i < j ) k = arguments[i++], typeof k == 'function' ? end = k : t0[k] = arguments[i++];
+			return bs.db( this.db ).$( this.type, bs.$tmpl( this.query, t0 ), end );
+		};
+	} ),
+	bs.$class( 'db', (function(){
+		return function( $fn, bs ){
+			$fn.constructor = function( $sel ){
+				$sel = $sel.split('@'), this.__db = new db[$sel[1]], $sel = $sel[0];
+			},
+			$fn.$ = function(){return this.__db.$( arguments );},
+			$fn.open = function(){return this.__db.open();},
+			$fn.close = function(){return this.__db.close();};
+		};
+	})() );
+})();
+
 };
