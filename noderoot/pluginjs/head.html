@@ -23,11 +23,6 @@
 <body>
 <div class="top"><div class="contents">
 	<div id="menu"><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>
-	<div id="login">login</div>
+	<div id="login"><%=bs.WEB.session( 'nick' ) || ''%></div>
 </div></div>
-<script>
-bs( function(){
-<%=$data.login%>
-} );
-</script>
 <div class="contents"><div class="middle">

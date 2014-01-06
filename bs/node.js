@@ -54,18 +54,10 @@ bs.$method( 'crypt', (function(){
 			if( $load ){
 				if( $data.charAt($data.length-1)=='=' ) $data += 'bs.__callback.'+(i='c'+(id++)), jc[i] = function(){delete jc[i],$end.apply(null,arguments);};
 				bs.$get( function( $v ){
-					try{
-						new Function( 'bs', $v )(bs);
-					}catch( $e ){
-						console.log( $e );
-					}
+					try{new Function( 'bs', $v )(bs);}catch( $e ){console.log( $e );}
 					$load();
 				}, $data );
-			}else try{
-				new Function( 'bs', $data )(bs);
-			}catch( $e ){
-				console.log( $e );
-			};
+			}else try{new Function( 'bs', $data )(bs);}catch( $e ){console.log( $e );};
 		};
 		return function( $end ){
 			var i, j, arg, load;
@@ -124,7 +116,7 @@ bs.$method( 'crypt', (function(){
 (function( HTTP, URL ){
 	var form, mime, clone, portStart, sort, staticHeader, err,
 		sessionName, id, cookie, clientCookie, ckParser, next,
-		head, method, response, rq, rp, getData, postData, postFile, data;
+		head, method, response, application, rq, rp, getData, postData, postFile, data;
 		
 	mime = require('./mime'), form = require( 'formidable' ),
 	clone = function( $v ){
@@ -209,7 +201,7 @@ bs.$method( 'crypt', (function(){
 	})() ),
 	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};
 	bs.$class( 'site', function( $fn, bs ){
-		var ports, tEnd, f, retry;
+		var ports, tEnd, f, runRule, defaultRouter, pass;
 		ports = {},
 		portStart = function( $sites, $port ){
 			HTTP.createServer( function( $rq, $rp ){
@@ -224,13 +216,22 @@ bs.$method( 'crypt', (function(){
 		},
 		f = function( $path ){return f[$path] || ( f[$path] = bs.$file( null, $path ).toString() );},
 		tEnd = function( $data ){bs.WEB.response( $data ), bs.WEB.next();},
+		runRule = function( $v ){
+			switch( typeof $v ){
+			case'string':return new Function( 'bs', f( bs.$path( $v ) ) )(bs);
+			case'function':return $v();
+			case'object':if( $v.splice ) return $v[0][$v[1]]();
+			}
+		},
+		defaultRouter = ['template', '@.html'],
+		pass = function(){process.nextTick( next );},
 		$fn.constructor = function(){
 			var self = this, router, nextstep, onData, file, path, currRule, idx;
 			this.form = new form.IncomingForm, this.form.encoding = 'utf-8', this.form.keepExtensions = true;
-			this.url = [], this.isStarted = 0,
-			this.mime = clone( mime ), this.index = 'index', this.config = 'config.js',
+			this.url = [], this.isStarted = 0, this.retry = 0,
+			this.mime = clone( mime ), this.index = 'index',
 			this.fileMax = 2 * 1024 * 1024, this.postMax = .5 * 1024 * 1024,
-			this.rules = {};
+			this.rules = {'':defaultRouter}, this.application = {},
 			this.request = function( $url, $rq, $rp ){
 				var t0, i, j;
 				rq = $rq, rp = $rp, site = $url.hostname, fileRoot[site] = self.root, getData = bs.$cgiparse( $url.query ), postData = postFile = null, path = $url.pathname.substr(1);
@@ -248,28 +249,25 @@ bs.$method( 'crypt', (function(){
 						return;
 					}
 				}
-				ckParser(), head.length = response.length = 0, data = {}, cookie = {}, retry = 1;
-				( method = $rq.method ) == 'GET' ? router() : form.parse( $rq, onData );
+				ckParser(), head.length = response.length = 0, data = {}, cookie = {}, application = this.application, this.retry = 1;
+				( method = $rq.method ) == 'GET' ? process.nextTick( router ) : form.parse( $rq, onData );
 			},
 			onData = function( $e, $data, $file ){
 				if( $e ) return err( 500, 'post Error' + $e );
 				postData = $data, postFile = $file, router();
 			},
 			router = function(){
-				next = function(){
-					var t0, i;
-					t0 = self.rulesArr, i = t0.length;
-					while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, ( next = nextstep )();
-					err( 500, '<h1>server error</h1><div>Error: no matched rules '+path+file );
-				};
-				if( retry && self.config ){
-					switch( typeof self.config ){
-					case'string':if( new Function( 'bs', f( bs.$path( self.config ) ) )(bs) ) return; break;
-					case'function':if( self.config() ) return; break;
-					case'object':if( self.config.splice ){if( self.config[0][self.config[1]]() )return;}
-					}
+				try{
+					next = function(){
+						var t0, i;
+						t0 = self.rulesArr, i = t0.length, next = nextstep;
+						while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, next();
+						err( 500, '<h1>server error</h1><div>Error: no matched rules '+path+file );
+					};
+					if( !runRule( self.pageStart ) ) pass();
+				}catch($e){
+					err( 500, '<h1>server error</h1><div>Error: '+$e+'</div>router' );
 				}
-				next();
 			},
 			nextstep = function(){
 				var t0, i, j;
@@ -279,17 +277,21 @@ bs.$method( 'crypt', (function(){
 						if( typeof j == 'string' ) j = j.replace( '@', file ), j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ), t0 = bs.$path( j );
 						switch( i ){
 						case'template':self.template( t0, f(t0), data, tEnd ); break;
-						case'static':bs.WEB.response( f(t0) ), nextstep(); break;
-						case'script':if( ! ( new Function( 'bs', f(t0) )(bs) ) ) nextstep(); break;
-						case'require':if( !require( t0 )(bs) ) nextstep(); break;
-						case'function':if( typeof j == 'function' ){if( !j() ) nextstep();}else if( j.splice ){if( !j[0][j[1]]() ) nextstep();}break;
-						default:nextstep();
+						case'static':bs.WEB.response( f(t0) ), pass(); break;
+						case'script':if( ! ( new Function( 'bs', f(t0) )(bs) ) ) pass(); break;
+						case'require':if( !require( t0 )(bs) ) pass(); break;
+						case'function':if( !runRule( j ) ) pass(); break;
+						default: pass();
 						}
+						return;
 					}catch($e){
-						if( retry-- ) head.length = response.length = 0, data = {}, cookie = {}, path = path + file + '/', file = self.index, router();
+						if( self.retry-- ) head.length = response.length = 0, data = {}, cookie = {}, path = path + file + '/', file = self.index, router();
 						else err( 500, '<h1>server error</h1><div>Error: '+$e+'</div>path: '+path+'<br>file: '+file+'<br>rule: '+i+'(idx:'+idx+')<br>target :'+j );
 					}
-				}else bs.WEB.flush();
+				}else{
+					next = bs.WEB.flush;
+					if( !runRule( self.pageEnd ) ) pass();
+				}
 			};
 		},
 		$fn.router = function(){
@@ -317,8 +319,8 @@ bs.$method( 'crypt', (function(){
 						if( this.url.indexOf( v[0] ) == -1 ) this.url.push( v[0], parseInt( v[1] || '8001' ) );
 						break;
 					case'root':this.root = bs.$path( v, 'root' ); break;
-					case'init':case'template':case'index':this[k] = v; break;
-					case'config':this[k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
+					case'template':case'index':this[k] = v; break;
+					case'siteStart':case'pageStart':case'pageEnd':this[k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
 					case'upload':this.upload = bs.$path( v, 'root' ); break;
 					case'postMax':case'fileMax':this[k] = v * 1024 * 1024; break;
 					case'table':case'rules': for( t0 in v ) if( v.hasOwnProperty( t0 ) ) this['_'+k][t0] = v[t0]; break;
@@ -337,9 +339,10 @@ bs.$method( 'crypt', (function(){
 			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
 			this.rulesArr.sort( sort );
 			i = 0, j = this.url.length;
-			switch( typeof this.init ){
+			switch( typeof this.siteStart ){
 			case'string': new Function( 'bs', bs.$file( null, bs.$path( this.init, this.root ) ) )(bs); break;
-			case'function': this.init(); break;
+			case'function': this.siteStart(); break;
+			default:
 			}
 			while( i < j ){
 				domain = this.url[i++], port = this.url[i++];

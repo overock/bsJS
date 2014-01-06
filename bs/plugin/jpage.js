@@ -20,10 +20,10 @@ bs.$register( 'method', 'jpage', (function(){
 		}
 		t1 = '';
 		if( $render ){
-			new Function( '$$R, $data', v )( function( $v ){t1 += $v, $render( $v );}, $data );
+			new Function( '$$R, $$, bs', v )( function( $v ){t1 += $v, $render( $v );}, $data, bs );
 			if( $end ) $end( t1 );
 		}else if( $end ){
-			new Function( '$$R, $data', v )( function( $v ){t1 += $v}, $data );
+			new Function( '$$R, $$, bs', v )( function( $v ){t1 += $v}, $data, bs );
 			$end( t1 );
 		}
 		return t0;
