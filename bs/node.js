@@ -1,5 +1,5 @@
 module.exports = function( bs ){
-var HTTP = require('http'), URL = require('url'), site, fileRoot = {};
+var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), site, fileRoot = {};
 bs.$method( 'os', (function(){
 	var os = require('os');
 	return function( $k ){return os[$k]();};
@@ -113,7 +113,7 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'put', function( $end, $path ){return http( 'PUT', $end, bs.$url($path), arguments );} ),
 	bs.$method( 'delete', function( $end, $path ){return http( 'DELETE', $end, bs.$url($path), arguments );} );
 })( HTTP, URL ),
-(function( HTTP, URL ){
+(function( HTTP, HTTPS, URL ){
 	var form, mime, clone, portStart, staticHeader, err,
 		sessionName, id, cookie, clientCookie, ckParser, next,
 		head, method, response, application, rq, rp, getData, postData, postFile, data;
@@ -202,15 +202,20 @@ bs.$method( 'crypt', (function(){
 	bs.$class( 'site', function( $fn, bs ){
 		var ports, tEnd, f, runRule, defaultRouter, pass, sort;
 		ports = {},
-		portStart = function( $sites, $port ){
-			HTTP.createServer( function( $rq, $rp ){
+		portStart = function( $https, $sites, $port ){
+			var rqListener;
+			rqListener = function( $rq, $rp ){
 				var t0, t1, i, j, k, v;
 				t0 = URL.parse( 'http://'+$rq.headers.host+$rq.url ), t1 = t0.hostname, i = 0, j = $sites.length;
 				while( i < j ){
 					k = $sites[i++], v = $sites[i++];
 					if( k == t1 ) v.request( t0, $rq, $rp );
 				}
-			} ).on('error', function($e){console.log($e);}).listen( $port );
+			};
+			if( $https )
+				HTTPS.createServer( $https, rqListener ).on('error', function($e){console.log($e);}).listen( $port );
+			else
+				HTTP.createServer( rqListener ).on('error', function($e){console.log($e);}).listen( $port );
 			console.log( $port + ' started' );
 		},
 		f = function( $path ){return f[$path] || ( f[$path] = bs.$file( null, $path ).toString() );},
@@ -324,6 +329,10 @@ bs.$method( 'crypt', (function(){
 					return null;
 				}else if( v !== undefined ){
 					switch( k ){
+					case'https':
+						v.key = f( bs.$path( v.key, 'root' ) ),
+						v.cert = f( bs.$path( v.cert, 'root' ) ),
+						this.https = v; break;
 					case'db': this.db[this.db.length] = v; break;
 					case'url':
 						v = v.split(':');
@@ -355,7 +364,7 @@ bs.$method( 'crypt', (function(){
 				runRule( self.siteStart );
 				while( i < j ){
 					domain = self.url[i++], port = self.url[i++];
-					if( !ports[port] ) portStart( ports[port] = [], port );
+					if( !ports[port] ) portStart( self.https, ports[port] = [], port );
 					if( ports[port].indexOf( domain ) == -1 ) ports[port].push( domain, self );
 				}
 			};			
@@ -373,7 +382,7 @@ bs.$method( 'crypt', (function(){
 	} );
 	bs.site.load = function(){
 	};
-})( HTTP, URL );
+})( HTTP, HTTPS, URL );
 (function(){
 	var type, i, db;
 	type = 'execute,recordset,stream'.split(','); for( i in type ) type[type[i]] = 1;
