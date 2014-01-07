@@ -330,8 +330,8 @@ bs.$method( 'crypt', (function(){
 				}else if( v !== undefined ){
 					switch( k ){
 					case'https':
-						v.key = f( bs.$path( v.key, 'root' ) ),
-						v.cert = f( bs.$path( v.cert, 'root' ) ),
+						v.key = f( bs.$path( v.sslkey, 'root' ) ),
+						v.cert = f( bs.$path( v.sslcert, 'root' ) ),
 						this.https = v; break;
 					case'db': this.db[this.db.length] = v; break;
 					case'url':

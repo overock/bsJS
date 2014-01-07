@@ -4,8 +4,8 @@ bs.$importer( function(){
 		/*'url', 'js.bsplugin.com',
 		'url', '192.168.56.101',*/
 		'https', {
-			key:'./key.pem',
-			cert:'./cert.pem'
+			sslkey:'./key.pem',
+			sslcert:'./cert.pem'
 		},
 		'url', '127.0.0.1',
 		'root', './noderoot/pluginjs/',
