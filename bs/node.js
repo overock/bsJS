@@ -239,7 +239,7 @@ bs.$method( 'crypt', (function(){
 				else{
 					if( i = path.lastIndexOf( '/' ) + 1 ) file = path.substr( i ), path = path.substring( 0, i );
 					else file = path, path = '';
-					if( ( i = file.indexOf( '.' ) ) > -1 ){
+					if( ( i = file.indexOf( '.' ) ) > -1 && file.charAt(0) != '@' ){
 						if( t0 = self.mime[file.substr( i + 1 )] ) bs.$stream( bs.$path( path+file ),
 								function(){$rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe( $rp );},
 								function( $e ){err( 404, 'no file<br>'+path+file);}
@@ -277,7 +277,7 @@ bs.$method( 'crypt', (function(){
 						switch( i ){
 						case'template':self.template( t0, f(t0), data, tEnd ); break;
 						case'static':bs.WEB.response( f(t0) ), pass(); break;
-						case'script':if( ! ( new Function( 'bs', f(t0) )(bs) ) ) pass(); break;
+						case'script':if( !( new Function( 'bs', f(t0) )(bs) ) ) pass(); break;
 						case'require':if( !require( t0 )(bs) ) pass(); break;
 						case'function':if( !runRule( j ) ) pass(); break;
 						default: pass();
@@ -386,7 +386,7 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'registerdbc', function( $name, $obj ){db[$name] = $obj;} ),
 	bs.$class( 'sql', function( $fn, bs ){
 		var key, i;
-		key = 'type,query'.split(','); for( i in key ) key[key[i]] = 1;
+		key = 'db,type,query'.split(','); for( i in key ) key[key[i]] = 1;
 		$fn.constructor = function(){this.type = 'recordset';},
 		$fn.$ = function(){
 			var i, j, k, v, t0;
