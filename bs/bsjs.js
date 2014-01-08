@@ -11,7 +11,7 @@
 'use strict';
 var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
-PLUGIN_REPO = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/';//'http://projectbs.github.io/bsJS/bs/plugin/'
+PLUGIN_REPO = 'http://projectbs.github.io/bsJS/bs/plugin/';//'http://projectbs.github.io/bsJS/bs/plugin/'//http://www.bsidesoft.com/bs/bs5/bs/plugin/
 if( doc = W['document'] ) que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
 else if( __dirname ) node=require('./node'), module.exports = bs = function(f){bs.__root = f;return bs;};
 else throw new Error( 0, 'not supported platform' );
@@ -38,7 +38,7 @@ function method( $name, $func, $version/*, $dependency*/ ){
 method( 'timeout', function( $time ){timeout = parseInt( $time * 1000 );} ),
 method( 'method', method ),
 method( 'del', function(){
-	var i, j;
+	var i, j, k;
 	i = 0, j = arguments.length;
 	while( i < j ){
 		k = arguments[i++];
