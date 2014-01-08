@@ -11,7 +11,7 @@
 'use strict';
 var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
-PLUGIN_REPO = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/';//'http://projectbs.github.io/bsJS/bs/plugin/'
+PLUGIN_REPO = 'http://projectbs.github.io/bsJS/bs/plugin/';//'http://projectbs.github.io/bsJS/bs/plugin/'//http://www.bsidesoft.com/bs/bs5/bs/plugin/
 if( doc = W['document'] ) que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
 else if( __dirname ) node=require('./node'), module.exports = bs = function(f){bs.__root = f;return bs;};
 else throw new Error( 0, 'not supported platform' );
@@ -38,7 +38,7 @@ function method( $name, $func, $version/*, $dependency*/ ){
 method( 'timeout', function( $time ){timeout = parseInt( $time * 1000 );} ),
 method( 'method', method ),
 method( 'del', function(){
-	var i, j;
+	var i, j, k;
 	i = 0, j = arguments.length;
 	while( i < j ){
 		k = arguments[i++];
@@ -49,7 +49,7 @@ method( 'class', (function(){
 	function factory( $name, $func ){
 		var cls, fn, t0, k;
 		$func( t0 = {}, bs ), cls = function( $sel ){this.__new( this.__k = $sel );}, fn = cls.prototype, fn.__new = none, fn.destroyer = function(){delete cls[this.__k];};
-		if( typeof $func == 'function' ){for( k in t0 ) if( t0.hasOwnProperty( k ) ) k == 'constructor' ? ( fn.__new = t0.constructor ) : ( fn[k] = t0[k] );}
+		if( typeof $func == 'function' ){for( k in t0 ) if( t0.hasOwnProperty( k ) ) k == '$constructor' ? ( fn.__new = t0.$constructor ) : ( fn[k] = t0[k] );}
 		return fn.instanceOf = bs[$name] = function( $sel ){
 			var t0;
 			if( typeof $sel == 'string' ){
@@ -612,7 +612,7 @@ function DOM(){
 		else add = function( $k, $v ){sheet.addRule( $k, $v||' ' );return ruleSet[ruleSet.length - 1];},
 			del = function( $v ){sheet.removeRule( idx( $v ) );};
 		rule = function( $rule ){this.r = $rule, this.s = new style( $rule );},
-		$fn.constructor = function( $key ){
+		$fn.$constructor = function( $key ){
 			var t0, v;
 			if( $key.indexOf('@') > -1 ){
 				$key = $key.split('@');
@@ -669,7 +669,7 @@ function DOM(){
 		var dom, ds, ds0, ev, t, x, y, nodes, drill, childNodes,
 			win, wine, hash, sizer;
 		t = /^\s*|\s*$/g, dom = bs.$dom,
-		$fn.constructor = function( $key ){
+		$fn.$constructor = function( $key ){
 			var t0, i;
 			t0 = dom( $key ), this.length = i = t0.length;
 			while( i-- ) this[i] = t0[i];

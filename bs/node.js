@@ -227,7 +227,7 @@ bs.$method( 'crypt', (function(){
 		},
 		defaultRouter = ['template', '@.html'],
 		pass = function(){process.nextTick( next );},
-		$fn.constructor = function(){
+		$fn.$constructor = function(){
 			var self = this, router, nextstep, onData, file, path, currRule, idx;
 			this.form = new form.IncomingForm, this.form.encoding = 'utf-8', this.form.keepExtensions = true;
 			this.url = [], this.isStarted = 0, this.retry = 0,
@@ -394,7 +394,7 @@ bs.$method( 'crypt', (function(){
 	bs.$class( 'sql', function( $fn, bs ){
 		var key, i;
 		key = 'db,type,query'.split(','); for( i in key ) key[key[i]] = 1;
-		$fn.constructor = function(){this.type = 'recordset';},
+		$fn.$constructor = function(){this.type = 'recordset';},
 		$fn.$ = function(){
 			var i, j, k, v, t0;
 			i = 0, j = arguments.length;
@@ -416,7 +416,7 @@ bs.$method( 'crypt', (function(){
 	} ),
 	bs.$class( 'db', (function(){
 		return function( $fn, bs ){
-			$fn.constructor = function( $sel ){
+			$fn.$constructor = function( $sel ){
 				$sel = $sel.split('@'), this.__db = new db[$sel[1]], $sel = $sel[0];
 			},
 			$fn.$ = function(){return this.__db.$( arguments );},

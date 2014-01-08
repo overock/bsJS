@@ -26,7 +26,7 @@ if( bs.site ){
 		key = 'login,logout,appid,secret,redirect'.split(',');
 		i = key.length;
 		while( i-- ) key[key[i]] = 1;
-		$fn.constructor = function( $sel ){this.ck = 'fbatk_' + $sel;},
+		$fn.$constructor = function( $sel ){this.ck = 'fbatk_' + $sel;},
 		$fn.$ = function(){
 			var i, j, k, v;
 			i = 0, j = arguments.length;
