@@ -1,13 +1,9 @@
 var bs = require( './bs/bsjs' )( __dirname );
 bs.$importer( function(){
 	bs.site( 'bsplugin' ).$(
-		/*'url', 'js.bsplugin.com',
-		'url', '192.168.56.101',*/
-		'https', {
-			sslkey:'./key.pem',
-			sslcert:'./cert.pem'
-		},
-		'url', '127.0.0.1',
+		'url', 'js.bsplugin.com',
+		'url', '192.168.56.101',
+		'https', {key:'./key.pem',cert:'./cert.pem'},
 		'root', './noderoot/pluginjs/',
 		'db', 'mysql',
 		'template', function( $url, $template, $data, $end ){

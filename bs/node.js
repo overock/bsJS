@@ -212,10 +212,8 @@ bs.$method( 'crypt', (function(){
 					if( k == t1 ) v.request( t0, $rq, $rp );
 				}
 			};
-			if( $https )
-				HTTPS.createServer( $https, rqListener ).on('error', function($e){console.log($e);}).listen( $port );
-			else
-				HTTP.createServer( rqListener ).on('error', function($e){console.log($e);}).listen( $port );
+			if( $https ) HTTPS.createServer( $https, rqListener ).on('error', function($e){console.log($e);}).listen( $port );
+			else HTTP.createServer( rqListener ).on('error', function($e){console.log($e);}).listen( $port );
 			console.log( $port + ' started' );
 		},
 		f = function( $path ){return f[$path] || ( f[$path] = bs.$file( null, $path ).toString() );},
@@ -329,10 +327,7 @@ bs.$method( 'crypt', (function(){
 					return null;
 				}else if( v !== undefined ){
 					switch( k ){
-					case'https':
-						v.key = f( bs.$path( v.sslkey, 'root' ) ),
-						v.cert = f( bs.$path( v.sslcert, 'root' ) ),
-						this.https = v; break;
+					case'https':this.https = v; break;
 					case'db': this.db[this.db.length] = v; break;
 					case'url':
 						v = v.split(':');
@@ -359,12 +354,15 @@ bs.$method( 'crypt', (function(){
 			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
 			this.rulesArr.sort( sort );
 			start = function(){
-				var domain, port, i, j
+				var domain, port, i, j, https;
+				https = {},
+				https.key = f( bs.$path( self.https.key, self.root ) ),
+				https.cert = f( bs.$path( self.https.cert, self.root ) ),
 				i = 0, j = self.url.length;
 				runRule( self.siteStart );
 				while( i < j ){
 					domain = self.url[i++], port = self.url[i++];
-					if( !ports[port] ) portStart( self.https, ports[port] = [], port );
+					if( !ports[port] ) portStart( https, ports[port] = [], port );
 					if( ports[port].indexOf( domain ) == -1 ) ports[port].push( domain, self );
 				}
 			};			
