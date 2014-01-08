@@ -1,246 +1,142 @@
 module.exports = function( bs ){
-	var HTTP = require('http'), site;
-	bs.$class( 'sql', function( $fn, bs ){
-		$fn.$ = function(){
-			var i, j, k, v, t0;
-			i = 0, j = arguments.length;
-			while( i < j ){
-				k = arguments[i++], v = arguments[i++];
-				if( v === undefined ) return this[k];
-				if( k == 'run' ){
-					t0 = v ? bs.$tmpl( this.query, v ) : this.query;
-					if( this.type == 'record' ) return bs.db( this.db ).$( 'record', t0, arguments[i++] );
-					return bs.db( this.db ).$( 'rs', t0, arguments[i++] );
-				}else this[k] = v;
-			}
-		};
-	} ),
-	bs.$class( 'db', (function(){
-		var db = {
-			mysql:(function(){
-				var d, mysql;
-				return d = function(){},
-				d.prototype.open = function(){
-					var t0;
-					t0 = this;
-					if( !this.__conn ) this.__conn = ( mysql || ( mysql = require( 'mysql' ) ) ).createConnection( this ),
-						this.__conn.on( 'error', function( $e ){if( $e.code === 'PROTOCOL_CONNECTION_LOST') t0._conn = null;} );
-					return this.__conn;
-				},
-				d.prototype.close = function(){this.__conn.destroy();},
-				d.prototype.$ = function( $arg ){
-					var t0, t1, i, j, k, v;
-					i = 0, j = $arg.length;
-					while( i < j ){
-						k = $arg[i++], v = $arg[i++];
-						if( k == null ){
-							if( this.__conn ) this.close();
-							return delete db[this.sel];
-						}
-						if( v === undefined ) return k == 'url' ? this.host + ':' + this.port :
-							k == 'id' ? this.user :
-							k == 'pw' ? this.password :
-							k == 'db' ? this.database :
-							k == 'open' ? this.open() :
-							k == 'close' ? this.close() :
-							k == 'rollback' ? this.__conn && this.__conn.rollback() :
-							k == 'commit' ? this.__conn && this.__conn.commit() : 0;
-						else switch( k ){
-							case'url':v = v.split(':'), this.host = v[0], this.port = v[1]; break;
-							case'id':this.user = v; break;
-							case'pw':this.password = v; break;
-							case'db':this.database = v; break;
-							default:
-								t0 = this.open();
-								switch( k ){
-								case'ex':return t0.query( v );
-								case'rs':return t1 = arguments[i++], t0.query( v, function( e, r ){e ? t1( null, e ) : t1( r );} );
-								case'record':return t1 = arguments[i++], t0.query( v ).on('result', function( r ){t1( r );} );
-								}
-								throw 1;
-						}
-					}
-				}, d;
-			})()
-		};
-		return function( $fn, bs ){
-			$fn.constructor = function( $sel ){
-				var i, type;
-				if( i = $sel.indexOf( '@' ) ) $sel = $sel.substring( 0, i ), type = $sel.substr( i );
-				this.__db = new db[$type||'mysql'];
-			},
-			$fn.$ = function(){return this.__db.$( arguments );},
-			$fn.open = function(){return this.__db.open();},
-			$fn.close = function(){return this.__db.close();};
-		};
-	})() );
-	bs.$method( 'os', (function(){
-		var os = require('os');
-		return function( $k ){return os[$k]();};
-	})() ),
-	bs.$method( 'cgi', function( $arg ){
-		var h, t0, i, j;
-		if( !$arg || ( j = $arg.length ) < 4 ) return '';
-		h = bs.$cgi.header, t0 = bs.$cgi.temp;
-		h.length = t0.length = 0, i = 2;
-		while( i < j )
-			if ( $arg[i].charAt(0) == '@' ) h[h.length] = $arg[i++].substr(1), h[h.length] = $arg[i++];
-			else t0[t0.length] = encodeURIComponent( $arg[i++] ) + '=' + encodeURIComponent( $arg[i++] );
-		return t0.join('&');
-	}),
-	bs.$cgi.header = [], bs.$cgi.temp = [],
-	/*bs.$method( 'url', (function(){
-		var url = require('url');
-		return function( $url ){return url.parse( $url );};
-	})() ),*/
-	(function(){
-		var query = require('querystring');
-		bs.$method( 'escape', function( $val ){return query.escape( $val );} ),
-		bs.$method( 'unescape', function( $val ){return query.unescape( $val );} ),
-		bs.$method( 'cgiParse', function( $val ){return query.parse( $val );} ),
-		bs.$method( 'cgiStringify', function( $val ){return query.stringify( $val );} );
-	})();
-	bs.$method( 'crypt', (function(){
-		var crypto = require('crypto');
-		return function( $type, $v ){
-			var t0;
-			switch( $type ){
-			case'sha256': return t0 = crypto.createHash('sha256'), t0.update( $v ), t0.digest('hex');
-			}
-		};
-	})() ),
-	(function( HTTP ){
-		var fs, p, url, path, http;
-		fs = require('fs'), p = require('path'), url = require('url'),
-		path = {},
-		bs.$method( 'path', function( $path, $context ){
-			var t0;
-			if( $context == 'bs' ) t0 = bs.__root;
-			else if( $context ) t0 = path[$context];
-			else t0 = path[site];
-			return p.resolve( t0, $path );
-		} );
-		bs.$method( 'stream', function( $path ){ //파일스트림을 출력한다.
-		} ),
-		function convert( $arg ){
-			var t0, i, j;
-			t0 = {}, i = 0, j = $arg.length;
-			while( i < j )
-				if( typeof $arg[i] == 'string' && $arg[i].charAt(0) != '@' ) t0[$arg[i++]] = $arg[i++];
-				else i++, i++;
-			return t0;
+var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), site, fileRoot = {};
+bs.$method( 'os', (function(){
+	var os = require('os');
+	return function( $k ){return os[$k]();};
+})() ),
+(function(){
+	var query = require('querystring');
+	bs.$method( 'escape', function( $val ){return query.escape( $val );} ),
+	bs.$method( 'unescape', function( $val ){return query.unescape( $val );} ),
+	bs.$method( 'cgiparse', function( $val ){return query.parse( $val );} ),
+	bs.$method( 'cgistringify', function( $val ){return query.stringify( $val );} );
+})();
+bs.$method( 'crypt', (function(){
+	var crypto = require('crypto');
+	return function( $type, $v ){
+		var t0;
+		switch( $type ){
+		case'sha256': return t0 = crypto.createHash('sha256'), t0.update( $v ), t0.digest('hex');
 		}
-		http = (function(){
-			var htop;
-			htop = {};
-			return function( $type, $end, $url, $arg ){
-				var t0, t1, response;
+	};
+})() ),
+(function( HTTP, URL ){
+	var fs, p, http, arr2obj;
+	fs = require('fs'), p = require('path'),
+	bs.$method( 'path', function( $path, $context ){
+		var t0;
+		if( $path.substr(0,5) == 'http:' || $path.substr(0,5) == 'https:' ) return $path;
+		if( $context == 'root' ){
+			if( !(t0 = bs.__root) ) throw new Error('Root is not set');
+		}else if( $context ) t0 = $context;
+		else t0 = fileRoot[site];
+		return p.resolve( t0, $path );
+	} );
+	bs.$method( 'stream', function( $path, $open, $err ){ //파일스트림을 출력한다.
+		var t0;
+		if( !fs.existsSync( $path ) ){
+			if( $err ) $err();
+			return null;
+		}
+		t0 = fs.createReadStream( $path );
+		if( $open ) t0.once( 'open', $open );
+		if( $err ) t0.once( 'error', $err );
+		return t0;
+	} ),
+	bs.$method( 'file', function( $end, $path, $v, $opition ){ //파일처리
+		if( !fs.existsSync( $path ) ) return null;
+		if( !$end ) return  fs.readFileSync( $path );
+		fs.readFile( $path, function( $e, $d ){return $end( $e || $d );});
+	} ),
+	bs.$method( 'js', (function(){
+		var js = function( $data, $load, $end ){
+			var t0, i;
+			if( $load ){
+				if( $data.charAt($data.length-1)=='=' ) $data += 'bs.__callback.'+(i='c'+(id++)), jc[i] = function(){delete jc[i],$end.apply(null,arguments);};
+				bs.$get( function( $v ){
+					try{new Function( 'bs', $v )(bs);}catch( $e ){console.log( $e );}
+					$load();
+				}, $data );
+			}else try{new Function( 'bs', $data )(bs);}catch( $e ){console.log( $e );};
+		};
+		return function( $end ){
+			var i, j, arg, load;
+			arg = arguments, i = 1, j = arg.length;
+			if( $end ) ( load = function(){i < j ? js( bs.$path( arg[i++] ), load, $end ) : $end();} )();
+			else while( i < j ) js( bs.$file( null, bs.$path( arg[i++] ) ) );
+		};
+	})() ),
+	arr2obj = function( $arg ){
+		var t0, i, j;
+		t0 = {}, i = 0, j = $arg.length;
+		while( i < j ) typeof $arg[i] == 'string' && $arg[i].charAt(0) != '@' ? t0[$arg[i++]] = $arg[i++] : i += 2;
+		return t0;
+	},
+	http = (function(){
+		var htop, maxSize;
+		htop = {},maxSize = 2 * 1024 * 1024;
+		return function( $type, $end, $url, $arg ){
+			var t0, t1, response;
+			if( $url.substr( 0, 5 ) == 'http:' || $url.substr( 0, 6 ) == 'https:' ){
 				if( !$end ) return console.log( 'http need callback!' ), null;
 				response = function( rs ){
 					var t0 = '';
-					rs.on( 'data', function($v){t0 += $v;} ),
-					rs.on( 'end', function(){$end(t0);t0='';} );
-				};
-				t0 = url.parse($url),
-				htop.hostname = t0.hostname,
-				htop.method = $type,
-				htop.port = t0.port,
-				htop.path = t0.path;
-				if( $type != 'GET' ){
-					bs.$cgi( $arg ),
-					t1 = bs.$cgiStringify( convert( $arg ) ),
-					htop.headers = convert( bs.$cgi.header ),
+					rs.on( 'data', function($v){
+						t0 += $v;
+						if( t0.length > maxSize ){
+							t0 = '', this.pause(), rs.writeHead(413), rs.end( 'Too Large' ), $end( null );
+						}
+					} ).on( 'end', function(){
+						if( !t0 ) rs.end(), $end( null );
+						else $end( t0, rs );t0='';
+					} );
+				},
+				t0 = URL.parse($url), htop.hostname = t0.hostname, htop.method = $type, htop.port = t0.port, htop.path = t0.path;
+				if( $type == 'GET' ){
+					htop.headers = arr2obj( bs.$cgi.header ),
+					t0 = HTTP.request( htop, response );
+				}else{
+					t1 = bs.$cgi( $arg ),
+					htop.headers = arr2obj( bs.$cgi.header ),
 					htop.headers['Content-Type'] = 'application/x-www-form-urlencoded',
 					htop.headers['Content-Length'] = Buffer.byteLength( t1 ),
 					t0 = HTTP.request( htop, response ),
 					t0.write( t1 );
-				}else{
-					htop.headers = convert( bs.$cgi.header ),
-					t0 = HTTP.request( htop, response );
 				}
 				t0.on('error', function($e){$end( null, $e );}),
 				t0.end();
-			};
-		})(),
-		bs.$method( 'get', function( $end, $path ){
-			var t0;
-			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'GET', $end, bs.$url( $path, arguments ) );
-			else{
-				if( !fs.existsSync( $path = bs.$path( $path ) ) ) return null;
-				if( !$end ) return  fs.readFileSync( $path );
-				fs.readFile( t0, function( $e, $d ){return $end( $e || $d );});
-			}
-		} ),
-		bs.$method( 'post', function( $end, $path ){
-			var t0;
-			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'POST', $end, $path, arguments );
-			else{
-				// TODO:파일등록
-			}
-		} ),
-		bs.$method( 'put', function( $end, $path ){
-			var t0;
-			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'PUT', $end, $path, arguments );
-			else{
-				// TODO:파일갱신
-			}
-		} ),
-		bs.$method( 'delete', function( $end, $path ){
-			var t0;
-			if( $path.substr( 0, 5 ) == 'http:' || $path.substr( 0, 6 ) == 'https:' ) http( 'DELETE', $end, $path, arguments );
-			else{
-				// TODO:파일삭제
-			}
-		} );
-	})( HTTP ),
-	(function(){
-		var http, form, sort, next, flush,
-			application,
-			session, sessionName, id,
-			cookie, clientCookie, ckParser,
-			head, response, rq, rp, getData, postData, postFile,
-			data, 
-			staticRoute, mimeTypes,
-			err;
-		form = require( 'formidable' ),
-		//base
-		sort = function( a, b ){return a = a.length, b = b.length, a > b ? 1 : a == b ? 0 : -1;},
-		bs.$next = function(){next();},
-		bs.$flush = flush = function(){
-			var t0, k;
-			for(k in cookie) head[head.length] = ['Set-Cookie', cookie[k]];
-			head.push( flush[0], flush[1], ( t0 = response.join(''), flush[2][1] = Buffer.byteLength( t0, 'utf8' ), flush[2] ) ),
-			rp.writeHead( 200, head ), rp.end( t0 );
-		},
-		flush[0] = ['Server', 'projectBS on node.js'],
-		flush[1] = ['Content-Type', 'text/html; charset=utf-8'],
-		flush[2] = ['Content-Length', 0],
-		//application
-		bs.$application = bs.$app = application = function( $k, $v ){return $v === undefined ? application[$k] : application[$k] = $v;},
-		//session
-		sessionName = '__bsNode', id = 0,
-		bs.$session = bs.$se = session = function( $k, $v ){
-			var t0;
-			t0 = bs.$ck( sessionName );
-			if( $v === undefined ){
-				if( t0 && ( t0 = session[t0] ) ) return t0[$k];
-			}else{
-				if( !t0 ) bs.$ck( '@'+sessionName, t0 = bs.$crypt( 'sha256', ''+bs.$ex( 1000,'~',9999 ) + (id++) + bs.$ex( 1000,'~',9999 ) ) );
-				if( !session[t0] ) session[t0] = {};
-				return session[t0][$k] = $v;
-			}
-		},
-		//cookie
-		clientCookie = null,
-		ckParser = function(){
-			var t0, t1, i;
-			clientCookie = {};
-			if( t0 = rq.headers.cookie ){
-				t0 = t0.split(';'), i = t0.length;
-				while( i-- ) t0[i] = bs.$trim( t0[i].split('=') ), clientCookie[t0[i][0]] = t0[i][1];
-			}
-		},
-		bs.$cookie = bs.$ck = function( $k, $v, $path, $expire, $domain ){
+			}else return bs.$file( $end && function($v){return $v.toString();}, bs.$path( $url.split('?')[0] ) ).toString();
+		};
+	})(),
+	bs.$method( 'get', function( $end, $path ){return http( 'GET', $end, bs.$url( $path, arguments ) );} ),
+	bs.$method( 'post', function( $end, $path ){return http( 'POST', $end, bs.$url($path), arguments );} ),
+	bs.$method( 'put', function( $end, $path ){return http( 'PUT', $end, bs.$url($path), arguments );} ),
+	bs.$method( 'delete', function( $end, $path ){return http( 'DELETE', $end, bs.$url($path), arguments );} );
+})( HTTP, URL ),
+(function( HTTP, HTTPS, URL ){
+	var form, mime, clone, portStart, staticHeader, err,
+		sessionName, id, cookie, clientCookie, ckParser, next,
+		head, method, response, application, rq, rp, getData, postData, postFile, data;
+		
+	mime = require('./mime'), form = require( 'formidable' ),
+	clone = function( $v ){
+		var t0, k;
+		t0 = {};
+		for( k in $v )if( $v.hasOwnProperty( k ) ) t0[k] = $v[k];
+		return t0;
+	},
+	staticHeader = {'Content-Type':0},
+	clientCookie = null,
+	ckParser = function(){
+		var t0, t1, i;
+		clientCookie = {};
+		if( t0 = rq.headers.cookie ){
+			t0 = t0.split(';'), i = t0.length;
+			while( i-- ) t0[i] = bs.$trim( t0[i].split('=') ), clientCookie[t0[i][0]] = t0[i][1];
+		}
+	},
+	bs.$method( 'ck', (function(){
+		return function( $k, $v, $path, $expire, $domain ){
 			var t0, t1;
 			if( $v === undefined ) return clientCookie[$k];
 			if( $k.charAt(0) == '@' ) t0 = 1, $k = $k.substr(1);
@@ -253,93 +149,283 @@ module.exports = function( bs ){
 			else if( $expire ) (t1 = new Date).setTime( t1.getTime() + $expire * 86400000 ),
 				t0 += ';expires=' + t1.toUTCString() + ';Max-Age=' + ( $expire * 86400 );
 			cookie[$k] = t0;
-		},
-		//head, request, response
+		};
+	})() );
+	bs.$static( 'WEB', (function(){
+		var flush;
 		head = [], response = [],
-		bs.$head = function( $k, $v ){head[head.length] = [$k, $v];},
-		bs.$method = function(){return rq.method.toLowerCase();},
-		bs.$request = bs.$rq = function( $k ){return $k ? rq[$k] : rq;},
-		bs.$requestGet = bs.$rqG = function( $k ){return getData[$k];},
-		bs.$requestPost = bs.$rqP = function( $k ){return postData[$k];},
-		bs.$requestFile = bs.$rqF = function( $k ){return postFile[$k];},
-		bs.$response = bs.$rp = function(){
-			var i, j;
-			for( i = 0, j = arguments.length ; i < j ; i++ ) response[response.length] = arguments[i];
-		},
-		//data
-		bs.$data = function( $k, $v ){return $v === undefined ? data[$k] : data[$k] = $v;},
-		//error
-		err = function( $code, $v ){rp.writeHead( $code, (staticRoute['Content-Type'] = 'text/html', staticRoute) ), rp.end( $v || '' );},
-		//route
-		staticRoute = {'Content-Type':0}, mimeTypes = require('./bsnode.mime.types'),
-		bs.$route = function( $data ){
-			var port, root, index, config, table, rules, rule, currRule, postForm, 
-				router, nextstep, fullPath, path, file, ext, log, idx, onData, k;
-			postForm = new form.IncomingForm,
-			postForm.encoding = 'utf-8',
-			postForm.keepExtensions = true;
-			if( $data.upload ) postForm.uploadDir = $data.upload;
-			if( $data.maxsize ) postForm.maxFieldsSize = parseInt( $data.maxsize * 1024 * 1024 );		
-			root = $data.root, index = $data.index || 'index.bs', config = $data.config ? root+'/'+$data.config : 0,
-			table = $data.table, rules = [], rule = $data.rules;
-			for( k in table ) table[k] = root+'/'+table[k];
-			for( k in rule ) rules[rules.length] = k;
-			rules.sort( sort ),
-			nextstep = function(){
-				var t0, i;
-				if( idx < currRule.length ){
-					i = currRule[idx++];
-					if( !require( 
-						log = i == 'absolute' ? root + '/' + currRule[idx++] :
-						i == 'relative' ? root + path + currRule[idx++] :
-						i == 'head' ? ( t0 = file.split('.'), root + path + currRule[idx++] + t0[0] + '.' + t0[1] ) :
-						i == 'tail' ? ( t0 = file.split('.'), root + path + t0[0] + currRule[idx++] + '.' + t0[1] ) :
-						i == 'url' ? root + path + file : 0
-					).bs( bs ) ) nextstep();
-				}else flush();
+		sessionName = '__bsNode', id = 0,
+		flush = {
+			0:['Server', 'projectBS on node.js'],
+			1:['Content-Type', 'text/html; charset=utf-8'],
+			2:['Content-Length', 0]
+		};
+		return {
+			next:function(){next();},
+			flush:function(){
+				var t0, k;
+				for(k in cookie) head[head.length] = ['Set-Cookie', cookie[k]];
+				head.push( flush[0], flush[1], ( t0 = response.join(''), flush[2][1] = Buffer.byteLength( t0, 'utf8' ), flush[2] ) ),
+				rp.writeHead( 200, head ), rp.end( t0 );
 			},
-			router = function(){
-				var t0, i;
-				try{
-					if( config ) require( log = config ).bs( bs );
-					if( t0 = table[fullPath] ) require( log = t0 ).bs( bs ), flush();
-					else{
-						i = rules.length;
-						while( i-- ) if( path.indexOf( rules[i] ) > -1 ) return currRule = rule[rules[i]], idx = 0, ( next = nextstep )();
-						throw 1;
-					}
-				}catch( $e ){
-					err( 500, '<h1>server error</h1><div>Error: '+$e+'</div><div>fullpath: '+fullPath+'<br>path: '+path+'<br>file: '+file+'<br>log: '+log +'</div>' );
+			application:function( $k, $v ){return $v === undefined ? application[$k] : application[$k] = $v;},
+			session:function( $k, $v ){
+				var t0;
+				t0 = bs.$ck( sessionName );
+				if( $v === undefined ){
+					if( t0 && ( t0 = session[t0] ) ) return t0[$k];
+				}else{
+					if( !t0 ) bs.$ck( '@'+sessionName, t0 = bs.$crypt( 'sha256', ''+bs.$ex( 1000,'~',9999 ) + (id++) + bs.$ex( 1000,'~',9999 ) ) );
+					if( !session[t0] ) session[t0] = {};
+					return session[t0][$k] = $v;
 				}
+			},
+			head:function( $k, $v ){head[head.length] = [$k, $v];},
+			method:function(){return method;},
+			request:function( $k ){return $k ? rq[$k] : rq;},
+			response:function(){
+				var i, j;
+				for( i = 0, j = arguments.length ; i < j ; i++ ) response[response.length] = arguments[i];
+			},
+			get:function( $k ){return getData[$k];},
+			post:function( $k ){return postData[$k];},
+			file:function( $k ){return postFile[$k];},
+			data:function( $k, $v ){return $v === undefined ? data[$k] : data[$k] = $v;},
+			redirect:function( $url, $isClient ){
+				if( $isClient ) rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( '<script>location.href="' + $url + '";</script>');
+				else rp.writeHead( 301, {Location:$url} ), rp.end();
+			},
+			exit:function( $html ){rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( $html );}
+		};
+	})() ),
+	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};
+	bs.$class( 'site', function( $fn, bs ){
+		var ports, tEnd, f, runRule, defaultRouter, pass, sort;
+		ports = {},
+		portStart = function( $https, $sites, $port ){
+			var rqListener;
+			rqListener = function( $rq, $rp ){
+				var t0, t1, i, j, k, v;
+				t0 = URL.parse( 'http://'+$rq.headers.host+$rq.url ), t1 = t0.hostname, i = 0, j = $sites.length;
+				while( i < j ){
+					k = $sites[i++], v = $sites[i++];
+					if( k == t1 ) v.request( t0, $rq, $rp );
+				}
+			};
+			if( $https )
+				HTTPS.createServer( $https, rqListener ).on('error', function($e){console.log($e);}).listen( $port );
+			else
+				HTTP.createServer( rqListener ).on('error', function($e){console.log($e);}).listen( $port );
+			console.log( $port + ' started' );
+		},
+		f = function( $path ){return f[$path] || ( f[$path] = bs.$file( null, $path ).toString() );},
+		tEnd = function( $data ){bs.WEB.response( $data ), bs.WEB.next();},
+		runRule = function( $v ){
+			switch( typeof $v ){
+			case'string':return new Function( 'bs', f( bs.$path( $v ) ) )(bs);
+			case'function':return $v();
+			case'object':if( $v.splice ) return $v[0][$v[1]]();
+			}
+		},
+		defaultRouter = ['template', '@.html'],
+		pass = function(){process.nextTick( next );},
+		$fn.constructor = function(){
+			var self = this, router, nextstep, onData, file, path, currRule, idx;
+			this.form = new form.IncomingForm, this.form.encoding = 'utf-8', this.form.keepExtensions = true;
+			this.url = [], this.isStarted = 0, this.retry = 0,
+			this.mime = clone( mime ), this.index = 'index',
+			this.fileMax = 2 * 1024 * 1024, this.postMax = .5 * 1024 * 1024,
+			this.rules = {'':defaultRouter}, this.application = {}, this.db = [],
+			this.request = function( $url, $rq, $rp ){
+				var t0, i, j;
+				rq = $rq, rp = $rp, site = $url.hostname, fileRoot[site] = self.root, getData = bs.$cgiparse( $url.query ), postData = postFile = null, path = $url.pathname.substr(1);
+				if( path.indexOf( '..' ) > -1 || path.indexOf( './' ) > -1 ) err( 404, 'no file<br>'+ path );
+				else if( !path || path.substr( path.length - 1 ) == '/' ) file = self.index;
+				else{
+					if( i = path.lastIndexOf( '/' ) + 1 ) file = path.substr( i ), path = path.substring( 0, i );
+					else file = path, path = '';
+					if( ( i = file.indexOf( '.' ) ) > -1 && file.charAt(0) != '@' ){
+						if( t0 = self.mime[file.substr( i + 1 )] ) bs.$stream( bs.$path( path+file ),
+								function(){$rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe( $rp );},
+								function( $e ){err( 404, 'no file<br>'+path+file);}
+							);
+						else err( 404, 'no file<br>'+path+file);
+						return;
+					}
+				}
+				ckParser(), head.length = response.length = 0, data = {}, cookie = {}, application = this.application, this.retry = 1;
+				( method = $rq.method ) == 'GET' ? process.nextTick( router ) : form.parse( $rq, onData );
 			},
 			onData = function( $e, $data, $file ){
-				if( $e ) err( 500, 'post Error' + $e );
-				else postData = $data, postFile = $file, router();
+				if( $e ) return err( 500, 'post Error' + $e );
+				postData = $data, postFile = $file, router();
 			},
-			port = http.createServer( function( $rq, $rp ){
-				var t0, i, j;
-				rq = $rq, rp = $rp, t0 = bs.$url( $rq.url ),
-				getData = bs.$cgiParse( t0.query ), postData = postFile = null, 
-				fullPath = path = t0.pathname,
-				i = path.lastIndexOf( '/' ) + 1, ext = 'bs';
-				if( path.substr( path.length - 1 ) == '/' ) path = path.substring( 0,  i ), file = index;
-				else{
-					t0 = path.substring( i );
-					if( ( j = t0.indexOf( '.' ) ) > -1 ){
-						file = t0, path = path.substring( 0, i );
-						if( ( ext = t0.substr( j + 1 ) ) != 'bs' ){
-							if( t0 = bs.$get( null, 'file://'+__dirname+'/'+root+fullPath ) ) rp.writeHead( 200, ( staticRoute['Content-Type'] = mimeTypes[ext] || 'Unknown type', staticRoute ) ), $rp.end( t0 );
-							else err( 404, 'no file<br>file://'+ root+fullPath);
-							return;
-						}
-					}else path += '/', file = index;
+			router = function(){
+				try{
+					next = function(){
+						var t0, i;
+						t0 = self.rulesArr, i = t0.length, next = nextstep;
+						while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, next();
+						err( 500, '<h1>server error</h1><div>Error: no matched rules '+path+file );
+					};
+					if( !runRule( self.pageStart ) ) pass();
+				}catch($e){
+					err( 500, '<h1>server error</h1><div>Error: '+$e+'</div>router' );
 				}
-				ckParser(), head.length = response.length = 0, data = {}, cookie = {};
-				if( bs.$method() == 'get' ) router();
-				else postForm.parse( $rq, onData );
-			}).listen( $data.port || 80 );
-			console.log('server started with port ' + ($data.port || 80)); 
+			},
+			nextstep = function(){
+				var t0, i, j;
+				if( idx < currRule.length ){
+					try{
+						i = currRule[idx++], j = currRule[idx++];
+						if( typeof j == 'string' ) j = j.replace( '@', file ), j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ), t0 = bs.$path( j );
+						switch( i ){
+						case'template':self.template( t0, f(t0), data, tEnd ); break;
+						case'static':bs.WEB.response( f(t0) ), pass(); break;
+						case'script':if( !( new Function( 'bs', f(t0) )(bs) ) ) pass(); break;
+						case'require':if( !require( t0 )(bs) ) pass(); break;
+						case'function':if( !runRule( j ) ) pass(); break;
+						default: pass();
+						}
+						return;
+					}catch($e){
+						if( self.retry-- ) head.length = response.length = 0, data = {}, cookie = {}, path = path + file + '/', file = self.index, router();
+						else err( 500, '<h1>server error</h1><div>Error: '+$e+'</div>path: '+path+'<br>file: '+file+'<br>rule: '+i+'(idx:'+idx+')<br>target :'+j );
+					}
+				}else{
+					next = bs.WEB.flush;
+					if( !runRule( self.pageEnd ) ) pass();
+				}
+			};
+		},
+		$fn.router = function(){
+			/*			
+			bs.site( 'bsplugin' ).router(
+				'', [
+					'template', '/head.html',
+					'script', '@.js',
+					'template', '@.html',
+					'static','/foot.html'
+				],
+				'json', ['require', '@']
+			);
+			*/
+			var i, j, k, v;
+			i = 0, j = arguments.length;
+			while( i < j ){
+				k = arguments[i++], v = arguments[i++];
+				if( v === null ) delete this.rules[k]; else if( v !== undefined ) this.rules[k] = v;
+			}
+			return v;
+		},
+		$fn.$ = function(){
+			var t0, i, j, k, v;
+			i = 0, j = arguments.length;
+			while( i < j ){
+				k = arguments[i++], v = arguments[i++];
+				if( k === null ){
+					if( this.isStarted ) this.stop();
+					this.destroyer();
+					return null;
+				}else if( v !== undefined ){
+					switch( k ){
+					case'https':
+						v.key = f( bs.$path( v.sslkey, 'root' ) ),
+						v.cert = f( bs.$path( v.sslcert, 'root' ) ),
+						this.https = v; break;
+					case'db': this.db[this.db.length] = v; break;
+					case'url':
+						v = v.split(':');
+						if( this.url.indexOf( v[0] ) == -1 ) this.url.push( v[0], parseInt( v[1] || '8001' ) );
+						break;
+					case'root':this.root = bs.$path( v, 'root' ); break;
+					case'template':case'index':this[k] = v; break;
+					case'siteStart':case'pageStart':case'pageEnd':this[k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
+					case'upload':this.upload = bs.$path( v, 'root' ); break;
+					case'postMax':case'fileMax':this[k] = v * 1024 * 1024; break;
+					default:
+						if( k.charAt(0) == '.' ) this.mime[k.substr(1)] = v;
+					}
+				}
+			}
+			return this[k];
+		},
+		sort = function( a, b ){return a.length - b.length;},
+		$fn.start = function(){
+			var start, t0, self = this;
+			this.form.maxFieldsSize = this.postMax;
+			if( this.upload ) this.form.uploadDir = this.upload;
+			this.rulesArr = [];
+			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
+			this.rulesArr.sort( sort );
+			start = function(){
+				var domain, port, i, j
+				i = 0, j = self.url.length;
+				runRule( self.siteStart );
+				while( i < j ){
+					domain = self.url[i++], port = self.url[i++];
+					if( !ports[port] ) portStart( self.https, ports[port] = [], port );
+					if( ports[port].indexOf( domain ) == -1 ) ports[port].push( domain, self );
+				}
+			};			
+			if( this.db.length ) t0 = this.db.slice(0), t0.unshift( start ), bs.$importdbc.apply( null, t0 );
+			else start();
+		},
+		$fn.stop = function(){
+			var domain, port, i, j;
+			i = 0, j = this.url.length;
+			while( i < j ){
+				domain = this.url[i++], port = this.url[i++];
+				if( ports[port] && ( k = ports[port].indexOf( domain ) ) > -1 ) ports[port].splice( k, 2 );
+			}
 		};
-	})();
+	} );
+	bs.site.load = function(){
+	};
+})( HTTP, HTTPS, URL );
+(function(){
+	var type, i, db;
+	type = 'execute,recordset,stream'.split(','); for( i in type ) type[type[i]] = 1;
+	db = {};
+	bs.$method( 'importdbc', function( $end ){
+		var path, i, j, dbcnext, arg;
+		i = 1, j = arguments.length, path = bs.$import.path || bs.PLUGIN_REPO, arg = arguments,
+		( dbcnext = function(){i < j ? bs.$js( dbcnext, path + 'dbc_' + arg[i++]+'.js' ) : $end(); } )();
+	} ),
+	bs.$method( 'registerdbc', function( $name, $obj ){db[$name] = $obj;} ),
+	bs.$class( 'sql', function( $fn, bs ){
+		var key, i;
+		key = 'db,type,query'.split(','); for( i in key ) key[key[i]] = 1;
+		$fn.constructor = function(){this.type = 'recordset';},
+		$fn.$ = function(){
+			var i, j, k, v, t0;
+			i = 0, j = arguments.length;
+			while( i < j ){
+				k = arguments[i++], v = arguments[i++];
+				if( k === null ) return this.destroyer();
+				if( key[k] ){
+					if( v === undefined ) return this[k];
+					if( k != 'type' || type[v] ) this[k] = v;
+				}
+			}
+		},
+		$fn.run = function(){
+			var end, t0, i, j, k;
+			t0 = {}, i = 0, j = arguments.length;
+			while( i < j ) k = arguments[i++], typeof k == 'function' ? end = k : t0[k] = arguments[i++];
+			return bs.db( this.db ).$( this.type, bs.$tmpl( this.query, t0 ), end );
+		};
+	} ),
+	bs.$class( 'db', (function(){
+		return function( $fn, bs ){
+			$fn.constructor = function( $sel ){
+				$sel = $sel.split('@'), this.__db = new db[$sel[1]], $sel = $sel[0];
+			},
+			$fn.$ = function(){return this.__db.$( arguments );},
+			$fn.open = function(){return this.__db.open();},
+			$fn.close = function(){return this.__db.close();};
+		};
+	})() );
+})();
 
 };

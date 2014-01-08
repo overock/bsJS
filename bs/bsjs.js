@@ -11,11 +11,11 @@
 'use strict';
 var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
-	
-if( doc = W['document'] ) PLUGIN_REPO='../bs/plugin/',que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
-else if( __dirname ) PLUGIN_REPO='http://projectbs.github.io/bsJS/bs/plugin/', node=require('./node'), module.exports = bs = function(f){bs.__root = f;},bs.__root = __dirname;
+PLUGIN_REPO = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/';//'http://projectbs.github.io/bsJS/bs/plugin/'
+if( doc = W['document'] ) que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
+else if( __dirname ) node=require('./node'), module.exports = bs = function(f){bs.__root = f;return bs;};
 else throw new Error( 0, 'not supported platform' );
-bs.VERSION = VERSION = 0.2;
+bs.PLUGIN_REPO = PLUGIN_REPO, bs.VERSION = VERSION = 0.2;
 function error( $num, $msg ){if( doc ) throw new Error( $num, $msg ); else console.log( $num, $msg );}
 function dependency( $arg ){
 	var t0, i, j, k, v;
@@ -37,6 +37,14 @@ function method( $name, $func, $version/*, $dependency*/ ){
 }
 method( 'timeout', function( $time ){timeout = parseInt( $time * 1000 );} ),
 method( 'method', method ),
+method( 'del', function(){
+	var i, j;
+	i = 0, j = arguments.length;
+	while( i < j ){
+		k = arguments[i++];
+		if( bs[k] ) delete depend[k.charAt(0)=='$'?k.substr(1):k], delete bs[k];
+	}
+} );
 method( 'class', (function(){
 	function factory( $name, $func ){
 		var cls, fn, t0, k;
@@ -235,55 +243,53 @@ if( !W['console'] ) (function(){
 		flush:function(){return t0 = log.slice(0), log.length = 0, t0;}
 	};
 })();
-//3. define JSloader, ajax
-var head, e, rq, js, jid, jc;
-function xhrSend( $type, $xhr, $data ){
-	var h, i, j;
-	$xhr.setRequestHeader( 'Content-Type', $type == 'GET' ? 'text/plain; charset=UTF-8' : 'application/x-www-form-urlencoded; charset=UTF-8' ),
-	$xhr.setRequestHeader( 'Cache-Control', 'no-cache' ),
-	h = bs.$cgi.header, i = 0, j = h.length;
-	while(i < j) $xhr.setRequestHeader( h[i++], h[i++] );
-	$xhr.send( $data );
-}
-function xhr( $end ){
-	var t0, t1;
-	return t0 = rq(), t0.onreadystatechange = function(){
-		if( t0.readyState != 4 || t1 < 0 ) return;
-		t0.onreadystatechange = null, clearTimeout( t1 ), t1 = -1, $end( t0.status == 200 || t0.status == 0 ? t0.responseText : '@'+t0.status );
-	}, t1 = setTimeout( function(){if( t1 > -1 ) t1 = -1, t0.onreadystatechange = null, $end( '@timeout' );}, timeout ), t0;
-}
-function http( $type, $end, $url, $arg ){
-	var t0;
-	return t0 = $end ? xhr( $end ) : rq(), t0.open( $type, $url, $end ? true : false ), xhrSend( $type, t0, bs.$cgi( $arg ) || '' ), $end ? '' : t0.responseText;
-}
-head = doc.getElementsByTagName( 'head' )[0], e = W['addEventListener'],
-rq = W['XMLHttpRequest'] ? function(){return new XMLHttpRequest;} : (function(){
-	var t0, i, j;
-	t0 = 'MSXML2.XMLHTTP', t0 = ['Microsoft.XMLHTTP',t0,t0+'.3.0',t0+'.4.0',t0+'.5.0'], i = t0.length;
-	while( i-- ){try{new ActiveXObject( j = t0[i] );}catch( $e ){continue;}break;}
-	return function(){return new ActiveXObject( j );};
-})(),
-jid = 0, bs.__callback = jc = {},
-js = function( $data, $load, $end ){
-	var t0, i;
-	t0 = doc.createElement( 'script' ), t0.type = 'text/javascript', t0.charset = 'utf-8', head.appendChild( t0 );
-	if( $load ){
-		if( e ) t0.onload = function(){t0.onload = null, $load();};
-		else t0.onreadystatechange = function(){(t0.readyState=='loaded'||t0.readyState=='complete')&&(t0.onreadystatechange=null,$load());};
-		if( $data.charAt($data.length-1)=='=' ) $data += 'bs.__callback.'+(i='c'+(id++)), jc[i] = function(){delete jc[i],$end.apply(null,arguments);};
-		t0.src = $data;
-	}else t0.text = $data;
-},
-method( 'get', function( $end, $url ){return http( 'GET', $end, bs.$url( $url, arguments ) );} ),
-method( 'post', function( $end, $url ){return http( 'POST', $end, bs.$url($url), arguments );} ),
-method( 'put', function( $end, $url ){return http( 'PUT', $end, bs.$url($url), arguments );} ),
-method( 'delete', function( $end, $url ){return http( 'DELETE', $end, bs.$url($url), arguments );} ),
-method( 'js', function( $end ){
-	var i, j, arg, load;
-	arg = arguments, i = 1, j = arg.length;
-	if( $end ) ( load = function(){i < j ? js( arg[i++], load, $end ) : $end();} )();
-	else while( i < j ) js( bs.$get( null, arg[i++] ) );
-} ),
+(function(){
+	var rq = W['XMLHttpRequest'] ? function(){return new XMLHttpRequest;} : (function(){
+		var t0, i, j;
+		t0 = 'MSXML2.XMLHTTP', t0 = ['Microsoft.XMLHTTP',t0,t0+'.3.0',t0+'.4.0',t0+'.5.0'], i = t0.length;
+		while( i-- ){try{new ActiveXObject( j = t0[i] );}catch( $e ){continue;}break;}
+		return function(){return new ActiveXObject( j );};
+	})(), h = bs.$cgi.header;
+	function http( $type, $end, $url, $arg ){
+		var t0, t1, i, j;
+		t0 = rq();
+		if( $end ) t0.onreadystatechange = function(){
+			if( t0.readyState != 4 || t1 < 0 ) return;
+			t0.onreadystatechange = null, clearTimeout( t1 ), t1 = -1, $end( t0.status == 200 || t0.status == 0 ? t0.responseText : '@'+t0.status, t0.getAllResponseHeaders() );
+		}, t1 = setTimeout( function(){if( t1 > -1 ) t1 = -1, t0.onreadystatechange = null, $end( '@timeout' );}, timeout );
+		t0.open( $type, $url, $end ? true : false ),
+		t0.setRequestHeader( 'Content-Type', ( $type == 'GET' ? 'text/plain' : 'application/x-www-form-urlencoded' ) + 'charset=UTF-8' ),
+		t0.setRequestHeader( 'Cache-Control', 'no-cache' ),
+		i = 0, j = h.length;
+		while(i < j) $xhr.setRequestHeader( h[i++], h[i++] );
+		t0.send( bs.$cgi( $arg ) || '' );
+		if( !$end ) return t0.responseText;
+	}
+	method( 'get', function( $end, $url ){return http( 'GET', $end, bs.$url( $url, arguments ) );} ),
+	method( 'post', function( $end, $url ){return http( 'POST', $end, bs.$url($url), arguments );} ),
+	method( 'put', function( $end, $url ){return http( 'PUT', $end, bs.$url($url), arguments );} ),
+	method( 'delete', function( $end, $url ){return http( 'DELETE', $end, bs.$url($url), arguments );} );
+})();
+method( 'js', (function(){
+	var head, e, jid, jc, js;
+	head = doc.getElementsByTagName( 'head' )[0], e = W['addEventListener'], jid = 0, bs.__callback = jc = {},
+	js = function( $data, $load, $end ){
+		var t0, i;
+		t0 = doc.createElement( 'script' ), t0.type = 'text/javascript', t0.charset = 'utf-8', head.appendChild( t0 );
+		if( $load ){
+			if( e ) t0.onload = function(){t0.onload = null, $load();};
+			else t0.onreadystatechange = function(){(t0.readyState=='loaded'||t0.readyState=='complete')&&(t0.onreadystatechange=null,$load());};
+			if( $data.charAt($data.length-1)=='=' ) $data += 'bs.__callback.'+(i='c'+(id++)), jc[i] = function(){delete jc[i],$end.apply(null,arguments);};
+			t0.src = $data;
+		}else t0.text = $data;
+	};
+	return function( $end ){
+		var i, j, arg, load;
+		arg = arguments, i = 1, j = arg.length;
+		if( $end ) ( load = function(){i < j ? js( arg[i++], load, $end ) : $end();} )();
+		else while( i < j ) js( bs.$get( null, arg[i++] ) );
+	}
+})()),
 method( 'img', (function(){
 	function _load( $src, $data ){
 		var t0, t1;
@@ -1234,7 +1240,7 @@ id = setInterval( function(){
 	case'interactive':if( document.documentElement.doScroll ) try{document.documentElement.doScroll('left');}catch(e){return;}
 	default:return;}
 	clearInterval( id ), start = function(){for( var i = 0, j = que.length ; i < j ; i++ ) que[i](); que = null;},
-	DETECT(), DOM(), ANI(), im.length ? ( im.unshift( start ), bs.$importer.apply( null, im ), im.length = 0 ) : start();
+	DETECT(), DOM(), ANI(), im.length ? ( im.unshift( start ), bs.$importer.apply( null, im ), im = null, bs.$del( '$import' ) ) : start();
 }, 1 );
 })( doc, bs );
 

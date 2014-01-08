@@ -36,7 +36,6 @@ url
 <input id='url_OK1' type='text' value='http://google.com'>
 <input id='url_OK2' type='text' value='https://www.google.com'>
 <input class='tng' id='url_NG1' type='text' value='ftp://www.google.com'>
-<input class='tng' id='url_NG2' type='text' value='http://www.google'>
 <br/>
 email
 <input id='email_OK' type='text' value='gmail@gmail.com'>
@@ -223,9 +222,6 @@ bs( function(){
 		}, undefined,
 		function(){
 			return bs.$test( '@url', '#url_NG1|' );
-		}, undefined,
-		function(){
-			return bs.$test( '@url', '#url_NG2|' );
 		}, undefined,
 		function(){
 			return bs.$test( '@email', '#email_NG|' );
