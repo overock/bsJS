@@ -49,7 +49,7 @@ method( 'class', (function(){
 	function factory( $name, $func ){
 		var cls, fn, t0, k;
 		$func( t0 = {}, bs ), cls = function( $sel ){this.__new( this.__k = $sel );}, fn = cls.prototype, fn.__new = none, fn.destroyer = function(){delete cls[this.__k];};
-		if( typeof $func == 'function' ){for( k in t0 ) if( t0.hasOwnProperty( k ) ) k == 'constructor' ? ( fn.__new = t0.constructor ) : ( fn[k] = t0[k] );}
+		if( typeof $func == 'function' ){for( k in t0 ) if( t0.hasOwnProperty( k ) ) k == '$constructor' ? ( fn.__new = t0.$constructor ) : ( fn[k] = t0[k] );}
 		return fn.instanceOf = bs[$name] = function( $sel ){
 			var t0;
 			if( typeof $sel == 'string' ){
@@ -612,7 +612,7 @@ function DOM(){
 		else add = function( $k, $v ){sheet.addRule( $k, $v||' ' );return ruleSet[ruleSet.length - 1];},
 			del = function( $v ){sheet.removeRule( idx( $v ) );};
 		rule = function( $rule ){this.r = $rule, this.s = new style( $rule );},
-		$fn.constructor = function( $key ){
+		$fn.$constructor = function( $key ){
 			var t0, v;
 			if( $key.indexOf('@') > -1 ){
 				$key = $key.split('@');
@@ -669,7 +669,7 @@ function DOM(){
 		var dom, ds, ds0, ev, t, x, y, nodes, drill, childNodes,
 			win, wine, hash, sizer;
 		t = /^\s*|\s*$/g, dom = bs.$dom,
-		$fn.constructor = function( $key ){
+		$fn.$constructor = function( $key ){
 			var t0, i;
 			t0 = dom( $key ), this.length = i = t0.length;
 			while( i-- ) this[i] = t0[i];
