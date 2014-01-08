@@ -117,8 +117,52 @@ bs.$method( 'crypt', (function(){
 	var form, mime, clone, portStart, staticHeader, err,
 		sessionName, id, cookie, clientCookie, ckParser, next,
 		head, method, response, application, rq, rp, getData, postData, postFile, data;
-		
-	mime = require('./mime'), form = require( 'formidable' ),
+	bs.$class( 'form', function( $fn, bs ){
+		var key, i;
+		key = 'encoding,keepExtensions,postMax,fileMax,upload,'.split(',');
+
+		for( i in key ) key[key[i]] = 1;
+		$fn.$ = function(){
+			var i, j, k, v;
+			i = 0, j = arguments.length;
+			while( i < j ){
+				k = arguments[i++], v = arguments[i++];
+				if( key[k] ){
+					if( v === undefined ) return this[k];
+					else if( v === null ) delete this[k];
+					else this[k] = v;
+				}
+			}
+		},
+		$fn.parse = function( $end ){
+			var t0 = '', self = this;
+			rq.on( 'data', function( $v ){
+				t0 += $v;
+				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
+			} ).on( 'end', function(){
+				var type, i, t1;
+				type = rq.header['Content-type'];
+				if( t0 === null ) return rp.end();
+				if( type.indexOf( 'x-www-form-urlencoded' ) > -1 ){
+					postData = bs.$cgiparse( t0 );
+					postFile = null, $end();
+				}else if( type.indexOf( 'multipart' ) ){
+					t0 = bs.$trim( t0.split( '--' + type.substr( type.lastIndexOf('=') + 1 ) ) ),
+					postFile = {}, i = t0.length;
+					while( i-- ){
+						t1 = t0[i];
+						if( t1.indexOf( 'filename' ) > -1 ){
+							//파일처리 postFile[...] = new Buffer( xxx, 'base64' );
+						}else{
+							postData = bs.$cgiparse( bs.$trim( t1.substr( t1.indexOf( '\n' ) ) ) );
+						}
+					}
+					$end();
+				}
+			} );
+		};
+	} );
+	mime = require('./mime'),
 	clone = function( $v ){
 		var t0, k;
 		t0 = {};
@@ -227,11 +271,11 @@ bs.$method( 'crypt', (function(){
 		},
 		defaultRouter = ['template', '@.html'],
 		pass = function(){process.nextTick( next );},
-		$fn.$constructor = function(){
+		$fn.$constructor = function( $sel ){
 			var self = this, router, nextstep, onData, file, path, currRule, idx;
-			this.form = new form.IncomingForm, this.form.encoding = 'utf-8', this.form.keepExtensions = true;
+			this.form = bs.form( $sel ), this.form.encoding = 'utf-8', this.form.keepExtensions = true;
 			this.url = [], this.isStarted = 0, this.retry = 0,
-			this.mime = clone( mime ), this.index = 'index',
+			this.mime = clone( mime ), this.index = '@index',
 			this.fileMax = 2 * 1024 * 1024, this.postMax = .5 * 1024 * 1024,
 			this.rules = {'':defaultRouter}, this.application = {}, this.db = [],
 			this.request = function( $url, $rq, $rp ){
@@ -252,11 +296,7 @@ bs.$method( 'crypt', (function(){
 					}
 				}
 				ckParser(), head.length = response.length = 0, data = {}, cookie = {}, application = this.application, this.retry = 1;
-				( method = $rq.method ) == 'GET' ? process.nextTick( router ) : form.parse( $rq, onData );
-			},
-			onData = function( $e, $data, $file ){
-				if( $e ) return err( 500, 'post Error' + $e );
-				postData = $data, postFile = $file, router();
+				( method = $rq.method ) == 'GET' ? process.nextTick( router ) : this.form( router );
 			},
 			router = function(){
 				try{
@@ -295,6 +335,7 @@ bs.$method( 'crypt', (function(){
 					if( !runRule( self.pageEnd ) ) pass();
 				}
 			};
+			
 		},
 		$fn.router = function(){
 			/*			
@@ -336,10 +377,9 @@ bs.$method( 'crypt', (function(){
 					case'root':this.root = bs.$path( v, 'root' ); break;
 					case'template':case'index':this[k] = v; break;
 					case'siteStart':case'pageStart':case'pageEnd':this[k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
-					case'upload':this.upload = bs.$path( v, 'root' ); break;
-					case'postMax':case'fileMax':this[k] = v * 1024 * 1024; break;
-					default:
-						if( k.charAt(0) == '.' ) this.mime[k.substr(1)] = v;
+					case'upload':this.form.upload = bs.$path( v, 'root' ); break;
+					case'postMax':case'fileMax':this.form[k] = v * 1024 * 1024; break;
+					default:if( k.charAt(0) == '.' ) this.mime[k.substr(1)] = v;
 					}
 				}
 			}
@@ -348,16 +388,16 @@ bs.$method( 'crypt', (function(){
 		sort = function( a, b ){return a.length - b.length;},
 		$fn.start = function(){
 			var start, t0, self = this;
-			this.form.maxFieldsSize = this.postMax;
-			if( this.upload ) this.form.uploadDir = this.upload;
 			this.rulesArr = [];
 			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
 			this.rulesArr.sort( sort );
 			start = function(){
 				var domain, port, i, j, https;
-				https = {},
-				https.key = f( bs.$path( self.https.key, self.root ) ),
-				https.cert = f( bs.$path( self.https.cert, self.root ) ),
+				if( self.https ){
+					https = {},
+					https.key = f( bs.$path( self.https.key, self.root ) ),
+					https.cert = f( bs.$path( self.https.cert, self.root ) );
+				}
 				i = 0, j = self.url.length;
 				runRule( self.siteStart );
 				while( i < j ){
@@ -425,5 +465,5 @@ bs.$method( 'crypt', (function(){
 		};
 	})() );
 })();
-
+	
 };
