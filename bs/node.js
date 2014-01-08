@@ -120,7 +120,6 @@ bs.$method( 'crypt', (function(){
 	bs.$class( 'form', function( $fn, bs ){
 		var key, i;
 		key = 'encoding,keepExtensions,postMax,fileMax,upload,'.split(',');
-
 		for( i in key ) key[key[i]] = 1;
 		$fn.$ = function(){
 			var i, j, k, v;
@@ -392,6 +391,7 @@ bs.$method( 'crypt', (function(){
 			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
 			this.rulesArr.sort( sort );
 			start = function(){
+				console.log( 'start');
 				var domain, port, i, j, https;
 				if( self.https ){
 					https = {},
@@ -418,17 +418,17 @@ bs.$method( 'crypt', (function(){
 			}
 		};
 	} );
-	bs.site.load = function(){
-	};
 })( HTTP, HTTPS, URL );
 (function(){
 	var type, i, db;
 	type = 'execute,recordset,stream'.split(','); for( i in type ) type[type[i]] = 1;
 	db = {};
 	bs.$method( 'importdbc', function( $end ){
-		var path, i, j, dbcnext, arg;
+		var path, i, j, k, dbcnext, arg;
 		i = 1, j = arguments.length, path = bs.$import.path || bs.PLUGIN_REPO, arg = arguments,
-		( dbcnext = function(){i < j ? bs.$js( dbcnext, path + 'dbc_' + arg[i++]+'.js' ) : $end(); } )();
+		( dbcnext = function(){
+			if( i < j ) k = arg[i++], !db[k] ? bs.$js( dbcnext, path + 'dbc_' + k+'.js' ) : dbcnext(); else $end();
+		} )();
 	} ),
 	bs.$method( 'registerdbc', function( $name, $obj ){db[$name] = $obj;} ),
 	bs.$class( 'sql', function( $fn, bs ){
@@ -457,7 +457,7 @@ bs.$method( 'crypt', (function(){
 	bs.$class( 'db', (function(){
 		return function( $fn, bs ){
 			$fn.$constructor = function( $sel ){
-				$sel = $sel.split('@'), this.__db = new db[$sel[1]], $sel = $sel[0];
+				$sel = $sel.split('@'), this.__db = new db[$sel[1]](), $sel = $sel[0];
 			},
 			$fn.$ = function(){return this.__db.$( arguments );},
 			$fn.open = function(){return this.__db.open();},
