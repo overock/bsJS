@@ -50,7 +50,7 @@ bs.$register( 'class', 'd3', (function(){
     };
     // d3m
     bs.$class( 'd3m', function($fn){
-        $fn.constructor = function ($key) {
+        $fn.$constructor = function ($key) {
             this.__list = {};
             this.dom = bs.dom("<div></div>").$('<', 'body', 'top', -100000, 'display', 'none', 'this'); // 안불러져서 박았음 -_-
         }
@@ -71,7 +71,7 @@ bs.$register( 'class', 'd3', (function(){
 			t0 = 'x,y,z,width,height,material'.split(','), key = {}, i = t0.length;
 			while (i--) key[t0[i]] = 1;
 		})(),
-		$fn.constructor = function ($key) {
+		$fn.$constructor = function ($key) {
 			var tname = $key.split('@')[1];
 			if ($key.indexOf('camera@') > -1) type[tname] ? console.log('cameraMode :', tname) : console.log('존재하지않는 카메라타입입니다'), bs.ANI.ani(d3Camera), this.camera = d3Camera
 			else if ($key.indexOf('plane@') > -1) this.x = this.y = this.z = this.width = this.height = 0, this.div = bs.d("<div class='D3' id='" + tname + "'>재질적용전</div>"), d3Camera.list.push(this), this.material = undefined

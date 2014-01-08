@@ -23,7 +23,7 @@ bs.$register( 'class', 'sprite', function( $fn ){ console.log( 'sprite' );
 		curr = this.first + parseInt( rate * ( this.last - this.first ) );
 		this.img.$( 'margin-left', -(curr%this.col)*this.width, 'margin-top', -parseInt(curr/this.col)*this.height );
 	},
-	$fn.constructor = function( $key ){this.time = this.row = this.col = 1;},
+	$fn.$constructor = function( $key ){this.time = this.row = this.col = 1;},
 	$fn.$ = function(){
 		var t0, i, j, k, v;
 		if( ( t0 = arguments[0] ).charAt(0) == '@' ){
