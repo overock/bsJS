@@ -4,7 +4,7 @@ bs.$register( 'method', 'jpage', (function(){
 	r0 = /\\/g, r1 = /["]/g, r2 = /\r\n|\r|\n/g, s = '<%', e = '%>',
 	jpage = function( $str, $data, $render, $end, $id ){
 		var t0, t1, i, j, k, v, importer, render;
-		if( !( v = cache[$id] ) ){
+		if( !( jpage.cache && ( v = cache[$id] ) ) ){
 			if( $str instanceof jp ) v = $str.v;
 			else{
 				$str = ( $str.substr(0,2) == '#T' ? bs.dom( $str ).$('@text') : $str.substr($str.length-5) == '.html' ? bs.$get( null, $str ) : $str ).split( s );
@@ -16,18 +16,15 @@ bs.$register( 'method', 'jpage', (function(){
 				}
 			}
 			t0 = $str.v ? $str : new jp(v);
-			if( $id ) cache[$id] = v;
+			if( jpage.cache && $id ) cache[$id] = v;
 		}
 		t1 = '',
-		importer = function( $url ){jpage( $url, $data, null, render, $url );};
-		if( $render ){
-			new Function( 'ECHO, $$, bs, IMPORT', v )( render = function( $v ){t1 += $v, $render( $v );}, $data, bs, importer );
-			if( $end ) $end( t1 );
-		}else if( $end ){
-			new Function( 'ECHO, $$, bs, IMPORT', v )( render = function( $v ){t1 += $v;}, $data, bs, importer );
-			$end( t1 );
-		}
+		importer = function( $url ){jpage( $url, $data, null, render, $url );},
+		render = $render ? function( $v ){t1 += $v, $render( $v );} : function( $v ){t1 += $v;},
+		new Function( 'ECHO, $, bs, IMPORT', v )( render, $data, bs, importer );
+		if( $end ) $end( t1 );
 		return t0;
 	};
+	jpage.cache = 1;
 	return jpage;
 })(), 1.0 );

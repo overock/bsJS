@@ -115,7 +115,7 @@ bs.$method( 'crypt', (function(){
 })( HTTP, URL ),
 (function( HTTP, HTTPS, URL ){
 	var form, mime, clone, portStart, staticHeader, err,
-		sessionName, id, cookie, clientCookie, ckParser, next,
+		currsite, sessionName, id, cookie, clientCookie, ckParser, next,
 		head, method, response, application, rq, rp, getData, postData, postFile, data;
 	bs.$class( 'form', function( $fn, bs ){
 		var key, i;
@@ -140,8 +140,8 @@ bs.$method( 'crypt', (function(){
 				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
 			} ).on( 'end', function(){
 				var type, i, t1;
-				type = rq.header['Content-type'];
 				if( t0 === null ) return rp.end();
+				type = rq.header['Content-type'];
 				if( type.indexOf( 'x-www-form-urlencoded' ) > -1 ){
 					postData = bs.$cgiparse( t0 );
 					postFile = null, $end();
@@ -238,13 +238,14 @@ bs.$method( 'crypt', (function(){
 				if( $isClient ) rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( '<script>location.href="' + $url + '";</script>');
 				else rp.writeHead( 301, {Location:$url} ), rp.end();
 			},
-			exit:function( $html ){rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( $html );}
+			site:function(){return currsite;},
+			exit:function( $html ){err( 200, $html );}
 		};
 	})() ),
 	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};
 	bs.$class( 'site', function( $fn, bs ){
-		var ports, tEnd, f, runRule, defaultRouter, pass, sort;
-		ports = {},
+		var ports, tEnd, f, runRule, defaultRouter, pass, sort, cache;
+		ports = {}, siteCache = {},
 		portStart = function( $https, $sites, $port ){
 			var rqListener;
 			rqListener = function( $rq, $rp ){
@@ -252,14 +253,18 @@ bs.$method( 'crypt', (function(){
 				t0 = URL.parse( 'http://'+$rq.headers.host+$rq.url ), t1 = t0.hostname, i = 0, j = $sites.length;
 				while( i < j ){
 					k = $sites[i++], v = $sites[i++];
-					if( k == t1 ) v.request( t0, $rq, $rp );
+					if( k == t1 ) currsite = v, fileRoot[site = t0.hostname] = v.root, cache = v.cache, 
+						rq = $rq, rp = $rp, application = v.application, v.request( t0, $rq, $rp );
 				}
 			};
-			if( $https ) HTTPS.createServer( $https, rqListener ).on('error', function($e){console.log($e);}).listen( $port );
-			else HTTP.createServer( rqListener ).on('error', function($e){console.log($e);}).listen( $port );
+			HTTP.createServer( rqListener ).on('error', function($e){console.log($e);}).listen( $port );
+			if( $https ) HTTPS.createServer( $https, rqListener ).on('error', function($e){console.log($e);}).listen( 443 );
 			console.log( $port + ' started' );
 		},
-		f = function( $path ){return f[$path] || ( f[$path] = bs.$file( null, $path ).toString() );},
+		f = function( $path ){
+			if( cache ) return f[$path] || ( f[$path] = bs.$file( null, $path ).toString() );
+			return bs.$file( null, $path ).toString();
+		},
 		tEnd = function( $data ){bs.WEB.response( $data ), bs.WEB.next();},
 		runRule = function( $v ){
 			switch( typeof $v ){
@@ -270,32 +275,54 @@ bs.$method( 'crypt', (function(){
 		},
 		defaultRouter = ['template', '@.html'],
 		pass = function(){process.nextTick( next );},
+		sort = function( a, b ){return a.length - b.length;},
+		$fn.start = function(){
+			var start, t0, self = this;
+			this.rulesArr = [];
+			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
+			this.rulesArr.sort( sort );
+			start = function(){
+				var domain, port, i, j, https;
+				if( self.https ){
+					https = {},
+					https.key = f( bs.$path( self.https.key, self.root ) ),
+					https.cert = f( bs.$path( self.https.cert, self.root ) );
+				}
+				currsite = self, fileRoot[site = self.__k] = self.root, cache = self.cache, application = self.application,
+				i = 0, j = self.url.length;
+				runRule( self.siteStart );
+				while( i < j ){
+					domain = self.url[i++], port = self.url[i++];
+					if( !ports[port] ) portStart( https, ports[port] = [], port );
+					if( ports[port].indexOf( domain ) == -1 ) ports[port].push( domain, self );
+				}
+			};			
+			if( this.db.length ) t0 = this.db.slice(0), t0.unshift( start ), bs.$importdbc.apply( null, t0 );
+			else start();
+		},
 		$fn.$constructor = function( $sel ){
 			var self = this, router, nextstep, onData, file, path, currRule, idx;
-			this.form = bs.form( $sel ), this.form.encoding = 'utf-8', this.form.keepExtensions = true;
-			this.url = [], this.isStarted = 0, this.retry = 0,
+			this.form = bs.form( $sel ), this.form.$( 'encoding', 'utf-8', 'keepExtensions', 1 );
+			this.url = [], this.isStarted = 0,
 			this.mime = clone( mime ), this.index = '@index',
 			this.fileMax = 2 * 1024 * 1024, this.postMax = .5 * 1024 * 1024,
-			this.rules = {'':defaultRouter}, this.application = {}, this.db = [],
+			this.rules = {'':defaultRouter}, this.application = {}, this.db = [], this.cache = 1,
 			this.request = function( $url, $rq, $rp ){
 				var t0, i, j;
-				rq = $rq, rp = $rp, site = $url.hostname, fileRoot[site] = self.root, getData = bs.$cgiparse( $url.query ), postData = postFile = null, path = $url.pathname.substr(1);
+				path = $url.pathname.substr(1);
 				if( path.indexOf( '..' ) > -1 || path.indexOf( './' ) > -1 ) err( 404, 'no file<br>'+ path );
 				else if( !path || path.substr( path.length - 1 ) == '/' ) file = self.index;
 				else{
-					if( i = path.lastIndexOf( '/' ) + 1 ) file = path.substr( i ), path = path.substring( 0, i );
-					else file = path, path = '';
-					if( ( i = file.indexOf( '.' ) ) > -1 && file.charAt(0) != '@' ){
-						if( t0 = self.mime[file.substr( i + 1 )] ) bs.$stream( bs.$path( path+file ),
-								function(){$rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe( $rp );},
-								function( $e ){err( 404, 'no file<br>'+path+file);}
-							);
-						else err( 404, 'no file<br>'+path+file);
-						return;
-					}
+					( i = path.lastIndexOf( '/' ) + 1 ) ? ( file=path.substr(i), path=path.substring(0,i) ) : ( file=path, path='' );
+					if( ( i = file.indexOf( '.' ) ) > -1 && file.charAt(0) != '@' ) return ( t0 = self.mime[file.substr( i + 1 )] ) ? 
+						bs.$stream( bs.$path( path+file ),
+							function(){$rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe( $rp );},
+							function( $e ){err( 404, 'no file<br>'+path+file);}
+						) : err( 404, 'no file<br>'+path+file);
 				}
-				ckParser(), head.length = response.length = 0, data = {}, cookie = {}, application = this.application, this.retry = 1;
-				( method = $rq.method ) == 'GET' ? process.nextTick( router ) : this.form( router );
+				head.length = response.length = 0, this.retry = 1,
+				getData = bs.$cgiparse( $url.query ), ckParser(), data = {}, cookie = {}, 
+				( method = $rq.method ) == 'GET' ? ( postData = postFile = null, process.nextTick( router ) ) : this.form( router );
 			},
 			router = function(){
 				try{
@@ -317,7 +344,7 @@ bs.$method( 'crypt', (function(){
 						i = currRule[idx++], j = currRule[idx++];
 						if( typeof j == 'string' ) j = j.replace( '@', file ), j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ), t0 = bs.$path( j );
 						switch( i ){
-						case'template':self.template( t0, f(t0), data, tEnd ); break;
+						case'template':self.template( t0, f(t0), bs.WEB, tEnd ); break;
 						case'static':bs.WEB.response( f(t0) ), pass(); break;
 						case'script':if( !( new Function( 'bs', f(t0) )(bs) ) ) pass(); break;
 						case'require':if( !require( t0 )(bs) ) pass(); break;
@@ -334,27 +361,6 @@ bs.$method( 'crypt', (function(){
 					if( !runRule( self.pageEnd ) ) pass();
 				}
 			};
-			
-		},
-		$fn.router = function(){
-			/*			
-			bs.site( 'bsplugin' ).router(
-				'', [
-					'template', '/head.html',
-					'script', '@.js',
-					'template', '@.html',
-					'static','/foot.html'
-				],
-				'json', ['require', '@']
-			);
-			*/
-			var i, j, k, v;
-			i = 0, j = arguments.length;
-			while( i < j ){
-				k = arguments[i++], v = arguments[i++];
-				if( v === null ) delete this.rules[k]; else if( v !== undefined ) this.rules[k] = v;
-			}
-			return v;
 		},
 		$fn.$ = function(){
 			var t0, i, j, k, v;
@@ -370,44 +376,40 @@ bs.$method( 'crypt', (function(){
 					case'https':this.https = v; break;
 					case'db': this.db[this.db.length] = v; break;
 					case'url':
-						v = v.split(':');
+						v = bs.$trim( v.split(':') );
 						if( this.url.indexOf( v[0] ) == -1 ) this.url.push( v[0], parseInt( v[1] || '8001' ) );
 						break;
+					case'cache':this.cache = v; break;
 					case'root':this.root = bs.$path( v, 'root' ); break;
 					case'template':case'index':this[k] = v; break;
 					case'siteStart':case'pageStart':case'pageEnd':this[k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
-					case'upload':this.form.upload = bs.$path( v, 'root' ); break;
-					case'postMax':case'fileMax':this.form[k] = v * 1024 * 1024; break;
+					case'upload':this.form.$( k, v ); break;
+					case'postMax':case'fileMax':this.form.$( k, v * 1024 * 1024 ); break;
 					default:if( k.charAt(0) == '.' ) this.mime[k.substr(1)] = v;
 					}
 				}
 			}
 			return this[k];
 		},
-		sort = function( a, b ){return a.length - b.length;},
-		$fn.start = function(){
-			var start, t0, self = this;
-			this.rulesArr = [];
-			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
-			this.rulesArr.sort( sort );
-			start = function(){
-				console.log( 'start');
-				var domain, port, i, j, https;
-				if( self.https ){
-					https = {},
-					https.key = f( bs.$path( self.https.key, self.root ) ),
-					https.cert = f( bs.$path( self.https.cert, self.root ) );
-				}
-				i = 0, j = self.url.length;
-				runRule( self.siteStart );
-				while( i < j ){
-					domain = self.url[i++], port = self.url[i++];
-					if( !ports[port] ) portStart( https, ports[port] = [], port );
-					if( ports[port].indexOf( domain ) == -1 ) ports[port].push( domain, self );
-				}
-			};			
-			if( this.db.length ) t0 = this.db.slice(0), t0.unshift( start ), bs.$importdbc.apply( null, t0 );
-			else start();
+		/*			
+		bs.site( 'bsplugin' ).router(
+			'', [
+				'template', '/head.html',
+				'script', '@.js',
+				'template', '@.html',
+				'static','/foot.html'
+			],
+			'json', ['require', '@']
+		);
+		*/
+		$fn.router = function(){
+			var i, j, k, v;
+			i = 0, j = arguments.length;
+			while( i < j ){
+				k = arguments[i++], v = arguments[i++];
+				if( v === null ) delete this.rules[k]; else if( v !== undefined ) this.rules[k] = v;
+			}
+			return v;
 		},
 		$fn.stop = function(){
 			var domain, port, i, j;
@@ -457,7 +459,9 @@ bs.$method( 'crypt', (function(){
 	bs.$class( 'db', (function(){
 		return function( $fn, bs ){
 			$fn.$constructor = function( $sel ){
-				$sel = $sel.split('@'), this.__db = new db[$sel[1]](), $sel = $sel[0];
+				$sel = $sel.split('@');
+				if( !db[$sel[1]] ) return error( 'no db connector for ' + $sel[1] );
+				this.__db = new db[$sel[1]](), $sel = $sel[0];
 			},
 			$fn.$ = function(){return this.__db.$( arguments );},
 			$fn.open = function(){return this.__db.open();},
