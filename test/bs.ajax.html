@@ -47,8 +47,8 @@ bs( function(){
 	},  'ajax.json' );
 
 	bsTest( printer, 'ajax sync',
-		"bs.$get( cb , url ) url.a", 1, syncRS.a ,
-		"bs.$get( cb , url ) url.c", 3, syncRS.c
+		"bs.$get( null , url ) url.a", 1, syncRS.a ,
+		"bs.$get( null , url ) url.c", 3, syncRS.c
 	);
 
 } );
