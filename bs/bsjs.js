@@ -121,10 +121,12 @@ method( 'tmpl', (function(){
 		}
 		if( cnt == 0 ) return $0;
 		if( cnt > 1 ) return '@ERROR matchs '+cnt+'times@'
-		if( ( i = typeof t2 ) == 'object' ){
-			if( t2.TMPL ) return t2.TMPL( $0 );
-			else if( t2.splice ) return t2.join('');
-		}else if( i == 'function' ) return t2( $0 );
+		if( t2 ){
+			if( ( i = typeof t2 ) == 'object' ){
+				if( t2.TMPL ) return t2.TMPL( $0 );
+				else if( t2.splice ) return t2.join('');
+			}else if( i == 'function' ) return t2( $0 );
+		}
 		return t2;
 	}
 	return function( $str ){

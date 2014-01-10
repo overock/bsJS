@@ -235,7 +235,7 @@ bs.$method( 'crypt', (function(){
 				if( type.indexOf( 'x-www-form-urlencoded' ) > -1 ){
 					postData = bs.$cgiparse( t0 );
 					postFile = null, $end();
-				}else if( type.indexOf( 'multipart' ) ){
+				}else if( type.indexOf( 'multipart' ) > -1 ){
 					t0 = bs.$trim( t0.split( '--' + type.substr( type.lastIndexOf('=') + 1 ) ) ),
 					postFile = {}, i = t0.length;
 					while( i-- ){
@@ -479,7 +479,9 @@ bs.$method( 'crypt', (function(){
 			var end, t0, i, j, k;
 			t0 = {}, i = 1, j = arguments.length;
 			while( i < j ) t0[k = arguments[i++]] = arguments[i++];
-			return bs.db( this.db )[this.type]( bs.$tmpl( this.query, t0 ), $end );
+			t0 = bs.$tmpl( this.query, t0 );
+			//console.log( t0 );
+			return bs.db( this.db )[this.type]( t0, $end );
 		};
 	} ),
 	bs.$class( 'db', (function(){
