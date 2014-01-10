@@ -6,6 +6,7 @@ bs.$importer( function(){
 		'https', {key:'./key.pem',cert:'./cert.pem',port:4430},
 		'root', './noderoot/pluginjs/',
 		'db', 'mysql',
+		'cache', 0,
 		'template', function( $url, $template, $data, $end ){
 			bs.$jpage( $template, $data, null, $end, this.cache ? $url : 0 );
 		},

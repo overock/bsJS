@@ -15,7 +15,7 @@ bs( function(){
 		if( t0 ){
 			t0 = JSON.parse( t0 );
 			if( t0.result == 'ok' ){
-				bs.dom( '#personal' ).$( 'html', 'logined' );
+				bs.dom( '#personal' ).$( 'html', '<a href="/member/">' + t0.contents.thumb + ':' + t0.contents.nick + '</a>' );
 				bs.dom( '#menuLogin' ).$( 'html', t0.contents.nick );
 			}else{
 				bs.dom( '#Lalert' ).$( 'html', 'loginFailed:'+ t0.contents );
@@ -27,6 +27,8 @@ bs( function(){
 	bs.dom( '#Ljoin' ).$( 'down', function( $e ){bs.$go( '/join' );} );
 } );
 </script>
+<%}else%>
+<a href="/member/"><%=bs.WEB.session('t0.contents.thumb') + ':' + bs.WEB.session('nick')%></a>
 <%}%>
 </div>
 <div>
