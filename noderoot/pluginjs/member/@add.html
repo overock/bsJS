@@ -1,0 +1,17 @@
+<%
+if( bs.WEB.method() != 'POST' ) return bs.WEB.response( JSON.stringify( {result:'fail',contents:'invaild try'} ) );
+if( !bs.WEB.session('id') ) return bs.WEB.response( JSON.stringify( {result:'fail',contents:'no session'} ) );
+bs.sql( 'Padd' ).run( function( $rs ){
+	var t0 = {};
+	if( $rs ) t0.result = 'ok';
+	else t0.result = 'fail', t0.contents = JSON.stringify( arguments[1]);
+	bs.WEB.response( JSON.stringify( t0 ) );
+	bs.WEB.next();
+}, 
+'type', bs.WEB.post( 'type' ), 'uname', bs.WEB.post( 'uname' ),
+'title', bs.WEB.post( 'title' ), 'description', bs.WEB.post( 'description' ),
+'cat', bs.WEB.post( 'cat' ), 'id', bs.WEB.session('id'), 'thumb', bs.WEB.post( 'thumb' )
+);
+//, 'keyword', bs.WEB.post( 'keyword' )
+bs.WEB.pause();
+%>
