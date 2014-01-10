@@ -14,6 +14,7 @@ bs.$importer( function(){
 			if( bs.$os( 'hostname' ) == 'hika' ) bs.db( 'd@mysql' ).$( 'url', 'localhost:3306', 'id', 'root', 'pw', '1234', 'db', 'hika01' );
 			else bs.db( 'd@mysql' ).$( 'url', '10.0.0.1:3306', 'id', 'hika01', 'pw', 'projectbs00', 'db', 'hika01' );
 			bs.sql( 'login' ).$( 'db', 'd@mysql', 'query', "select email,nick,thumb from member where email='@email@' and pw='@pw@'" );
+			bs.sql( 'join' ).$( 'db', 'd@mysql', 'query', "insert into member(email,pw,nick,thumb)values('@email@','@pw@','@nick@','@thumb@')" );
 		}
 	);
 	bs.site('bsplugin').start();

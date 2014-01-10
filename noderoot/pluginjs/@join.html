@@ -1,10 +1,28 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>무제 문서</title>
-</head>
-
-<body>
-</body>
-</html>
+<%
+if( !bs.WEB.session('email') ){
+	var e, n, t;
+	bs.sql( 'join' ).run( function( $rs ){
+		var t0 = {};
+		if( $rs ){
+			t0.result = 'ok',
+			t0.contents = {email:e, nick:n, thumb:t},
+			bs.WEB.session( 'email', e, 'nick', n, 'thumb', t );
+		}else t0.result = 'fail', t0.contents = arguments[1] + '';
+		bs.WEB.response( JSON.stringify( t0 ) );
+		bs.WEB.next();
+	},
+	'email', e = bs.WEB.post( 'email' ), 'pw', bs.WEB.post( 'pw' ),
+	'nick', n = bs.WEB.post( 'nick' ), 'thumb', t = bs.WEB.post( 'thumb' )
+	);
+	bs.WEB.pause();
+}else{
+	bs.WEB.response( JSON.stringify( {
+		result:'ok',
+		contents:{
+			email:bs.WEB.session('email'),
+			nick:bs.WEB.session('nick'),
+			thumb:bs.WEB.session('thumb')
+		}
+	} ) );
+}
+%>
