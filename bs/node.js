@@ -115,60 +115,16 @@ bs.$method( 'crypt', (function(){
 })( HTTP, URL ),
 (function( HTTP, HTTPS, URL ){
 	var form, mime, clone, portStart, staticHeader, err,
-		currsite, sessionName, id, cookie, clientCookie, ckParser, next,
-		head, method, response, application, rq, rp, getData, postData, postFile, data;
-	bs.$class( 'form', function( $fn, bs ){
-		var key, i;
-		key = 'encoding,keepExtensions,postMax,fileMax,upload,'.split(',');
-		for( i in key ) key[key[i]] = 1;
-		$fn.$ = function(){
-			var i, j, k, v;
-			i = 0, j = arguments.length;
-			while( i < j ){
-				k = arguments[i++], v = arguments[i++];
-				if( key[k] ){
-					if( v === undefined ) return this[k];
-					else if( v === null ) delete this[k];
-					else this[k] = v;
-				}
-			}
-		},
-		$fn.parse = function( $end ){
-			var t0 = '', self = this;
-			rq.on( 'data', function( $v ){
-				t0 += $v;
-				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
-			} ).on( 'end', function(){
-				var type, i, t1;
-				if( t0 === null ) return rp.end();
-				type = rq.header['Content-type'];
-				if( type.indexOf( 'x-www-form-urlencoded' ) > -1 ){
-					postData = bs.$cgiparse( t0 );
-					postFile = null, $end();
-				}else if( type.indexOf( 'multipart' ) ){
-					t0 = bs.$trim( t0.split( '--' + type.substr( type.lastIndexOf('=') + 1 ) ) ),
-					postFile = {}, i = t0.length;
-					while( i-- ){
-						t1 = t0[i];
-						if( t1.indexOf( 'filename' ) > -1 ){
-							//파일처리 postFile[...] = new Buffer( xxx, 'base64' );
-						}else{
-							postData = bs.$cgiparse( bs.$trim( t1.substr( t1.indexOf( '\n' ) ) ) );
-						}
-					}
-					$end();
-				}
-			} );
-		};
-	} );
-	mime = require('./mime'),
+		currsite, sessionName, id, cookie, clientCookie, ckParser, next, pause,
+		head, method, response, application, session, rq, rp, getData, postData, postFile, data;
+	mime = require('./mime'), staticHeader = {'Content-Type':0},
+	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );},
 	clone = function( $v ){
 		var t0, k;
 		t0 = {};
 		for( k in $v )if( $v.hasOwnProperty( k ) ) t0[k] = $v[k];
 		return t0;
 	},
-	staticHeader = {'Content-Type':0},
 	clientCookie = null,
 	ckParser = function(){
 		var t0, t1, i;
@@ -193,7 +149,7 @@ bs.$method( 'crypt', (function(){
 				t0 += ';expires=' + t1.toUTCString() + ';Max-Age=' + ( $expire * 86400 );
 			cookie[$k] = t0;
 		};
-	})() );
+	})() ),
 	bs.$static( 'WEB', (function(){
 		var flush;
 		head = [], response = [],
@@ -204,7 +160,10 @@ bs.$method( 'crypt', (function(){
 			2:['Content-Length', 0]
 		};
 		return {
+			pause:function(){pause = 1;},
 			next:function(){next();},
+			site:function(){return currsite;},
+			exit:function( $html ){err( 200, $html );},
 			flush:function(){
 				var t0, k;
 				for(k in cookie) head[head.length] = ['Set-Cookie', cookie[k]];
@@ -212,23 +171,31 @@ bs.$method( 'crypt', (function(){
 				rp.writeHead( 200, head ), rp.end( t0 );
 			},
 			application:function( $k, $v ){return $v === undefined ? application[$k] : application[$k] = $v;},
-			session:function( $k, $v ){
-				var t0;
-				t0 = bs.$ck( sessionName );
-				if( $v === undefined ){
-					if( t0 && ( t0 = session[t0] ) ) return t0[$k];
-				}else{
-					if( !t0 ) bs.$ck( '@'+sessionName, t0 = bs.$crypt( 'sha256', ''+bs.$ex( 1000,'~',9999 ) + (id++) + bs.$ex( 1000,'~',9999 ) ) );
-					if( !session[t0] ) session[t0] = {};
-					return session[t0][$k] = $v;
+			session:function(){
+				var t0, t1, i, j, k, v;
+				i = 0, j = arguments.length;
+				while( i < j ){
+					k = arguments[i++], v = arguments[i++];
+					if( v === undefined ) return session ? session[k] : null;
+					else if( v === null && session ) delete session[k];
+					else{
+						if( !session ){
+							t0 = currsite.session
+							while( t0[t1 = bs.$crypt( 'sha256', ''+bs.$ex( 1000,'~',9999 ) + (id++) + bs.$ex( 1000,'~',9999 ) )] );
+							bs.$ck( sessionName, t1 );
+							session = t0[t1] = {__t:Date.now()};
+						}
+						session[k] = v;
+					}
 				}
+				return v;
 			},
 			head:function( $k, $v ){head[head.length] = [$k, $v];},
 			method:function(){return method;},
 			request:function( $k ){return $k ? rq[$k] : rq;},
 			response:function(){
-				var i, j;
-				for( i = 0, j = arguments.length ; i < j ; i++ ) response[response.length] = arguments[i];
+				var i = 0, j = arguments.length;
+				while( i < j ) response[response.length] = arguments[i++];
 			},
 			get:function( $k ){return getData[$k];},
 			post:function( $k ){return postData[$k];},
@@ -237,29 +204,74 @@ bs.$method( 'crypt', (function(){
 			redirect:function( $url, $isClient ){
 				if( $isClient ) rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( '<script>location.href="' + $url + '";</script>');
 				else rp.writeHead( 301, {Location:$url} ), rp.end();
-			},
-			site:function(){return currsite;},
-			exit:function( $html ){err( 200, $html );}
+			}
 		};
 	})() ),
-	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );};
+	bs.$class( 'form', function( $fn, bs ){
+		var key, i;
+		key = 'encoding,keepExtensions,postMax,fileMax,upload,'.split(',');
+		for( i in key ) key[key[i]] = 1;
+		$fn.$ = function(){
+			var i, j, k, v;
+			i = 0, j = arguments.length;
+			while( i < j ){
+				k = arguments[i++], v = arguments[i++];
+				if( key[k] ){
+					if( v === undefined ) return this[k];
+					else if( v === null ) delete this[k];
+					else this[k] = v;
+				}
+			}
+		},
+		$fn.parse = function( $end ){
+			var t0 = '', self = this;
+			rq.on( 'data', function( $v ){
+				t0 += $v;
+				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
+			} ).on( 'end', function(){
+				var type, i, t1;
+				if( t0 === null ) return rp.end();
+				type = rq.headers['content-type'];
+				if( type.indexOf( 'x-www-form-urlencoded' ) > -1 ){
+					postData = bs.$cgiparse( t0 );
+					postFile = null, $end();
+				}else if( type.indexOf( 'multipart' ) ){
+					t0 = bs.$trim( t0.split( '--' + type.substr( type.lastIndexOf('=') + 1 ) ) ),
+					postFile = {}, i = t0.length;
+					while( i-- ){
+						t1 = t0[i];
+						if( t1.indexOf( 'filename' ) > -1 ){
+							//파일처리 postFile[...] = new Buffer( xxx, 'base64' );
+						}else{
+							postData = bs.$cgiparse( bs.$trim( t1.substr( t1.indexOf( '\n' ) ) ) );
+						}
+					}
+					$end();
+				}
+			} );
+		};
+	} ),
 	bs.$class( 'site', function( $fn, bs ){
-		var ports, tEnd, f, runRule, defaultRouter, pass, sort, cache;
-		ports = {}, siteCache = {},
+		var ports, tEnd, f, runRule, defaultRouter, pass, cache;
+		ports = {},
 		portStart = function( $https, $sites, $port ){
 			var rqListener;
 			rqListener = function( $rq, $rp ){
-				var t0, t1, i, j, k, v;
+				var t0, t1, t2, i, j, k, v;
 				t0 = URL.parse( 'http://'+$rq.headers.host+$rq.url ), t1 = t0.hostname, i = 0, j = $sites.length;
 				while( i < j ){
 					k = $sites[i++], v = $sites[i++];
-					if( k == t1 ) currsite = v, fileRoot[site = t0.hostname] = v.root, cache = v.cache, 
+					if( k == t1 ) currsite = v, fileRoot[site = t0.hostname] = v.root, cache = v.cache, pause = 0,
 						rq = $rq, rp = $rp, application = v.application, v.request( t0, $rq, $rp );
 				}
 			};
 			HTTP.createServer( rqListener ).on('error', function($e){console.log($e);}).listen( $port );
-			if( $https ) HTTPS.createServer( $https, rqListener ).on('error', function($e){console.log($e);}).listen( 443 );
-			console.log( $port + ' started' );
+			console.log( 'http:' + $port + ' started' );
+			if( $https ){
+				HTTPS.createServer( $https, rqListener ).on('error', function($e){console.log($e);}).listen( $https.port );
+				console.log( 'https:' + $https.port + ' started' );
+			}
+			
 		},
 		f = function( $path ){
 			if( cache ) return f[$path] || ( f[$path] = bs.$file( null, $path ).toString() );
@@ -274,39 +286,44 @@ bs.$method( 'crypt', (function(){
 			}
 		},
 		defaultRouter = ['template', '@.html'],
-		pass = function(){process.nextTick( next );},
-		sort = function( a, b ){return a.length - b.length;},
+		pass = function(){pause = 0, process.nextTick( next );},
 		$fn.start = function(){
-			var start, t0, self = this;
+			var start, t0, self = this, k;
 			this.rulesArr = [];
 			for( k in this.rules ) this.rulesArr[this.rulesArr.length] = k;
-			this.rulesArr.sort( sort );
+			this.rulesArr.sort( function( a, b ){return a.length - b.length;} );
 			start = function(){
 				var domain, port, i, j, https;
 				if( self.https ){
 					https = {},
 					https.key = f( bs.$path( self.https.key, self.root ) ),
 					https.cert = f( bs.$path( self.https.cert, self.root ) );
+					https.port = self.https.port || 443;
 				}
-				currsite = self, fileRoot[site = self.__k] = self.root, cache = self.cache, application = self.application,
+				currsite = self, fileRoot[site = self.__k] = self.root, cache = self.cache, application = self.application, pause = 0,
 				i = 0, j = self.url.length;
+				next = function(){
+					next = null, self.isStarted = 0;
+					while( i < j ){
+						domain = self.url[i++], port = self.url[i++];
+						if( !ports[port] ) portStart( https, ports[port] = [], port );
+						if( ports[port].indexOf( domain ) == -1 ) ports[port].push( domain, self );
+					}
+				},
 				runRule( self.siteStart );
-				while( i < j ){
-					domain = self.url[i++], port = self.url[i++];
-					if( !ports[port] ) portStart( https, ports[port] = [], port );
-					if( ports[port].indexOf( domain ) == -1 ) ports[port].push( domain, self );
-				}
+				if( !pause ) pass();
 			};			
 			if( this.db.length ) t0 = this.db.slice(0), t0.unshift( start ), bs.$importdbc.apply( null, t0 );
 			else start();
 		},
+		$fn.index = 'index', $fn.cache = 1, $fn.sessionTime = 1000 * 60 * 20,
 		$fn.$constructor = function( $sel ){
 			var self = this, router, nextstep, onData, file, path, currRule, idx;
-			this.form = bs.form( $sel ), this.form.$( 'encoding', 'utf-8', 'keepExtensions', 1 );
+			this.form = bs.form( $sel ),
+			this.form.$( 'encoding', 'utf-8', 'keepExtensions', 1, 'fileMax', 2 * 1024 * 1024, 'postMax', 5 * 1024 * 1024 ),
 			this.url = [], this.isStarted = 0,
-			this.mime = clone( mime ), this.index = '@index',
-			this.fileMax = 2 * 1024 * 1024, this.postMax = .5 * 1024 * 1024,
-			this.rules = {'':defaultRouter}, this.application = {}, this.db = [], this.cache = 1,
+			this.mime = clone( mime ),
+			this.rules = {'':defaultRouter}, this.application = {}, this.session = {}, this.db = [],
 			this.request = function( $url, $rq, $rp ){
 				var t0, i, j;
 				path = $url.pathname.substr(1);
@@ -321,8 +338,11 @@ bs.$method( 'crypt', (function(){
 						) : err( 404, 'no file<br>'+path+file);
 				}
 				head.length = response.length = 0, this.retry = 1,
-				getData = bs.$cgiparse( $url.query ), ckParser(), data = {}, cookie = {}, 
-				( method = $rq.method ) == 'GET' ? ( postData = postFile = null, process.nextTick( router ) ) : this.form( router );
+				getData = bs.$cgiparse( $url.query ), ckParser(), data = {}, cookie = {};
+				if( session = self.session[t0 = bs.$ck(sessionName)] ){
+					session.__t - Date.now() > self.sessionTime ? ( delete self.session[t0], session = null ) : ( session.__t = Date.now() );
+				}
+				( method = $rq.method ) == 'GET' ? ( postData = postFile = null, process.nextTick( router ) ) : this.form.parse( router );
 			},
 			router = function(){
 				try{
@@ -332,7 +352,8 @@ bs.$method( 'crypt', (function(){
 						while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, next();
 						err( 500, '<h1>server error</h1><div>Error: no matched rules '+path+file );
 					};
-					if( !runRule( self.pageStart ) ) pass();
+					runRule( self.pageStart );
+					if( !pause ) pass();
 				}catch($e){
 					err( 500, '<h1>server error</h1><div>Error: '+$e+'</div>router' );
 				}
@@ -340,25 +361,27 @@ bs.$method( 'crypt', (function(){
 			nextstep = function(){
 				var t0, i, j;
 				if( idx < currRule.length ){
-					try{
+					//try{
 						i = currRule[idx++], j = currRule[idx++];
-						if( typeof j == 'string' ) j = j.replace( '@', file ), j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ), t0 = bs.$path( j );
+						if( typeof j == 'string' ) j = j.replace( '@', '@'+file ), j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ), t0 = bs.$path( j );
 						switch( i ){
 						case'template':self.template( t0, f(t0), bs.WEB, tEnd ); break;
-						case'static':bs.WEB.response( f(t0) ), pass(); break;
-						case'script':if( !( new Function( 'bs', f(t0) )(bs) ) ) pass(); break;
-						case'require':if( !require( t0 )(bs) ) pass(); break;
-						case'function':if( !runRule( j ) ) pass(); break;
+						case'static':bs.WEB.response( f(t0) ); break;
+						case'script':new Function( 'bs', f(t0) )(bs); break;
+						case'require':require( t0 )(bs); break;
+						case'function':runRule( j ); break;
 						default: pass();
 						}
-						return;
-					}catch($e){
+						if( !pause ) pass();
+					/*}catch($e){
+						console.log( t0,'::', $e );
 						if( self.retry-- ) head.length = response.length = 0, data = {}, cookie = {}, path = path + file + '/', file = self.index, router();
 						else err( 500, '<h1>server error</h1><div>Error: '+$e+'</div>path: '+path+'<br>file: '+file+'<br>rule: '+i+'(idx:'+idx+')<br>target :'+j );
-					}
+					}*/
 				}else{
 					next = bs.WEB.flush;
-					if( !runRule( self.pageEnd ) ) pass();
+					runRule( self.pageEnd );
+					if( !pause ) pass();
 				}
 			};
 		},
@@ -381,7 +404,7 @@ bs.$method( 'crypt', (function(){
 						break;
 					case'cache':this.cache = v; break;
 					case'root':this.root = bs.$path( v, 'root' ); break;
-					case'template':case'index':this[k] = v; break;
+					case'sessionTime':case'template':case'index':this[k] = v; break;
 					case'siteStart':case'pageStart':case'pageEnd':this[k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
 					case'upload':this.form.$( k, v ); break;
 					case'postMax':case'fileMax':this.form.$( k, v * 1024 * 1024 ); break;
@@ -432,7 +455,10 @@ bs.$method( 'crypt', (function(){
 			if( i < j ) k = arg[i++], !db[k] ? bs.$js( dbcnext, path + 'dbc_' + k+'.js' ) : dbcnext(); else $end();
 		} )();
 	} ),
-	bs.$method( 'registerdbc', function( $name, $obj ){db[$name] = $obj;} ),
+	bs.$method( 'registerdbc', function( $name, $obj ){
+		$obj.require = require( $obj.require ),
+		db[$name] = $obj;
+	}),
 	bs.$class( 'sql', function( $fn, bs ){
 		var key, i;
 		key = 'db,type,query'.split(','); for( i in key ) key[key[i]] = 1;
@@ -449,23 +475,26 @@ bs.$method( 'crypt', (function(){
 				}
 			}
 		},
-		$fn.run = function(){
+		$fn.run = function( $end ){
 			var end, t0, i, j, k;
-			t0 = {}, i = 0, j = arguments.length;
-			while( i < j ) k = arguments[i++], typeof k == 'function' ? end = k : t0[k] = arguments[i++];
-			return bs.db( this.db ).$( this.type, bs.$tmpl( this.query, t0 ), end );
+			t0 = {}, i = 1, j = arguments.length;
+			while( i < j ) t0[k = arguments[i++]] = arguments[i++];
+			return bs.db( this.db )[this.type]( bs.$tmpl( this.query, t0 ), $end );
 		};
 	} ),
 	bs.$class( 'db', (function(){
 		return function( $fn, bs ){
 			$fn.$constructor = function( $sel ){
 				$sel = $sel.split('@');
-				if( !db[$sel[1]] ) return error( 'no db connector for ' + $sel[1] );
+				if( !db[$sel[1]] ) return bs.$error( 'no db connector for ' + $sel[1] );
 				this.__db = new db[$sel[1]](), $sel = $sel[0];
 			},
 			$fn.$ = function(){return this.__db.$( arguments );},
 			$fn.open = function(){return this.__db.open();},
 			$fn.close = function(){return this.__db.close();};
+			$fn.execute = function( $query ){return this.__db.execute( $query );},
+			$fn.recordset = function( $query, $end ){this.__db.recordset( $query, $end );},
+			$fn.stream = function( $query, $end ){this.__db.stream( $query, $end );};
 		};
 	})() );
 })();

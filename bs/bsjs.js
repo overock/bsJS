@@ -36,6 +36,7 @@ function method( $name, $func, $version/*, $dependency*/ ){
 	$func.DEPENDENCY = dependency( arguments ) || {length:0}, depend[$name.substr(1)] = $func.VERSION = $version || VERSION, bs[$name] = $func;
 }
 method( 'timeout', function( $time ){timeout = parseInt( $time * 1000 );} ),
+method( 'error', error ),
 method( 'method', method ),
 method( 'del', function(){
 	var i, j, k;
@@ -263,6 +264,7 @@ if( !W['console'] ) (function(){
 		i = 0, j = h.length;
 		while(i < j) $xhr.setRequestHeader( h[i++], h[i++] );
 		t0.send( bs.$cgi( $arg ) || '' );
+		console.log('aaa', $end, '::', t0.responseText);
 		if( !$end ) return t0.responseText;
 	}
 	method( 'get', function( $end, $url ){return http( 'GET', $end, bs.$url( $url, arguments ) );} ),

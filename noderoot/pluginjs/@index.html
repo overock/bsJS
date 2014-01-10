@@ -2,7 +2,7 @@
 
 <h1>projectBS - BSJS<br />Plugin</h1>
 <div id="personal">
-<%if( !bs.WEB.session('nick') ){%>
+<%if( !bs.WEB.session('email') ){%>
 	<div>email <input type="text" id="Lemail" /></div>
 	<div>pw <input type="password" id="Lpw" /></div>
 	<div><input type="button" id="Llogin" value="login" /> <input type="button" id="Ljoin" value="join" /></div>
@@ -11,7 +11,9 @@
 bs( function(){
 	bs.dom( '#Llogin' ).$( 'down', function( $e ){
 		var t0;
-		if( t0 = JSON.parse( bs.$get( null, '/login', 'email', bs.dom( '#Lemail' ).$('@value'), 'pw', bs.$md5( bs.dom( '#Lpw' ).$('@value') ) ) ) ){
+		t0 = bs.$post( null, '/login', 'email', bs.dom( '#Lemail' ).$('@value'), 'pw', bs.$md5( bs.dom( '#Lpw' ).$('@value') ) );
+		if( t0 ){
+			t0 = JSON.parse( t0 );
 			if( t0.result == 'ok' ){
 				bs.dom( '#personal' ).$( 'html', 'logined' );
 				bs.dom( '#menuLogin' ).$( 'html', t0.contents.nick );
