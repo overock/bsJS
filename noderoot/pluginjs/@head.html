@@ -25,6 +25,6 @@
 <body>
 <div class="top"><div class="contents">
 	<div id="menu"><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>
-	<div id="menuLogin"><%if( bs.WEB.session( 'email' ) ) ECHO( bs.WEB.session( 'nick' ) );%></div>
+	<div id="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' + bs.WEB.session( 'nick' ) + '</a>  <a href="/logout">logout</a>' );%></div>
 </div></div>
 <div class="contents"><div class="middle">
