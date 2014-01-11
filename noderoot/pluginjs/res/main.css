@@ -6,8 +6,8 @@ div{font-size: 12px}
 .top{width:100%;background-image: url("top/bg.jpg");height:65px}
 .top .container{margin:0 auto;width:980px  }
 .top .container .logo{float: left; width:150px; margin-top: 20px}
-.top .container .navi{float: left; margin-top: 20px}
-.top .container .search{float: left; margin-top: 20px}
+.top .container .navi{float: left;width:220px; margin-top: 20px}
+.top .container .search{float: left; width:150px;margin-top: 20px}
 .top .container .personal{float: right; margin-top: 20px; }
 .top .container .personal div{float: left;}
 .top .container .menuLogin{float: right;margin-top: 20px; margin-left: 20px }
@@ -22,12 +22,12 @@ div{font-size: 12px}
 .middle .lists .list3{float: left;}
 .middle .lists .recommand{clear:both;margin-left: -10px;padding-bo: 20px}
 
-.middle .lists img{vertical-align: top; margin-top: 15px}
+.middle .lists img{margin-top: 15px; display: }
 .middle .lists h1{height: 1px;margin: 5px}
-.middle .lists .title{display: inline-block;color: #bfbec3; margin-top: 16px; margin-left: 15px;font-size: 11px }
-.middle .lists .hit1{display: inline-block; color: #404040; ;font-weight: bold;font-size: 12px}
-.middle .lists .list3 .title{display: inline-block;font-size: 20px;color: #404040; margin-top: 12px; margin-left: 15px;}
-.middle .lists .list3 .ex{display: inline-block; color: #bbbbbb; width: 300px; height: 56px}
+.middle .lists .title{color: #bfbec3; margin-top:-32px;margin-left: 50px; font-size: 11px }
+.middle .lists .hit1{color: #404040; ;font-weight: bold;font-size: 12px}
+.middle .lists .list3 .title{font-size: 20px;color: #404040; margin-top: -95px; margin-left: 115px;}
+.middle .lists .list3 .ex{color: #bbbbbb; width: 300px; height: 52px}
 .middle .lists .list3 .ex2{ color: #81acac;}
 
 
