@@ -13,9 +13,9 @@ div{font-size: 12px}
 .top .container .menuLogin{float: right;margin-top: 20px; margin-left: 20px }
 
 
-
 .middle{}
-.middle .middleVisual{width: 100%; height: 410px; background: #999999}
+.middle .middleVisual{width: 100%; height: 410px; }
+
 .middle .lists{margin: 10px;}
 .middle .lists .list1{width: 240px;float: left; }
 .middle .lists .list2{width: 300px;float: left }
