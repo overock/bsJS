@@ -1,8 +1,35 @@
-body{margin:0;padding:0}
-.contents{width:960px;margin:0 auto;overflow:hidden}
-.top{height:60px;background:#dedede}
-.middle{margin:20px 0}
-.bottom{height:60px;background:#eee}
+body{margin:0;padding:0;font-family: Arial}
+div{font-size: 12px}
+.contents{width:980px;margin:0 auto;overflow:hidden}
+
+.top{width:100%;;background:#dedede; background-image: url("top/bg.jpg")}
+.top .contents{width:980px}
+.top .logo{width:150px;float: left}
+.top .navi{margin: 0 auto; height:65px;background-image: url("draft/top.jpg")}
+.top .navi div{float: left}
+.top .personal {float: left}
+
+.middle{ }
+.middle .middleVisual{width: 100%; height: 410px; background: #999999}
+.middle .lists{margin: 10px;}
+.middle .lists .list1{width: 240px;float: left; }
+.middle .lists .list2{width: 300px;float: left }
+.middle .lists .list3{loat: left;}
+.middle .lists .recommand{clear:both;margin-left: -10px;padding-bo: 20px}
+
+.middle .lists img{vertical-align: top; margin-top: 15px}
+.middle .lists h1{height: 1px;margin: 5px}
+.middle .lists .title1{display: inline-block;color: #bfbec3; margin-top: 12px; margin-left: 15px;}
+.middle .lists .hit1{display: inline-block; color: #404040; ;font-weight: bold}
+.middle .lists .list3 .title{display: inline-block;font-size: 20px;color: #404040; margin-top: 12px; margin-left: 15px;}
+.middle .lists .list3 .ex{display: inline-block; color: #bbbbbb; width: 300px;}
+
+
+.bottom{clear: both;height:50px; width:100%;background:#eee; margin-top: 50px}
+.bottom .footer{width: 980px;margin: 0 auto}
+.bottom .copy{font-size: 11px; color: #a1a1a1; display: inline}
+.bottom .site{font-size: 11px; color: #a1a1a1; display: inline}
+
 #menu{float:left;width:700px}
 #login{float:right;width:200px}
 #login img{float:left;margin-right:3px}

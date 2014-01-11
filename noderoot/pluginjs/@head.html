@@ -24,7 +24,19 @@
 <script type="text/javascript" src="/res/main.js"></script>
 <body>
 <div class="top"><div class="contents">
-	<div id="menu"><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>
-	<div id="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' + bs.WEB.session( 'nick' ) + '</a>  <a href="/logout">logout</a>' );%></div>
+    <div class="logo">project BS Logo </div>
+    <div class="navi">
+        <div id="menu"><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>
+        <div id="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' + bs.WEB.session( 'nick' ) + '</a>  <a href="/logout">logout</a>' );%></div>
+
+        <div id="join" style="display:none">
+            <div>email <input type="text" id="Jemail"/></div>
+            <div>pw <input type="password" id="Jpw"/></div>
+            <div>nick <input type="text" id="Jnick"/></div>
+            <div>thumb url <input type="text" id="Jthumb"/></div>
+            <div><input type="button" id="Jjoin" value="join"/> <input type="button" id="Jcancel" value="cencel"/></div>
+            <div id="Jalert"></div>
+        </div>
+    </div >
 </div></div>
 <div class="contents"><div class="middle">
