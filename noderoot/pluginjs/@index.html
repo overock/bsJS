@@ -1,7 +1,7 @@
 <%IMPORT( '@head.html' );%>
 <ul>
     <li>영역 일단정리</li>
-    <li>TODO 상단 네비 스킨 </li>
+    <li>TODO 상단 네비 스킨</li>
     <li>TODO 비쥬얼 컨테이너</li>
     <li>TODO 섬네일 태그와 이미지 분리</li>
     <li>TODO 푸터 스킨</li>
@@ -27,21 +27,34 @@
 
 <script>
     bs(function () {
+        var titleData = [
+            'Debuger 1.2',
+            'Navigation Maker 2.0',
+            'Chart 2.2',
+            'Templete Parser 2.0',
+            'Particle 3.1',
+            'Loop Gallery 1.0',
+            'd3',
+            'Sprite Sheet 1.0',
+            'Test Method 1.0',
+            'Paticle Maker 1.0',
+            'Console Debuger 1.2'
+        ]
         // redcamel 추가
         var i = 7, p, j = 1, code
         p = bs.dom('#list1')
         while (i--)
             code = '<div><img src="res/draft/index_thumb1.png">',
-                    code += '<div class="title">Templete Parser 2.0<div>',
-                    code += ' <div class="hit1">9,800</div>',
+                    code += '<div class="title"><a href="">'+titleData[bs.$ex(0, '~', 10)]+'</a><div>',
+                    code += ' <div class="hit1">' + bs.$ex(1, '~', 2) + ',' + bs.$ex(200, '~', 999) + '</div>',
                     code += '</div>',
                     bs.dom(code).$('<', p)
 
         i = 7, p = bs.dom('#list2')
         while (i--)
             code = '<div><img src="res/draft/index_thumb1.png">',
-                    code += '<div class="title">Templete Parser 2.0<div>',
-                    code += ' <div class="hit1">9,800</div>',
+                    code += '<div class="title"><a href="">'+titleData[bs.$ex(0, '~', 10)]+'</a><div>',
+                    code += ' <div class="hit1">' + bs.$ex(1, '~', 2) + ',' + bs.$ex(200, '~', 999) + '</div>',
                     code += '</div>',
                     bs.dom(code).$('<', p)
 
@@ -53,7 +66,7 @@
             else  str = "sprite which CSS sprite system supports Frame Animations and OneFrameCut. Its a perfect Choice when you want...";
 
             code = '<div><img src=' + img + '>'
-            code += '<div class="title">Console Debuger 1.2<div>'
+            code += '<div class="title"><a href="">Console Debuger 1.2</a><div>'
             code += '<div class="ex">' + str + '</div>'
             code += '<div class="ex2">' + 'category : Graphics / by hika / 2014.02.11' + '</div>'
             code += '</div>'
