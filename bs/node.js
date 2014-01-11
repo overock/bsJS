@@ -114,7 +114,7 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'delete', function( $end, $path ){return http( 'DELETE', $end, bs.$url($path), arguments );} );
 })( HTTP, URL ),
 (function( HTTP, HTTPS, URL ){
-	var form, mime, clone, portStart, staticHeader, err,
+	var form, mime, clone, portStart, staticHeader, err, Upfile,
 		currsite, sessionName, id, cookie, clientCookie, ckParser, next, pause,
 		head, method, response, application, session, rq, rp, getData, postData, postFile, data;
 	mime = require('./mime'), staticHeader = {'Content-Type':0},
@@ -133,6 +133,10 @@ bs.$method( 'crypt', (function(){
 			t0 = t0.split(';'), i = t0.length;
 			while( i-- ) t0[i] = bs.$trim( t0[i].split('=') ), clientCookie[t0[i][0]] = t0[i][1];
 		}
+	},
+	Upfile = function Upfile( $name, $file ){
+		this.name = $name,
+		this.file = $file
 	},
 	bs.$method( 'ck', (function(){
 		return function( $k, $v, $path, $expire, $domain ){
@@ -229,7 +233,7 @@ bs.$method( 'crypt', (function(){
 				t0 += $v;
 				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
 			} ).on( 'end', function(){
-				var type, i, t1;
+				var type, i, t1, mfi, mty, mctnt, mkey, mfn;
 				if( t0 === null ) return rp.end();
 				type = rq.headers['content-type'];
 				if( type.indexOf( 'x-www-form-urlencoded' ) > -1 ){
@@ -237,15 +241,24 @@ bs.$method( 'crypt', (function(){
 					postFile = null, $end();
 				}else if( type.indexOf( 'multipart' ) > -1 ){
 					t0 = bs.$trim( t0.split( '--' + type.substr( type.lastIndexOf('=') + 1 ) ) ),
-					postFile = {}, i = t0.length;
+					postFile = {}, postData = {}, i = t0.length;
 					while( i-- ){
 						t1 = t0[i];
 						if( t1.indexOf( 'filename' ) > -1 ){
-							//파일처리 postFile[...] = new Buffer( xxx, 'base64' );
-						}else{
-							postData = bs.$cgiparse( bs.$trim( t1.substr( t1.indexOf( '\n' ) ) ) );
+							t1 = t1.split( '\r\n' ),
+							mfi = ( t1.shift() ).split( ';' ),
+							mkey = mfi[1].substring( mfi[1].indexOf( '"' )+1, mfi[1].lastIndexOf( '"' ) ),
+							mfn = mfi[2].substring( mfi[2].indexOf( '"' )+1, mfi[2].lastIndexOf( '"' ) ),
+							mty = t1.shift(),
+							mctnt = ( t1.slice(1) ).join( '\r\n' ),
+							postFile[mkey] = new Upfile( mfn, new Buffer( mctnt ) );
+						}else if( t1.indexOf( 'name' ) > -1 ){
+							t1 = t1.split( '\r\n' ),
+							mkey = t1[0].substring( t1[0].indexOf( '"' )+1, t1[0].lastIndexOf( '"' ) ),
+							postData[mkey] = t1[2];
 						}
 					}
+					console.log(postData), console.log(postFile);
 					$end();
 				}
 			} );
