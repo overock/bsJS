@@ -1,20 +1,23 @@
 body{margin:0;padding:0;font-family: Arial}
 div{font-size: 12px}
-.contents{width:980px;margin:0 auto;overflow:hidden}
+.contents{width:980px;margin:0 auto;overflow:hidden;clear: both}
 
-.top{width:100%;;background:#dedede; background-image: url("top/bg.jpg")}
-.top .contents{width:980px}
-.top .logo{width:150px;float: left}
-.top .navi{margin: 0 auto; height:65px;background-image: url("draft/top.jpg")}
-.top .navi div{float: left}
-.top .personal {float: left}
+.top{width:100%;background-image: url("top/bg.jpg");height:65px}
+.top .container{margin:0 auto;width:980px  }
+.top .container .logo{float: left; width:150px; margin-top: 20px}
+.top .container .navi{float: left; margin-top: 20px}
+.top .container .personal{float: right; margin-top: 20px; }
+.top .container .personal div{float: left;}
+.top .container .menuLogin{float: right;margin-top: 20px; margin-left: 20px }
 
-.middle{ }
+
+
+.middle{}
 .middle .middleVisual{width: 100%; height: 410px; background: #999999}
 .middle .lists{margin: 10px;}
 .middle .lists .list1{width: 240px;float: left; }
 .middle .lists .list2{width: 300px;float: left }
-.middle .lists .list3{loat: left;}
+.middle .lists .list3{float: left;}
 .middle .lists .recommand{clear:both;margin-left: -10px;padding-bo: 20px}
 
 .middle .lists img{vertical-align: top; margin-top: 15px}

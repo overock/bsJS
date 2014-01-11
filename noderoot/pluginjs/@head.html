@@ -23,12 +23,10 @@
 <script>bs.$import( 'md5', 'last' );</script>
 <script type="text/javascript" src="/res/main.js"></script>
 <body>
-<div class="top"><div class="contents">
+<div class="top"><div class="container">
     <div class="logo">project BS Logo </div>
     <div class="navi">
         <div id="menu"><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>
-        <div id="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' + bs.WEB.session( 'nick' ) + '</a>  <a href="/logout">logout</a>' );%></div>
-
         <div id="join" style="display:none">
             <div>email <input type="text" id="Jemail"/></div>
             <div>pw <input type="password" id="Jpw"/></div>
@@ -38,5 +36,66 @@
             <div id="Jalert"></div>
         </div>
     </div >
+    <div id="menuLogin" class="menuLogin" ><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' + bs.WEB.session( 'nick' ) + '</a>  <a href="/logout">logout</a>' );%></div>
+    <div id="personal" class="personal">
+
+        <%if( !bs.WEB.session('email') ){%>
+        <div>email <input type="text" id="Lemail"/></div>
+        <div>pw <input type="password" id="Lpw"/></div>
+        <div><input type="button" id="Llogin" value="login"/> <input type="button" id="Ljoin" value="join"/></div>
+        <div id="Lalert"></div>
+        <script>
+            bs(function () {
+                //login
+                bs.dom('#Llogin').$('down', function ($e) {
+                    var t0;
+                    t0 = bs.$post(null, '/login', 'email', bs.dom('#Lemail').$('@value'), 'pw', bs.$md5(bs.dom('#Lpw').$('@value')));
+                    if (t0) {
+                        t0 = JSON.parse(t0);
+                        if (t0.result == 'ok') {
+                            bs.dom('#personal').$('html', '<a href="/member/">' + t0.contents.nick + '</a>');
+                            bs.dom('#menuLogin').$('html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>');
+                        } else {
+                            bs.dom('#Lalert').$('html', 'loginFailed:' + t0.contents);
+                        }
+                    } else {
+                        bs.dom('#Lalert').$('html', 'loginFailed: no response');
+                    }
+                });
+                bs.dom('#Ljoin').$('down', function ($e) {
+                    bs.dom('#personal').$('display', 'none');
+                    bs.dom('#join').$('display', 'block');
+                });
+                //join
+                bs.dom('#Jjoin').$('down', function ($e) {
+                    var t0;
+                    t0 = bs.$post(null, '/join',
+                            'email', bs.dom('#Jemail').$('@value'), 'pw', bs.$md5(bs.dom('#Jpw').$('@value')),
+                            'nick', bs.dom('#Jnick').$('@value'), 'thumb', bs.dom('#Jthumb').$('@value')
+                    );
+                    if (t0) {
+                        t0 = JSON.parse(t0);
+                        if (t0.result == 'ok') {
+                            bs.dom('#join').$('display', 'none');
+                            bs.dom('#personal').$('display', 'block', 'html', '<a href="/member/">' + t0.contents.nick + '</a>');
+                            bs.dom('#menuLogin').$('html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>');
+                        } else {
+                            bs.dom('#Jalert').$('html', 'joinFailed:' + t0.contents);
+                        }
+                    } else {
+                        bs.dom('#Jalert').$('html', 'joinFailed: no response');
+                    }
+                });
+                bs.dom('#Jcancel').$('down', function ($e) {
+                    bs.dom('#join').$('display', 'none');
+                    bs.dom('#personal').$('display', 'block');
+                });
+
+            });
+        </script>
+        <%}else{%>
+        <a href="/member/"><%=bs.WEB.session('nick')%></a>
+        <%}%>
+    </div>
 </div></div>
 <div class="contents"><div class="middle">
