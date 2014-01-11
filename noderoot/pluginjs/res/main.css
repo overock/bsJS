@@ -2,10 +2,12 @@ body{margin:0;padding:0;font-family: Arial}
 div{font-size: 12px}
 .contents{width:980px;margin:0 auto;overflow:hidden;clear: both}
 
+#githubTag{position: absolute; top: 64px; left: 0; border: 0;}
 .top{width:100%;background-image: url("top/bg.jpg");height:65px}
 .top .container{margin:0 auto;width:980px  }
 .top .container .logo{float: left; width:150px; margin-top: 20px}
 .top .container .navi{float: left; margin-top: 20px}
+.top .container .search{float: left; margin-top: 20px}
 .top .container .personal{float: right; margin-top: 20px; }
 .top .container .personal div{float: left;}
 .top .container .menuLogin{float: right;margin-top: 20px; margin-left: 20px }
@@ -22,10 +24,11 @@ div{font-size: 12px}
 
 .middle .lists img{vertical-align: top; margin-top: 15px}
 .middle .lists h1{height: 1px;margin: 5px}
-.middle .lists .title1{display: inline-block;color: #bfbec3; margin-top: 12px; margin-left: 15px;}
-.middle .lists .hit1{display: inline-block; color: #404040; ;font-weight: bold}
+.middle .lists .title{display: inline-block;color: #bfbec3; margin-top: 16px; margin-left: 15px;font-size: 11px }
+.middle .lists .hit1{display: inline-block; color: #404040; ;font-weight: bold;font-size: 12px}
 .middle .lists .list3 .title{display: inline-block;font-size: 20px;color: #404040; margin-top: 12px; margin-left: 15px;}
-.middle .lists .list3 .ex{display: inline-block; color: #bbbbbb; width: 300px;}
+.middle .lists .list3 .ex{display: inline-block; color: #bbbbbb; width: 300px; height: 56px}
+.middle .lists .list3 .ex2{ color: #81acac;}
 
 
 .bottom{clear: both;height:50px; width:100%;background:#eee; margin-top: 50px}

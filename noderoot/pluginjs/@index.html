@@ -1,5 +1,13 @@
 <%IMPORT( '@head.html' );%>
-음...css로가야하나...id셀렉터기반으로 가야하나..
+<ul>
+    <li>영역 일단정리</li>
+    <li>TODO 상단 네비 스킨 </li>
+    <li>TODO 비쥬얼 컨테이너</li>
+    <li>TODO 섬네일 태그와 이미지 분리</li>
+    <li>TODO 푸터 스킨</li>
+    <li>TODO recommand Plugin 영역구현</li>
+</ul>
+
 <div class="middleVisual">mainVisuals</div>
 <div><img src="res/index/bs_ex1.png"></div>
 <div class="lists">
@@ -17,26 +25,41 @@
         <h1></h1></div>
 </div>
 
-        <script>
-            bs(function(){
-                // redcamel 추가
-                var i = 7, p,j=1
-                p = bs.dom('#list1')
-                while (i--) bs.dom('<div><img src="res/draft/index_thumb1.png"><div class="title1">Templete Parser 2.0<div><div class="hit1">9,800</div></div>').$('<', p)
-                i = 7, p = bs.dom('#list2')
-                while (i--) bs.dom('<div><img src="res/draft/index_thumb1.png"><div class="title1">Templete Parser 2.0<div><div class="hit1">9,800</div></div>').$('<', p)
-                i = 5, p = bs.dom('#list3')
-                while (i--) {
-                    var str = ''
-                    var img = 'res/draft/index_Bthumb_'+(j++)+'.png'
-                    if (i % 2 == 0) str = '어떤 느낌이지 한글이 되면 간만에 하려니....감떨어지는군...두줄도 써봐야 되지않겠어? 스파리이트가 뭐냐하니...그냥 스프라이트지머..';
-                    else  str ="sprite which CSS sprite system supports Frame Animations and OneFrameCut. Its a perfect Choice when you want...";
+<script>
+    bs(function () {
+        // redcamel 추가
+        var i = 7, p, j = 1, code
+        p = bs.dom('#list1')
+        while (i--)
+            code = '<div><img src="res/draft/index_thumb1.png">',
+                    code += '<div class="title">Templete Parser 2.0<div>',
+                    code += ' <div class="hit1">9,800</div></div>',
+                    bs.dom(code).$('<', p)
 
-                    bs.dom('<div><img src='+img+'><div class="title">Console Debuger 1.2<div><div class="ex">'+str+'</div></div>').$('<', p)
+        i = 7, p = bs.dom('#list2')
+        while (i--)
+            code = '<div><img src="res/draft/index_thumb1.png">',
+                    code += '<div class="title">Templete Parser 2.0<div>',
+                    code += ' <div class="hit1">9,800</div></div>',
+                    bs.dom(code).$('<', p)
 
-                }
-            })
-        </script>
+        i = 5, p = bs.dom('#list3')
+        while (i--) {
+            var str = ''
+            var img = 'res/draft/index_Bthumb_' + (j++) + '.png'
+            if (i % 2 == 0) str = '어떤 느낌이지 한글이 되면 간만에 하려니....감떨어지는군...두줄도 써봐야 되지않겠어? 스파리이트가 뭐냐하니...그냥 스프라이트지머..';
+            else  str = "sprite which CSS sprite system supports Frame Animations and OneFrameCut. Its a perfect Choice when you want...";
+
+            code = '<div><img src=' + img + '>'
+            code += '<div class="title">Console Debuger 1.2<div>'
+            code += '<div class="ex">' + str + '</div>'
+            code += '<div class="ex2">' + 'category : Graphics / by hika / 2014.02.11' + '</div>'
+            code += '</div>'
+            bs.dom(code).$('<', p)
+
+        }
+    })
+</script>
 
 
 <!--<div>-->
