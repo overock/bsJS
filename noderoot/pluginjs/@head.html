@@ -25,31 +25,25 @@
     <script type="text/javascript" src="/res/main.js"></script>
 <body>
 <img id="githubTag" src="res/top/tag.png">
+
 <div class="top">
     <div class="container">
-        <div class="logo">project BS Logo</div>
+        <div class="logo"><img src="/res/draft/logo.jpg"></div>
         <div class="navi">
-            <div id="menu"><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a
-                    href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>
-            <div id="join" style="display:none">
-                <div>email <input type="text" id="Jemail"/></div>
-                <div>pw <input type="password" id="Jpw"/></div>
-                <div>nick <input type="text" id="Jnick"/></div>
-                <div>thumb url <input type="text" id="Jthumb"/></div>
-                <div><input type="button" id="Jjoin" value="join"/> <input type="button" id="Jcancel" value="cencel"/>
-                </div>
-                <div id="Jalert"></div>
-            </div>
+            <div id="menu"><a href="/recent/">Recent</a> | <a href="/hot/">Hot</a> | <a
+                    href="/updated/">Updated</a> | <a href="/catalog/">Catalog</a></div>
         </div>
-        <div id="menuLogin" class="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' +
-            bs.WEB.session( 'nick' ) + '</a> <a href="/logout">logout</a>' );%>
+        <div class="search">
+            <div><input type="text" value="search"/><input type="image" src="/res/top/search.jpg" style="vertical-align: middle"/></div>
         </div>
-        <div class="search">서치드갈자리</div>
+        <div id="menuLogin" class="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' +bs.WEB.session( 'nick' ) + '</a> <a href="/logout">logout</a>' );%>
+        </div>
+
         <div id="personal" class="personal">
             <%if( !bs.WEB.session('email') ){%>
-            <div>email <input type="text" id="Lemail"/></div>
-            <div>pw <input type="password" id="Lpw"/></div>
-            <div><input type="button" id="Llogin" value="login"/> <input type="button" id="Ljoin" value="join"/></div>
+            <div style="padding-right: 10px"><input type="text" id="Lemail" value='email' style="width: 100px"/></div>
+            <div>pw <input type="password" id="Lpw" style="width: 100px"/></div>
+            <div><input type="button" id="Llogin" value="login"/><input type="button" id="Ljoin" value="join"/></div>
             <div id="Lalert"></div>
             <script>
                 bs(function () {
@@ -108,3 +102,15 @@
 </div>
 <div class="contents">
     <div class="middle">
+        <div id="join" style="display:none">
+            가입안내 어쩌고저쩌고~~~<br/>
+            <div>email <input type="text" id="Jemail"/></div>
+            <div>pw <input type="password" id="Jpw"/></div>
+            <div>nick <input type="text" id="Jnick"/></div>
+            <div>thumb url <input type="text" id="Jthumb"/></div>
+            <div>
+                <input type="button" id="Jjoin" value="join"/>
+                <input type="button" id="Jcancel" value="cencel"/>
+            </div>
+            <div id="Jalert"></div>
+        </div>
