@@ -28,23 +28,28 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 .middle .lists .list3{float: left;}
 .middle .lists .recommand{clear:both;margin-left: -10px;padding-bo: 20px}
 
-.middle .lists img{margin-top: 15px; display: }
+.middle .lists .blockLine{ height: 17px}
+
 .middle .lists h1{height: 1px;margin: 5px}
 .middle .list3 a:visited {text-decoration: none;color: #404040 }
 .middle .list3 a:active {text-decoration: none;color: #404040 }
 
 .middle .lists .title{color: #bfbec3; margin-top:-34px;margin-left: 50px; font-size: 11px }
-.middle .lists .hit1{color: #404040; ;font-weight: bold;font-size: 12px}
+.middle .lists .hitNum{color: #404040; ;font-weight: bold;font-size: 12px}
+
+
 .middle .lists .list3 .title{ font-size: 20px;color: #404040; margin-top: -95px; margin-left: 115px;}
 .middle .lists .list3 .ex{color: #bbbbbb; width: 300px; height: 52px}
 .middle .lists .list3 .ex2{ color: #81acac;}
+
+
 
 
 .bottom{clear: both;height:50px; width:100%;background:#eee; margin-top: 50px}
 .bottom .container{margin:0 auto;width:980px  }
 .bottom .container .logo{float: left; margin-top: 20px}
 .bottom .copy{font-size: 12px; color: #a1a1a1; float: left; margin-top: 20px}
-.bottom .site{font-size: 11px; color: #a1a1a1; float: right;margin-top: 20px}}
+.bottom .site{font-size: 11px; color: #a1a1a1; float: right;margin-top: 20px}
 
 
 
