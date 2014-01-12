@@ -27,7 +27,6 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 .middle .lists .list2{width: 300px;float: left }
 .middle .lists .list3{float: left;}
 .middle .lists .recommand{clear:both;margin-left: -10px;padding-bo: 20px}
-
 .middle .lists .blockLine{ height: 17px}
 
 .middle .lists h1{height: 1px;margin: 5px}
@@ -36,8 +35,6 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 
 .middle .lists .title{color: #bfbec3; margin-top:-34px;margin-left: 50px; font-size: 11px }
 .middle .lists .hitNum{color: #404040; ;font-weight: bold;font-size: 12px}
-
-
 .middle .lists .list3 .title{ font-size: 20px;color: #404040; margin-top: -95px; margin-left: 115px;}
 .middle .lists .list3 .ex{color: #bbbbbb; width: 300px; height: 52px}
 .middle .lists .list3 .ex2{ color: #81acac;}
