@@ -20,8 +20,7 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 
 .contents{width:980px;margin:0 auto;overflow:hidden;clear: both}
 .middle{}
-#join div{float: left;}
-#join {height: 200px; background: #eee}
+#join {height: 200px; background: #eee; padding: 10px}
 
 .middle .middleVisual{width: 100%; height: 410px; }
 
