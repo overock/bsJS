@@ -1,93 +1,137 @@
 <%IMPORT( '@head.html' );%>
 
-<h1>projectBS - BSJS<br />Plugin</h1>
-<div id="join" style="display:none">
-	<div>email <input type="text" id="Jemail" /></div>
-	<div>pw <input type="password" id="Jpw" /></div>
-	<div>nick <input type="text" id="Jnick" /></div>
-	<div>thumb url <input type="text" id="Jthumb" /></div>
-	<div><input type="button" id="Jjoin" value="join" /> <input type="button" id="Jcancel" value="cencel" /></div>
-	<div id="Jalert"></div>
+<div class="middleVisual"><img src="res/draft/index_visual.png"></div>
+<div><img src="res/index/bs_ex1.png"></div>
+<div class="lists">
+    <div style="float: left">
+        <div class="list1" id="list1"><img src="res/index/list_title1.png"></div>
+        <div class="list2" id="list2"><img src="res/index/list_title2.png"></div>
+        <div class="recommand">
+            <div class="blockLine"></div>
+            <img src="res/draft/index_recommand.png"></div>
+    </div>
+    <div class="list3" id="list3"><img src="res/index/list_title3.png"></div>
 </div>
-<div id="personal">
-<%if( !bs.WEB.session('email') ){%>
-	<div>email <input type="text" id="Lemail" /></div>
-	<div>pw <input type="password" id="Lpw" /></div>
-	<div><input type="button" id="Llogin" value="login" /> <input type="button" id="Ljoin" value="join" /></div>
-	<div id="Lalert"></div>
+
 <script>
-bs( function(){
-	//login
-	bs.dom( '#Llogin' ).$( 'down', function( $e ){
-		var t0;
-		t0 = bs.$post( null, '/login', 'email', bs.dom( '#Lemail' ).$('@value'), 'pw', bs.$md5( bs.dom( '#Lpw' ).$('@value') ) );
-		if( t0 ){
-			t0 = JSON.parse( t0 );
-			if( t0.result == 'ok' ){
-				bs.dom( '#personal' ).$( 'html', '<a href="/member/">' + t0.contents.nick + '</a>' );
-				bs.dom( '#menuLogin' ).$( 'html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>' );
-			}else{
-				bs.dom( '#Lalert' ).$( 'html', 'loginFailed:'+ t0.contents );
-			}
-		}else{
-			bs.dom( '#Lalert' ).$( 'html', 'loginFailed: no response' );
-		}
-	} );
-	bs.dom( '#Ljoin' ).$( 'down', function( $e ){
-		bs.dom( '#personal' ).$( 'display', 'none' );
-		bs.dom( '#join' ).$( 'display', 'block' );
-	} );
-	//join
-	bs.dom( '#Jjoin' ).$( 'down', function( $e ){
-		var t0;
-		t0 = bs.$post( null, '/join', 
-			'email', bs.dom( '#Jemail' ).$('@value'), 'pw', bs.$md5( bs.dom( '#Jpw' ).$('@value') ),
-			'nick', bs.dom( '#Jnick' ).$('@value'), 'thumb', bs.dom( '#Jthumb' ).$('@value')
-		);
-		if( t0 ){
-			t0 = JSON.parse( t0 );
-			if( t0.result == 'ok' ){
-				bs.dom( '#join' ).$( 'display', 'none' );
-				bs.dom( '#personal' ).$( 'display', 'block', 'html', '<a href="/member/">' + t0.contents.nick + '</a>' );
-				bs.dom( '#menuLogin' ).$( 'html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>' );
-			}else{
-				bs.dom( '#Jalert' ).$( 'html', 'joinFailed:'+ t0.contents );
-			}
-		}else{
-			bs.dom( '#Jalert' ).$( 'html', 'joinFailed: no response' );
-		}
-	} );
-	bs.dom( '#Jcancel' ).$( 'down', function( $e ){
-		bs.dom( '#join' ).$( 'display', 'none' );
-		bs.dom( '#personal' ).$( 'display', 'block' );
-	} );	
-} );
+    bs(function () {
+        var titleData = [
+            'Debuger 1.2',
+            'Navigation Maker 2.0',
+            'Chart 2.2',
+            'Templete Parser 2.0',
+            'Particle 3.1',
+            'Loop Gallery 1.0',
+            'd3',
+            'Sprite Sheet 1.0',
+            'Test Method 1.0',
+            'Paticle Maker 1.0',
+            'Console Debuger 1.2'
+        ]
+        // redcamel 추가
+        var i = 7, p, j = 1, code
+        p = bs.dom('#list1')
+        while (i--)
+            code = '<div class="blockLine"></div><div><img src="res/draft/index_thumb1.png"><div></div>',
+                    code += '<div class="title"><a href="">' + titleData[bs.$ex(0, '~', 10)] + '</a><div>',
+                    code += '<div class="hitNum">' + bs.$ex(1, '~', 2) + ',' + bs.$ex(200, '~', 999) + '</div>',
+                    code += '</div>',
+                    bs.dom(code).$('<', p)
+
+        i = 7, p = bs.dom('#list2')
+        while (i--)
+            code = '<div class="blockLine"></div><div><img src="res/draft/index_thumb1.png">',
+                    code += '<div class="title"><a href="">' + titleData[bs.$ex(0, '~', 10)] + '</a><div>',
+                    code += '<div class="hitNum">' + bs.$ex(1, '~', 2) + ',' + bs.$ex(200, '~', 999) + '</div>',
+                    code += '</div>',
+                    bs.dom(code).$('<', p)
+
+        i = 5, p = bs.dom('#list3')
+        while (i--) {
+            var exStr = ''
+            var thumb = 'res/draft/index_Bthumb_' + (j++) + '.png'
+            var tagBG = 'res/thumb/bar_0' + bs.$ex(1, '~', 5) + '.jpg';
+            if (i % 2 == 0) exStr = '어떤 느낌이지 한글이 되면 간만에 하려니....감떨어지는군...두줄도 써봐야 되지않겠어? 스파리이트가 뭐냐하니...그냥 스프라이트지머..';
+            else  exStr = "sprite which CSS sprite system supports Frame Animations and OneFrameCut. Its a perfect Choice when you want...";
+
+            code = '<div class="blockLine"></div>'
+            code += '<div>'
+            code += '   <div>'
+            code += "      <div style='background-image:url(" + thumb + ");width:97px;height:97px'>"
+            code += "              <div style='background-image:url(" + tagBG + ");width:92px;height:19px ;color:#fff;position:absolute;margin-top:75px;padding-left:5px;padding-top:3px;font-size:11px'>TYPE STR</div>"
+            code += "     </div>"
+            code += "   </div>"
+            code += '   <div class="title"><a href="">Console Debuger 1.2</a><div>'
+            code += '   <div class="ex">' + exStr + '</div>'
+            code += '   <div class="ex2">' + 'category :' + '<a href="">Graphics</a>' + '/ By ' + '<a href="">hika</a>' + ' / 2014.02.11' + '</div>'
+            code += '</div>'
+            bs.dom(code).$('<', p)
+
+        }
+    })
 </script>
-<%}else{%>
-	<a href="/member/"><%=bs.WEB.session('nick')%></a>
-<%}%>
-</div>
-<div>
-	<h2>recently updated</h2>
-	<div><h3>title</h3><div>time</div></div>
-	<div><h3>title</h3><div>time</div></div>
-	<div><h3>title</h3><div>time</div></div>
-	<div><h3>title</h3><div>time</div></div>
-</div>
-<div>
-	<h2>new arrival</h2>
-	<div><h3>title</h3><div>thumb, contents</div><div>category, author, date</div></div>
-	<div><h3>title</h3><div>thumb, contents</div><div>category, author, date</div></div>
-	<div><h3>title</h3><div>thumb, contents</div><div>category, author, date</div></div>
-</div>
-<div>
-	<h2>most depended</h2>
-	<div><h3>title</h3><div>count</div></div>
-	<div><h3>title</h3><div>count</div></div>
-	<div><h3>title</h3><div>count</div></div>
-	<div><h3>title</h3><div>count</div></div>
-	<div>authors</div>
-</div>
+
+
+<!--<div>-->
+<!--<h2>recently updated</h2>-->
+
+<!--<div><h3>title</h3>-->
+
+<!--<div>time</div>-->
+<!--</div>-->
+<!--<div><h3>title</h3>-->
+
+<!--<div>time</div>-->
+<!--</div>-->
+<!--<div><h3>title</h3>-->
+
+<!--<div>time</div>-->
+<!--</div>-->
+<!--<div><h3>title</h3>-->
+
+<!--<div>time</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div>-->
+<!--<h2>new arrival</h2>-->
+
+<!--<div><h3>title</h3>-->
+
+<!--<div>thumb, contents</div>-->
+<!--<div>category, author, date</div>-->
+<!--</div>-->
+<!--<div><h3>title</h3>-->
+
+<!--<div>thumb, contents</div>-->
+<!--<div>category, author, date</div>-->
+<!--</div>-->
+<!--<div><h3>title</h3>-->
+
+<!--<div>thumb, contents</div>-->
+<!--<div>category, author, date</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div>-->
+<!--<h2>most depended</h2>-->
+
+<!--<div><h3>title</h3>-->
+
+<!--<div>count</div>-->
+<!--</div>-->
+<!--<div><h3>title</h3>-->
+
+<!--<div>count</div>-->
+<!--</div>-->
+<!--<div><h3>title</h3>-->
+
+<!--<div>count</div>-->
+<!--</div>-->
+<!--<div><h3>title</h3>-->
+
+<!--<div>count</div>-->
+<!--</div>-->
+<!--<div>authors</div>-->
+<!--</div>-->
 
 
 <%IMPORT( '@foot.html' );%>

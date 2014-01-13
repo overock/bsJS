@@ -1,8 +1,60 @@
-body{margin:0;padding:0}
-.contents{width:960px;margin:0 auto;overflow:hidden}
-.top{height:60px;background:#dedede}
-.middle{margin:20px 0}
-.bottom{height:60px;background:#eee}
-#menu{float:left;width:700px}
+body{margin:0;padding:0;font-family: Arial}
+div{font-size: 12px}
+
+a:link {text-decoration: none; color: #bfbec3 }
+a:visited {text-decoration: none;color: #bfbec3 }
+a:active {text-decoration: none;color: #bfbec3 }
+a:hover {text-decoration: underline;color: #bfbec3 }
+
+
+
+#githubTag{position: absolute; top: 64px; left: 0; border: 0;}
+.top{width:100%;background-image: url("top/bg.jpg");height:65px}
+.top .container{margin:0 auto;width:980px  }
+.top .container .logo{float: left;}
+.top .container .navi{float: left;margin-top: 24px;margin-left: 30px}
+.top .container .search{float: left; ;margin-top: 20px;margin-left: 30px}
+.top .container .personal{float: right; margin-top: 20px; }
+.top .container .personal div{float: left;}
+.top .container .menuLogin{float: right;margin-top: 21px; margin-left: 20px}
+
+.contents{width:980px;margin:0 auto;overflow:hidden;clear: both}
+.middle{}
+#join {height: 200px; background: #eee; padding: 10px}
+
+.middle .middleVisual{width: 100%; height: 410px; }
+
+.middle .lists{margin: 10px;}
+.middle .lists .list1{width: 240px;float: left; }
+.middle .lists .list2{width: 300px;float: left }
+.middle .lists .list3{float: left;}
+.middle .lists .recommand{clear:both;margin-left: -10px;padding-bo: 20px}
+.middle .lists .blockLine{ height: 17px}
+
+.middle .lists h1{height: 1px;margin: 5px}
+.middle .list3 a:visited {text-decoration: none;color: #404040 }
+.middle .list3 a:active {text-decoration: none;color: #404040 }
+
+.middle .lists .title{color: #bfbec3; margin-top:-34px;margin-left: 50px; font-size: 11px }
+.middle .lists .hitNum{color: #404040; ;font-weight: bold;font-size: 12px}
+.middle .lists .list3 .title{ font-size: 20px;color: #404040; margin-top: -95px; margin-left: 115px;}
+.middle .lists .list3 .ex{color: #bbbbbb; width: 300px; height: 52px}
+.middle .lists .list3 .ex2{ color: #81acac;}
+
+
+
+
+.bottom{clear: both;height:50px; width:100%;background:#eee; margin-top: 50px}
+.bottom .container{margin:0 auto;width:980px  }
+.bottom .copy{font-size: 12px; color: #a1a1a1; float: left; margin-top: 20px;}
+.bottom .site{font-size: 11px; color: #a1a1a1; float: right;margin-top: 20px}
+
+
+
+#menu{float:left ;font-size: 15px}
+#menu a:link {text-decoration: none; color: #000 }
+#menu a:visited {text-decoration: none;color: #000 }
+#menu a:active {text-decoration: none;color: #000 }
+#menu a:hover {text-decoration: underline;color: #000 }
 #login{float:right;width:200px}
 #login img{float:left;margin-right:3px}

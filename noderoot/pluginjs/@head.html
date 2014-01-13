@@ -1,30 +1,133 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta name="description" content="" />
-<meta name="keyword" content="" />
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="Content-Style-Type" content="text/css" />
-<meta http-equiv="Content-Script-Type" content="text/javascript" />
-<meta http-equiv="imagetoolbar" content="no">
-<meta property="og:title" content="bs-plugin"/> 
-<meta property="og:url" content="http://js.bsplugin.com/"/>
-<meta property="og:image" content="i/logo.png"/>
-<meta property="og:description" content="bs-plugin site"/>
-<meta property="og:type" content="website"/>
-<link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
-<link href="/res/main.css" rel="stylesheet" media="screen">
-<!--<script type="text/javascript" src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>-->
-<script type="text/javascript" src="http://www.bsidesoft.com/bs/bs5/bs/bsjs.js"></script>
-<script>bs.$import( 'md5', 'last' );</script>
-<script type="text/javascript" src="/res/main.js"></script>
+    <meta name="description" content=""/>
+    <meta name="keyword" content=""/>
+    <meta charset="utf-8"/>
+    <meta name="viewport"
+          content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Style-Type" content="text/css"/>
+    <meta http-equiv="Content-Script-Type" content="text/javascript"/>
+    <meta http-equiv="imagetoolbar" content="no">
+    <meta property="og:title" content="bs-plugin"/>
+    <meta property="og:url" content="http://js.bsplugin.com/"/>
+    <meta property="og:image" content="i/logo.png"/>
+    <meta property="og:description" content="bs-plugin site"/>
+    <meta property="og:type" content="website"/>
+    <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+    <link href="/res/main.css" rel="stylesheet" media="screen">
+    <!--<script type="text/javascript" src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>-->
+    <script type="text/javascript" src="http://www.bsidesoft.com/bs/bs5/bs/bsjs.js"></script>
+    <script>bs.$import('md5', 'last');</script>
+    <script type="text/javascript" src="/res/main.js"></script>
 <body>
-<div class="top"><div class="contents">
-	<div id="menu"><a href="/">home</a> | <a href="/recent/">recent</a> | <a href="/hot/">hot</a> | <a href="/updated/">updated</a> | <a href="/catalog/">catalog</a></div>
-	<div id="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' + bs.WEB.session( 'nick' ) + '</a>  <a href="/logout">logout</a>' );%></div>
-</div></div>
-<div class="contents"><div class="middle">
+<img id="githubTag" src="res/top/tag.png">
+
+<div class="top">
+    <div class="container">
+        <div class="logo"><img src="/res/draft/logo.jpg"></div>
+        <div class="navi">
+            <div id="menu"><a href="/recent/">Recent</a> | <a href="/hot/">Hot</a> | <a
+                    href="/updated/">Updated</a> | <a href="/catalog/">Catalog</a></div>
+        </div>
+        <div class="search">
+            <div><input type="text" value="search"/><input type="image" src="/res/top/search.jpg" style="vertical-align: middle"/></div>
+        </div>
+        <div id="menuLogin" class="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' +bs.WEB.session( 'nick' ) + '</a> <a href="/logout">logout</a>' );%>
+        </div>
+
+        <div id="personal" class="personal">
+            <%if( !bs.WEB.session('email') ){%>
+            <div style="padding-right: 10px"><input type="text" id="Lemail" value='email' style="width: 100px"/></div>
+            <div>pw <input type="password" id="Lpw" style="width: 100px"/></div>
+            <div><input type="button" id="Llogin" value="login"/><input type="button" id="Ljoin" value="join"/></div>
+            <div id="Lalert"></div>
+            <script>
+                bs(function () {
+                    //login
+                    bs.dom('#Llogin').$('down', function ($e) {
+                        var t0;
+                        t0 = bs.$post(null, '/login', 'email', bs.dom('#Lemail').$('@value'), 'pw', bs.$md5(bs.dom('#Lpw').$('@value')));
+                        if (t0) {
+                            t0 = JSON.parse(t0);
+                            if (t0.result == 'ok') {
+                                bs.dom('#personal').$('html', '<a href="/member/">' + t0.contents.nick + '</a>');
+                                bs.dom('#menuLogin').$('html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>');
+                            } else {
+                                bs.dom('#Lalert').$('html', 'loginFailed:' + t0.contents);
+                            }
+                        } else {
+                            bs.dom('#Lalert').$('html', 'loginFailed: no response');
+                        }
+                    });
+                    bs.dom('#Ljoin').$('down', function ($e) {
+                        bs.dom('#personal').$('display', 'none');
+                        bs.dom('#join').$('display', 'block');
+                    });
+                    //join
+                    bs.dom('#Jjoin').$('down', function ($e) {
+                        var t0;
+                        t0 = bs.$post(null, '/join',
+                                'email', bs.dom('#Jemail').$('@value'), 'pw', bs.$md5(bs.dom('#Jpw').$('@value')),
+                                'nick', bs.dom('#Jnick').$('@value'), 'thumb', bs.dom('#Jthumb').$('@value')
+                        );
+                        if (t0) {
+                            t0 = JSON.parse(t0);
+                            if (t0.result == 'ok') {
+                                bs.dom('#join').$('display', 'none');
+                                bs.dom('#personal').$('display', 'block', 'html', '<a href="/member/">' + t0.contents.nick + '</a>');
+                                bs.dom('#menuLogin').$('html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>');
+                            } else {
+                                bs.dom('#Jalert').$('html', 'joinFailed:' + t0.contents);
+                            }
+                        } else {
+                            bs.dom('#Jalert').$('html', 'joinFailed: no response');
+                        }
+                    });
+                    bs.dom('#Jcancel').$('down', function ($e) {
+                        bs.dom('#join').$('display', 'none');
+                        bs.dom('#personal').$('display', 'block');
+                    });
+
+                });
+            </script>
+            <%}else{%>
+            <a href="/member/"><%=bs.WEB.session('nick')%></a>
+            <%}%>
+        </div>
+    </div>
+</div>
+<div class="contents">
+    <div class="middle">
+        <div class="blockLine"></div>'
+        <div id="join" style="display:none">
+            가입안내 어쩌고저쩌고~~~ 페이지내에서 처리함<br/>
+            <div>email <input type="text" id="Jemail"/></div>
+            <div>pw <input type="password" id="Jpw"/></div>
+            <div>nick <input type="text" id="Jnick"/></div>
+            <div>thumb url <input type="text" id="Jthumb"/></div>
+            <div style="text-align: center">
+                <input type="button" id="Jjoin" value="join"/>
+                <input type="button" id="Jcancel" value="cencel"/>
+            </div>
+            <div id="Jalert"></div>
+        </div>
+        <ul>
+            <li>영역 일단정리</li>
+            <li>TODO 로고디자인</li>
+            <li>TODO 상단 네비 스킨</li>
+            <li>TODO 비쥬얼 컨테이너</li>
+            <li>TODO 섬네일 태그와 이미지 분리 - 완료</li>
+            <li>TODO 푸터 스킨</li>
+            <li>TODO recommand Plugin 영역구현</li>
+            <li>TODO 로그인 관련들 디자인 & 스킨처리</li>
+            <li>TODO 로그인후 자기 플러그인 관리페이지 디자인 & 스킨처리</li>
+            <li>TODO Recent 페이지</li>
+            <li>TODO Hot 페이지</li>
+            <li>TODO Updated 페이지</li>
+            <li>TODO Catalog 페이지</li>
+        </ul>
+
