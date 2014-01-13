@@ -26,6 +26,11 @@ bs.$importer( function(){
 				"insert into plugin(member_rowid,plugintype_rowid,uname,title,contents,cat_rowid,thumb)values("+
 				"@id@,@type@,'@uname@','@title@','@description@',@cat@,'@thumb@')"
 			);
+			bs.sql( 'Pview' ).$( 'db', 'd@mysql', 'query', 
+				"select p.plugin_rowid,t.title type,p.title,p.uname,p.thumb,c.title cat,regdate from plugin p,plugintype t, cat c "+
+				"where p.plugintype_rowid=t.plugintype_rowid and p.cat_rowid=c.cat_rowid and p.plugin_rowid=@r@" );
+			
+			
 			bs.sql( 'cat' ).run( function( $rs ){
 				bs.WEB.application( 'cat', $rs );
 				bs.WEB.next();
