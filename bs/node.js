@@ -174,7 +174,17 @@ bs.$method( 'crypt', (function(){
 				head.push( flush[0], flush[1], ( t0 = response.join(''), flush[2][1] = Buffer.byteLength( t0, 'utf8' ), flush[2] ) ),
 				rp.writeHead( 200, head ), rp.end( t0 );
 			},
-			application:function( $k, $v ){return $v === undefined ? application[$k] : application[$k] = $v;},
+			application:function(){
+				var i, j, k, v;
+				i = 0, j = arguments.length;
+				while( i < j ){
+					k = arguments[i++], v = arguments[i++];
+					if( v === undefined ) return application[k];
+					else if( v === null ) delete application[k];
+					else application[k] = v;
+				}
+				return v;
+			},
 			session:function(){
 				var t0, t1, i, j, k, v;
 				i = 0, j = arguments.length;
@@ -362,7 +372,7 @@ bs.$method( 'crypt', (function(){
 					next = function(){
 						var t0, i;
 						t0 = self.rulesArr, i = t0.length, next = nextstep;
-						while( i-- ) if( path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, next();
+						while( i-- )if( path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, next();
 						err( 500, '<h1>server error</h1><div>Error: no matched rules '+path+file );
 					};
 					runRule( self.pageStart );
@@ -378,7 +388,7 @@ bs.$method( 'crypt', (function(){
 						i = currRule[idx++], j = currRule[idx++];
 						if( typeof j == 'string' ) j = j.replace( '@', '@'+file ), j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ), t0 = bs.$path( j );
 						switch( i ){
-						case'template':self.template( t0, f(t0), bs.WEB, tEnd ); break;
+						case'template':self.template( t0, f(t0), null, tEnd ); break;
 						case'static':bs.WEB.response( f(t0) ); break;
 						case'script':new Function( 'bs', f(t0) )(bs); break;
 						case'require':require( t0 )(bs); break;
