@@ -16,7 +16,6 @@ bs.$register( 'method', 'innerhtml', (function(){console.log( 'innerhtml' );
 		option : [ 0, '<select>', '</select>' ]
 	};
 	return function(  $str, $target, $mode  ) {
-		console.log($target)
 	/***1. 필터링***/
 		if( typeof $str != 'string' || ( t0 = $str.replace( trim, '' ) ), t0.charAt(0) != '<' ) return console.log('임시 필터링');
 
@@ -46,7 +45,6 @@ bs.$register( 'method', 'innerhtml', (function(){console.log( 'innerhtml' );
 			}else {
 				div.innerHTML = $str;
 				parent = div; 
-				console.dir(parent)
 			}
 			return bs.dom( bs.$reverse( parent.childNodes ) );
 		}
