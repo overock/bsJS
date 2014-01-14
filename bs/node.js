@@ -114,7 +114,7 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'delete', function( $end, $path ){return http( 'DELETE', $end, bs.$url($path), arguments );} );
 })( HTTP, URL ),
 (function( HTTP, HTTPS, URL ){
-	var form, mime, clone, portStart, staticHeader, err, Upfile, getPostFile,
+	var form, mime, clone, portStart, staticHeader, err, Upfile, bodyParser,
 		currsite, sessionName, id, cookie, clientCookie, ckParser, next, pause,
 		head, method, response, application, session, rq, rp, getData, postData, postFile, data;
 	mime = require('./mime'), staticHeader = {'Content-Type':0},
@@ -138,14 +138,16 @@ bs.$method( 'crypt', (function(){
 		this.name = $name,
 		this.file = $file
 	},
-	getPostFile = function getPostFile( $req, $buf ){
+	bodyParser = function bodyParser( $req, $buf ){
 		var i, j, k, t0,
-			bboundary, blen, bline,
+			bboundary, blen, bline, bbuf,
 			mkey, mfi, mfn, rawSt, rawEd, ret;
 
-		ret = {},
+		ret = {
+			data:{}, file:{}
+		},
 		t0 = $req.headers['content-type'],
-		bboundary = new Buffer( '--' + t0.substr(t0.lastIndexOf('=') + 1) ),
+		bboundary = new Buffer( '--' + t0.substr( t0.lastIndexOf( '=' ) + 1) ),
 		i = 0, j = $buf.length;
 
 		while( i < j ){
@@ -154,10 +156,16 @@ bs.$method( 'crypt', (function(){
 				t0 = $buf.slice(i, blen);
 
 				if( t0.toString() == bboundary.toString() ){
-					rawEd = i-2;
-					if( rawSt )
-						ret[mkey] = new Upfile( mfn, $buf.slice(rawSt, rawEd) ),
-						rawSt = 0;
+					rawEd = i - 2;
+					if( rawSt ){
+						if( mfn )
+							bbuf = new Buffer(rawEd - rawSt),
+							$buf.copy( bbuf, 0, rawSt, rawEd ),
+							ret.file[mkey] = new Upfile( mfn, bbuf );
+						else ret.data[mkey] = $buf.slice( rawSt, rawEd ).toString();
+
+						rawSt = 0, mkey = null, mfn = null;
+					}
 
 					bline = 0,
 					k = i;
@@ -170,12 +178,15 @@ bs.$method( 'crypt', (function(){
 									mfi = t0.split( ';' ),
 									mkey = mfi[1].substring( mfi[1].indexOf( '"' )+1, mfi[1].lastIndexOf( '"' ) ),
 									mfn = mfi[2].substring( mfi[2].indexOf( '"' )+1, mfi[2].lastIndexOf( '"' ) );
+								else if( t0.indexOf('name') > -1 )
+									mkey = t0.substring( t0.indexOf( '"' )+1, t0.lastIndexOf( '"' ) );
 							}else if( bline == 3 ){
 								t0 = $buf.slice(i, k).toString();
 								if( t0 ) rawSt = k + 4;
+								else if( mkey ) rawSt = k + 2;
 								break;
 							}
-							i = k+2;
+							i = k + 2;
 						}
 						k++;
 					}
@@ -298,20 +309,11 @@ bs.$method( 'crypt', (function(){
 					postData = bs.$cgiparse( t0.toString() );
 					postFile = null, $end();
 				}else if( type.indexOf( 'multipart' ) > -1 ){
-					postFile = getPostFile(rq, t0),
-					t0 = t0.toString(),
-					t0 = bs.$trim( t0.split( '--' + type.substr( type.lastIndexOf('=') + 1 ) ) ),
-					postData = {}, i = t0.length;
-					while( i-- ){
-						t1 = t0[i];
-						if( t1.indexOf( 'filename' ) > -1 ){
-						}else if( t1.indexOf( 'name' ) > -1 ){
-							t1 = t1.split( '\r\n' ),
-							mkey = t1[0].substring( t1[0].indexOf( '"' )+1, t1[0].lastIndexOf( '"' ) ),
-							postData[mkey] = t1[2];
-						}
-					}
-					//require('fs').writeFileSync('/__app/test/c'+postFile.ffile.name, postFile.ffile.file);
+					t0 = bodyParser(rq, t0),
+					postData = t0.data,
+					postFile = t0.file;
+					/*require('fs').writeFileSync('/__app/test/c'+postFile.ffile.name, postFile.ffile.file);
+					require('fs').writeFileSync('/__app/test/c'+postFile.ff2.name, postFile.ff2.file);*/
 					console.log(postData), console.log(postFile);
 					$end();
 				}
