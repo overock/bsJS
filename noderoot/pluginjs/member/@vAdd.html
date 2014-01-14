@@ -1,0 +1,4 @@
+<%
+var post = bs.WEB.application('post')( true, 'r', 'i', 'version', 'f' );
+if( post ) bs.WEB.application('db')( 'Vadd', post );
+%>

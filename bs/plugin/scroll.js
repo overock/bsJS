@@ -144,7 +144,7 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 		while( i-- ) key[t0[i]] = 1;
 	})(),
 	rTagName = /^(INPUT|TEXTAREA|BUTTON|SELECT)$/,
-	$fn.constructor = function( $key ){
+	$fn.$constructor = function( $key ){
 		console.log( 'init' );
 
 		this.__k = $key;

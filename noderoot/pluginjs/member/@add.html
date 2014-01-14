@@ -1,0 +1,4 @@
+<%
+var post = bs.WEB.application('post')( true, 'type', 'i', 'uname', 's', 'title', 's', 'description', 's', 'cat', 'i', 'thumb', 's' );
+if( post ) post.push( 'id', bs.WEB.session('id') ), bs.WEB.application('db')( 'Vlist', post );
+%>

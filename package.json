@@ -23,7 +23,6 @@
 		"url": "https://www.facebook.com/groups/bs5js/?hc_location=stream"
 	},
 	"dependencies": {
-		"mysql": "latest",
-		"formidable": "latest"
+		"mysql": "latest"
 	}
 }

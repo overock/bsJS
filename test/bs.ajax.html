@@ -23,6 +23,7 @@
 <script src="./printer.js"></script>
 <script>
 bs( function(){
+	var syncRS;
 	/*
 		config
 	*/
@@ -31,17 +32,24 @@ bs( function(){
 	/*
 		pre process
 	*/
-
+	bsTest.tear( '스타일설정', function(){
+		syncRS = JSON.parse( bs.$get(null, 'ajax.json') );
+	} );
 	/*
 		test case
 	*/
 	bs.$get( function( rs ){
 		var r = JSON.parse( rs );
-		bsTest( printer, 'ajax',
+		bsTest( printer, 'ajax async',
 			"bs.$get( cb , url ) url.a", 1, r.a,
 			"bs.$get( cb , url ) url.c", 3, r.c
 		);
 	},  'ajax.json' );
+
+	bsTest( printer, 'ajax sync',
+		"bs.$get( null , url ) url.a", 1, syncRS.a ,
+		"bs.$get( null , url ) url.c", 3, syncRS.c
+	);
 
 } );
 </script>
