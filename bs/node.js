@@ -114,7 +114,7 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'delete', function( $end, $path ){return http( 'DELETE', $end, bs.$url($path), arguments );} );
 })( HTTP, URL ),
 (function( HTTP, HTTPS, URL ){
-	var form, mime, clone, portStart, staticHeader, err, Upfile,
+	var form, mime, clone, portStart, staticHeader, err, Upfile, getPostFile,
 		currsite, sessionName, id, cookie, clientCookie, ckParser, next, pause,
 		head, method, response, application, session, rq, rp, getData, postData, postFile, data;
 	mime = require('./mime'), staticHeader = {'Content-Type':0},
@@ -137,6 +137,53 @@ bs.$method( 'crypt', (function(){
 	Upfile = function Upfile( $name, $file ){
 		this.name = $name,
 		this.file = $file
+	},
+	getPostFile = function getPostFile( $req, $buf ){
+		var i, j, k, t0,
+			bboundary, blen, bline,
+			mkey, mfi, mfn, rawSt, rawEd, ret;
+
+		ret = {},
+		t0 = $req.headers['content-type'],
+		bboundary = new Buffer( '--' + t0.substr(t0.lastIndexOf('=') + 1) ),
+		i = 0, j = $buf.length;
+
+		while( i < j ){
+			if( $buf[i] == bboundary[0] && $buf[i+1] == bboundary[1] ){
+				blen = i+bboundary.length,
+				t0 = $buf.slice(i, blen);
+
+				if( t0.toString() == bboundary.toString() ){
+					rawEd = i-2;
+					if( rawSt )
+						ret[mkey] = new Upfile( mfn, $buf.slice(rawSt, rawEd) ),
+						rawSt = 0;
+
+					bline = 0,
+					k = i;
+					while( k < j ){
+						if( $buf[k] === 13 && $buf[k+1] === 10 ){
+							bline++;
+							if( bline == 2 ){
+								t0 = $buf.slice(i, k).toString();
+								if( t0.indexOf('filename') > -1 )
+									mfi = t0.split( ';' ),
+									mkey = mfi[1].substring( mfi[1].indexOf( '"' )+1, mfi[1].lastIndexOf( '"' ) ),
+									mfn = mfi[2].substring( mfi[2].indexOf( '"' )+1, mfi[2].lastIndexOf( '"' ) );
+							}else if( bline == 3 ){
+								t0 = $buf.slice(i, k).toString();
+								if( t0 ) rawSt = k + 4;
+								break;
+							}
+							i = k+2;
+						}
+						k++;
+					}
+					i++;
+				}else i++;
+			}else i++;
+		}
+		return ret;
 	},
 	bs.$method( 'ck', (function(){
 		return function( $k, $v, $path, $expire, $domain ){
@@ -238,36 +285,33 @@ bs.$method( 'crypt', (function(){
 			}
 		},
 		$fn.parse = function( $end ){
-			var t0 = '', self = this;
+			var t0 = new Buffer(''), self = this;
 			rq.on( 'data', function( $v ){
-				t0 += $v;
+				t0 = Buffer.concat([t0, $v]);
+				//t0 += $v;
 				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
 			} ).on( 'end', function(){
 				var type, i, t1, mfi, mty, mctnt, mkey, mfn;
 				if( t0 === null ) return rp.end();
 				type = rq.headers['content-type'];
 				if( type.indexOf( 'x-www-form-urlencoded' ) > -1 ){
-					postData = bs.$cgiparse( t0 );
+					postData = bs.$cgiparse( t0.toString() );
 					postFile = null, $end();
 				}else if( type.indexOf( 'multipart' ) > -1 ){
+					postFile = getPostFile(rq, t0),
+					t0 = t0.toString(),
 					t0 = bs.$trim( t0.split( '--' + type.substr( type.lastIndexOf('=') + 1 ) ) ),
-					postFile = {}, postData = {}, i = t0.length;
+					postData = {}, i = t0.length;
 					while( i-- ){
 						t1 = t0[i];
 						if( t1.indexOf( 'filename' ) > -1 ){
-							t1 = t1.split( '\r\n' ),
-							mfi = ( t1.shift() ).split( ';' ),
-							mkey = mfi[1].substring( mfi[1].indexOf( '"' )+1, mfi[1].lastIndexOf( '"' ) ),
-							mfn = mfi[2].substring( mfi[2].indexOf( '"' )+1, mfi[2].lastIndexOf( '"' ) ),
-							mty = t1.shift(),
-							mctnt = ( t1.slice(1) ).join( '\r\n' ),
-							postFile[mkey] = new Upfile( mfn, new Buffer( mctnt ) );
 						}else if( t1.indexOf( 'name' ) > -1 ){
 							t1 = t1.split( '\r\n' ),
 							mkey = t1[0].substring( t1[0].indexOf( '"' )+1, t1[0].lastIndexOf( '"' ) ),
 							postData[mkey] = t1[2];
 						}
 					}
+					//require('fs').writeFileSync('/__app/test/c'+postFile.ffile.name, postFile.ffile.file);
 					console.log(postData), console.log(postFile);
 					$end();
 				}
