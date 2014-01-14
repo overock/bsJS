@@ -31,7 +31,20 @@ bs.$method( 'crypt', (function(){
 		}else if( $context ) t0 = $context;
 		else t0 = fileRoot[site];
 		return p.resolve( t0, $path );
-	} );
+	} ),
+	bs.$method( 'file', function( $end, $path, $v, $opition ){ //파일처리
+		var t0, t1, dir, i, j, k;
+		if($v){
+			dir = $path.split( t0 = $path.lastIndexOf('\\') == -1 ? '/' : '\\' ), t1 = dir.slice( 0, -1 );
+			do t1.pop(); while( !fs.existsSync( t1.join(t0) ) )
+			for( i = t1.length, j = dir.length ; i < j ; i++ ) if( !fs.existsSync( k ) ) fs.mkdirSync( k );
+			fs.writeFileSync( $path, $v );
+		}else{
+			if( !fs.existsSync( $path ) ) return null;
+			if( !$end ) return  fs.readFileSync( $path );
+			fs.readFile( $path, function( $e, $d ){return $end( $e || $d );});
+		}
+	} ),
 	bs.$method( 'stream', function( $path, $open, $err ){ //파일스트림을 출력한다.
 		var t0;
 		if( !fs.existsSync( $path ) ){
@@ -42,11 +55,6 @@ bs.$method( 'crypt', (function(){
 		if( $open ) t0.once( 'open', $open );
 		if( $err ) t0.once( 'error', $err );
 		return t0;
-	} ),
-	bs.$method( 'file', function( $end, $path, $v, $opition ){ //파일처리
-		if( !fs.existsSync( $path ) ) return null;
-		if( !$end ) return  fs.readFileSync( $path );
-		fs.readFile( $path, function( $e, $d ){return $end( $e || $d );});
 	} ),
 	bs.$method( 'js', (function(){
 		var js = function( $data, $load, $end ){
@@ -437,26 +445,26 @@ bs.$method( 'crypt', (function(){
 			}
 			return this[k];
 		},
-		/*			
-		bs.site( 'bsplugin' ).router(
-			'', [
-				'template', '/head.html',
-				'script', '@.js',
-				'template', '@.html',
-				'static','/foot.html'
-			],
-			'json', ['require', '@']
-		);
-		*/
-		$fn.router = function(){
-			var i, j, k, v;
-			i = 0, j = arguments.length;
-			while( i < j ){
-				k = arguments[i++], v = arguments[i++];
-				if( v === null ) delete this.rules[k]; else if( v !== undefined ) this.rules[k] = v;
-			}
-			return v;
-		},
+		$fn.router = (function(){
+			var key, i;
+			key = 'template,static,script,require,function'.split(','), i = key.length;
+			while( i--) key[key[i]] = 1;
+			return function(){
+				var i, j, k, v, m, n;
+				i = 0, j = arguments.length;
+				while( i < j ){
+					k = arguments[i++], v = arguments[i++];
+					if( v === null ) delete this.rules[k];
+					else if( v !== undefined ){
+						if( v.splice ){
+							for( m = 0, n = v.length ; m < n ; m += 2 ) if( !key[v[m]] ) return bs.$error( 'invalid router type:'+v[m] );
+							this.rules[k] = v;
+						}else bs.$error( 'invalid router:'+v );
+					}
+				}
+				return v;
+			};
+		})(),
 		$fn.stop = function(){
 			var domain, port, i, j;
 			i = 0, j = this.url.length;
@@ -469,7 +477,7 @@ bs.$method( 'crypt', (function(){
 })( HTTP, HTTPS, URL );
 (function(){
 	var type, i, db;
-	type = 'execute,recordset,stream'.split(','); for( i in type ) type[type[i]] = 1;
+	type = 'execute,recordset,stream,transation'.split(','); for( i in type ) type[type[i]] = 1;
 	db = {};
 	bs.$method( 'importdbc', function( $end ){
 		var path, i, j, k, dbcnext, arg;
@@ -499,10 +507,15 @@ bs.$method( 'crypt', (function(){
 			}
 		},
 		$fn.run = function( $end ){
-			var end, t0, i, j, k;
+			var end, t0, t1, i, j, k;
 			t0 = {}, i = 1, j = arguments.length;
 			while( i < j ) t0[k = arguments[i++]] = arguments[i++];
-			t0 = bs.$tmpl( this.query, t0 );
+			if( i = this.query.length ){
+				this.type = 'transation';
+				t1 = this.query.slice(0);
+				while( i-- ) t1[i] = bs.$tmpl( t1[i], t0 );
+				t0 = t1;
+			}else t0 = bs.$tmpl( this.query, t0 );
 			//console.log( t0 );
 			return bs.db( this.db )[this.type]( t0, $end );
 		};

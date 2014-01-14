@@ -40,6 +40,26 @@ bs.$registerdbc( 'mysql', (function(){
 	},
 	d.prototype.execute = function( $query ){return this.open().query( $query );},
 	d.prototype.recordset = function( $query, $end ){this.open().query( $query, function( e, r ){e ? $end( null, e ) : $end( r );});},
-	d.prototype.stream = function( $query, $end ){this.open().query( $query ).on('result', $end );};
+	d.prototype.stream = function( $query, $end ){this.open().query( $query ).on('result', $end );},
+	d.prototype.transation = function( $query, $end ){
+		var conn = this.open();
+		conn.beginTransaction( function($e){
+			var next, i, j;
+			if( $e ) $end( null, $e );
+			i = 0, j = $query.length, next = function( $rs ){
+				if( i < j ){
+					conn.query( $query[i++], function( $e, $rs ){
+						if( $e ) conn.rollback( function(){$end( null, $e );} );
+						next( $rs );
+					} );
+				}else{
+					conn.commit( function($e){
+						if( $e ) conn.rollback( function(){$end( null, $e );} );
+						$end( $rs );
+					} );
+				}
+			}, next();
+		} );
+	};
 	return d;
 })() );
