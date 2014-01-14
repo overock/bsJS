@@ -24,98 +24,48 @@
     <script>bs.$import('md5', 'last');</script>
     <script type="text/javascript" src="/res/main.js"></script>
 <body>
-<img id="githubTag" src="res/top/tag.png">
-
 <div class="top">
-    <div class="container">
-        <div class="logo"><img src="/res/draft/logo.jpg"></div>
-        <div class="navi">
-            <div id="menu"><a href="/recent/">Recent</a> | <a href="/hot/">Hot</a> | <a
-                    href="/updated/">Updated</a> | <a href="/catalog/">Catalog</a></div>
-        </div>
-        <div class="search">
-            <div><input type="text" value="search"/><input type="image" src="/res/top/search.jpg" style="vertical-align: middle"/></div>
-        </div>
-        <div id="menuLogin" class="menuLogin"><%if( bs.WEB.session( 'nick' ) ) ECHO( '<a href="/member/">' +bs.WEB.session( 'nick' ) + '</a> <a href="/logout">logout</a>' );%>
-        </div>
-
-        <div id="personal" class="personal">
-            <%if( !bs.WEB.session('email') ){%>
-            <div style="padding-right: 10px"><input type="text" id="Lemail" value='hika00@gmail.com' style="width: 100px"/></div>
-            <div>pw <input type="password" id="Lpw" style="width: 100px"/></div>
-            <div><input type="button" id="Llogin" value="login"/><input type="button" id="Ljoin" value="join"/></div>
-            <div id="Lalert"></div>
-            <script>
-                bs(function () {
-                    //login
-                    bs.dom('#Llogin').$('down', function ($e) {
-                        var t0;
-                        t0 = bs.$post(null, '/login', 'email', bs.dom('#Lemail').$('@value'), 'pw', bs.$md5(bs.dom('#Lpw').$('@value')));
-                        if (t0) {
-                            t0 = JSON.parse(t0);
-                            if (t0.result == 'ok') {
-                                bs.dom('#personal').$('html', '<a href="/member/">' + t0.contents.nick + '</a>');
-                                bs.dom('#menuLogin').$('html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>');
-                            } else {
-                                bs.dom('#Lalert').$('html', 'loginFailed:' + t0.contents);
-                            }
-                        } else {
-                            bs.dom('#Lalert').$('html', 'loginFailed: no response');
-                        }
-                    });
-                    bs.dom('#Ljoin').$('down', function ($e) {
-                        bs.dom('#personal').$('display', 'none');
-                        bs.dom('#join').$('display', 'block');
-                    });
-                    //join
-                    bs.dom('#Jjoin').$('down', function ($e) {
-                        var t0;
-                        t0 = bs.$post(null, '/join',
-                                'email', bs.dom('#Jemail').$('@value'), 'pw', bs.$md5(bs.dom('#Jpw').$('@value')),
-                                'nick', bs.dom('#Jnick').$('@value'), 'thumb', bs.dom('#Jthumb').$('@value')
-                        );
-                        if (t0) {
-                            t0 = JSON.parse(t0);
-                            if (t0.result == 'ok') {
-                                bs.dom('#join').$('display', 'none');
-                                bs.dom('#personal').$('display', 'block', 'html', '<a href="/member/">' + t0.contents.nick + '</a>');
-                                bs.dom('#menuLogin').$('html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>');
-                            } else {
-                                bs.dom('#Jalert').$('html', 'joinFailed:' + t0.contents);
-                            }
-                        } else {
-                            bs.dom('#Jalert').$('html', 'joinFailed: no response');
-                        }
-                    });
-                    bs.dom('#Jcancel').$('down', function ($e) {
-                        bs.dom('#join').$('display', 'none');
-                        bs.dom('#personal').$('display', 'block');
-                    });
-
-                });
-            </script>
-            <%}else{%>
-            <a href="/member/"><%=bs.WEB.session('nick')%></a>
-            <%}%>
-        </div>
-    </div>
+	<div class="container">
+		<div class="logo"><img src="/res/draft/logo.jpg"></div>
+		<div class="navi"><div id="menu">
+			<a href="/recent/">Recent</a> | <a href="/hot/">Hot</a> | 
+			<a href="/updated/">Updated</a> | <a href="/catalog/">Catalog</a>
+		</div></div>
+	<div class="search">
+		<input type="text" placeholder="search"/>
+		<input id="menuSearch" type="image" src="/res/top/search.jpg" style="vertical-align: middle"/>
+	</div>
+	<div id="personal" class="personal">
+<%if( !bs.WEB.session('id') ){%>
+		<div style="padding-right:10px">email <input type="text" id="Lemail" value="<%=bs.$ck('savedid')||''%>"/></div>
+		<div>pw <input type="password" id="Lpw"/></div>
+		<div><input type="button" id="Llogin" value="login"/><input type="button" id="Ljoin" value="join"/></div>
+		<div id="Lalert"></div>
+		<script>bs( site.header );</script>
+<%}else{%>
+		<a href="/member/"><%=bs.WEB.session('nick')%></a> <a href="/logout">logout</a>
+<%}%>
+	</div>
+	<br clear="both" />
 </div>
 <div class="contents">
-    <div class="middle">
-        <div class="blockLine"></div>'
-        <div id="join" style="display:none">
-            가입안내 어쩌고저쩌고~~~ 페이지내에서 처리함<br/>
-            <div>email <input type="text" id="Jemail"/></div>
-            <div>pw <input type="password" id="Jpw"/></div>
-            <div>nick <input type="text" id="Jnick"/></div>
-            <div>thumb url <input type="text" id="Jthumb"/></div>
-            <div style="text-align: center">
-                <input type="button" id="Jjoin" value="join"/>
-                <input type="button" id="Jcancel" value="cencel"/>
-            </div>
-            <div id="Jalert"></div>
-        </div>
-        <ul>
+<br clear="both" />
+	<div class="middle">
+		<div id="join" style="display:none;text-align:center">
+			Join us
+			<table border="0" cellpadding="0" cellspacing="0" style="width:200px;margin:0 auto">
+			<tr><td style="width:70px">email</td><td style="width:130px"><input type="text" id="Jemail"/></td></tr>
+			<tr><td>pw</td><td><input type="password" id="Jpw"/></td></tr>
+			<tr><td>nick</td><td><input type="text" id="Jnick"/></td></tr>
+			<tr><td>thumb</td><td><input type="text" id="Jthumb"/></td></tr>
+			<tr><td colspan="2" style="text-align:center"><div id="Jalert"></div></td></tr>
+			<tr><td colspan="2" style="text-align:center">
+				<input type="button" id="Jjoin" value="join"/>
+				<input type="button" id="Jcancel" value="cencel"/>
+			</td></tr>
+			</table>
+		</div>
+<!--        <ul>
             <li>영역 일단정리</li>
             <li>TODO 로고디자인</li>
             <li>TODO 상단 네비 스킨</li>
@@ -129,5 +79,4 @@
             <li>TODO Hot 페이지</li>
             <li>TODO Updated 페이지</li>
             <li>TODO Catalog 페이지</li>
-        </ul>
-
+        </ul>-->
