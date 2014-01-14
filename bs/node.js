@@ -38,7 +38,8 @@ bs.$method( 'crypt', (function(){
 			dir = $path.split( t0 = $path.lastIndexOf('\\') == -1 ? '/' : '\\' ), t1 = dir.slice( 0, -1 );
 			do t1.pop(); while( !fs.existsSync( t1.join(t0) ) )
 			for( i = t1.length, j = dir.length ; i < j ; i++ ) if( !fs.existsSync( k ) ) fs.mkdirSync( k );
-			fs.writeFileSync( $path, $v );
+			if( !$end ) return fs.writeFileSync( $path, $v );
+			fs.writeFile( $path, $v, function( $e ){return $end( $e );});
 		}else{
 			if( !fs.existsSync( $path ) ) return null;
 			if( !$end ) return  fs.readFileSync( $path );
@@ -55,17 +56,6 @@ bs.$method( 'crypt', (function(){
 		if( $open ) t0.once( 'open', $open );
 		if( $err ) t0.once( 'error', $err );
 		return t0;
-	} ),
-	bs.$method( 'file', function( $end, $path, $v, $opt ){ //파일처리
-		if( $v ){
-			// TODO: 존재하지않는 경로일 경우 경로 생성
-			if( !$end ) return fs.writeFileSync( $path, $v );
-			fs.writeFile( $path, $v, function( $e ){return $end( $e );});
-		}else{
-			if( !fs.existsSync( $path ) ) return null;
-			if( !$end ) return fs.readFileSync( $path );
-			fs.readFile( $path, function( $e, $d ){return $end( $e || $d );});
-		}
 	} ),
 	bs.$method( 'js', (function(){
 		var js = function( $data, $load, $end ){
