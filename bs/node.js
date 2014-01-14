@@ -56,6 +56,17 @@ bs.$method( 'crypt', (function(){
 		if( $err ) t0.once( 'error', $err );
 		return t0;
 	} ),
+	bs.$method( 'file', function( $end, $path, $v, $opt ){ //파일처리
+		if( $v ){
+			// TODO: 존재하지않는 경로일 경우 경로 생성
+			if( !$end ) return fs.writeFileSync( $path, $v );
+			fs.writeFile( $path, $v, function( $e ){return $end( $e );});
+		}else{
+			if( !fs.existsSync( $path ) ) return null;
+			if( !$end ) return fs.readFileSync( $path );
+			fs.readFile( $path, function( $e, $d ){return $end( $e || $d );});
+		}
+	} ),
 	bs.$method( 'js', (function(){
 		var js = function( $data, $load, $end ){
 			var t0, i;
@@ -145,6 +156,9 @@ bs.$method( 'crypt', (function(){
 	Upfile = function Upfile( $name, $file ){
 		this.name = $name,
 		this.file = $file
+	},
+	Upfile.prototype.save = function( $path ){
+		bs.$file( null, $path, this.file );
 	},
 	bodyParser = function bodyParser( $req, $buf ){
 		var i, j, k, t0,
@@ -320,8 +334,8 @@ bs.$method( 'crypt', (function(){
 					t0 = bodyParser(rq, t0),
 					postData = t0.data,
 					postFile = t0.file;
-					/*require('fs').writeFileSync('/__app/test/c'+postFile.ffile.name, postFile.ffile.file);
-					require('fs').writeFileSync('/__app/test/c'+postFile.ff2.name, postFile.ff2.file);*/
+					/*postFile.ffile.save('/__app/test/c'+postFile.ffile.name);
+					postFile.ff2.save('/__app/test/c'+postFile.ff2.name);*/
 					console.log(postData), console.log(postFile);
 					$end();
 				}
