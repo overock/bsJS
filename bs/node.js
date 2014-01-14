@@ -556,8 +556,8 @@ bs.$method( 'crypt', (function(){
 			var end, t0, t1, i, j, k;
 			t0 = {}, i = 1, j = arguments.length;
 			while( i < j ) t0[k = arguments[i++]] = arguments[i++];
-			if( i = this.query.length ){
-				this.type = 'transation';
+			if( i = this.query.splice ){
+				this.type = 'transaction';
 				t1 = this.query.slice(0);
 				while( i-- ) t1[i] = bs.$tmpl( t1[i], t0 );
 				t0 = t1;
