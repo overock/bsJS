@@ -21,8 +21,12 @@
 <div id="test1">text</div>
 <div id="test2">text</div>
 <div id="test3">text</div>
+<div id="stageHika"></div>
+<div id="result"></div>
+<div id="test"></div>
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
+<script src="./printer.js"></script>
 <script>
 bs.$import( 'innerhtml', 'last' );
 bs(function() {
@@ -32,7 +36,10 @@ bs(function() {
   bs.$innerhtml( '<a href="http://www.naver.com">naverLink</a>', target1);
   bs.$innerhtml( '<a href="http://www.naver.com">naverLink</a>', target2, 'html+' );
   bs.$innerhtml( '<a href="http://www.naver.com">naverLink</a>', target3, '+html' );
-  bs.$innerhtml( '<a href="http://www.naver.com">naverLink</a>' );
+
+  bsTest( 'innerhtml method',
+  "bs.$innerhtml( '&lt;a href=\"http://www.naver.com\"&gt;naverLink&lt;/a&gt;' ).$( 'html' )", 'naverLink', bs.$innerhtml( '<a href="http://www.naver.com">naverLink</a>' ).$('html')
+  );
 });
 </script>
 </body>
