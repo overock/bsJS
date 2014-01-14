@@ -302,7 +302,7 @@ bs.$method( 'crypt', (function(){
 				//t0 += $v;
 				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
 			} ).on( 'end', function(){
-				var type, i, t1, mfi, mty, mctnt, mkey, mfn;
+				var type;
 				if( t0 === null ) return rp.end();
 				type = rq.headers['content-type'];
 				if( type.indexOf( 'x-www-form-urlencoded' ) > -1 ){
