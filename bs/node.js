@@ -211,7 +211,7 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'ck', (function(){
 		return function( $k, $v, $path, $expire, $domain ){
 			var t0, t1;
-			if( $v === undefined ) return bs.$unescape(clientCookie[$k]);
+			if( $v === undefined ) return bs.$unescape(clientCookie[$k]||'');
 			if( $k.charAt(0) == '@' ) t0 = 1, $k = $k.substr(1);
 			t0 = $k + '=' + ( bs.$escape($v) || '' ) + 
 				';Path=' + ( $path || '/' ) + 
