@@ -1,6 +1,5 @@
 body{margin:0;padding:0;font-family: Arial}
 div{font-size: 12px}
-
 a:link {text-decoration: none; color: #bfbec3 }
 a:visited {text-decoration: none;color: #bfbec3 }
 a:active {text-decoration: none;color: #bfbec3 }
@@ -9,28 +8,29 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 .contents{width:980px;margin:0 auto;overflow:hidden}
 .batch{font-family:batch}
 
-.top{width:100%;background:#706E83;height:45px;color:#fff}
+.top{width:100%;background:#757dae;height:45px;color:#fff}
 
 #logo{float:left;width:120px}
 
-#menu{float:left;width:255px;margin-top:14px;font-size:15px;text-align:center}
+#menu{float:left;width:255px;margin-top:14px;font-size:13px;text-align:center}
 #menu a:link,#menu a:visited,#menu a:active{text-decoration:none;color:#fff;font-weight:bold}
 #menu a:hover{text-decoration:underline;color:#fff}
 
-#search{float:left;width:235px;margin-top:10px}
-#searchTxt{width:180px;height:20px;line-height:20px;border:0}
-#searchBtn{cursor:pointer;font-size:17px;line-height:20px}
+#search{float:left;margin-top:10px}
+#searchTxt{width:155px;height:25px;line-height:20px;border:0;padding-left:7px;border-radius:7px;opacity:0.5;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
+#searchBtn{cursor:pointer;font-size:14px;line-height:20px;opacity:0.5}
 
-#personal{float:right;margin-top:10px;line-height:20px;width:350px}
+#personal{float:right;margin-top:10px;line-height:20px;width:385px}
 #personal div{float:left}
-#personal .batch{font-size:17px}
-#Lemail{width:130px;height:20px;border:0;padding-left:3px}
-#Lpw{width:70px;height:20px;border:0;padding-left:3px}
-#Llogin{cursor:pointer;border:0;background:#BD84B1;color:#fff;height:24px}
-#Ljoin{cursor:pointer;width:60px;border:0;background:none;color:#8ABDE0;height:24px;font-weight:bold;overflow:hidden}
+#personal .batch{font-size:15px;}
+#Lemail{width:123px;height:25px;border:0;padding-left:7px;border-radius:7px;opacity:0.5;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
+#Lpw{width:70px;height:25px;border:0;padding-left:7px;border-radius:7px;opacity:0.5;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
+#Llogin{cursor:pointer;border:0;background:#BD84B1;color:#fff;}
+#Ljoin{cursor:pointer;border:0;background:none;color:#8ABDE0;font-weight:bold;overflow:hidden}
 #Lalert{display:none}
 
-#join{display:none;text-align:center;background:#706E83;color:#fff;font-size:15px;padding:10px 0}
+#join{display:none;text-align:center;background:#659cad;color:#fff;font-size:15px;padding:10px 0}
+#Jemail,#Jpw,#Jpwc,#Jnick{margin:2px 0 2px 0;height:25px;border:0;padding-left:7px;border-radius:7px;opacity:0.5;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
 #Jcancel,#Jjoin{font-size:40px;color:#fff;cursor:pointer}
 
 .middleVisual{width: 100%; height: 410px; }
