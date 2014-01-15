@@ -23,14 +23,14 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 #personal{float:right;margin:8px;line-height:20px;width:405px}
 #personal div{float:left}
 #personal .batch{font-size:15px;}
-#Lemail{width:120px;height:25px;border:0;padding-left:7px;margin:0px 5px 0px 5px;border-radius:7px;opacity:0.5;color:#fff;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
+#Lemail{width:125px;height:25px;border:0;padding-left:7px;margin:0px 5px 0px 5px;border-radius:7px;opacity:0.5;color:#fff;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
 #Lpw{width:70px;height:25px;border:0;padding-left:7px;margin:0px 2px 0px 5px;border-radius:7px;opacity:0.5;color:#fff;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
 #Llogin{cursor:pointer;border:0;background:#BD84B1;color:#fff;}
 #Ljoin{cursor:pointer;border:0;background:none;color:#8ABDE0;font-weight:bold;overflow:hidden}
 #Lalert{display:none}
 
 #join{height:150px;display:none;text-align:center;background:#659cad;background-image: linear-gradient(to bottom, #659CAD 0%, #FFFFFF 100%);color:#fff;font-size:15px;padding:30px 0}
-#Jemail,#Jpw,#Jpwc,#Jnick{width:400px;margin:2px 0 2px 0;height:25px;border:0;padding-left:7px;border-radius:7px;opacity:0.5;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
+#Jemail,#Jpw,#Jpwc,#Jnick{color:#fff;width:400px;margin:2px 0 2px 0;height:25px;border:0;padding-left:7px;border-radius:7px;opacity:0.5;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
 #Jcancel,#Jjoin{font-size:40px;color:#fff;cursor:pointer}
 
 .middleVisual{width: 100%; height: 410px; }
@@ -42,13 +42,13 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 .lists .blockLine{ height: 17px}
 
 .lists h1{height: 1px;margin: 5px}
-.list3 a:visited {text-decoration: none;color: #404040 }
-.list3 a:active {text-decoration: none;color: #404040 }
+.list3 a:visited {text-decoration: none;color: #4c516d }
+.list3 a:active {text-decoration: none;color: #4c516d }
 
-.lists .title{color: #bfbec3; margin-top:-34px;margin-left: 50px; font-size: 11px }
-.lists .hitNum{color: #404040; ;font-weight: bold;font-size: 12px}
-.lists .list3 .title{ font-size: 20px;color: #404040; margin-top: -95px; margin-left: 115px;}
-.lists .list3 .ex{color: #bbbbbb; width: 300px; height: 52px}
+.lists .title{color: #bfbec3; margin-top:-37px;margin-left: 50px; font-size: 12px }
+.lists .hitNum{color: #4c516d; ;font-weight: bold;font-size: 11px;margin-top:5px}
+.lists .list3 .title{ font-size: 18px;color: #404040; margin-top: -95px; margin-left: 115px;}
+.lists .list3 .ex{color: #bbbbbb; width: 300px; height: 48px;margin-top:5px}
 .lists .list3 .ex2{ color: #81acac;}
 
 .bottom{clear:both;height:28px;width:100%;background:#757dae; margin-top:50px}
