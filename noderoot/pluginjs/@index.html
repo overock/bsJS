@@ -1,5 +1,9 @@
 <%IMPORT( '@head.html' );%>
-<div class="middleVisual"><img src="res/draft/index_visual.png"></div>
+<div class="middleVisual">
+    <div id="visualEffect"></div>
+    <img src="res/index/title.png" style="position:absolute; margin-top:100px;margin-left:60px">
+    <img src="res/index/register.png" style="position:absolute; margin-top:60px;margin-left:650px">
+</div>
 <div><img src="res/index/bs_ex1.png"></div>
 <div class="lists">
     <div style="float: left">
@@ -14,6 +18,49 @@
 
 <script>
     bs(function () {
+        var game = {
+            x:0, y:0, vx:0, vy:0, v:1, rv:.5, w:0, h:0, tcheck:0, div:{length:0},
+            term:bs.DETECT.device =='tablet' || bs.DETECT.device=='mobile' ? 100 : 10,
+            init:function(){
+                var i;
+                this.div.length = i = bs.DETECT.device =='tablet' || bs.DETECT.device=='mobile' ? 15 : 30;
+                while( i-- ) this.div[i] = bs.dom('<div></div>' ).$( 'position','absolute', 'visibility', 'hidden', '<', '#visualEffect', 'this' );
+                this.w =980,this.h = 400,this.x = this.w/2,this.y = this.h/2
+
+                bs.dom( '#visualEffect' ).$( 'top', 45, 'position', 'absolute', 'width', this.w, 'height', this.h, 'overflow', 'hidden', 'down', function( $e ){
+                    game.vx = ( $e.lx - game.x )*.1, game.vy = ($e.ly - game.y)*.1;
+                } );
+                bs.dom( '<div></div>' ).$( '@id', 'a', 'position', 'absolute', 'background', '#950',
+                        'left', 0, 'top', 0, 'width', 1, 'height', 1, 'border-radius',5,
+                        '<', '#visualEffect'
+                );
+            },
+            end:function( $target ){
+                game.div[game.div.length++] = $target.$('visibility', 'hidden', 'this');
+            },
+            ANI:function( $time ){
+                bs.dom('#a').$( 'left', this.x, 'top', this.y );
+
+                //particle
+                if( $time > this.tcheck ){
+                    this.tcheck = $time + this.term;
+                    var s = bs.$ex( 10, '~', 60 );
+                    var d = this.div.length ? this.div[--this.div.length] : bs.dom('<div></div>' ).$( 'position','absolute', '<', '#visualEffect', 'this' );
+                    d.$( 'visibility', 'visible', 'background', 'rgb('+bs.$ex(100,'~',200)+','+bs.$ex(100,'~',200)+','+bs.$ex(100, '~',200)+')',
+                            'width',1, 'height',1, 'border-radius', 10, 'left',this.x+ bs.$ex( -10, '~', 10 ) ,'top',this.y+bs.$ex( -10, '~', 10 ), 'opacity', 0.3
+                    );
+                    bs.ANI.tween( d,
+                            'left', bs.$ex( -300, '~', 300 ) + this.x, 'top', bs.$ex( -150, '~', 150 ) + this.y,
+                            'border-radius', s, 'width', s, 'height',s, 'opacity', 0,
+                            'time', bs.$ex( 2, '~f', 3 ), 'end', this.end
+                    );
+                }
+            }
+        };
+        game.init();
+        bs.ANI.ani( game );
+
+
         var titleData = [
             'Debuger 1.2',
             'Navigation Maker 2.0',
