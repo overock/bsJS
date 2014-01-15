@@ -174,7 +174,7 @@ bs.$method( 'crypt', (function(){
 							bbuf = new Buffer(rawEd - rawSt),
 							$buf.copy( bbuf, 0, rawSt, rawEd ),
 							ret.file[mkey] = new Upfile( mfn, bbuf );
-						else ret.data[mkey] = $buf.slice( rawSt, rawEd ).toString();
+						else ret.data[mkey] = bs.$unescape( $buf.slice( rawSt, rawEd ).toString() );
 
 						rawSt = 0, mkey = null, mfn = null;
 					}
@@ -211,7 +211,7 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'ck', (function(){
 		return function( $k, $v, $path, $expire, $domain ){
 			var t0, t1;
-			if( $v === undefined ) return clientCookie[$k];
+			if( $v === undefined ) return bs.$unescape(clientCookie[$k]);
 			if( $k.charAt(0) == '@' ) t0 = 1, $k = $k.substr(1);
 			t0 = $k + '=' + ( bs.$escape($v) || '' ) + 
 				';Path=' + ( $path || '/' ) + 

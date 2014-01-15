@@ -1,20 +1,19 @@
 <%
-if( !bs.WEB.session('email') ){
-	bs.sql( 'login' ).run( function( $rs ){
-		var t0 = {};
+if( !bs.WEB.session('id') ){
+	var post = bs.WEB.application('post')( false, 'email', 's', 'pw', 's' );
+	if( post ) bs.WEB.application('db')( 'login', post, function( $data, $rs, $e ){
 		if( $rs && $rs.length ){
-			t0.result = 'ok',
-			t0.contents = {
-				email:$rs[0].email,
-				nick:$rs[0].nick,
-				thumb:$rs[0].thumb
+			$rs = $rs[0];
+			bs.$ck( 'savedid', $rs.email, '/', 100 ),
+			$data.contents = {
+				email:$rs.email,
+				nick:$rs.nick,
+				thumb:$rs.thumb
 			},
-			bs.WEB.session( 'id', $rs[0].member_rowid, 'email', $rs[0].email, 'nick', $rs[0].nick, 'thumb', $rs[0].nickthumb );
-		}else t0.result = 'fail';
-		bs.WEB.response( JSON.stringify( t0 ) );
-		bs.WEB.next();
-	}, 'email', bs.WEB.post( 'email' ), 'pw', bs.WEB.post( 'pw' ) );
-	bs.WEB.pause();
+			bs.WEB.session( 'id', $rs.member_rowid, 'email', $rs.email, 'nick', $rs.nick, 'thumb', $rs.thumb );
+		}else $data.result = 'fail', $data.contents = 'no data';
+	} );
+	else $data.result = 'fail', $data.contents = 'no post';
 }else{
 	bs.WEB.response( JSON.stringify( {
 		result:'ok',

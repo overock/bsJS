@@ -1,9 +1,14 @@
 module.exports = {
+	//font
+	'woff' :'application/x-font-woff',
+	'eot' :'application/vnd.ms-fontobject',
+	'ttf' :'application/octet-stream',
 	// image
 	'jpeg' :'image/jpeg',
 	'jpg'  :'image/jpeg',
 	'gif'  :'image/gif',
 	'png'  :'image/png',
+	'svg'  :'image/svg+xml',
 	// text
 	'html' :'text/html',
 	'htm'  :'text/html',

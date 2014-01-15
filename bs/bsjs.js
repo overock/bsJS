@@ -474,7 +474,7 @@ function DOM(){
 			if( t0 == '.' ){
 				$sel = $sel.substr(1), t0 = doc.getElementsByTagName('*'), c.length = 0, i = t0.length;
 				while( i-- ) if( t0[i].className.indexOf( $sel ) > -1 ) c[c.length++] = t0[i];
-				return c;
+				return c.length ? c : null;
 			}
 			return doc.getElementsByTagName($sel);
 		};

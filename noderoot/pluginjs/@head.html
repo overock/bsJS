@@ -25,58 +25,46 @@
     <script type="text/javascript" src="/res/main.js"></script>
 <body>
 <div class="top">
-	<div class="container">
-		<div class="logo"><img src="/res/draft/logo.jpg"></div>
-		<div class="navi"><div id="menu">
-			<a href="/recent/">Recent</a> | <a href="/hot/">Hot</a> | 
-			<a href="/updated/">Updated</a> | <a href="/catalog/">Catalog</a>
-		</div></div>
-	<div class="search">
-		<input type="text" placeholder="search"/>
-		<input id="menuSearch" type="image" src="/res/top/search.jpg" style="vertical-align: middle"/>
-	</div>
-	<div id="personal" class="personal">
+	<div class="contents">
+		<div id="logo"><img src="/res/draft/logo.jpg"></div>
+		<div id="menu">
+			<a href="/recent">Recent</a> &nbsp; <a href="/hot">Hot</a> &nbsp; 
+			<a href="/updated">Updated</a> &nbsp; <a href="/catalog">Catalog</a>
+		</div>
+		<div id="search">
+			<input type="text" id="searchTxt" placeholder="search"/> &nbsp;
+			<span id="searchBtn" class="batch">&#xF097;</span>
+		</div>
+		<div id="personal">
 <%if( !bs.WEB.session('id') ){%>
-		<div style="padding-right:10px">email <input type="text" id="Lemail" value="<%=bs.$ck('savedid')||''%>"/></div>
-		<div>pw <input type="password" id="Lpw"/></div>
-		<div><input type="button" id="Llogin" value="login"/><input type="button" id="Ljoin" value="join"/></div>
-		<div id="Lalert"></div>
-		<script>bs( site.header );</script>
+			<span class="batch">&#xf152;</span> <input type="text" id="Lemail" value="<%=bs.$ck('savedid')||''%>"/>
+			<span class="batch">&#xF0C0;</span> <input type="password" id="Lpw"/>
+			<div style="float:right">
+				<input type="button" class="batch" id="Llogin" value="&#xf16b;"/>
+				<input type="button" id="Ljoin" value="Join!"/>
+			</div>
+			<div id="Lalert"></div>
+			<script>bs( site.header );</script>
 <%}else{%>
-		<a href="/member/"><%=bs.WEB.session('nick')%></a> <a href="/logout">logout</a>
+			<a href="/member/"><%=bs.WEB.session('nick')%></a> <a href="/logout">logout</a>
 <%}%>
+		</div>
 	</div>
-	<br clear="both" />
+</div>
+<div id="join">
+	<table border="0" cellpadding="0" cellspacing="0" style="width:400px;margin:0 auto">
+	<tr><td rowspan="5" class="batch" style="width:100px;font-size:80px;">&#xf173;</td>
+		<td style="width:70px">email</td><td style="width:130px"><input type="text" id="Jemail" placeholder="email"/></td>
+		<td rowspan="5" style="text-align:center;width:100px">
+			<div class="batch" id="Jjoin">&#xf164;</div>
+			<div class="batch" id="Jcancel">&#xf165;</div>
+		</td>
+	</tr>
+	<tr><td>pw</td><td><input type="password" id="Jpw"/></td></tr>
+	<tr><td>isPw</td><td><input type="password" id="Jpwc"/></td></tr>
+	<tr><td>nick</td><td><input type="text" id="Jnick" placeholder="nick"/></td></tr>
+	<tr><td colspan="2" style="text-align:center"><div id="Jalert"></div></td></tr>
+	</table>
 </div>
 <div class="contents">
-<br clear="both" />
-	<div class="middle">
-		<div id="join" style="display:none;text-align:center">
-			Join us
-			<table border="0" cellpadding="0" cellspacing="0" style="width:200px;margin:0 auto">
-			<tr><td style="width:70px">email</td><td style="width:130px"><input type="text" id="Jemail"/></td></tr>
-			<tr><td>pw</td><td><input type="password" id="Jpw"/></td></tr>
-			<tr><td>nick</td><td><input type="text" id="Jnick"/></td></tr>
-			<tr><td>thumb</td><td><input type="text" id="Jthumb"/></td></tr>
-			<tr><td colspan="2" style="text-align:center"><div id="Jalert"></div></td></tr>
-			<tr><td colspan="2" style="text-align:center">
-				<input type="button" id="Jjoin" value="join"/>
-				<input type="button" id="Jcancel" value="cencel"/>
-			</td></tr>
-			</table>
-		</div>
-<!--        <ul>
-            <li>영역 일단정리</li>
-            <li>TODO 로고디자인</li>
-            <li>TODO 상단 네비 스킨</li>
-            <li>TODO 비쥬얼 컨테이너</li>
-            <li>TODO 섬네일 태그와 이미지 분리 - 완료</li>
-            <li>TODO 푸터 스킨</li>
-            <li>TODO recommand Plugin 영역구현</li>
-            <li>TODO 로그인 관련들 디자인 & 스킨처리</li>
-            <li>TODO 로그인후 자기 플러그인 관리페이지 디자인 & 스킨처리</li>
-            <li>TODO Recent 페이지</li>
-            <li>TODO Hot 페이지</li>
-            <li>TODO Updated 페이지</li>
-            <li>TODO Catalog 페이지</li>
-        </ul>-->
+	
