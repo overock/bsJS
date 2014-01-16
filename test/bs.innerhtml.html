@@ -18,27 +18,14 @@
     <img style="position: fixed; top: 0; right: 0; border: 0;"
          src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
 </a>
-<div id="test1">text</div>
-<div id="test2">text</div>
-<div id="test3">text</div>
-<div id="result"></div>
-<div id="test"></div>
+<div id="target"></div>
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
-<script src="./printer.js"></script>
 <script>
 bs.$import( 'innerhtml', 'last' );
 bs(function() {
-  var target1 = document.getElementById('test1');
-  var target2 = document.getElementById('test2');
-  var target3 = document.getElementById('test3');
-  bs.$innerhtml( '<a href="http://www.naver.com">naverLink</a>', target1);
-  bs.$innerhtml( '<a href="http://www.naver.com">naverLink</a>', target2, 'html+' );
-  bs.$innerhtml( '<a href="http://www.naver.com">naverLink</a>', target3, '+html' );
-
-  bsTest( 'innerhtml method',
-  "bs.$innerhtml( '&lt;a href=\"http://www.naver.com\"&gt;naverLink&lt;/a&gt;' ).$( 'html' )", 'naverLink', bs.$innerhtml( '<a href="http://www.naver.com">naverLink</a>' ).$('html')
-  );
+  var target = document.getElementById('target');
+  bs.$innerhtml( '<td>태그문자열1</td><td>태그문자열2</td><td>태그문자열3</td><td>태그문자열4</td>', target);
 });
 </script>
 </body>
