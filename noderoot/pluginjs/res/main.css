@@ -1,5 +1,6 @@
 body{margin:0;padding:0;font-family: Arial}
 div{font-size: 12px}
+img{border:0}
 a:link {text-decoration: none; color: #bfbec3 }
 a:visited {text-decoration: none;color: #bfbec3 }
 a:active {text-decoration: none;color: #bfbec3 }
@@ -12,7 +13,7 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 
 #logo{float:left;width:100px}
 
-#menu{float:left;width:255px;margin-top:-14px;font-size:13px;text-align:center;text-shadow:1px 1px 0 #000000;}
+#menu{float:left;width:255px;margin-top:-14px;font-size:13px;text-align:center;text-shadow:1px 1px 0 #000}
 #menu a:link,#menu a:visited,#menu a:active{text-decoration:none;color:#fff;font-weight:bold}
 #menu a:hover{text-decoration:underline;color:#fff}
 
@@ -25,9 +26,14 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 #personal .batch{font-size:15px;}
 #Lemail{width:125px;height:25px;border:0;padding-left:7px;margin:0px 5px 0px 5px;border-radius:7px;opacity:0.5;color:#fff;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
 #Lpw{width:70px;height:25px;border:0;padding-left:7px;margin:0px 2px 0px 5px;border-radius:7px;opacity:0.5;color:#fff;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
-#Llogin{cursor:pointer;border:0;background:#BD84B1;color:#fff;}
+#Llogin{cursor:pointer;border:0;background:#BD84B1;color:#fff}
 #Ljoin{cursor:pointer;border:0;background:none;color:#8ABDE0;font-weight:bold;overflow:hidden}
 #Lalert{display:none}
+#Llogined{width:405px;text-align:right;line-height:22px}
+#Llogined0{color:#fff;font-size:18px;text-shadow:1px 1px 0 #000}
+#Llogined1{color:#4b506c;font-size:16px}
+#Llogined1:hover{color:#A5ABCA}
+
 
 #join{height:150px;display:none;text-align:center;background:#659cad;background-image: linear-gradient(to bottom, #659CAD 0%, #FFFFFF 100%);color:#fff;font-size:15px;padding:30px 0}
 #Jemail,#Jpw,#Jpwc,#Jnick{color:#fff;width:400px;margin:2px 0 2px 0;height:25px;border:0;padding-left:7px;border-radius:7px;opacity:0.5;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}

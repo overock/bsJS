@@ -583,6 +583,7 @@ bs.$method( 'crypt', (function(){
 			$fn.execute = function( $query ){return this.__db.execute( $query );},
 			$fn.recordset = function( $query, $end ){this.__db.recordset( $query, $end );},
 			$fn.stream = function( $query, $end ){this.__db.stream( $query, $end );};
+			$fn.transation = function( $query, $end ){this.__db.transation( $query, $end );};
 		};
 	})() );
 })();

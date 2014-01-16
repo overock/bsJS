@@ -26,7 +26,7 @@
 <body>
 <div class="top">
 	<div class="contents">
-		<div id="logo"><img src="/res/draft/logo.jpg"></div>
+		<div id="logo"><a href="/"><img src="/res/draft/logo.jpg"></a></div>
 		<div id="menu">
             <img src="/res/top/line.png" style="margin: 0px 12px 0px 5px">
 			<a href="/recent">Recent</a> &nbsp; <a href="/hot">Hot</a> &nbsp;
@@ -42,13 +42,13 @@
 			<span class="batch">&#xf152;</span> <input type="text" id="Lemail" value="<%=bs.$ck('savedid')||''%>"/>
 			<span class="batch">&#xF0C0;</span> <input type="password" id="Lpw"/>
 			<div style="float:right">
-				<input type="image" src="res/top/login/bt_login.png"/>
+				<input type="image" id="Llogin" src="res/top/login/bt_login.png"/>
 				<input type="image" id="Ljoin" src="res/top/login/bt_join.png"/>
 			</div>
 			<div id="Lalert"></div>
 			<script>bs( site.header );</script>
 <%}else{%>
-			<a href="/member/"><%=bs.WEB.session('nick')%></a> <a href="/logout">logout</a>
+			<script>site.logined( '<%=bs.WEB.session('nick')%>' );</script>
 <%}%>
 		</div>
 	</div>
@@ -64,7 +64,7 @@
 		</td>
 	</tr>
 	<tr><td>pw <span style="font-size:10px">6~12</span></td><td><input type="password" id="Jpw"/></td></tr>
-	<tr><td>isPw</td><td><input type="password" id="Jpwc"/></td></tr>
+	<tr><td>pw <span style="font-size:10px">confirm</span></td><td><input type="password" id="Jpwc"/></td></tr>
 	<tr><td>nick <span style="font-size:10px">4~10</span></td><td><input type="text" id="Jnick" placeholder="nick"/></td></tr>
 	<tr><td colspan="2" style="text-align:center"><div id="Jalert">&nbsp;</div></td></tr>
 	</table>

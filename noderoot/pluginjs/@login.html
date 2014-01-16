@@ -10,11 +10,10 @@ if( !bs.WEB.session('id') ){
 				nick:$rs.nick,
 				thumb:$rs.thumb
 			},
-			console.log($rs.member_rowid);
 			bs.WEB.session( 'id', $rs.member_rowid, 'email', $rs.email, 'nick', $rs.nick, 'thumb', $rs.thumb );
 		}else $data.result = 'fail', $data.contents = 'no data';
 	} );
-	else $data.result = 'fail', $data.contents = 'no post';
+	else bs.WEB.response( JSON.stringify( {result:'fail', contents:'no post'} ) );
 }else{
 	bs.WEB.response( JSON.stringify( {
 		result:'ok',

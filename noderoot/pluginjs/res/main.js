@@ -7,6 +7,10 @@ post:function( $url ){
 	for( i = 2, j = arguments.length ; i < j ; i += 2 ) arguments[i-1] = bs.dom(arguments[i]).$('@value');
 	return bs.$post.apply(null, arguments );
 },
+logined:function( $nick ){
+	return '<div id="Llogined"><a href="/member/" id="Llogined0">' + $nick + '</a> &nbsp; &nbsp; '+
+		'<a href="/logout" id="Llogined1" class="batch">&#xf165;</a></div>';
+},
 header:function(){
 	var isJoin, lend, jend, jcancel, jover, jout, jheight;
 	 //login
@@ -15,7 +19,7 @@ header:function(){
 		bs.dom('#Lalert').$( 'html', '' );
 		if( t0 ){
 			t0 = JSON.parse(t0);
-			if( t0.result == 'ok' ) bs.dom('#personal').$('html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>');
+			if( t0.result == 'ok' ) bs.dom('#personal').$('html', site.logined( t0.contents.nick ) );
 			else bs.dom('#Lalert').$('html', 'loginFailed:' + t0.contents);
 		}else bs.dom('#Lalert').$('html', 'loginFailed: no response');
 	}),
@@ -67,7 +71,7 @@ header:function(){
 		) ){
 			t0 = JSON.parse(t0);
 			if( t0.result == 'ok' ){
-				bs.ANI.tween( bs.dom( '#personal' ).$( 'html', '<a href="/member/">' + t0.contents.nick + '</a> <a href="/logout">logout</a>', 'display', 'block', 'this' ), 'opacity', 1, 'time', .3 ),
+				bs.ANI.tween( bs.dom( '#personal' ).$( 'html', site.logined( t0.contents.nick ), 'display', 'block', 'this' ), 'opacity', 1, 'time', .3 ),
 				bs.ANI.tween( bs.dom( '#join' ), 'height', 0, 'time', .2, 'end', jcancel );
 			}else bs.dom('#Jalert').$('html', 'joinFailed:' + t0.contents);
 		}else bs.dom('#Jalert').$('html', 'joinFailed: no response');
