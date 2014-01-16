@@ -32,13 +32,8 @@ header:function(){
 		bs.ANI.tween( bs.dom( '#join' ).$( 'height', 0, 'this'), 'height', jheight, 'time', .7, 'ease', 'bounceOut', 'end', jend );
 	} ),
 	//join
-	jend = function(){
-		bs.dom( '#Jemail' ).$('f');
-	},
-	jcancel = function(){
-		isJoin = 0,
-		bs.dom( '#join' ).$( 'display', 'none' );
-	},
+	jend = function(){bs.dom( '#Jemail' ).$('f');},
+	jcancel = function(){isJoin = 0, bs.dom( '#join' ).$( 'display', 'none' );},
 	jover = function( $e ){bs.dom( '#'+this.id ).$( 'color', '#8ABDE0' );},
 	jout = function( $e ){bs.dom( '#'+this.id ).$( 'color', '#fff' );},
 	bs.dom('#Jcancel').$( 'mouseover', jover, 'mouseout', jout, 'down', function( $e ){
