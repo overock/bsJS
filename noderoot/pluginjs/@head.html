@@ -28,8 +28,10 @@
 	<div class="contents">
 		<div id="logo"><img src="/res/draft/logo.jpg"></div>
 		<div id="menu">
-			<a href="/recent">Recent</a> &nbsp; <a href="/hot">Hot</a> &nbsp; 
+            <img src="/res/top/line.png" style="margin: 0px 12px 0px 5px">
+			<a href="/recent">Recent</a> &nbsp; <a href="/hot">Hot</a> &nbsp;
 			<a href="/updated">Updated</a> &nbsp; <a href="/catalog">Catalog</a>
+            <img src="/res/top/line.png" style="margin: 0px 10px 0px 12px">
 		</div>
 		<div id="search">
 			<input type="text" id="searchTxt" placeholder="search"/> &nbsp;
@@ -40,8 +42,8 @@
 			<span class="batch">&#xf152;</span> <input type="text" id="Lemail" value="<%=bs.$ck('savedid')||''%>"/>
 			<span class="batch">&#xF0C0;</span> <input type="password" id="Lpw"/>
 			<div style="float:right">
-				<input type="button" class="batch" id="Llogin" value="&#xf16b;"/>
-				<input type="button" id="Ljoin" value="Join!"/>
+				<input type="image" src="res/top/login/bt_login.png"/>
+				<input type="image" id="Ljoin" src="res/top/login/bt_join.png"/>
 			</div>
 			<div id="Lalert"></div>
 			<script>bs( site.header );</script>
@@ -51,11 +53,14 @@
 		</div>
 	</div>
 </div>
-<div id="join">
-	<table border="0" cellpadding="0" cellspacing="0" style="width:400px;margin:0 auto">
-	<tr><td rowspan="5" class="batch" style="width:100px;font-size:80px;">&#xf173;</td>
+<div id="join" >
+    디자인반영중
+	<table border="0" cellpadding="0" cellspacing="0" style="width:750px;margin:0 auto;text-align:left;color:#000">
+	<!--<tr><td rowspan="5" class="batch" style="width:100px;font-size:80px;">&#xf173;</td>-->
+        <tr><td rowspan="6" style="padding-top:15px;width:150px"></td>
+        <tr><td colspan="2" height="50" ><img src="res/top/login/joinTitle.png"></tr>
 		<td style="width:70px">email</td><td style="width:130px"><input type="text" id="Jemail" placeholder="email"/></td>
-		<td rowspan="5" style="text-align:center;width:100px">
+		<td rowspan="6" style="text-align:center;">
 			<div class="batch" id="Jjoin">&#xf164;</div>
 			<div class="batch" id="Jcancel">&#xf165;</div>
 		</td>
