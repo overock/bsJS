@@ -55,7 +55,9 @@ bs.$register( 'method', 'innerhtml', (function(){console.log( 'innerhtml' );
 		}
 
 		i = parent.childNodes.length;
-		while( i-- ) $target.appendChild(parent.childNodes[0]);
+		if( !$target ) {$target = {length : 0};while( i-- ) $target[$target.length++] = parent.childNodes[i];Array.prototype.reverse.call($target);}
+		else while( i-- ) $target.appendChild(parent.childNodes[0]);
+		//while( parent.childNodes[0] ) $target.appendChild(parent.childNodes[0]);
 		return $target;
 	};
 })(), 1.0 );
