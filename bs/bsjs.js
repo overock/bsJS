@@ -13,7 +13,7 @@ var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
 PLUGIN_REPO = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/';//'http://projectbs.github.io/bsJS/bs/plugin/'//http://www.bsidesoft.com/bs/bs5/bs/plugin/
 if( doc = W['document'] ) que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
-else if( __dirname ) node=require('./node'), module.exports = bs = function(f){bs.__root = f;return bs;};
+else if( __dirname ) node=require('./node'), module.exports = bs = function(f){f();}, bs.__root = require.main.filename.substring( 0, require.main.filename.lastIndexOf( '\\' ) );
 else throw new Error( 0, 'not supported platform' );
 bs.PLUGIN_REPO = PLUGIN_REPO, bs.VERSION = VERSION = 0.2;
 function error( $num, $msg ){if( doc ) throw new Error( $num, $msg ); else console.log( $num, $msg );}
@@ -134,6 +134,34 @@ method( 'tmpl', (function(){
 		else if( $str.substr($str.length-5) == '.html' ) $str = bs.$get( null, $str );
 		return arg = arguments, bs.$trim( $str.replace( reg, r ) );
 	};
+})() ),
+method( 'jpage', (function(){
+	var jp, jpage, r0, r1, r2, s, e, cache;
+	jp = function( $v ){this.v = $v}, cache = {}, r0 = /\\/g, r1 = /["]/g, r2 = /\r\n|\r|\n/g, s = '<%', e = '%>',
+	jpage = function( $str, $data, $render, $end, $id ){
+		var t0, t1, i, j, k, v, importer, render;
+		if( !( jpage.cache && ( v = cache[$id] ) ) ){
+			if( $str instanceof jp ) v = $str.v;
+			else{
+				$str = ( $str.substr(0,2) == '#T' ? bs.dom( $str ).$('@text') : $str.substr($str.length-5) == '.html' ? bs.$get( null, $str ) : $str ).split( s );
+				i = 0, j = $str.length, v = '';
+				while( i < j ){
+					t0 = $str[i++];
+					if( ( k = t0.indexOf( e ) ) > -1 ) t1 = t0.substring( 0, k ), t0 = t0.substr( k + 2 ), v += t1.charAt(0) == '=' ? 'ECHO(' + t1.substr(1) + ');' : t1;
+					v += 'ECHO("' + t0.replace( r0, '\\\\' ).replace( r1, '\\"' ).replace( r2, '\\n' ) + '");';
+				}
+			}
+			t0 = $str.v ? $str : new jp(v);
+			if( jpage.cache && $id ) cache[$id] = v;
+		}
+		t1 = '',
+		importer = function( $url ){jpage( $url, $data, null, render, $url );},
+		render = $render ? function( $v ){t1 += $v, $render( $v );} : function( $v ){t1 += $v;},
+		new Function( 'ECHO, $, bs, IMPORT', v )( render, $data, bs, importer );
+		if( $end ) $end( t1 );
+		return t0;
+	}, jpage.cache = 1;
+	return jpage;
 })() );
 function regfactory( r, v ){	
 	function f( $v ){

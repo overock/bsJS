@@ -8,7 +8,7 @@ post:function( $url ){
 	return bs.$post.apply(null, arguments );
 },
 logined:function( $nick ){
-	return '<div id="Llogined"><a href="/member/" id="Llogined0">' + $nick + '</a> &nbsp; &nbsp; '+
+	return '<div id="Llogined"><a href="/member/" id="Llogined0"><span class="batch">&#xf170;</span> ' + $nick + '</a> &nbsp; &nbsp; '+
 		'<a href="/logout" id="Llogined1" class="batch">&#xf165;</a></div>';
 },
 header:function(){

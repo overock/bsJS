@@ -48,7 +48,7 @@
 			<div id="Lalert"></div>
 			<script>bs( site.header );</script>
 <%}else{%>
-			<script>site.logined( '<%=bs.WEB.session('nick')%>' );</script>
+			<script>bs( function(){bs.dom( '#personal' ).$( 'html', site.logined( '<%=bs.WEB.session('nick')%>' ) )} );</script>
 <%}%>
 		</div>
 	</div>

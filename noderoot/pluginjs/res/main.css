@@ -5,9 +5,31 @@ a:link {text-decoration: none; color: #bfbec3 }
 a:visited {text-decoration: none;color: #bfbec3 }
 a:active {text-decoration: none;color: #bfbec3 }
 a:hover {text-decoration: underline;color: #bfbec3 }
+h1{font-size:50px;font-weight:bold;color:#4b506c;margin:10px;padding:0}
 
 .contents{width:980px;margin:0 auto;overflow:hidden}
 .batch{font-family:batch}
+.tableHead{height:45px;text-align:center;font-size:14px;text-shadow:1px 1px 0 #000;color:#fff;
+background: #757dae; /* Old browsers */
+background:-moz-linear-gradient(top, #757dae 0%, #9fa4c6 100%);
+background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#757dae), color-stop(100%,#9fa4c6));
+background:-webkit-linear-gradient(top, #757dae 0%,#9fa4c6 100%);
+background:-o-linear-gradient(top, #757dae 0%,#9fa4c6 100%);
+background:-ms-linear-gradient(top, #757dae 0%,#9fa4c6 100%);
+background:linear-gradient(to bottom, #757dae 0%,#9fa4c6 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#757dae', endColorstr='#9fa4c6',GradientType=0 );
+}
+.add{cursor:pointer;height:55px;line-height:55px;padding:0 15px;text-align:center;font-size:30px;text-shadow:1px 1px 0 #000;color:#fff;border-radius:10px;
+background: #757dae; /* Old browsers */
+background:-moz-linear-gradient(top, #294952 0%, #65BCAD 100%);
+background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#294952), color-stop(100%,#65BCAD));
+background:-webkit-linear-gradient(top, #294952 0%,#65BCAD 100%);
+background:-o-linear-gradient(top, #294952 0%,#65BCAD 100%);
+background:-ms-linear-gradient(top, #294952 0%,#65BCAD 100%);
+background:linear-gradient(to bottom, #294952 0%,#65BCAD 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#294952', endColorstr='#65BCAD',GradientType=0 );
+}
+
 
 .top{width:100%;background:#757dae;height:45px;color:#fff}
 
@@ -57,6 +79,13 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 .lists .list3 .title{ font-size: 18px;color: #404040; margin-top: -95px; margin-left: 115px;}
 .lists .list3 .ex{color: #bbbbbb; width: 300px; height: 48px;margin-top:5px}
 .lists .list3 .ex2{ color: #81acac;}
+
+
+
+#Plist td{height:45px;color:#4C516D;font-size:14px;border-bottom:1px dashed #999;font-weight:bold}
+#Plist a{color:#4C516D}
+#Plist tr:hover{background:#eee}
+#Padd{float:right;margin:10px;font-size:20px}
 
 .bottom{clear:both;height:28px;width:100%;background:#757dae; margin-top:50px}
 .copy{font-size: 12px; color: #fff; float: left; margin-top:8px}

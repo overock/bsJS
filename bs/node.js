@@ -145,7 +145,7 @@ bs.$method( 'crypt', (function(){
 	},
 	Upfile = function Upfile( $name, $file ){
 		this.name = $name,
-		this.file = $file
+		this.file = $file;
 	},
 	Upfile.prototype.save = function( $path ){
 		bs.$file( null, $path, this.file );
@@ -333,7 +333,7 @@ bs.$method( 'crypt', (function(){
 		};
 	} ),
 	bs.$class( 'site', function( $fn, bs ){
-		var ports, tEnd, f, runRule, defaultRouter, pass, cache;
+		var ports, tEnd, f, runRule, defaultRouter, pass, cache, defaultTmpl;
 		ports = {},
 		portStart = function( $https, $sites, $port ){
 			var rqListener;
@@ -368,6 +368,7 @@ bs.$method( 'crypt', (function(){
 		},
 		defaultRouter = ['template', '@.html'],
 		pass = function(){pause = 0, process.nextTick( next );},
+		defaultTmpl = function( $url, $template, $data, $end ){bs.$jpage( $template, $data, null, $end, this.cache ? $url : 0 );},
 		$fn.start = function(){
 			var start, t0, self = this, k;
 			this.rulesArr = [];
@@ -403,7 +404,7 @@ bs.$method( 'crypt', (function(){
 			this.form = bs.form( $sel ),
 			this.form.$( 'encoding', 'utf-8', 'keepExtensions', 1, 'fileMax', 2 * 1024 * 1024, 'postMax', 5 * 1024 * 1024 ),
 			this.url = [], this.isStarted = 0,
-			this.mime = clone( mime ),
+			this.mime = clone( mime ), this.template = defaultTmpl,
 			this.rules = {'':defaultRouter}, this.application = {}, this.session = {}, this.db = [],
 			this.request = function( $url, $rq, $rp ){
 				var t0, i, j;

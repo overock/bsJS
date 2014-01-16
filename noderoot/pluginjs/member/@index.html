@@ -1,18 +1,7 @@
 <%if( bs.WEB.method() == 'POST' ){
-	if( bs.WEB.session('id') ){
-		bs.sql( 'Plist' ).run( function( $rs ){
-			var t0 = {};
-			if( $rs ){
-				if( $rs.length ) t0.result = 'ok', t0.contents = $rs;
-				else t0.result = 'no';
-			}else t0.result = 'fail';
-			bs.WEB.response( JSON.stringify( t0 ) );
-			bs.WEB.next();
-		}, 'p', ( ( bs.WEB.post( 'p' ) || 1 ) - 1 )*10, 'rpp', 10, 'id', bs.WEB.session('id') );
-		return bs.WEB.pause();
-	}
-	bs.WEB.response( JSON.stringify( {result:'no'} ) );
-	return;
+	var p = parseInt( bs.WEB.post( 'p' ), 10 );
+	if( p < 1 ) p = 1;
+	return bs.WEB.application('db')( 'Plist', ['p', ( p - 1 ) * 10, 'rpp', 10, 'id', bs.WEB.session('id')] );
 }%>
 
 <%IMPORT( '@head.html' );%>
@@ -32,7 +21,12 @@
 	<input type="button" id="Aadd" value="add"/> <input type="button" id="Acancel" value="cancel"/>
 </div>
 <div id="list">
-	<input type="button" id="Padd" value="add plugin"/>
+	<h1 style="float:left"><%=bs.WEB.session('nick')%>'s plugin</h1>
+	<div id="Padd" class="add"><span class="batch">&#xF14C;</span> ADD</div>
+	<table id="Ptop" cellspacing="0" border="0" cellpadding="0" style="width:980px"><tr>
+	<td style="border-radius:15px 0 0 15px;width:500px" class="tableHead">Title</td><td style="width:150px" class="tableHead">Type</td>
+	<td style="width:150px" class="tableHead">Category</td><td style="border-radius:0 15px 15px 0" class="tableHead">Date</td>
+	</tr></table>
 	<div id="Plist"></div>
 	<div id="Ppage"></div>
 </div>
@@ -44,12 +38,14 @@ bs( function(){
 		page = $page, t0 = JSON.parse( bs.$post( null, '/member/', 'p', page ) );
 		if( t0.result == 'ok' ){
 			t0 = t0.contents, i = 0, j = t0.length,
-			t1 = '<table><tr><td>title</td><td>type</td><td>category</td><td>date</td></tr>';
+			t1 = '<table cellspacing="0" border="0" cellpadding="0" style="width:980px">'+
+				'<colgroup><col style="width:50px"/><col style="width:450px"/><col style="width:150px"/><col style="width:150px"/><col/></colgroup>';
 			for( ; i < j ; i++ )
-				t1 += '<tr><td><a href="/member/view?r='+t0[i].plugin_rowid+'">'+t0[i].title+'('+t0[i].uname+')</a></td>'+
-					'<td>'+t0[i].type+'</td><td>'+t0[i].cat+'</td><td>'+t0[i].regdate+'</td></tr>';
+				t1 += '<tr style="text-align:center"><td></td><td style="text-align:left;font-weight:normal;font-size:20px">'+
+					'<a href="/member/view?r='+t0[i].plugin_rowid+'">[ '+t0[i].uname+' ] '+t0[i].title+'</a></td>'+
+					'<td>'+t0[i].type.charAt(0).toUpperCase()+t0[i].type.substr(1)+'</td><td>'+t0[i].cat+'</td><td>'+t0[i].regdate+'</td></tr>';
 			t1 += '</table>';
-		}else t1 = 'no registered plugin';
+		}else t1 = 'No Registered Plugin';
 		bs.dom( '#Plist' ).$( 'html', t1 );
 	}
 	list(1);
