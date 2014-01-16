@@ -31,10 +31,10 @@ a:hover {text-decoration: underline;color: #bfbec3 }
 
 #join{height:150px;display:none;text-align:center;background:#659cad;background-image: linear-gradient(to bottom, #659CAD 0%, #FFFFFF 100%);color:#fff;font-size:15px;padding:30px 0}
 #Jemail,#Jpw,#Jpwc,#Jnick{color:#fff;width:400px;margin:2px 0 2px 0;height:25px;border:0;padding-left:7px;border-radius:7px;opacity:0.5;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
-#Jcancel,#Jjoin{font-size:40px;color:#fff;cursor:pointer}
+#Jcancel,#Jjoin{font-size:50px;color:#fff;cursor:pointer}
 #Jalert{color:#8ABDE0;font-size:11px;font-weight:bold}
 
-.middleVisual{width: 100%; height: 410px; }
+#middleVisual{width: 100%; height: 410px;position:relative;overflow:hidden}
 .lists{margin: 10px;}
 .lists .list1{width: 240px;float: left; }
 .lists .list2{width: 300px;float: left }

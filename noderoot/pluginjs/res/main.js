@@ -72,6 +72,51 @@ header:function(){
 			}else bs.dom('#Jalert').$('html', 'joinFailed:' + t0.contents);
 		}else bs.dom('#Jalert').$('html', 'joinFailed: no response');
 	});
+},
+mainVisual:function(){
+	var game, d3;
+	d3 = bs.DETECT.transform3D;
+	game = {
+		x:0, y:0, vx:0, vy:0, v:1, rv:.5, w:0, h:0, tcheck:0, div:{length:0}, rz:0,
+		term:bs.DETECT.device =='tablet' || bs.DETECT.device=='mobile' ? 70 : 10,
+		init:function(){
+			var i;
+			this.div.length = i = bs.DETECT.device =='tablet' || bs.DETECT.device=='mobile' ? 15 : 30;
+			while( i-- ) this.div[i] = bs.dom('<div></div>' ).$( 'position','absolute', 'visibility', 'hidden', '<', '#visualEffect', 'this' );
+			this.w = 980, this.h = 980, this.x = this.w/2, this.y = this.h/2;
+
+			bs.dom( '#visualEffect' ).$( 'top', 45, 'position', 'absolute', 'top', -290, 'width', this.w, 'height', this.h, 'overflow', 'hidden', 'down', function( $e ){
+				game.vx = ( $e.lx - game.x )*.1, game.vy = ($e.ly - game.y)*.1;
+			} );
+			bs.dom( '<div></div>' ).$( '@id', 'a', 'position', 'absolute', 'background', '#950',
+					'left', 0, 'top', 0, 'width', 1, 'height', 1, 'border-radius',5,
+					'<', '#visualEffect'
+			);
+		},
+		end:function( $target ){
+			game.div[game.div.length++] = $target.$('visibility', 'hidden', 'this');
+		},
+		ANI:function( $time ){
+			bs.dom('#a').$( 'left', this.x, 'top', this.y );
+			game.rz += .3;
+			bs.dom( '#visualEffect' ).$( 'transform', (d3 ? 'rotateZ' : 'rotate') + '(' + game.rz + 'deg)' );
+			if( $time > this.tcheck ){
+				this.tcheck = $time + this.term;
+				var s = bs.$ex( 10, '~', 60 );
+				var d = this.div.length ? this.div[--this.div.length] : bs.dom('<div></div>' ).$( 'position','absolute', '<', '#visualEffect', 'this' );
+				d.$( 'visibility', 'visible', 'background', 'rgb('+bs.$ex(100,'~',200)+','+bs.$ex(100,'~',150)+','+bs.$ex(100, '~',200)+')',
+						'width',1, 'height',1, 'border-radius', 10, 'left',this.x+ bs.$ex( -10, '~', 10 ) ,'top',this.y+bs.$ex( -10, '~', 10 ), 'opacity', 0.3
+				);
+				bs.ANI.tween( d,
+						'left', bs.$ex( -600, '~', 600 ) + this.x, 'top', bs.$ex( -600, '~', 600 ) + this.y,
+						'border-radius', s, 'width', s, 'height',s, 'opacity', 0,
+						'time', bs.$ex( 2, '~f', 3 ), 'end', this.end
+				);
+			}
+		}
+	};
+	game.init();
+	bs.ANI.ani( game );
 }
 
 };
