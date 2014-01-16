@@ -13,8 +13,11 @@ var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
 PLUGIN_REPO = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/';//'http://projectbs.github.io/bsJS/bs/plugin/'//http://www.bsidesoft.com/bs/bs5/bs/plugin/
 if( doc = W['document'] ) que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
-else if( __dirname ) node=require('./node'), module.exports = bs = function(f){f();}, bs.__root = require.main.filename.substring( 0, require.main.filename.lastIndexOf( '\\' ) );
-else throw new Error( 0, 'not supported platform' );
+else if( __dirname ){
+	node=require('./node'), module.exports = bs = function(f){f();};
+	bs.__root = require.main.filename.lastIndexOf( '\\' ) > -1 ? '\\' : '/',
+	bs.__root = require.main.filename.substring( 0, require.main.filename.lastIndexOf( bs.__root ) );
+}else throw new Error( 0, 'not supported platform' );
 bs.PLUGIN_REPO = PLUGIN_REPO, bs.VERSION = VERSION = 0.2;
 function error( $num, $msg ){if( doc ) throw new Error( $num, $msg ); else console.log( $num, $msg );}
 function dependency( $arg ){
