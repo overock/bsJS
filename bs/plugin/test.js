@@ -9,14 +9,15 @@ bs.$register( 'method', 'test', (function(){ console.log( 'test' );
 		japanese:parseRule('/^[ぁ-んァ-ヶー一-龠！-ﾟ・～「」“”‘’｛｝〜−]+$/'),
 		alpha:parseRule('/^[a-z]+$/'),
 		ALPHA:parseRule('/^[A-Z]+$/'),
+		pass:parseRule('/^[\\w]+$/'),
 		num:parseRule('/^[0-9]+$/'),
 		alphanum:parseRule('/^[a-z0-9]+$/'),
 		'1alpha':parseRule('/^[a-z]/'),
 		'1ALPHA':parseRule('/^[A-Z]/'),
 		float:function( $v ){return '' + parseFloat( $v ) === $v;},
 		int:function( $v ){return '' + parseInt( $v, 10 ) === $v;},
-		length:function( $v, $a ){return $v.length === +$a[0];},
-		range:function( $v, $a ){return $v = $v.length, +$a[0] <= $v && $v <= +$a[1];},
+		length:function( $v, $a ){return ( $v ? $v.length : 0 ) === +$a[0];},
+		range:function( $v, $a ){return $v = $v ? $v.length : 0, +$a[0] <= $v && $v <= +$a[1];},
 		indexOf:function( $v, $a ){
 			var i, j;
 			i = $a.length;

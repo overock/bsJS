@@ -3,7 +3,7 @@ bs.$importer( function(){
 	bs.site( 'bsplugin' ).$(
 		'url', 'js.bsplugin.com:8001',
 		'url', '127.0.0.1:8001',
-		'https', {key:'./key.pem',cert:'./cert.pem',port:4430},
+		//'https', {key:'./key.pem',cert:'./cert.pem',port:4430},
 		'root', './noderoot/pluginjs/',
 		'db', 'mysql',
 		'cache', 0,
