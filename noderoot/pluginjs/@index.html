@@ -16,10 +16,12 @@
     </div>
     <div class="list3" id="list3"><img src="res/index/list_title3.png"></div>
 </div>
+<div id="Padd" class="add"><span class="batch">&#xF14C;</span> ADD</div>
 <script>
     bs(function () {
 		
-
+bs.dom('#Padd').$( 'gradientDirection', 'h', 'gradientBeginR', 255, 'gradientBeginB', 0, 'gradientEndB', 255, 'gradientEndR', 0 );
+bs.ANI.tween( bs.dom('#Padd'), 'gradientBeginR', 0, 'gradientBeginB', 255, 'gradientEndB', 0, 'gradientEndR', 255 );
 
         var titleData = [
             'Debuger 1.2',

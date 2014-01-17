@@ -615,7 +615,24 @@ function DOM(){
 			}
 			return k;
 		},
-		style.float = 'styleFloat' in b ? 'styleFloat' : 'cssFloat' in b ? 'cssFloat' : 'float', style['url('] = function($v){return $v;};
+		style.float = 'styleFloat' in b ? 'styleFloat' : 'cssFloat' in b ? 'cssFloat' : 'float', style['url('] = function($v){return $v;},
+		(function(){
+			var gra, rgb, m0, m1, b;
+			b = '#000000', gra = bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 10 ? function( $s, $d, $b, $e ){
+				$s.filter = "progid:DXImageTransform.Microsoft.gradient(startColorstr='"+$b+"',endColorstr='"+$e+"',GradientType="+($d=='h'?1:0)+")";
+			} : function( $s, $d, $b, $e ){$s.background = 'linear-gradient(to '+($d=='h'?'right,':'bottom,')+$b+','+$e+')';},
+			( rgb = function(){this[0]=this[1]=this[2]=0;} ).prototype.toString = function(){
+				var t0, t1;
+				return t0='#', t1=parseInt(this[0]).toString(16),t0+=t1=='0'?'00':t1, t1=parseInt(this[1]).toString(16),t0+=t1=='0'?'00':t1, t1=parseInt(this[2]).toString(16),t0+=t1=='0'?'00':t1, t0;
+			},
+			m0 = function( i ){return function( $this, $v ){return $v===undefined?$this.grB[i]:(($this.grB||($this.grB=new rgb))[i] = $v,gra( $this.s, $this.grD, $this.grB, $this.grE||b ),$v);};},
+			m1 = function( i ){return function( $this, $v ){return $v===undefined?$this.grE[i]:(($this.grE||($this.grE=new rgb))[i] = $v,gra( $this.s, $this.grD, $this.grB||b, $this.grE ),$v);};},
+			style.gradientBeginR = m0(0), style.gradientBeginG = m0(1), style.gradientBeginB = m0(2),
+			style.gradientEndR = m1(0), style.gradientEndG = m1(1), style.gradientEndB = m1(2),
+			style.gradientBegin = function( $this, $v ){return $v===undefined?$this.grB:(gra( $this.s, $this.grD, $this.grB = $v, $this.grE || b ),$v);},
+			style.gradientEnd = function( $this, $v ){return $v===undefined?$this.grE:(gra( $this.s, $this.grD, $this.grB || b, $this.grE = $v ),$v);},
+			style.gradientDirection = function( $this, $v ){return $v===undefined?$this.grD:(gra( $this.s, $this.grD = $v, $this.grB || b, $this.grE || b ),$v);};
+		} )();
 		if( !( 'opacity' in b ) ){
 			style.opacity = function(s){
 				var v = arguments[1];

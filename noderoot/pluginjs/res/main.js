@@ -1,5 +1,10 @@
 bs( function(){
 	bs.css('font-face@batch /res/batch');
+	bs.css('.add').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 10, 'gradientBegin', '#294952', 'gradientEnd', '#65BCAD' );
+	bs.css('.add:hover').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 10, 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
+	bs.css('.tableHead').$( 'text-shadow', '1px 1px 0 #000', 'gradientBegin', '#757dae', 'gradientEnd', '#9fa4c6' );
+	bs.css('#menu').$( 'text-shadow', '1px 1px 0 #000' );
+	bs.css('.addBack').$( 'gradientBegin', '#659CAD', 'gradientEnd', '#FFFFFF' );
 } );
 var site = {
 post:function( $url ){
@@ -12,9 +17,9 @@ logined:function( $nick ){
 		'<a href="/logout" id="Llogined1" class="batch">&#xf165;</a></div>';
 },
 header:function(){
-	var isJoin, lend, jend, jcancel, jover, jout, jheight;
-	 //login
-	bs.dom('#Llogin').$('down', function ($e) {
+	var isJoin, login, lend, jend, jcancel, jover, jout, jheight;
+	lend = function( $e ){bs.dom( '#personal' ).$( 'display', 'none' );},
+	bs.dom('#Llogin').$('down', login = function( $e ){
 		var t0 = bs.$post(null, '/login', 'email', bs.dom('#Lemail').$('@value'), 'pw', bs.$md5(bs.dom('#Lpw').$('@value')));
 		bs.dom('#Lalert').$( 'html', '' );
 		if( t0 ){
@@ -24,9 +29,7 @@ header:function(){
 		}else bs.dom('#Lalert').$('html', 'loginFailed: no response');
 	}),
 	bs.dom( bs.dom( '#Lemail' ).$( '@value' ) ? '#Lpw' : '#Lemail' ).$('f'),
-	lend = function( $e ){
-		bs.dom( '#personal' ).$( 'display', 'none' );
-	},
+	bs.dom('#Lpw').$( 'keydown', function( $e ){if( $e.key('enter') ) login();} ),
 	bs.dom( '#Ljoin' ).$( 'down', function( $e ){
 		if( isJoin ) return;
 		isJoin = 1,
