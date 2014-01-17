@@ -14,63 +14,97 @@ if( bs.WEB.method() == 'POST' ){
 }%>
 
 <%IMPORT( '@head.html' );%>
-<div id="view">
-	<div id="Vinfo"></div>
-	<div>
-		version <input type="text" id="Vversion" /> <input type="button" id="Vadd" value="add"/>
-		<div id="Aalert"></div>
-	</div>
-	<div id="Vversions">versions</div>
-	<div id="Vdetail" style="display:none">
-		<input type="hidden" id="Vidx"/>
-		<input type="hidden" id="Vvr"/>
-		<div id="Vver"></div>
-		<div id="Vdependency"></div>
-		<div>code</div>
-		<textarea id="Vcode"></textarea>
-		<div>notice</div>
-		<textarea id="Vcontents"></textarea>
-		<input type="button" id="Vfreeze" value="freeze"/>
-		<input type="button" id="Vupdate" value="update"/>
-		<div id="Valert"></div>
-	</div>
+
+<h1><span class="batch" id="back">&#xf158;</span> <%=bs.WEB.session('nick')%>'s plugin <span id="Vtitle"></span></h1>
+
+<table cellspacing="0" border="0" cellpadding="0" style="width:980px"><tr>
+<td class="tableHeadL" style="width:500px" class="tableHead">Title</td><td style="width:150px" class="tableHead">Type</td>
+<td style="width:150px" class="tableHead">Category</td><td class="tableHeadR" class="tableHead">Date</td>
+</tr></table>
+<div id="Vinfo" class="mlist"></div>
+
+<div id="Vvadd" style="margin:15px auto;width:290px">
+	<div style="float:left"><input type="text" id="Vversion" placeholder="version" style="padding-left:5px;width:180px;font-size:30px;height:50px;border:1px solid #54597c"/></div>
+	<div id="Vadd" class="add"><span class="batch">&#xF14C;</span> ADD</div>
+	<div id="Aalert" style="clear:both"></div>
+</div>
+
+<div id="Vversions"></div>
+
+<div id="Vdetail" style="clear:both;display:none">
+	<input type="hidden" id="Vidx"/><input type="hidden" id="Vvr"/>
+	<div id="Vver" style="font-size:35px;margin:10px"></div>
 	
+	<div id="Vdependency"></div>
+	<div id="Vtab" style="clear:both">
+		<div id="Vtab0" class="tab VtabOn">code</div>
+		<div id="Vtab1" class="tab">notice</div>
+		<div id="Valert" style="float:left"></div>
+		<div id="Vupdate" class="add" style="float:right;font-size:20px;height:30px;line-height:30px;margin:10px 25px 10px 5px">update</div>
+		<div id="Vfreeze" class="add" style="float:right;font-size:20px;height:30px;line-height:30px;margin:10px 5px">freeze</div>
+		
+	</div>
+	<textarea id="Vcode" style="border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#fff"></textarea>
+	<textarea id="Vcontents" style="display:none;border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#54597c;color:#fff"></textarea>
 </div>
 <script>
 bs( function(){
-	var version, r;
+	var version, r, vadd, tab = 0;
 	r = <%=r%>;
+	bs.dom('#Vtab0').$( 'down', function( $e ){
+		if( tab ) return;
+		bs.dom('#Vtab0').$( 'class+', 'VtabOn' );
+		bs.dom('#Vtab1').$( 'class-', 'VtabOn' );
+		bs.dom('#Vcode').$( 'display', 'block' );
+		bs.dom('#Vcontents').$( 'display', 'none' );
+	} );
+	bs.dom('#Vtab1').$( 'down', function( $e ){
+		bs.dom('#Vtab0').$( 'class-', 'VtabOn' );
+		bs.dom('#Vtab1').$( 'class+', 'VtabOn' );
+		bs.dom('#Vcode').$( 'display', 'none' );
+		bs.dom('#Vcontents').$( 'display', 'block' );
+	} );
+	function s0( t ){
+		return function( $e ){if( bs.dom(t).$( 'height' ) || 0 != this.scrollHeight ) bs.dom('#Vcode').$( 'height', this.scrollHeight );};
+	}
+	bs.dom('#Vcode').$( 'scroll', s0('#Vcode') );
+	bs.dom('#Vcontents').$( 'scroll', s0('#Vcontents') );
 	var t0 = JSON.parse( bs.$post( null, '/member/view', 'r', r ) );
 	if( t0.result == 'ok' ){
-		t0 = t0.contents;
+		t0 = t0.contents,
 		bs.dom( '#Vinfo' ).$( 'html', 
-			'<div>'+t0.title+'('+t0.uname+')</div>'+
-			'<div>'+t0.contents+'</div>'+
-			'<div>type: '+t0.type+'</div>'+
-			'<div>category:'+t0.cat+'</div>'+
-			'<div>regdate:'+t0.regdate+'</div>'
+			'<table cellspacing="0" border="0" cellpadding="0" style="width:980px">'+
+			'<colgroup><col style="width:50px"/><col style="width:450px"/><col style="width:150px"/><col style="width:150px"/><col/></colgroup>'+
+			'<tr style="text-align:center"><td></td><td style="text-align:left;font-weight:normal;font-size:20px">[ '+t0.uname+' ] '+t0.title+'</a></td>'+'<td>'+t0.type.charAt(0).toUpperCase()+t0.type.substr(1)+'</td><td>'+t0.cat+'</td><td>'+t0.regdate+'</td></tr>'+
+			'<tr><td></td><td colspan="4">'+t0.contents+'</td></tr></table>'
 		);
+		bs.dom( '#Vtitle' ).$( 'html', t0.uname );
 		ver();
 	}else return bs.$back();
+	
 	function ver(){
 		var t0, t1, i, j;
 		t0 = JSON.parse( bs.$post( null, '/member/ver', 'r', r ) );
 		version = t0 = t0.contents, i = 0, j = t0.length;
-		bs.dom( '#Vversions' ).$( 'html', 'versions' );
 		for( ; i < j ; i++ ){
-			bs.dom( '<div id="v'+i+'">'+t0[i].version+'<br>freeze:'+t0[i].freezeData+'<br>update:'+t0[i].editdate+'</div>' ).$( '<', '#Vversions', 'down', function(){
+			bs.dom( '<div id="v'+i+'" class="Vver">'+
+				'<div class="Vver0">'+t0[i].version+'</div>'+
+				'<div class="Vver1">last updated<br>'+t0[i].editdate+'</div>'+
+				(t0[i].freezedate ? '<div class="Vver2">freezed<br>'+t0[i].freezedate+'</div>':'<div class="Vver3">warm<br>&nbsp;</div>' )+
+				'</div>' ).$( '<', '#Vversions', 'down', function(){
 				versionDetail( this.id.substr(1) );
-			}, 'background', '#ff0', 'border', '1px solid #999' );
+			} );
 		}
-	}	
+	}
+	
 	function versionDetail( $v ){
 		var t0;
 		bs.dom( '#Vidx' ).$( '@value', $v );
 		$v = version[$v];
-		bs.dom( '#Vver' ).$( 'html', $v.version );
+		bs.dom( '#Vver' ).$( 'html', 'v.'+$v.version );
 		bs.dom( '#Vvr' ).$( '@value', $v.ver_rowid );
-		bs.dom( '#Vcode' ).$( 'width', 960, 'height', 300, 'display', 'block', '@value', $v.code || '' );
-		bs.dom( '#Vcontents' ).$( 'width', 960, 'height', 300, 'display', 'block', '@value', $v.contents || '' );
+		bs.dom( '#Vcode' ).$( '@value', $v.code || '' );
+		bs.dom( '#Vcontents' ).$( '@value', $v.contents || '' );
 		bs.dom( '#Vdetail' ).$( 'display', 'block' );
 	}
 	bs.dom( '#Vupdate' ).$( 'down', function( $e ){
@@ -106,8 +140,8 @@ bs( function(){
 			bs.dom( '#Valert' ).$( 'html', 'freezeFailed: no response' );
 		}
 	} );
-	
-	bs.dom( '#Vadd' ).$( 'down', function( $e ){
+	bs.dom( '#Vversion' ).$( 'keydown', function( $e ){if( $e.key('enter') ) vadd(), this.value = '';} );
+	bs.dom( '#Vadd' ).$( 'down', vadd = function( $e ){
 		var t0;
 		t0 = bs.$post( null, '/member/vAdd', 
 			'version', parseFloat( bs.dom( '#Vversion' ).$('@value') ), 'r', r

@@ -542,7 +542,7 @@ bs.$method( 'crypt', (function(){
 		db[$name] = $obj;
 	}),
 	bs.$class( 'sql', function( $fn, bs ){
-		var key, i;
+		var key, i, toDB, r0, r1;
 		key = 'db,type,query'.split(','); for( i in key ) key[key[i]] = 1;
 		$fn.$constructor = function(){this.type = 'recordset';},
 		$fn.$ = function(){
@@ -557,10 +557,14 @@ bs.$method( 'crypt', (function(){
 				}
 			}
 		},
+		r0 = /[']/g, r1 = /--/g,
+		toDB = function( $v ){
+			return typeof $v == 'string' ? $v.replace( r0, "''" ).replace( r1, '' ) : $v;
+		},
 		$fn.run = function( $end ){
 			var end, t0, t1, i, j, k;
 			t0 = {}, i = 1, j = arguments.length;
-			while( i < j ) t0[k = arguments[i++]] = arguments[i++];
+			while( i < j ) t0[k = arguments[i++]] = toDB( arguments[i++] );
 			if( i = this.query.splice ){
 				this.type = 'transaction';
 				t1 = this.query.slice(0);

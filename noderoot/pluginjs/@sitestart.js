@@ -7,17 +7,17 @@ bs.sql( 'login' ).$( 'db', 'd@mysql', 'query', "select member_rowid,email,nick,t
 bs.sql( 'join' ).$( 'db', 'd@mysql', 'query', "insert into member(email,pw,nick,thumb)values('@email@','@pw@','@nick@','@thumb@')" );
 
 bs.sql( 'Plist' ).$( 'db', 'd@mysql', 'query', 
-	"select p.plugin_rowid,t.title type,p.title,p.uname,p.thumb,c.title cat,DATE_FORMAT(regdate,'%Y.%m.%d  %H:%i') regdate from plugin p,plugintype t, cat c "+
+	"select p.plugin_rowid,t.title type,p.title,p.uname,p.thumb,c.title cat,DATE_FORMAT(regdate,'%Y.%m.%d %H:%i')regdate from plugin p,plugintype t, cat c "+
 	"where p.plugintype_rowid=t.plugintype_rowid and p.cat_rowid=c.cat_rowid and p.member_rowid=@id@ order by regdate desc limit @p@,@rpp@" );
 bs.sql( 'Padd' ).$( 'db', 'd@mysql', 'query', 
 	"insert into plugin(member_rowid,plugintype_rowid,uname,title,contents,cat_rowid,thumb)values("+
 	"@id@,@type@,'@uname@','@title@','@description@',@cat@,'@thumb@')"
 );
 bs.sql( 'Pview' ).$( 'db', 'd@mysql', 'query', 
-	"select p.plugin_rowid,t.title type,p.title,p.contents,p.uname,p.thumb,c.title cat,regdate from plugin p,plugintype t, cat c "+
+	"select p.plugin_rowid,t.title type,p.title,p.contents,p.uname,p.thumb,c.title cat,DATE_FORMAT(regdate,'%Y.%m.%d %H:%i')regdate from plugin p,plugintype t, cat c "+
 	"where p.plugintype_rowid=t.plugintype_rowid and p.cat_rowid=c.cat_rowid and p.plugin_rowid=@r@" );
 
-bs.sql( 'Vlist' ).$( 'db', 'd@mysql', 'query', "select*from ver where plugin_rowid=@r@ order by version" );
+bs.sql( 'Vlist' ).$( 'db', 'd@mysql', 'query', "select ver_rowid,version,DATE_FORMAT(freezeDate,'%y.%m.%d %H:%i')freezedata,DATE_FORMAT(editdate,'%y.%m.%d %H:%i')editdate,code,contents from ver where plugin_rowid=@r@ order by version" );
 bs.sql( 'Vadd' ).$( 'db', 'd@mysql', 'query', "insert into ver(plugin_rowid,version)values(@r@,@version@)" );
 bs.sql( 'Vupdate' ).$( 'db', 'd@mysql', 'query', "update ver set code='@code@',contents='@contents@'where ver_rowid=@vr@" );
 bs.sql( 'Vfreeze' ).$( 'db', 'd@mysql', 'query', "update ver set freezeDate=CURRENT_TIMESTAMP()where ver_rowid=@vr@" );

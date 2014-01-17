@@ -11,8 +11,16 @@ h1{font-size:50px;font-weight:bold;color:#4b506c;margin:10px;padding:0}
 .batch{font-family:batch}
 .tableHead{height:45px;text-align:center;font-size:14px;color:#fff}
 .add{cursor:pointer;height:55px;line-height:55px;padding:0 15px;text-align:center;font-size:30px;color:#fff}
+.tab{float:left;padding:5px 30px;margin:10px 0 0 10px;font-size:25px;color:#fff;cursor:pointer;
+border-top:3px solid #fff;border-right:3px solid #fff;border-left:3px solid #fff
+}
+.VtabOn{border-top:3px solid #54597c;border-right:3px solid #54597c;border-left:3px solid #54597c}
+
+
 .top{width:100%;background:#757dae;height:45px;color:#fff}
 
+#back{color:#AF7695;cursor:pointer}
+#back:hover{color:#bfbec6}
 #logo{float:left;width:100px}
 
 #menu{float:left;width:255px;margin-top:-14px;font-size:13px;text-align:center}
@@ -61,11 +69,17 @@ h1{font-size:50px;font-weight:bold;color:#4b506c;margin:10px;padding:0}
 .lists .list3 .ex2{ color: #81acac;}
 
 
-
-#Plist td{height:45px;color:#4C516D;font-size:14px;border-bottom:1px dashed #999;font-weight:bold}
-#Plist a{color:#4C516D}
-#Plist tr:hover{background:#eee}
 #Padd{float:right;margin:10px;font-size:20px}
+.mlist td{height:45px;color:#4C516D;font-size:14px;border-bottom:1px dashed #999;font-weight:bold}
+.mlist a{color:#4C516D}
+.mlist tr:hover{background:#eee}
+
+#Vadd{float:right;font-size:20px}
+#Vtitle{color:#81acb3;font-size:40px}
+.Vver{float:left;margin:5px;padding:5px;font-size:11px;width:100px;text-align:center;cursor:pointer;color:#54597c}
+.Vver0{font-size:35px;font-weight:normal}
+.Vver1{width:90%;border:1px dashed #AF7695;color:#fff;background:#C79FB4;margin:5px auto;padding:3px 0}
+.Vver2{width:90%;border:1px solid #fff;color:#fff;background:#65BCAD;margin:5px auto;padding:3px 0}
 
 .bottom{clear:both;height:28px;width:100%;background:#757dae; margin-top:50px}
 .copy{font-size: 12px; color: #fff; float: left; margin-top:8px}
