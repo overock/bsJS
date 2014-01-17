@@ -567,7 +567,7 @@ bs.$method( 'crypt', (function(){
 				while( i-- ) t1[i] = bs.$tmpl( t1[i], t0 );
 				t0 = t1;
 			}else t0 = bs.$tmpl( this.query, t0 );
-			//console.log( t0 );
+			console.log( t0 );
 			return bs.db( this.db )[this.type]( t0, $end );
 		};
 	} ),

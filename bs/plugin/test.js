@@ -1,4 +1,4 @@
-bs.$register( 'method', 'test', (function(){ console.log( 'test' );
+bs.$register( 'method', 'test', (function(){
 	var rules, set, rule, group;
 	group = {},
 	rules = {

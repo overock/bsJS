@@ -9,7 +9,7 @@
  */
 ( function( W, N ){
 'use strict';
-var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id,
+var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id, STYLE,
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
 PLUGIN_REPO = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/';//'http://projectbs.github.io/bsJS/bs/plugin/'//http://www.bsidesoft.com/bs/bs5/bs/plugin/
 if( doc = W['document'] ) que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
@@ -90,10 +90,13 @@ method( 'importer', function( $end ){
 		re[k] = function( $type, $name, $obj, $version/*, $dependency*/ ){
 			var register, t0, t1, i, j, k, v;
 			isLoaded = 1, clearTimeout( id );
-			if( $version === undefined ) error( 4, 'import undefined version' );
 			register = function(){
+				var t0;
 				switch( $type ){
-				case'class':case'method':case'static':bs['$'+$type]( '@' + $name, $obj, $version ); break;
+				case'class':case'method':case'static':
+					if( $version === undefined ) error( 4, 'import undefined version' );
+					bs['$'+$type]( '@' + $name, $obj, $version ); break;
+				case'style':$obj( t0 = {} ); for( k in t0 ) if( t0.hasOwnProperty( k ) ) STYLE[k] = t0[k]; break;
 				default:throw new Error( 4, 'import type:' + $type );
 				}
 				loader();
@@ -537,7 +540,7 @@ function DOM(){
 		}
 		return dom;
 	})( bs.$domquery, bs.$domfromhtml ) );
-	style = (function(){
+	STYLE = style = (function(){
 		var style, nopx, b, pf, reg, regf;
 		b = doc.body.style,
 		reg = /-[a-z]/g, regf = function($0){return $0.charAt(1).toUpperCase();},
