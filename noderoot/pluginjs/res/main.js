@@ -2,9 +2,9 @@ bs( function(){
 	bs.css('font-face@batch /res/batch');
 	bs.css('.add').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 10, 'gradientBegin', '#294952', 'gradientEnd', '#65BCAD' );
 	bs.css('.add:hover').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 10, 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
+	bs.css('.addBack').$( 'gradientBegin', '#659CAD', 'gradientEnd', '#FFFFFF' );
 	bs.css('.tableHead').$( 'text-shadow', '1px 1px 0 #000', 'gradientBegin', '#757dae', 'gradientEnd', '#9fa4c6' );
 	bs.css('#menu').$( 'text-shadow', '1px 1px 0 #000' );
-	bs.css('.addBack').$( 'gradientBegin', '#659CAD', 'gradientEnd', '#FFFFFF' );
 } );
 var site = {
 post:function( $url ){
