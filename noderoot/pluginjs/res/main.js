@@ -13,9 +13,10 @@ bs( function(){
 	bs.css('.tableHeadL').$( 'border-radius', '15px 0 0 15px' );
 	bs.css('.tableHeadR').$( 'border-radius', '0 15px 15px 0' );
 	bs.css('#menu').$( 'text-shadow', '1px 1px 0 #000' );
-	bs.css('.Vver').$( 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695', 'border-radius', 10, 'border', '1px solid #AF7695' );
-	bs.css('.Vver:hover').$( 'gradientBegin', '#C79FB4', 'gradientEnd', '#ffffff', 'color', '#fff' );
-	
+	bs.css('.Vver').$('border', '1px solid #bfbec6' );
+//	bs.css('.Vver:hover').$( 'gradientBegin', '#C79FB4', 'gradientEnd', '#ffffff', 'color', '#fff' );
+
+
 	if( bs.$domquery( '#back' ) ) bs.dom( '#back' ).$( 'down', site.back = function($e){bs.$back();} );
 } );
 var site = {
