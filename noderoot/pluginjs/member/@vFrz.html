@@ -1,17 +1,24 @@
 <%
 var post = bs.WEB.application('post')( true, 'vr', 'i' );
-if( post ) bs.WEB.application('db')( 'Vfreeze', post, function( $data, $rs, $e){
-	if( $rs ){
-		bs.WEB.application('db')( 'VfreezeDetail', post, function( $data, $rs, $e ){
-			var code, rs;
-			if( $rs ){
-				rs = $rs[0],
-				code = "bs.$register( '"+rs.title+"','"+rs.uname+"',"+rs.code+","+rs.version+")",
-				console.log(  bs.$path( 'plugin/'+rs.uname+rs.version+'.js' ) );
-				bs.$file( null, bs.$path( 'plugin/'+rs.uname+rs.version+'.js' ), code );
-			}
-		} );
-		return 1;
+if( !post ) return;
+var t0;
+function Vfreezable( $data, $rs, $e ){
+	if( $rs && $rs.length ){
+		if( !$rs[0].freezedate ) return t0 = $rs[0], bs.WEB.application('db')( 'Vfreeze', post, Vfreeze ), 1;
+		else $data.result = 'fail', $data.contents = 'freezed!';
 	}
-} );
+}
+function Vfreeze( $data, $rs, $e ){
+	if( $rs ) return bs.WEB.application('db')( 'VfreezeDetail', post, VfreezeDetail ), 1;
+}
+function VfreezeDetail( $data, $rs, $e ){
+	var code, rs;
+	if( $rs ){
+		rs = $rs[0],
+		code = "bs.$register( '"+rs.title+"','"+rs.uname+"',"+rs.code+","+rs.version+")",
+		bs.$file( null, bs.$path( 'plugin/'+rs.uname+rs.version+'.js' ), code );
+		if( t0.k ) bs.$file( null, bs.$path( 'plugin/'+rs.uname+'.js' ), code );
+	}
+}
+bs.WEB.application('db')( 'Vfreezable', post, Vfreezable );
 %>

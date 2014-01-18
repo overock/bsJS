@@ -32,16 +32,14 @@ bs.$method( 'crypt', (function(){
 		else t0 = fileRoot[site];
 		return p.resolve( t0, $path );
 	} ),
-	bs.$method( 'file', function( $end, $path, $v, $opition ){ //파일처리
+	bs.$method( 'file', function( $end, $path, $v, $opition ){
 		var t0, t1, dir, i, j, k;
 		if($v){
 			dir = $path.split( t0 = $path.lastIndexOf('\\') == -1 ? '/' : '\\' ), t1 = dir.slice( 0, -1 );
-			console.log( t1 );
 			do t1.pop(); while( !fs.existsSync( t1.join(t0) ) )
-			console.log( t1 );
 			for( i = t1.length, j = dir.length ; i < j ; i++ ){
 				k = dir.slice( 0, i ).join(t0);
-				if( !fs.existsSync( k ) ) console.log( 'k:', k ), fs.mkdirSync( k );
+				if( !fs.existsSync( k ) ) fs.mkdirSync( k );
 			}
 			if( !$end ) return fs.writeFileSync( $path, $v );
 			fs.writeFile( $path, $v, function( $e ){return $end( $e );});
@@ -51,7 +49,7 @@ bs.$method( 'crypt', (function(){
 			fs.readFile( $path, function( $e, $d ){return $end( $e || $d );});
 		}
 	} ),
-	bs.$method( 'stream', function( $path, $open, $err ){ //파일스트림을 출력한다.
+	bs.$method( 'stream', function( $path, $open, $err ){
 		var t0;
 		if( !fs.existsSync( $path ) ){
 			if( $err ) $err();

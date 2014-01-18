@@ -300,7 +300,6 @@ if( !W['console'] ) (function(){
 		i = 0, j = h.length;
 		while(i < j) $xhr.setRequestHeader( h[i++], h[i++] );
 		t0.send( bs.$cgi( $arg ) || '' );
-		console.log('aaa', $end, '::', t0.responseText);
 		if( !$end ) return t0.responseText;
 	}
 	method( 'get', function( $end, $url ){return http( 'GET', $end, bs.$url( $url, arguments ) );} ),
