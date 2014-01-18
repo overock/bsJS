@@ -10,9 +10,9 @@ sup{font-size:10px}
 .contents{width:980px;margin:0 auto;overflow:hidden}
 .batch{font-family:batch}
 .tableHead{height:45px;text-align:center;font-size:14px;color:#fff}
-.add{cursor:pointer;height:55px;line-height:55px;padding:0 15px;text-align:center;font-size:30px;color:#fff}
+.add{cursor:pointer;height:40px;line-height:40px;padding:0 15px;text-align:center;font-size:30px;color:#fff}
 .tab{float:left;padding:5px 30px;margin:10px 0 0 10px;font-size:25px;color:#fff;cursor:pointer;
-border-top:3px solid #fff;border-right:3px solid #fff;border-left:3px solid #fff
+    border-top:3px solid #fff;border-right:3px solid #fff;border-left:3px solid #fff
 }
 .VtabOn{border-top:3px solid #54597c;border-right:3px solid #54597c;border-left:3px solid #54597c}
 
@@ -69,24 +69,36 @@ border-top:3px solid #fff;border-right:3px solid #fff;border-left:3px solid #fff
 .lists .list3 .ex2{ color: #81acac;}
 
 
-#Padd{float:right;margin:10px;font-size:20px}
+#Padd{float:right;margin:10px 0px 0px 0px;font-size:20px}
+#pgMiddleVisual{width:100%; height:410px;position:relative;overflow:hidden}
+/*#add input,select,textArea{border:0px; width:100%; height:100%; padding:5px}*/
+
+#add .title {background:#54597c;color:#fff; padding:10px 10px 10px 10px; float:left;}
+#add .value {background:#fff;padding:0px 15px 0px 15px;float:left; border:0px; height:35px}
+#add .title2 {background:#54597c;color:#fff; padding:10px 10px 10px 10px; float:left;  width:80px;margin-top:2px}
+#add .value2 {background:#fff;padding:0px 15px 0px 15px;border:0px; height:35px;margin-top:2px; width:680px}
+
 .mlist td{height:45px;color:#4C516D;font-size:14px;border-bottom:1px dashed #999;font-weight:bold}
 .mlist a{color:#4C516D}
 .mlist tr:hover{background:#eee}
 
 #Vadd{float:right;font-size:20px}
 #Vtitle{color:#81acb3;font-size:40px}
-.Vver{float:left;margin:5px;padding:5px;font-size:11px;width:100px;text-align:center;cursor:pointer;color:#54597c}
-.Vver0{font-size:35px;font-weight:normal}
-.Vver1{width:90%;border:1px dashed #AF7695;color:#fff;background:#C79FB4;margin:5px auto;padding:3px 0}
-.Vver2{width:90%;border:1px solid #fff;color:#fff;background:#65BCAD;margin:5px auto;padding:3px 0}
+.Vver{float:left;width:170px;height:170px;font-size:11px;text-align:left;cursor:pointer;color:#54597c;margin:10px;border-radius:5px;}
+.Vver0{font-size:12px;font-weight:normal;position:absolute;margin-top:112px;background:#AF7695;padding:6px 15px 6px 10px;color:#fff;font-weight:bold; }
+.Vver1{font-size:14px;width:160px;height:28px;background:#757dae;position:relative;color:#fff;padding:12px 0px 0px 10px;opacity:0.8}
+.Vver2{width:90%;border:1px solid #fff;color:#fff;background:#65BCAD;;;margin-top:20px;position:absolute;}
+.Vver3{;position:absolute;margin-top:100px;height:20px;background:#22284f;padding:7px 15px 3px 10px;color:#fff;font-weight:bold}
 
 #Vcode{color:#757dae;border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#fff}
 #Vcontents{color:#bfbec6;border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#54597c;display:none}
-	
+
 .bottom{clear:both;height:28px;width:100%;background:#757dae; margin-top:50px}
 .copy{font-size: 12px; color: #fff; float: left; margin-top:8px}
 .site{font-size: 11px; color: #ddd; float: right;margin-top:8px}
+
+
+
 
 
 
