@@ -20,9 +20,19 @@
 	<div id="Aalert"></div>
 	<input type="button" id="Aadd" value="add"/> <input type="button" id="Acancel" value="cancel"/>
 </div>
+<div id="pgMiddleVisual">
+    <div id="visualEffect"></div>
+    <script>bs( site.mainVisual );</script>
+    <img src="../res/member/title.png" style="position:absolute; margin-top:100px;margin-left:60px">
+</div>
+<div style="margin:-200px 0px 80px 60px;position:relative">
+    <table cellspacing="0" border="0" cellpadding="0">
+        <tr><td rowspan="4" width="115"><img src="../res/draft/index_Bthumb_1.png" height="100" width="100" style="border-radius:10px"></td><td style="font-size:20px;font-weight:bold"><%=bs.WEB.session('nick')%>'s plugin</td></tr>
+        <tr><td><%=bs.WEB.session('email')%></td></tr>
+        <tr><td><div id="Padd" class="add"><span class="batch">&#xF14C;</span> Add New Plugin</div></td></tr>
+    </table>
+</div>
 <div id="list">
-	<h1 style="float:left"><%=bs.WEB.session('nick')%>'s plugin</h1>
-	<div id="Padd" class="add"><span class="batch">&#xF14C;</span> ADD</div>
 	<table cellspacing="0" border="0" cellpadding="0" style="width:980px"><tr>
 	<td style="border-radius:15px 0 0 15px;width:500px" class="tableHead">Title</td><td style="width:150px" class="tableHead">Type</td>
 	<td style="width:150px" class="tableHead">Category</td><td style="border-radius:0 15px 15px 0" class="tableHead">Date</td>
@@ -37,14 +47,15 @@ bs( function(){
 		var t0, t1, i, j;
 		page = $page, t0 = JSON.parse( bs.$post( null, '/member/', 'p', page ) );
 		if( t0.result == 'ok' ){
-			t0 = t0.contents, i = 0, j = t0.length,
-			t1 = '<table cellspacing="0" border="0" cellpadding="0" style="width:980px">'+
-				'<colgroup><col style="width:50px"/><col style="width:450px"/><col style="width:150px"/><col style="width:150px"/><col/></colgroup>';
-			for( ; i < j ; i++ )
-				t1 += '<tr style="text-align:center"><td></td><td style="text-align:left;font-weight:normal;font-size:20px">'+
-					'<a href="/member/view?r='+t0[i].plugin_rowid+'">[ '+t0[i].uname+' ] '+t0[i].title+'</a></td>'+
-					'<td>'+t0[i].type.charAt(0).toUpperCase()+t0[i].type.substr(1)+'</td><td>'+t0[i].cat+'</td><td>'+t0[i].regdate+'</td></tr>';
-			t1 += '</table>';
+            t0 = t0.contents, i = 0, j = t0.length,
+                    t1 = '<table cellspacing="0" border="0" cellpadding="0" style="width:980px">'+
+                            '<colgroup><col style="width:20px"/><col/><col style="width:380px"/><col style="width:160px"/><col style="width:150px"/><col/></colgroup>';
+            for( ; i < j ; i++ )
+                t1 += '<tr style="text-align:center; height:125px"><td></td><td width="100"><img src="../res/draft/index_Bthumb_1.png" style="width:72px;border-radius:5px"></td><td style="text-align:left;font-weight:normal;font-size:22px">'+
+                        '<a href="/member/view?r='+t0[i].plugin_rowid+'">'+t0[i].title+'</a><br/><div style="background:#81acb3;border-radius:15px;margin-top:5px;padding:2px 10px 2px 10px;color:#fff;font-size:11px;float:left">'+t0[i].uname+'</div><div style="background:#757dae;border-radius:15px;margin:5px 5px 0px 5px;padding:2px 10px 2px 10px;color:#fff;font-size:11px;float:left">Hit 2,000 / Like 1,324</div>' +
+                        '<img src="../res/member/icon_fix.png" style="margin:5px 5px 0px 0px; opacity:0.3"><img src="../res/member/icon_view.png" style="opacity:0.3"> </td>'+
+                        '<td style="font-size:12px;font-weight:normal;color:#bfbec6">'+t0[i].type.charAt(0).toUpperCase()+t0[i].type.substr(1)+'</td><td style="font-size:12px;font-weight:normal;color:#bfbec6">'+t0[i].cat+'</td><td style="font-size:12px;color:#404040">'+t0[i].regdate+'</td></tr>';
+            t1 += '</table>';
 		}else t1 = 'No Registered Plugin';
 		bs.dom( '#Plist' ).$( 'html', t1 );
 	}
@@ -80,5 +91,4 @@ bs( function(){
 	} );
 } );
 </script>
-<img src="../res/draft/plugin_draft.png">
 <%IMPORT( '@foot.html' );%>
