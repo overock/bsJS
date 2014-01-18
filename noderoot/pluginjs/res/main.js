@@ -25,6 +25,8 @@ post:function( $url ){
 },
 logined:function( $nick ){
 	bs.WIN.on( 'keydown', 'plugin', function( $e ){
+		var t0 = document.activeElement;
+		if( t0 && ( t0 = t0.tagName.toLowerCase() ) == 'input' || t0 == 'textarea' ) return;
 		if( $e.key('1') ) bs.$go( '/member/' );
 		else if( site.back && $e.key('b') ) site.back();
 	} );
