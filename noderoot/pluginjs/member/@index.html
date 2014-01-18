@@ -5,27 +5,57 @@
 }%>
 
 <%IMPORT( '@head.html' );%>
-<div id="add" style="display:none">
-	<div>type <select id="Atype"><option value="1">method</option><option value="2">class</option><option value="3">static</option></select></div>
-	<div>uniquename <input type="text" id="Auname" /></div>
-	<div>title <input type="text" id="Atitle" /></div>
-	<div>description<br /><textarea id="Adescription"></textarea></div>
-	<div>category <select id="Acat">
-<%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>
-		<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
-<%}%>
-	</select></div>
-	<div>keyword <input type="text" id="Akeyword" /></div>
-	<div>thumb url <input type="text" id="Athumb" /></div>
+<!--<div id="add" style="display:none">-->
+    <!--<table cellspacing="0" border="0" cellpadding="0">-->
+        <!--<tr height="35px">-->
+            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">title</td><td style="background:#fff"><input type="text" id="Atitle" /></td>-->
+            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">uniquename</td><td style="background:#fff"><input type="text" id="Auname" /></td>-->
+            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">type</td><td style="background:#fff"><select id="Atype"><option value="1">method</option><option value="2">class</option><option value="3">static</option></select></td>-->
+            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">category</td><td style="background:#fff"><select id="Acat">-->
+                <!--<%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>-->
+                <!--<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>-->
+                <!--<%}%>-->
+            <!--</select></td>-->
+        <!--</tr>-->
+        <!--<tr height="10px"></tr>-->
+        <!--<tr height="35px"><td colspan="8" style="background:#54597c;padding:0px 10px 0px 10px;color:#fff">description</td></tr>-->
+        <!--<tr ><td colspan="8"><textarea id="Adescription" style="width:900px;height:250px"></textarea></td></tr>-->
+        <!--<tr height="35px"><td colspan="1" style="background:#54597c;padding:0px 10px 0px 10px;color:#fff">keyword</td><td colspan="7" style="background:#fff"> <input type="text" id="Akeyword" /></td></tr>-->
+        <!--<tr height="10px"></tr>-->
+        <!--<tr height="35px"><td colspan="1" style="background:#54597c;padding:0px 10px 0px 10px;color:#fff">thumb url</td><td colspan="7" style="background:#fff"><input type="text" id="Athumb" /></td></tr>-->
+    <!--</table>-->
+    <!--<input type="button" id="Aadd" value="add" style=""/> <input type="button" id="Acancel" value="cancel" style=""/>-->
+<!--</div>-->
+<div id="add" style="display:none; ">
+    <div style="width:850px; margin:auto;padding-top:50px">
+	<div class="title">title</div>
+    <div><input type="text" id="Atitle" class="value" /></div>
+    <div class="title" >uniquename</div>
+    <div><input type="text" id="Auname" class="value"/></div>
+    <div  class="title">type</div>
+    <div><select id="Atype" class="value"><option value="1">method</option><option value="2">class</option><option value="3">static</option></select></div>
+    <div class="title" >category</div>
+    <div> <select id="Acat" class="value">
+        <%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>
+        <option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
+        <%}%>
+    </select></div>
+    <div style="clear:both;background:#54597c;color:#fff; padding:10px 10px 10px 10px; float:left;  width:80px;margin-top:2px">description</div>
+    <div><textarea id="Adescription" style="background:#fff;padding:5px;border:0px;margin-top:2px; width:800px; height:200px"></textarea></div>
+	<div class="title2">keyword</div>
+    <div ><input type="text" id="Akeyword" class="value2"/></div>
+	<div class="title2">thumb url</div>
+    <div ><input type="text" id="Athumb" class="value2"/></div>
 	<div id="Aalert"></div>
 	<input type="button" id="Aadd" value="add"/> <input type="button" id="Acancel" value="cancel"/>
+    </div>
 </div>
 <div id="pgMiddleVisual">
     <div id="visualEffect"></div>
     <script>bs( site.mainVisual );</script>
     <img src="../res/member/title.png" style="position:absolute; margin-top:100px;margin-left:60px">
 </div>
-<div style="margin:-200px 0px 80px 60px;position:relative">
+<div id='idBox' style="margin:-200px 0px 80px 60px;position:relative">
     <table cellspacing="0" border="0" cellpadding="0">
         <tr><td rowspan="4" width="115"><img src="../res/draft/index_Bthumb_1.png" height="100" width="100" style="border-radius:10px"></td><td style="font-size:20px;font-weight:bold"><%=bs.WEB.session('nick')%>'s plugin</td></tr>
         <tr><td><%=bs.WEB.session('email')%></td></tr>
@@ -63,6 +93,7 @@ bs( function(){
 	bs.dom( '#Padd' ).$( 'down', function(){
 		bs.dom( '#list' ).$( 'display', 'none' );
 		bs.dom( '#add' ).$( 'display', 'block' );
+        bs.ANI.tween( bs.dom( '#add').$('height',0,'this'), 'height', 500, 'time', 1, 'ease','circleInOut');
 	} );
 	bs.dom( '#Aadd' ).$( 'down', function( $e ){
 		var t0;

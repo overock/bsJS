@@ -3,7 +3,9 @@ bs( function(){
 	bs.css('.add').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 30, 'gradientBegin', '#AF7695', 'gradientEnd', '#C79FB4' );
 	bs.css('.add:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
 	bs.css('.addBack').$( 'gradientBegin', '#659CAD', 'gradientEnd', '#FFFFFF' );
-	
+
+    bs.css('#add').$( 'gradientBegin', '#AF7695', 'gradientEnd', '#FFFFFF' );
+
 	bs.css('.tab').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', '15px 15px 0 0', 'gradientBegin', '#917d68', 'gradientEnd', '#bd9d84' );
 	bs.css('.tab:hover').$( 'gradientBegin', '#bd9d84', 'gradientEnd', '#917d68' );
 	
