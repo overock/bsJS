@@ -7,6 +7,7 @@ if( post ) bs.WEB.application('db')( 'Vfreeze', post, function( $data, $rs, $e){
 			if( $rs ){
 				rs = $rs[0],
 				code = "bs.$register( '"+rs.title+"','"+rs.uname+"',"+rs.code+","+rs.version+")",
+				console.log(  bs.$path( 'plugin/'+rs.uname+rs.version+'.js' ) );
 				bs.$file( null, bs.$path( 'plugin/'+rs.uname+rs.version+'.js' ), code );
 			}
 		} );

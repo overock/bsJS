@@ -15,11 +15,11 @@ if( bs.WEB.method() == 'POST' ){
 
 <%IMPORT( '@head.html' );%>
 
-<h1><span class="batch" id="back">&#xf158;</span> <%=bs.WEB.session('nick')%>'s plugin <span id="Vtitle"></span></h1>
+<h1><span class="batch" id="back">&#xf158;</span><sup>b</sup> <%=bs.WEB.session('nick')%>'s plugin <span id="Vtitle"></span></h1>
 
 <table cellspacing="0" border="0" cellpadding="0" style="width:980px"><tr>
-<td class="tableHeadL" style="width:500px" class="tableHead">Title</td><td style="width:150px" class="tableHead">Type</td>
-<td style="width:150px" class="tableHead">Category</td><td class="tableHeadR" class="tableHead">Date</td>
+<td class="tableHead tableHeadL" style="width:500px">Title</td><td style="width:150px" class="tableHead">Type</td>
+<td style="width:150px" class="tableHead">Category</td><td class="tableHead tableHeadR">Date</td>
 </tr></table>
 <div id="Vinfo" class="mlist"></div>
 
@@ -44,15 +44,15 @@ if( bs.WEB.method() == 'POST' ){
 		<div id="Vfreeze" class="add" style="float:right;font-size:20px;height:30px;line-height:30px;margin:10px 5px">freeze</div>
 		
 	</div>
-	<textarea id="Vcode" style="border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#fff"></textarea>
-	<textarea id="Vcontents" style="display:none;border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#54597c;color:#fff"></textarea>
+	<textarea id="Vcode"></textarea>
+	<textarea id="Vcontents"></textarea>
 </div>
 <script>
 bs( function(){
 	var version, r, vadd, tab = 0;
 	r = <%=r%>;
 	bs.dom('#Vtab0').$( 'down', function( $e ){
-		if( tab ) return;
+		console.log('aaa');
 		bs.dom('#Vtab0').$( 'class+', 'VtabOn' );
 		bs.dom('#Vtab1').$( 'class-', 'VtabOn' );
 		bs.dom('#Vcode').$( 'display', 'block' );
@@ -64,6 +64,24 @@ bs( function(){
 		bs.dom('#Vcode').$( 'display', 'none' );
 		bs.dom('#Vcontents').$( 'display', 'block' );
 	} );
+	function k0(t){
+		return function($e){
+			var i;
+			if( $e.key('tab') ) $e.prevent(),
+				bs.dom(t).$( '@value', $e.value.substring( 0, i = bs.dom(t).$( 'cursorPos' ).start ) + '\t' + $e.value.substr( i ) ),
+				setTimeout( function(){bs.dom(t).$( 'f', null, 'cursorPos', i + 1 );},1);
+		};
+	}
+	bs.dom('#Vcode').$(
+		'focus', function($e){bs.dom('#Vcode').$( 'color', '#404040' );},
+		'blur', function($e){bs.dom('#Vcode').$( 'color', '#757dae' );},
+		'keydown', k0('#Vcode')
+	);
+	bs.dom('#Vcontents').$(
+		'focus', function( $e ){bs.dom('#Vcontents').$( 'color', '#fff' );},
+		'blur', function( $e ){bs.dom('#Vcontents').$( 'color', '#bfbec6' );},
+		'keydown', k0('#Vcontents')
+	);
 	function s0( t ){
 		return function( $e ){if( bs.dom(t).$( 'height' ) || 0 != this.scrollHeight ) bs.dom('#Vcode').$( 'height', this.scrollHeight );};
 	}
@@ -84,23 +102,20 @@ bs( function(){
 	
 	function ver(){
 		var t0, t1, i, j;
-		t0 = JSON.parse( bs.$post( null, '/member/ver', 'r', r ) );
-		version = t0 = t0.contents, i = 0, j = t0.length;
-		for( ; i < j ; i++ ){
+		for( t0 = JSON.parse( bs.$post( null, '/member/ver', 'r', r ) ), bs.dom('#Vversions').$('html',''), version = t0 = t0.contents, i = 0, j = t0.length ; i < j ; i++ ){
 			bs.dom( '<div id="v'+i+'" class="Vver">'+
 				'<div class="Vver0">'+t0[i].version+'</div>'+
 				'<div class="Vver1">last updated<br>'+t0[i].editdate+'</div>'+
 				(t0[i].freezedate ? '<div class="Vver2">freezed<br>'+t0[i].freezedate+'</div>':'<div class="Vver3">warm<br>&nbsp;</div>' )+
-				'</div>' ).$( '<', '#Vversions', 'down', function(){
-				versionDetail( this.id.substr(1) );
-			} );
+				'</div>' ).$( '<', '#Vversions', 'down', function(){versionDetail( this.id.substr(1) );} );
 		}
 	}
-	
 	function versionDetail( $v ){
 		var t0;
 		bs.dom( '#Vidx' ).$( '@value', $v );
 		$v = version[$v];
+		bs.dom( '#Vupdate' ).$('display', $v.freezedate ? 'none' : 'block' );
+		bs.dom( '#Vfreeze' ).$('display', $v.freezedate ? 'none' : 'block' );
 		bs.dom( '#Vver' ).$( 'html', 'v.'+$v.version );
 		bs.dom( '#Vvr' ).$( '@value', $v.ver_rowid );
 		bs.dom( '#Vcode' ).$( '@value', $v.code || '' );

@@ -14,17 +14,21 @@ bs( function(){
 	bs.css('.Vver').$( 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695', 'border-radius', 10, 'border', '1px solid #AF7695' );
 	bs.css('.Vver:hover').$( 'gradientBegin', '#C79FB4', 'gradientEnd', '#ffffff', 'color', '#fff' );
 	
-	
-	if( bs.$domquery( '#back' ) ) bs.dom( '#back' ).$( 'down', function($e){bs.$back();} );
+	if( bs.$domquery( '#back' ) ) bs.dom( '#back' ).$( 'down', site.back = function($e){bs.$back();} );
 } );
 var site = {
+back:0,
 post:function( $url ){
 	var i, j;
 	for( i = 2, j = arguments.length ; i < j ; i += 2 ) arguments[i-1] = bs.dom(arguments[i]).$('@value');
 	return bs.$post.apply(null, arguments );
 },
 logined:function( $nick ){
-	return '<div id="Llogined"><a href="/member/" id="Llogined0"><span class="batch">&#xf170;</span> ' + $nick + '</a> &nbsp; &nbsp; '+
+	bs.WIN.on( 'keydown', 'plugin', function( $e ){
+		if( $e.key('1') ) bs.$go( '/member/' );
+		else if( site.back && $e.key('b') ) site.back();
+	} );
+	return '<div id="Llogined"><a href="/member/" id="Llogined0"><span class="batch">&#xf170;</span> ' + $nick + '<sup>1</sup></a> &nbsp; &nbsp; '+
 		'<a href="/logout" id="Llogined1" class="batch">&#xf165;</a></div>';
 },
 header:function(){
@@ -40,7 +44,7 @@ header:function(){
 		}else bs.dom('#Lalert').$('html', 'loginFailed: no response');
 	}),
 	bs.dom( bs.dom( '#Lemail' ).$( '@value' ) ? '#Lpw' : '#Lemail' ).$('f'),
-	bs.dom('#Lpw').$( 'keydown', function( $e ){if( $e.key('enter') ) login();} ),
+	bs.dom('#Lpw').$( 'keydown', function( $e ){if( $e.key('enter') || $e.key('space') ) $e.prevent(), login();} ),
 	bs.dom( '#Ljoin' ).$( 'down', function( $e ){
 		if( isJoin ) return;
 		isJoin = 1,

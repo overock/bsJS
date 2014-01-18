@@ -811,6 +811,28 @@ function DOM(){
 			if( ( i = t0.indexOf( $v ) ) > -1 ) t0.splice( i, 1 );
 			return $dom.className = t0.join(' ');
 		},
+		(function(){
+			var pos = {};
+			function getPos( $dom ){
+				var t0, t1, i;
+				if( 'selectionStart' in $dom && doc.activeElement == $dom ) pos.start = $dom.selectionStart, pos.end = $dom.selectionEnd;
+				else if( $dom.createTextRange ){
+					t0 = document.selection.createRange();
+					if( t0.parentElement() === $dom ){
+						for( ( t1 = $dom.createTextRange() ).moveToBookmark( t0.getBookmark() ), i = 0 ; t1.compareEndPoints( 'EndToStart', t1 ) > 0 ; t1.moveEnd( 'character', -1 ) ) i++;
+						for( t1.setEndPoint( 'StartToStart', $dom.createTextRange() ), pos.start = 0, pos.end = i ; t1.compareEndPoints( 'EndToStart', t1) > 0 ; t1.moveEnd( 'character', -1 ) ) pos.start++, pos.end++;
+					}
+				}
+			}
+			function setPos( $dom, $v ){
+				var t0;
+				if( $v.splice ) pos.start = $v[0], pos.end = $v[1]; else pos.start = pos.end = $v;
+				if( 'selectionStart' in $dom ) setTimeout( function(){$dom.selectionStart = pos.start, $dom.selectionEnd = pos.end;}, 1);
+				else if( $dom.createTextRange ) ( t0 = $dom.createTextRange() ).moveStart( 'character', pos.start ), t0.collapse(),
+					t0.moveEnd( 'character', pos.end - pos.start ), t0.select();
+			}
+			$fn['cursorPos'] = function( $dom, $v ){return ( $v === undefined ? getPos( $dom ) : setPos( $dom, $v ) ), pos;};
+		})(doc),
 		childNodes = function( $nodes ){
 			var i, j;
 			for( nodes.length = i = 0, j = $nodes.length ; i < j ; i++ )

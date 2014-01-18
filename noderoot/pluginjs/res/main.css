@@ -6,7 +6,7 @@ a:visited {text-decoration: none;color: #bfbec3 }
 a:active {text-decoration: none;color: #bfbec3 }
 a:hover {text-decoration: underline;color: #bfbec3 }
 h1{font-size:50px;font-weight:bold;color:#4b506c;margin:10px;padding:0}
-
+sup{font-size:10px}
 .contents{width:980px;margin:0 auto;overflow:hidden}
 .batch{font-family:batch}
 .tableHead{height:45px;text-align:center;font-size:14px;color:#fff}
@@ -81,6 +81,9 @@ border-top:3px solid #fff;border-right:3px solid #fff;border-left:3px solid #fff
 .Vver1{width:90%;border:1px dashed #AF7695;color:#fff;background:#C79FB4;margin:5px auto;padding:3px 0}
 .Vver2{width:90%;border:1px solid #fff;color:#fff;background:#65BCAD;margin:5px auto;padding:3px 0}
 
+#Vcode{color:#757dae;border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#fff}
+#Vcontents{color:#bfbec6;border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#54597c;display:none}
+	
 .bottom{clear:both;height:28px;width:100%;background:#757dae; margin-top:50px}
 .copy{font-size: 12px; color: #fff; float: left; margin-top:8px}
 .site{font-size: 11px; color: #ddd; float: right;margin-top:8px}

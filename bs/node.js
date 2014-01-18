@@ -36,8 +36,13 @@ bs.$method( 'crypt', (function(){
 		var t0, t1, dir, i, j, k;
 		if($v){
 			dir = $path.split( t0 = $path.lastIndexOf('\\') == -1 ? '/' : '\\' ), t1 = dir.slice( 0, -1 );
+			console.log( t1 );
 			do t1.pop(); while( !fs.existsSync( t1.join(t0) ) )
-			for( i = t1.length, j = dir.length ; i < j ; i++ ) if( !fs.existsSync( k ) ) fs.mkdirSync( k );
+			console.log( t1 );
+			for( i = t1.length, j = dir.length ; i < j ; i++ ){
+				k = dir.slice( 0, i ).join(t0);
+				if( !fs.existsSync( k ) ) console.log( 'k:', k ), fs.mkdirSync( k );
+			}
 			if( !$end ) return fs.writeFileSync( $path, $v );
 			fs.writeFile( $path, $v, function( $e ){return $end( $e );});
 		}else{
