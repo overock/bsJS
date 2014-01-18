@@ -416,10 +416,10 @@ bs.$method( 'crypt', (function(){
 				else if( !path || path.substr( path.length - 1 ) == '/' ) file = self.index;
 				else{
 					( i = path.lastIndexOf( '/' ) + 1 ) ? ( file=path.substr(i), path=path.substring(0,i) ) : ( file=path, path='' );
-					if( ( i = file.indexOf( '.' ) ) > -1 && file.charAt(0) != '@' ) return ( t0 = self.mime[file.substr( i + 1 )] ) ? 
+					if( ( i = file.lastIndexOf( '.' ) ) > -1 && file.charAt(0) != '@' ) return ( t0 = self.mime[file.substr( i + 1 )] ) ? 
 						bs.$stream( bs.$path( path+file ),
 							function(){$rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe( $rp );},
-							function( $e ){err( 404, 'no file<br>'+path+file);}
+							function( $e ){err( 404, 'no file<br>'+path+file+'<br>'+$e.toString());}
 						) : err( 404, 'no file<br>'+path+file);
 				}
 				head.length = response.length = 0, this.retry = 1,
