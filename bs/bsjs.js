@@ -1065,6 +1065,12 @@ function DOM(){
 				var t0 = bs.$domquery( $sel );
 				return t0 && t0.length;
 			},
+			dblselect:function($v){
+				doc.ondblclick = $v ? null : function(evt) { 
+					if( W.getSelection ) W.getSelection().removeAllRanges(); 
+					else if( doc.selection) doc.selection.empty();
+				};
+			},
 			scroll:(function( W, doc, root ){
 				return function scroll(){
 					switch( arguments[0].charAt(0) ){

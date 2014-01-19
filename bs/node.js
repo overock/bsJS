@@ -126,7 +126,7 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'delete', function( $end, $path ){return http( 'DELETE', $end, bs.$url($path), arguments );} );
 })( HTTP, URL ),
 (function( HTTP, HTTPS, URL ){
-	var form, mime, clone, portStart, staticHeader, err, Upfile, bodyParser, file, path, url,
+	var form, mime, clone, portStart, staticHeader, err, Upfile, bodyParser, file, path, url, locale,
 		currsite, sessionName, id, cookie, clientCookie, ckParser, next, pause,
 		head, method, response, application, session, rq, rp, getData, postData, postFile, data;
 	mime = require('./mime'), staticHeader = {'Content-Type':0},
@@ -295,6 +295,18 @@ bs.$method( 'crypt', (function(){
 			redirect:function( $url, $isClient ){
 				if( $isClient ) rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( '<script>location.href="' + $url + '";</script>');
 				else rp.writeHead( 301, {Location:$url} ), rp.end();
+			},
+			i18n:function( $group, $key ){
+				var t0 = locale||currsite.i18nD, t1;
+				if( !t0 ) return err( 'no locale:' + locale + ',' + currsite.i18nD );
+				if( !( t1 = currsite.i18nTxt[t0] ) ) return err( 'undefined locale:' + t0 );
+				if( !( t1 = t1[$group] ) ) return err( 'undefined group:' + $group );
+				return t1[$key];
+			},
+			i18nAdd:function( $isDefault, $locale, $data ){
+				if( !countryCode[$locale] ) return err( 'invaild locale:' + $locale );
+				if( $isDefault ) currsite.i18nD = $locale;
+				currsite.i18nTxt[$locale] = $data;
 			}
 		};
 	})() ),
@@ -340,7 +352,9 @@ bs.$method( 'crypt', (function(){
 		};
 	} ),
 	bs.$class( 'site', function( $fn, bs ){
-		var ports, tEnd, f, runRule, defaultRouter, pass, cache, defaultTmpl;
+		var ports, tEnd, f, runRule, defaultRouter, pass, cache, defaultTmpl, countryCode;
+		countryCode = {
+		}
 		ports = {},
 		portStart = function( $https, $sites, $port ){
 			var rqListener;
@@ -389,7 +403,8 @@ bs.$method( 'crypt', (function(){
 					https.cert = f( bs.$path( self.https.cert, self.root ) );
 					https.port = self.https.port || 443;
 				}
-				currsite = self, fileRoot[site = self.__k] = self.root, cache = self.cache, application = self.application, pause = 0,
+				currsite = self, fileRoot[site = self.__k] = self.root, cache = self.cache, application = self.application, pause = 0;
+				if( i = self.i18n.length ) while(i--) runRule( self.i18n[i] );
 				i = 0, j = self.url.length;
 				next = function(){
 					next = null, self.isStarted = 0;
@@ -410,11 +425,23 @@ bs.$method( 'crypt', (function(){
 			var self = this, router, nextstep, onData, currRule, idx;
 			this.form = bs.form( $sel ),
 			this.form.$( 'encoding', 'utf-8', 'keepExtensions', 1, 'fileMax', 2 * 1024 * 1024, 'postMax', 5 * 1024 * 1024 ),
-			this.url = [], this.isStarted = 0,
+			this.url = [], this.i18n = [], this.i18nTxt = {}, this.i18nD = '', this.isStarted = 0,
 			this.mime = clone( mime ), this.template = defaultTmpl,
 			this.rules = {'':defaultRouter}, this.application = {}, this.session = {}, this.db = [],
 			this.request = function( $url, $rq, $rp ){
-				var t0, i, j;
+				var t0, t1, i, j, k;
+				locale = 0;
+				if( countryCode[t0 = $rq.headers.lang] ) locale = t0;
+				else{
+					t0 = $rq.headers['accept-language'].split(';');
+					for( i = 0, j = t0.length ; i < j ; i++ ){
+						t1 = t0[i].split(','), k = t1.length;
+						while( k-- ) if( countryCode[t1[k]] ){
+							locale = t1[k];
+							break;
+						}
+					}
+				}
 				path = $url.pathname.substr(1);
 				if( path.indexOf( '..' ) > -1 || path.indexOf( './' ) > -1 ) err( 404, 'no file<br>'+ path );
 				else if( !path || path.substr( path.length - 1 ) == '/' ) file = self.index;
@@ -429,7 +456,7 @@ bs.$method( 'crypt', (function(){
 				head.length = response.length = 0, this.retry = 1,
 				getData = bs.$cgiparse( $url.query ), ckParser(), data = {}, cookie = {};
 				if( session = self.session[t0 = bs.$ck(sessionName)] ){
-					session.__t - Date.now() > self.sessionTime ? ( delete self.session[t0], session = null ) : ( session.__t = Date.now() );
+					Date.now() - session.__t > self.sessionTime ? ( delete self.session[t0], session = null ) : ( session.__t = Date.now() );
 				}
 				( method = $rq.method ) == 'GET' ? ( postData = postFile = null, process.nextTick( router ) ) : this.form.parse( router );
 			},
@@ -486,7 +513,7 @@ bs.$method( 'crypt', (function(){
 				}else if( v !== undefined ){
 					switch( k ){
 					case'https':this.https = v; break;
-					case'db': this.db[this.db.length] = v; break;
+					case'i18n':case'db': this[k][this[k].length] = v; break;
 					case'url':
 						v = bs.$trim( v.split(':') );
 						if( this.url.indexOf( v[0] ) == -1 ) this.url.push( v[0], parseInt( v[1] || '8001' ) );

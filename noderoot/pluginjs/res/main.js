@@ -1,4 +1,5 @@
 bs( function(){
+	bs.WIN.dblselect(0);
 	bs.css('font-face@batch /res/batch');
 	bs.css('.add').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 10, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
 	bs.css('.add:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
