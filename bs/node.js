@@ -126,10 +126,10 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'delete', function( $end, $path ){return http( 'DELETE', $end, bs.$url($path), arguments );} );
 })( HTTP, URL ),
 (function( HTTP, HTTPS, URL ){
-	var form, mime, clone, portStart, staticHeader, err, Upfile, bodyParser, file, path, url, locale,
+	var form, mime, clone, portStart, staticHeader, err, Upfile, bodyParser, file, path, url, i18n, countryCode, flushed,
 		currsite, sessionName, id, cookie, clientCookie, ckParser, next, pause,
 		head, method, response, application, session, rq, rp, getData, postData, postFile, data;
-	mime = require('./mime'), staticHeader = {'Content-Type':0},
+	countryCode = require('./i18n'), mime = require('./mime'), staticHeader = {'Content-Type':0},
 	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );},
 	clone = function( $v ){
 		var t0, k;
@@ -243,6 +243,8 @@ bs.$method( 'crypt', (function(){
 			exit:function( $html ){err( 200, $html );},
 			flush:function(){
 				var t0, k;
+				if( flushed) return;
+				flushed = 1;
 				for(k in cookie) head[head.length] = ['Set-Cookie', cookie[k]];
 				head.push( flush[0], flush[1], ( t0 = response.join(''), flush[2][1] = Buffer.byteLength( t0, 'utf8' ), flush[2] ) ),
 				rp.writeHead( 200, head ), rp.end( t0 );
@@ -297,10 +299,10 @@ bs.$method( 'crypt', (function(){
 				else rp.writeHead( 301, {Location:$url} ), rp.end();
 			},
 			i18n:function( $group, $key ){
-				var t0 = locale||currsite.i18nD, t1;
-				if( !t0 ) return err( 'no locale:' + locale + ',' + currsite.i18nD );
-				if( !( t1 = currsite.i18nTxt[t0] ) ) return err( 'undefined locale:' + t0 );
-				if( !( t1 = t1[$group] ) ) return err( 'undefined group:' + $group );
+				var t0 = i18n||currsite.i18nD, t1;
+				if( !t0 ) return err( 200, 'no locale:' + i18n + ',' + currsite.i18nD );
+				if( !( t1 = currsite.i18nTxt[t0] ) ) return err( 200, 'undefined locale:' + t0 );
+				if( !( t1 = t1[$group] ) ) return err( 200, 'undefined group:' + $group );
 				return t1[$key];
 			},
 			i18nAdd:function( $isDefault, $locale, $data ){
@@ -352,9 +354,7 @@ bs.$method( 'crypt', (function(){
 		};
 	} ),
 	bs.$class( 'site', function( $fn, bs ){
-		var ports, tEnd, f, runRule, defaultRouter, pass, cache, defaultTmpl, countryCode;
-		countryCode = {
-		}
+		var ports, tEnd, f, runRule, defaultRouter, pass, cache, defaultTmpl;
 		ports = {},
 		portStart = function( $https, $sites, $port ){
 			var rqListener;
@@ -430,19 +430,23 @@ bs.$method( 'crypt', (function(){
 			this.rules = {'':defaultRouter}, this.application = {}, this.session = {}, this.db = [],
 			this.request = function( $url, $rq, $rp ){
 				var t0, t1, i, j, k;
-				locale = 0;
-				if( countryCode[t0 = $rq.headers.lang] ) locale = t0;
-				else{
-					t0 = $rq.headers['accept-language'].split(';');
+				i18n = 0;
+				if( countryCode[t0 = $rq.headers.lang] ) i18n = t0;
+				else if( t0 = $rq.headers['accept-language'] ){
+					t0 = t0.split(';');
 					for( i = 0, j = t0.length ; i < j ; i++ ){
 						t1 = t0[i].split(','), k = t1.length;
-						while( k-- ) if( countryCode[t1[k]] ){
-							locale = t1[k];
-							break;
+						while( k-- ){
+							if( countryCode[t1[k]] ){
+								i18n = t1[k];
+								break;
+							}
 						}
+						if( i18n ) break;
 					}
 				}
-				path = $url.pathname.substr(1);
+				path = $url.pathname.substr(1), head.length = response.length = flushed = 0, this.retry = 1,
+				getData = bs.$cgiparse( $url.query ), ckParser(), data = {}, cookie = {};
 				if( path.indexOf( '..' ) > -1 || path.indexOf( './' ) > -1 ) err( 404, 'no file<br>'+ path );
 				else if( !path || path.substr( path.length - 1 ) == '/' ) file = self.index;
 				else{
@@ -453,8 +457,6 @@ bs.$method( 'crypt', (function(){
                             function( $e ){err( 404, 'no file<br>'+path+file);}
 						) : err( 404, 'no file<br>'+path+file);
 				}
-				head.length = response.length = 0, this.retry = 1,
-				getData = bs.$cgiparse( $url.query ), ckParser(), data = {}, cookie = {};
 				if( session = self.session[t0 = bs.$ck(sessionName)] ){
 					Date.now() - session.__t > self.sessionTime ? ( delete self.session[t0], session = null ) : ( session.__t = Date.now() );
 				}
