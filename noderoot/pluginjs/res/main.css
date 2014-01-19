@@ -21,6 +21,9 @@ sup{font-size:10px}
 
 #back{margin:10px 0px 0px 0px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;cursor:pointer;font-size:20px;}
 #back:hover{margin:10px 0px 0px 0px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;font-size:20px;}
+#pmModify{margin:10px 0px 0px 10px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;cursor:pointer;font-size:20px;}
+#pmModify:hover{margin:10px 0px 0px 10px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;font-size:20px;}
+
 #logo{float:left;width:100px}
 
 #menu{float:left;width:255px;margin-top:-14px;font-size:13px;text-align:center}
@@ -71,6 +74,7 @@ sup{font-size:10px}
 
 #Padd{float:right;margin:10px 0px 0px 0px;font-size:20px}
 #pgMiddleVisual{width:100%; height:310px;position:relative;overflow:hidden}
+
 /*#add input,select,textArea{border:0px; width:100%; height:100%; padding:5px}*/
 
 #add .title {background:#54597c;color:#fff; padding:10px 10px 10px 10px; float:left;}
