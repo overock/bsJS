@@ -11,11 +11,11 @@ sup{font-size:10px}
 .batch{font-family:batch}
 .tableHead{height:45px;text-align:center;font-size:14px;color:#fff}
 .add{cursor:pointer;height:40px;line-height:40px;padding:0 15px;text-align:center;font-size:30px;color:#fff}
-.tab{float:left;padding:5px 30px;margin:10px 0 0 10px;font-size:25px;color:#fff;cursor:pointer;
-    border-top:3px solid #fff;border-right:3px solid #fff;border-left:3px solid #fff
+.tab{float:left;height:30px;line-height:30px;padding:0 15px;margin:10px 0px 0px 5px;font-size:16px;color:#fff;cursor:pointer;
+    border-top:1px solid #eee;border-right:1px solid #eee;border-left:1px solid #eee
 }
-.VtabOn{border-top:3px solid #54597c;border-right:3px solid #54597c;border-left:3px solid #54597c}
-
+.VtabOn{border-top:1px solid #eee;border-right:1px solid #eee;border-left:1px solid #eee}
+.pmEdit{cursor:pointer;padding:0 15px;text-align:center;font-size:12px;color:#fff}
 
 .top{width:100%;background:#757dae;height:45px;color:#fff}
 
@@ -90,8 +90,10 @@ sup{font-size:10px}
 #Vtitle{color:#81acb3;font-size:40px}
 
 
-#Vcode{color:#757dae;border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#fff}
-#Vcontents{color:#bfbec6;border:2px solid #54597c;width:950px;height:700px;font-size:15px;padding:5px;background:#54597c;display:none}
+#Vcode{width:938px;height:700px;font-size:15px;color:#eee;border:1px solid #eee;padding:10px;background:#fff}
+#Vcontents{width:938px;height:700px;font-size:15px;color:#eee;border:1px solid #eee;padding:10px;background:#fff;display:none}
+
+
 
 .bottom{clear:both;height:28px;width:100%;background:#757dae; margin-top:50px}
 .copy{font-size: 12px; color: #fff; float: left; margin-top:8px}

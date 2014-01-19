@@ -1,20 +1,24 @@
 bs( function(){
 	bs.css('font-face@batch /res/batch');
-	bs.css('.add').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 30, 'gradientBegin', '#AF7695', 'gradientEnd', '#C79FB4' );
+	bs.css('.add').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 20, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
 	bs.css('.add:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
 	bs.css('.addBack').$( 'gradientBegin', '#659CAD', 'gradientEnd', '#FFFFFF' );
 
+    bs.css('.pmEdit').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 5, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
+    bs.css('.pmEdit:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
+
     bs.css('#add').$( 'gradientBegin', '#AF7695', 'gradientEnd', '#FFFFFF' );
 
-	bs.css('.tab').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', '15px 15px 0 0', 'gradientBegin', '#917d68', 'gradientEnd', '#bd9d84' );
-	bs.css('.tab:hover').$( 'gradientBegin', '#bd9d84', 'gradientEnd', '#917d68' );
+	bs.css('.tab').$(  'text-shadow', '1px 1px 0 #000', 'border-radius', 5, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
+    bs.css('.tab:hover').$( 'gradientBegin', '#767EAF', 'gradientEnd', '#AAAFD1' );
+	bs.css('.VtabOn').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952');
 	
 	bs.css('.tableHead').$( 'text-shadow', '1px 1px 0 #000', 'gradientBegin', '#767EAF', 'gradientEnd', '#AAAFD1' );
 	bs.css('.tableHeadL').$( 'border-radius', '15px 0 0 15px' );
 	bs.css('.tableHeadR').$( 'border-radius', '0 15px 15px 0' );
 	bs.css('#menu').$( 'text-shadow', '1px 1px 0 #000' );
 
-    bs.css('#back').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 30, 'gradientBegin', '#AF7695', 'gradientEnd', '#C79FB4' );
+    bs.css('#back').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 30, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
     bs.css('#back:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
 
     bs.css('#pmModify').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 30, 'gradientBegin', '#AF7695', 'gradientEnd', '#C79FB4' );
@@ -184,13 +188,13 @@ view:function(){
 		};
 	}
 	bs.dom('#Vcode').$(
-		'focus', function($e){bs.dom('#Vcode').$( 'color', '#404040' );},
-		'blur', function($e){bs.dom('#Vcode').$( 'color', '#757dae' );},
+		'focus', function($e){bs.dom('#Vcode').$( 'color', '#444' );},
+		'blur', function($e){bs.dom('#Vcode').$( 'color', '#222' );},
 		'keydown', k0('#Vcode')
 	);
 	bs.dom('#Vcontents').$(
-		'focus', function( $e ){bs.dom('#Vcontents').$( 'color', '#fff' );},
-		'blur', function( $e ){bs.dom('#Vcontents').$( 'color', '#bfbec6' );},
+		'focus', function( $e ){bs.dom('#Vcontents').$( 'color', '#444' );},
+		'blur', function( $e ){bs.dom('#Vcontents').$( 'color', '#222' );},
 		'keydown', k0('#Vcontents')
 	);
 	function s0( t ){
@@ -224,7 +228,7 @@ view:function(){
 //				(t0[i].freezedate ? '<div class="Vver2">freezed<br>'+t0[i].freezedate+'</div>':'<div class="Vver3">warm<br>&nbsp;</div>' )+
 //				'</div>' ).$( '<', '#Vversions', 'down', function(){versionDetail( this.id.substr(1) );} );
             bs.dom( '<div id="v'+i+'" class="Vver">'+
-                    '<div style="position:absolute"><img src="../res/draft/index_Bthumb_'+bs.$ex(1, '~',5)+'.png" width="175"></div>'+
+                    '<div style="position:absolute;"><img src="../res/draft/index_Bthumb_'+bs.$ex(1, '~',5)+'.png" width="175"></div>'+
 				'<div class="Vver0">Version '+t0[i].version+'</div>'+
 				'<div class="Vver1">UPDATED : '+t0[i].editdate+'</div>'+
 				(t0[i].freezedate ? '<div class="Vver2">FREEZE : '+t0[i].freezedate+'</div>':'<div class="Vver3">WARM<br>&nbsp;</div>' )+

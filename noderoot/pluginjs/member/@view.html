@@ -45,21 +45,24 @@ if( bs.WEB.method() == 'POST' ){
 
 <div id="Vversions"></div>
 
-<div id="Vdetail" style="clear:both;display:none">
+<div id="Vdetail" style="clear:both;display:none;background:#bbb;">
 	<input type="hidden" id="Vidx"/><input type="hidden" id="Vvr"/>
-	<div id="Vver" style="font-size:35px;margin:10px"></div>
-	
-	<div id="Vdependency"></div>
-	<div id="Vtab" style="clear:both">
+
+	<div id="Vtab" style="clear:both; background:#eaeaea;background-image:linear-gradient(#fafafa, #eaeaea);height:50px;border:1px solid #d8d8d8">
+        <div id="Vver" style="font-size:20px;margin:10px;float:left"></div>
+        <div id="Vdependency" style="font-size:35px;margin:10px;float:left"></div>
 		<div id="Vtab0" class="tab VtabOn">code</div>
 		<div id="Vtab1" class="tab">notice</div>
 		<div id="Valert" style="float:left"></div>
-		<div id="Vupdate" class="add" style="float:right;font-size:20px;height:30px;line-height:30px;margin:10px 25px 10px 5px">update</div>
-		<div id="Vfreeze" class="add" style="float:right;font-size:20px;height:30px;line-height:30px;margin:10px 5px">freeze</div>
+		<div id="Vupdate" class="pmEdit" style="float:right;height:30px;line-height:30px;margin:10px 25px 10px 5px">update</div>
+		<div id="Vfreeze" class="pmEdit" style="float:right;height:30px;line-height:30px;margin:10px 5px">freeze</div>
 		
 	</div>
-	<textarea id="Vcode"></textarea>
-	<textarea id="Vcontents"></textarea>
+    <div style="background:#eaeaea;background-image:linear-gradient(#fafafa, #eaeaea);border:1px solid #d8d8d8;padding:10px;margin-top:-1px">
+        <textarea id="Vcode"></textarea>
+        <textarea id="Vcontents"></textarea>
+    </div>
+
 </div>
 
 <script>site.viewr = <%=r%>, bs( site.view );</script>
