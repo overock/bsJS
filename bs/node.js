@@ -419,7 +419,7 @@ bs.$method( 'crypt', (function(){
 					if( ( i = file.lastIndexOf( '.' ) ) > -1 && file.charAt(0) != '@' ) return ( t0 = self.mime[file.substr( i + 1 )] ) ? 
 						bs.$stream( bs.$path( path+file ),
 							function(){$rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe( $rp );},
-							function( $e ){err( 404, 'no file<br>'+path+file);}
+                            function( $e ){err( 404, 'no file<br>'+path+file+'<br>'+($e?$e.toString():''));}
 						) : err( 404, 'no file<br>'+path+file);
 				}
 				head.length = response.length = 0, this.retry = 1,

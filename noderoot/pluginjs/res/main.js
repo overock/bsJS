@@ -14,6 +14,8 @@ bs( function(){
 	bs.css('.tableHeadR').$( 'border-radius', '0 15px 15px 0' );
 	bs.css('#menu').$( 'text-shadow', '1px 1px 0 #000' );
 	bs.css('.Vver').$('border', '1px solid #bfbec6' );
+    bs.css('#back').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 30, 'gradientBegin', '#AF7695', 'gradientEnd', '#C79FB4' );
+    bs.css('#back:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
 //	bs.css('.Vver:hover').$( 'gradientBegin', '#C79FB4', 'gradientEnd', '#ffffff', 'color', '#fff' );
 
 
