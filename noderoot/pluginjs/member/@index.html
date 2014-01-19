@@ -34,7 +34,11 @@
     <div class="title" >uniquename</div>
     <div><input type="text" id="Auname" class="value"/></div>
     <div  class="title">type</div>
-    <div><select id="Atype" class="value"><option value="1">method</option><option value="2">class</option><option value="3">static</option></select></div>
+    <div><select id="Atype" class="value">
+        <%for( var t0 = bs.WEB.application( 'type' ), i = 0, j = t0.length; i < j ; i++ ){%>
+        <option value="<%=t0[i].plugintype_rowid%>"><%=t0[i].title%></option>
+        <%}%>
+    </select></div>
     <div class="title" >category</div>
     <div> <select id="Acat" class="value">
         <%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>

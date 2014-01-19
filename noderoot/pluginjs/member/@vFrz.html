@@ -17,7 +17,7 @@ function VfreezeDetail( $data, $rs, $e ){
 		rs = $rs[0],
 		code = "bs.$register( '"+rs.title+"','"+rs.uname+"',"+rs.code+","+rs.version+")",
 		bs.$file( null, bs.$path( 'plugin/'+rs.uname+rs.version+'.js' ), code );
-		if( t0.k ) bs.$file( null, bs.$path( 'plugin/'+rs.uname+'.js' ), code );
+		if( t0.k === null || t0.k ) bs.$file( null, bs.$path( 'plugin/'+rs.uname+'.js' ), code );
 	}
 }
 bs.WEB.application('db')( 'Vfreezable', post, Vfreezable );
