@@ -47,9 +47,11 @@ sup{font-size:10px}
 #Llogined1{color:#4b506c;font-size:16px}
 #Llogined1:hover{color:#A5ABCA}
 
-#join{height:150px;display:none;text-align:center;color:#fff;font-size:15px;padding:30px 0}
+#join{height:300px;display:none;color:#fff;font-size:15px;padding:10px 0}
 #join table{width:750px;margin:0 auto;text-align:left;color:#000}
-#Jemail,#Jpw,#Jpwc,#Jnick{color:#fff;width:400px;margin:2px 0 2px 0;height:25px;border:0;padding-left:7px;border-radius:7px;opacity:0.5;background:#4b506c;box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
+#join .title {margin:10px 0px 5px 5px;font-size:13px;font-weight:bold;color:#4c4c4c;text-shadow:1px 1px 0 #e7e7e7;}
+#join .value {background:#4b506c;padding:0px 0px 0px 10px;height:30px; border-radius:5px; border:1px solid #c3c3c3;box-shadow:inset 0px 5px 5px 0px rgba(50, 50, 50, 0.05);width:295px;color:#fff}
+
 #Jcancel,#Jjoin{font-size:50px;color:#fff;cursor:pointer}
 #Jalert{color:#8ABDE0;font-size:11px;font-weight:bold}
 

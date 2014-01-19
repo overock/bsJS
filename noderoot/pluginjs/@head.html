@@ -54,20 +54,42 @@
 	</div>
 </div>
 <div id="join" class="addBack">
-	<table border="0" cellpadding="0" cellspacing="0">
-        <tr><td rowspan="6" style="padding-top:15px;width:150px"></td>
-        <tr><td colspan="2" height="50" ><img src="res/top/login/joinTitle.png"></tr>
-		<td style="width:100px">email</td><td style="width:400px"><input type="text" id="Jemail" placeholder="email"/></td>
-		<td rowspan="6" style="text-align:center;">
-			<div class="batch" id="Jjoin">&#xf164;</div>
-			<div class="batch" id="Jcancel">&#xf165;</div>
-		</td>
-	</tr>
-	<tr><td>pw <span style="font-size:10px">6~12</span></td><td><input type="password" id="Jpw"/></td></tr>
-	<tr><td>pw <span style="font-size:10px">confirm</span></td><td><input type="password" id="Jpwc"/></td></tr>
-	<tr><td>nick <span style="font-size:10px">4~10</span></td><td><input type="text" id="Jnick" placeholder="nick"/></td></tr>
-	<tr><td colspan="2" style="text-align:center"><div id="Jalert">&nbsp;</div></td></tr>
-	</table>
+    <div style="width:856px;height:285px; margin:30px auto;padding:30px;background:#fff;border-radius:10px;border:1px solid #eee;box-shadow:2px 2px 2px 2px rgba(50, 50, 50, 0.05)">
+    <div><img src="../res/member/plugin_reg.png"></div>
+    <div class="title"><%=bs.WEB.application('txt')('join','email')%></div>
+    <div><input type="text" id="Jemail" placeholder="email" class="value"/></div>
+    <div class="title"><%=bs.WEB.application('txt')('join','pw')%></div>
+    <div><input type="password" id="Jpw"  class="value"/></div>
+    <div class="title"><%=bs.WEB.application('txt')('join','pw2')%></div>
+    <div><input type="password" id="Jpwc"  class="value"/></div>
+    <div class="title"><%=bs.WEB.application('txt')('join','nick')%></div>
+    <div><input type="text" id="Jnick" placeholder="nick"  class="value"/></div>
+    <div style="position:relative;margin:-220px 0px 0px 330px;">
+        <div style="color:#000">어쩌고 저쩌고 이렇쿵 저렇쿵 쏼라쏼라<br>쏼라</div>
+        <div><img src="../res/draft/index_Bthumb_1.png" width="105" style="border-radius:10px;margin-top:10px"> </div>
+        <div class="title" style="margin:-100px 0px 0px 120px"><%=bs.WEB.application('txt')('join','thumb')%></div>
+        <div style="margin:-25px 0px 0px 210px;"><input type="text" class="value" style="width:305px"/></div>
+        <div style="margin:8px 0px 0px 122px;color:#000"><%=bs.WEB.application('txt')('join','rthumb')%> : 200*200</div>
+        <div><div id="Jalert">&nbsp;</div></div>
+        <div class="batch" id="Jjoin" style="color:#000">&#xf164;</div>
+        <div class="batch" id="Jcancel" style="color:#000">&#xf165;</div>
+    </div>
+    </div>
+
+	<!--<table border="0" cellpadding="0" cellspacing="0">-->
+        <!--<tr><td rowspan="6" style="padding-top:15px;width:150px"></td>-->
+        <!--<tr><td colspan="2" height="50" ><img src="res/top/login/joinTitle.png"></tr>-->
+		<!--<td style="width:100px">email</td><td style="width:400px"><input type="text" id="Jemail" placeholder="email"/></td>-->
+		<!--<td rowspan="6" style="text-align:center;">-->
+			<!--<div class="batch" id="Jjoin">&#xf164;</div>-->
+			<!--<div class="batch" id="Jcancel">&#xf165;</div>-->
+		<!--</td>-->
+	<!--</tr>-->
+	<!--<tr><td>pw <span style="font-size:10px">6~12</span></td><td><input type="password" id="Jpw"/></td></tr>-->
+	<!--<tr><td>pw <span style="font-size:10px">confirm</span></td><td><input type="password" id="Jpwc"/></td></tr>-->
+	<!--<tr><td>nick <span style="font-size:10px">4~10</span></td><td><input type="text" id="Jnick" placeholder="nick"/></td></tr>-->
+	<!--<tr><td colspan="2" style="text-align:center"><div id="Jalert">&nbsp;</div></td></tr>-->
+	<!--</table>-->
 </div>
 <div class="contents">
 	
