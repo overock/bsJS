@@ -5,62 +5,74 @@
 }%>
 
 <%IMPORT( '@head.html' );%>
-<!--<div id="add" style="display:none">-->
-    <!--<table cellspacing="0" border="0" cellpadding="0">-->
-        <!--<tr height="35px">-->
-            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">title</td><td style="background:#fff"><input type="text" id="Atitle" /></td>-->
-            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">uniquename</td><td style="background:#fff"><input type="text" id="Auname" /></td>-->
-            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">type</td><td style="background:#fff"><select id="Atype"><option value="1">method</option><option value="2">class</option><option value="3">static</option></select></td>-->
-            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">category</td><td style="background:#fff"><select id="Acat">-->
-                <!--<%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>-->
-                <!--<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>-->
-                <!--<%}%>-->
-            <!--</select></td>-->
-        <!--</tr>-->
-        <!--<tr height="10px"></tr>-->
-        <!--<tr height="35px"><td colspan="8" style="background:#54597c;padding:0px 10px 0px 10px;color:#fff">description</td></tr>-->
-        <!--<tr ><td colspan="8"><textarea id="Adescription" style="width:900px;height:250px"></textarea></td></tr>-->
-        <!--<tr height="35px"><td colspan="1" style="background:#54597c;padding:0px 10px 0px 10px;color:#fff">keyword</td><td colspan="7" style="background:#fff"> <input type="text" id="Akeyword" /></td></tr>-->
-        <!--<tr height="10px"></tr>-->
-        <!--<tr height="35px"><td colspan="1" style="background:#54597c;padding:0px 10px 0px 10px;color:#fff">thumb url</td><td colspan="7" style="background:#fff"><input type="text" id="Athumb" /></td></tr>-->
-    <!--</table>-->
-    <!--<input type="button" id="Aadd" value="add" style=""/> <input type="button" id="Acancel" value="cancel" style=""/>-->
-<!--</div>-->
-<div id="add" style="display:none;overflow:hidden ">
-    레지스터 타이틀들어감(헤더부분을 수정해야할듯)
-    <div style="width:850px; margin:auto;padding-top:50px">
-	<div class="title">title</div>
+<div id="add" style="display:none;overflow:hidden;">
+    <div style="width:856px;height:350px; margin:30px auto;padding:30px;background:#fff;border-radius:10px;border:1px solid #eee;box-shadow:2px 2px 2px 2px rgba(50, 50, 50, 0.05)">
+    <div><img src="../res/member/plugin_reg.png"></div>
+	<div class="title">TITLE</div>
     <div><input type="text" id="Atitle" class="value" /></div>
-    <div class="title" >uniquename</div>
+    <div class="title" >UNIQUE NAME</div>
     <div><input type="text" id="Auname" class="value"/></div>
-    <div  class="title">type</div>
+    <div  class="title">TYPE</div>
     <div><select id="Atype" class="value">
-        <%for( var t0 = bs.WEB.application( 'type' ), i = 0, j = t0.length; i < j ; i++ ){%>
-        <option value="<%=t0[i].plugintype_rowid%>"><%=t0[i].title%></option>
-        <%}%>
+    <%for( var t0 = bs.WEB.application( 'type' ), i = 0, j = t0.length; i < j ; i++ ){%>
+    <option value="<%=t0[i].plugintype_rowid%>"><%=t0[i].title%></option>
+    <%}%>
     </select></div>
-    <div class="title" >category</div>
+    <div class="title" >CATEGORY</div>
     <div> <select id="Acat" class="value">
-        <%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>
-        <option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
-        <%}%>
+    <%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>
+    <option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
+    <%}%>
     </select></div>
-    <div style="clear:both;background:#54597c;color:#fff; padding:10px 10px 10px 10px; float:left;  width:80px;margin-top:2px">description</div>
-    <div><textarea id="Adescription" style="background:#fff;padding:5px;border:0px;margin-top:2px; width:800px; height:200px"></textarea></div>
-	<div class="title2">keyword</div>
-    <div ><input type="text" id="Akeyword" class="value2"/></div>
-	<div class="title2">thumb url</div>
-    <div ><input type="text" id="Athumb" class="value2"/></div>
-	<div id="Aalert"></div>
-	<input type="button" id="Aadd" value="add"/> <input type="button" id="Acancel" value="cancel"/>
+    <div class="title">KEYWORD</div>
+    <div ><input type="text" id="Akeyword" class="value"/></div>
+    <div style="position:relative;margin:-320px 0px 0px 330px">
+        <div class="title" style="margin-top:19px; float:left;  width:80px;font-size:14px;font-weight:bold">Description</div>
+        <div><textarea id="Adescription" style="padding:5px;width:98%; height:150px;" class="value"></textarea></div>
+        <div><img src="../res/draft/index_Bthumb_1.png" width="105" style="border-radius:10px;margin-top:10px"> </div>
+        <div class="title" style="margin:-100px 0px 0px 120px">Thumb URL</div>
+        <div style="margin:-25px 0px 0px 210px;"><input type="text" id="Athumb" class="value" style="width:305px"/></div>
+        <div style="margin:8px 0px 0px 122px">Recommand Thumb size : 200*200</div>
+        <div id="Aalert" style="margin-left:120px"></div>
+        <input type="button" id="Aadd" value="Add Plugin" class="add" style="border:1px solid #eee;font-size:12px;margin:10px 3px 0px 120px;width:199px"/> <input type="button" id="Acancel" value="cancel" class="add" style="border:1px solid #eee;font-size:12px;width:200px"/>
+    </div>
     </div>
 </div>
+<!--<div id="add" style="display:none;overflow:hidden;">-->
+    <!--<div style="width:856px; margin:auto;padding:20px;background:#fff;border-radius:10px">-->
+        <!--<div><img src="../res/member/plugin_reg.png"></div>-->
+        <!--<div class="title">TITLE</div>-->
+        <!--<div><input type="text" id="Atitle" class="value" /></div>-->
+        <!--<div class="title" >UNIQUE NAME</div>-->
+        <!--<div><input type="text" id="Auname" class="value"/></div>-->
+        <!--<div  class="title">TYPE</div>-->
+        <!--<div><select id="Atype" class="value">-->
+            <!--<%for( var t0 = bs.WEB.application( 'type' ), i = 0, j = t0.length; i < j ; i++ ){%>-->
+            <!--<option value="<%=t0[i].plugintype_rowid%>"><%=t0[i].title%></option>-->
+            <!--<%}%>-->
+        <!--</select></div>-->
+        <!--<div class="title" >CATEGORY</div>-->
+        <!--<div> <select id="Acat" class="value">-->
+            <!--<%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>-->
+            <!--<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>-->
+            <!--<%}%>-->
+        <!--</select></div>-->
+        <!--<div style="clear:both; padding:10px 10px 10px 10px; float:left;  width:80px;margin-top:10px;font-size:14px;font-weight:bold">description</div>-->
+        <!--<div><textarea id="Adescription" style="padding:5px;margin:2px 0px 10px 0px; width:870px; height:200px;float:none" class="value"></textarea></div>-->
+        <!--<div class="title2">keyword</div>-->
+        <!--<div ><input type="text" id="Akeyword" class="value"/></div>-->
+        <!--<div class="title2">thumb url</div>-->
+        <!--<div ><input type="text" id="Athumb" class="value"/></div>-->
+        <!--<div id="Aalert"></div>-->
+        <!--<input type="button" id="Aadd" value="add"/> <input type="button" id="Acancel" value="cancel"/>-->
+    <!--</div>-->
+<!--</div>-->
 <div id="pgMiddleVisual">
     <div id="visualEffect"></div>
     <script>bs( site.mainVisual );</script>
-    <img src="../res/member/title.png" style="position:absolute; margin-top:100px;margin-left:60px">
+    <img src="../res/member/title.png" style="position:absolute; margin-top:50px;margin-left:60px">
 </div>
-<div id='idBox' style="margin:-200px 0px 80px 60px;position:relative">
+<div id='idBox' style="margin:-150px 0px 50px 60px;position:relative">
     <table cellspacing="0" border="0" cellpadding="0">
         <tr><td rowspan="4" width="115"><img src="../res/draft/index_Bthumb_1.png" height="100" width="100" style="border-radius:10px"></td><td style="font-size:20px;font-weight:bold"><%=bs.WEB.session('nick')%>'s plugin</td></tr>
         <tr><td><%=bs.WEB.session('email')%></td></tr>
@@ -98,7 +110,9 @@ bs( function(){
 	bs.dom( '#Padd' ).$( 'down', function(){
 		bs.dom( '#list' ).$( 'display', 'none' );
 		bs.dom( '#add' ).$( 'display', 'block' );
-        bs.ANI.tween( bs.dom( '#add').$('height',0,'this'), 'height', 500, 'time', 1, 'ease','circleInOut');
+        bs.dom( '#pgMiddleVisual' ).$( 'display', 'none' );
+        bs.dom( '#idBox' ).$( 'display', 'none' );
+        bs.ANI.tween( bs.dom( '#add').$('height',0,'this'), 'height', 500, 'time', 0.5, 'ease','circleInOut');
 	} );
 	bs.dom( '#Aadd' ).$( 'down', function( $e ){
 		var t0;
@@ -114,6 +128,8 @@ bs( function(){
 				list(page);
 				bs.dom( '#add' ).$( 'display', 'none' );
 				bs.dom( '#list' ).$( 'display', 'block' );
+                bs.dom( '#pgMiddleVisual' ).$( 'display', 'block' );
+                bs.dom( '#idBox' ).$( 'display', 'block' );
 			}else{
 				bs.dom( '#Aalert' ).$( 'html', 'addFailed:'+ t0.contents );
 			}
@@ -124,6 +140,8 @@ bs( function(){
 	bs.dom( '#Acancel' ).$( 'down', function( $e ){
 		bs.dom( '#add' ).$( 'display', 'none' );
 		bs.dom( '#list' ).$( 'display', 'block' );
+        bs.dom( '#pgMiddleVisual' ).$( 'display', 'block' );
+        bs.dom( '#idBox' ).$( 'display', 'block' );
 	} );
 } );
 </script>

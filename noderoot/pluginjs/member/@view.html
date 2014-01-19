@@ -14,55 +14,55 @@ if( bs.WEB.method() == 'POST' ){
 }%>
 
 <%IMPORT( '@head.html' );%>
-TODOLIST<br>
-상단에서 현재의 플러그인 수정목록에 들어왔다는걸 인지시켜야함..<br>
-섬네일 오버 표현<br>
-리스트 디자인적용<br>
-버전 추가 버튼인지<br>
+
 
 <div id="pgMiddleVisual">
     <div id="visualEffect"></div>
     <script>bs( site.mainVisual );</script>
-    <img src="../res/member/title.png" style="position:absolute; margin-top:100px;margin-left:60px">
+    <img src="../res/member/title.png" style="position:absolute; margin-top:50px;margin-left:60px">
 </div>
-<div id='idBox' style="margin:-200px 0px 80px 60px;position:relative">
+<div id='idBox' style="margin:-150px 0px 50px 60px;position:relative">
     <table cellspacing="0" border="0" cellpadding="0">
         <tr><td rowspan="4" width="115"><img src="../res/draft/index_Bthumb_1.png" height="100" width="100" style="border-radius:10px"></td><td style="font-size:20px;font-weight:bold"><%=bs.WEB.session('nick')%>'s plugin</td></tr>
         <tr><td><%=bs.WEB.session('email')%></td></tr>
-        <tr><td><span class="batch" id="back">&#xf158;</span><sup>b</sup> <%=bs.WEB.session('nick')%>'s plugin <span id="Vtitle"></span></td></tr>
+        <tr><td width=""><div id="back"><span class="batch" >&#xf158;</span>VIew My Plugin LIST</div> <div id="pmModify"><span class="batch" >&#xf04d;</span>&nbsp;Modify This Plugin Info</div></td></tr>
     </table>
 </div>
-
 <table cellspacing="0" border="0" cellpadding="0" style="width:980px"><tr>
 <td class="tableHead tableHeadL" style="width:500px">Title</td><td style="width:150px" class="tableHead">Type</td>
 <td style="width:150px" class="tableHead">Category</td><td class="tableHead tableHeadR">Date</td>
 </tr></table>
 <div id="Vinfo" class="mlist"></div>
 
-<div id="Vvadd" style="margin:15px auto;width:290px">
-	<div style="float:left"><input type="text" id="Vversion" placeholder="version" style="padding-left:5px;width:180px;font-size:30px;height:50px;border:1px solid #54597c"/></div>
-	<div id="Vadd" class="add"><span class="batch">&#xF14C;</span> ADD</div>
+<div id="Vvadd" style="margin:29px 20px 10px 20px;height:50px">
+    <div style="float:left; width:54%; margin:10px 10px;">*기존 버전보다 높은 버전만 등록 하실 수 있습니다 / FREEZE 버전은 수정할 수 없습니다..</div>
+	<div style="float:left"><input type="text" id="Vversion" placeholder="version" style="padding-left:15px;width:180px;font-size:12px;height:35px;border:1px solid #ddd;border-radius:20px;box-shadow:inset 0px 0px 15px rgba(0,0,0,.1)"/></div>
+
+	<div id="Vadd" class="add"><span class="batch">&#xF14C;</span> Add New Version</div>
 	<div id="Aalert" style="clear:both"></div>
 </div>
 
+
 <div id="Vversions"></div>
 
-<div id="Vdetail" style="clear:both;display:none">
+<div id="Vdetail" style="clear:both;display:none;">
 	<input type="hidden" id="Vidx"/><input type="hidden" id="Vvr"/>
-	<div id="Vver" style="font-size:35px;margin:10px"></div>
-	
-	<div id="Vdependency"></div>
-	<div id="Vtab" style="clear:both">
+    <div style="font-size:15px">&nbsp;</div>
+	<div id="Vtab" style="clear:both; background:#eaeaea;background-image:linear-gradient(#fafafa, #eaeaea);height:50px;border:1px solid #d8d8d8;border-top-left-radius:10px;border-top-right-radius:10px">
+        <div id="Vver" style="font-size:20px;margin:10px;float:left"></div>
+        <div id="Vdependency" style="font-size:35px;margin:10px;float:left"></div>
 		<div id="Vtab0" class="tab VtabOn">code</div>
 		<div id="Vtab1" class="tab">notice</div>
 		<div id="Valert" style="float:left"></div>
-		<div id="Vupdate" class="add" style="float:right;font-size:20px;height:30px;line-height:30px;margin:10px 25px 10px 5px">update</div>
-		<div id="Vfreeze" class="add" style="float:right;font-size:20px;height:30px;line-height:30px;margin:10px 5px">freeze</div>
+		<div id="Vupdate" class="pmEdit" style="float:right;height:30px;line-height:30px;margin:10px 25px 10px 5px">update</div>
+		<div id="Vfreeze" class="pmEdit" style="float:right;height:30px;line-height:30px;margin:10px 5px">freeze</div>
 		
 	</div>
-	<textarea id="Vcode"></textarea>
-	<textarea id="Vcontents"></textarea>
+    <div style="background:#eaeaea;background-image:linear-gradient(#fafafa, #eaeaea);border:1px solid #d8d8d8;padding:10px;margin-top:-1px">
+        <textarea id="Vcode"></textarea>
+        <textarea id="Vcontents"></textarea>
+    </div>
 </div>
-<script>site.viewr = <%=r%>, bs( site.view );</script>
 
+<script>site.viewr = <%=r%>, bs( site.view );</script>
 <%IMPORT( '@foot.html' );%>
