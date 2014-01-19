@@ -69,8 +69,18 @@ bs.WEB.application(
 
 var txt = {
 top:{
-	recent:['신규등록','Recent'],hot:['인기항목','Hot'],updated:['업데이트','Updated'],category:['카테고리','category'],
-	search:['검색','search'],email:['이메일','email'],login:['로그인','login'],join:['가입','join']
+        recent:['신규등록','Recent'],hot:['인기항목','Hot'],updated:['업데이트','Updated'],category:['카테고리','category'],
+        search:['검색','search'],email:['이메일','email'],login:['로그인','login'],join:['가입','join']
+    },
+join:{
+    email:['이메일','E-Mail'],pw:['패스워드를 입력하세요(6~12자리)','PassWord(6~12)'],pw2:['패스워드를 다시한번 입력하세요','PassWord(confirm)'],
+    nick:['사용할 닉네임을 입력하세요','Nickname(4~10)'],thumb:['섬네일 URL','Thumb URL'],rthumb:['권장 사이즈','Recommand Thumb size']
+},
+pluginAdd:{
+    title:['타이틀','TITLE'],unique:["유니크네임",'UNIQUE NAME'],type:["타입",'TYPE'],category:["카테고리",'CATEGORY'],keyword:["키워드(,단위로 입력하세요)",'KEYWORD'],
+    description:['플러그인 설명','Description'],thumb:['섬네일 URL','Thumb URL'],rthumb:['권장 사이즈','Recommand Thumb size'],
+    addPlugin:['새로운 플러그인 등록하기','Add New Plugin'],date:['업로드 날짜','Date'],addNewVersion:['새 버전 추가','Add New Version'],
+    backList:['내 플러그인 보기','VIew My Plugin LIST'],modify:['플러그인 정보 수정','Modify This Plugin Info']
 }
 
 };
