@@ -1,4 +1,5 @@
-<% 
+
+<%
 if( bs.WEB.method() == 'POST' ){
 	var post = bs.WEB.application('post')( true, 'r', 'i' );
 	if( post ) bs.WEB.application('db')( 'Pview', post, function( $data, $rs, $e ){
