@@ -305,9 +305,22 @@ bs.$method( 'crypt', (function(){
 				if( !( t1 = t1[$group] ) ) return err( 200, 'undefined group:' + $group );
 				return t1[$key];
 			},
-			i18nAdd:function( $isDefault, $locale, $data ){
-				if( !countryCode[$locale] ) return err( 'invaild locale:' + $locale );
-				if( $isDefault ) currsite.i18nD = $locale;
+			i18nAddDefault:function( $locale, $data ){
+				if( currsite.i18nD ) return console.log( 'default already exist:' + currsite.i18nD );
+				if( !countryCode[$locale] ) return console.log( 'invaild locale:' + $locale );
+				currsite.i18nD = $locale, currsite.i18nTxt[$locale] = $data;
+			},
+			i18nAdd:function( $locale, $data ){
+				var t0, t1, d1, i, j;
+				if( !countryCode[$locale] ) return console.log( 'invaild locale:' + $locale );
+				t0 = currsite.i18nTxt[currsite.i18nD];
+				for( i in t0 ) if( t0.hasOwnProperty(i) ){
+					if( !( i in $data ) ) return console.log( 'no key: $data[' + i +']' );
+					t1 = t0[i], d1 = $data[i];
+					for( j in t1 ) if( t1.hasOwnProperty(j) ){
+						if( !( j in d1 )  ) return console.log( 'no key: $data[' + i +'][' + j + ']' );
+					}
+				}
 				currsite.i18nTxt[$locale] = $data;
 			}
 		};

@@ -33,7 +33,6 @@ en = {
 		backList:'VIew My Plugin LIST',modify:'Modify This Plugin Info'
 	}
 },
-
-bs.WEB.i18nAdd( 0, 'ko', ko ),
-bs.WEB.i18nAdd( 1, 'en', en );
+bs.WEB.i18nAddDefault( 'en', en ),
+bs.WEB.i18nAdd( 'ko', ko );
 })();
