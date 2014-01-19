@@ -77,10 +77,9 @@ sup{font-size:10px}
 
 /*#add input,select,textArea{border:0px; width:100%; height:100%; padding:5px}*/
 
-#add .title {background:#54597c;color:#fff; padding:10px 10px 10px 10px; float:left;}
-#add .value {background:#fff;padding:0px 15px 0px 15px;float:left; border:0px; height:35px}
-#add .title2 {background:#54597c;color:#fff; padding:10px 10px 10px 10px; float:left;  width:80px;margin-top:2px}
-#add .value2 {background:#fff;padding:0px 15px 0px 15px;border:0px; height:35px;margin-top:2px; width:680px}
+#add .title {margin:10px 0px 5px 5px;font-size:13px;font-weight:bold;color:#4c4c4c;text-shadow:1px 1px 0 #e7e7e7;}
+#add .value {background:#4b506c;padding:0px 0px 0px 10px;height:30px; border-radius:5px; border:1px solid #c3c3c3;box-shadow:inset 0px 5px 5px 0px rgba(50, 50, 50, 0.05);width:295px;color:#fff}
+
 
 .mlist td{height:45px;color:#4C516D;font-size:14px;border-bottom:1px dashed #999;font-weight:bold}
 .mlist a{color:#4C516D}
