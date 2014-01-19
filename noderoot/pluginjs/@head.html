@@ -28,13 +28,13 @@
 	<div class="contents">
 		<div id="logo"><a href="/"><img src="/res/draft/logo.jpg"></a></div>
 		<div id="menu">
-            <img src="/res/top/line.png" style="margin: 0px 12px 0px 5px">
-			<a href="/recent">Recent</a> &nbsp; <a href="/hot">Hot</a> &nbsp;
-			<a href="/updated">Updated</a> &nbsp; <a href="/catalog">Catalog</a>
-            <img src="/res/top/line.png" style="margin: 0px 10px 0px 12px">
+			<a href="/recent"><%=bs.WEB.application('txt')('top','recent')%></a> &nbsp; 
+			<a href="/hot"><%=bs.WEB.application('txt')('top','hot')%></a> &nbsp;
+			<a href="/updated"><%=bs.WEB.application('txt')('top','updated')%></a> &nbsp; 
+			<a href="/category"><%=bs.WEB.application('txt')('top','category')%></a>
 		</div>
 		<div id="search">
-			<input type="text" id="searchTxt" placeholder="search"/> &nbsp;
+			<input type="text" id="searchTxt" placeholder="<%=bs.WEB.application('txt')('top','search')%>"/> &nbsp;
 			<span id="searchBtn" class="batch">&#xF097;</span>
 		</div>
 		<div id="personal">

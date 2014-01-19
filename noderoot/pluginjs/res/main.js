@@ -142,8 +142,10 @@ mainVisual:function(){
 			}
 		}
 	};
-	game.init();
-	bs.ANI.ani( game );
+	setTimeout( function(){
+		game.init();
+		bs.ANI.ani( game );
+	}, 50 );
 },
 viewr:0,
 view:function(){

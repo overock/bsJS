@@ -126,7 +126,7 @@ bs.$method( 'crypt', (function(){
 	bs.$method( 'delete', function( $end, $path ){return http( 'DELETE', $end, bs.$url($path), arguments );} );
 })( HTTP, URL ),
 (function( HTTP, HTTPS, URL ){
-	var form, mime, clone, portStart, staticHeader, err, Upfile, bodyParser,
+	var form, mime, clone, portStart, staticHeader, err, Upfile, bodyParser, file, path, url,
 		currsite, sessionName, id, cookie, clientCookie, ckParser, next, pause,
 		head, method, response, application, session, rq, rp, getData, postData, postFile, data;
 	mime = require('./mime'), staticHeader = {'Content-Type':0},
@@ -280,10 +280,14 @@ bs.$method( 'crypt', (function(){
 			head:function( $k, $v ){head[head.length] = [$k, $v];},
 			method:function(){return method;},
 			request:function( $k ){return $k ? rq[$k] : rq;},
+			requestHeader:function( $k ){return rq.headers[$k];},
 			response:function(){
 				var i = 0, j = arguments.length;
 				while( i < j ) response[response.length] = arguments[i++];
 			},
+			url:function(){return url;},
+			urlPath:function(){return path;},
+			urlFile:function(){return file;},
 			get:function( $k ){return getData[$k];},
 			post:function( $k ){return postData[$k];},
 			file:function( $k ){return postFile[$k];},
@@ -342,7 +346,7 @@ bs.$method( 'crypt', (function(){
 			var rqListener;
 			rqListener = function( $rq, $rp ){
 				var t0, t1, t2, i, j, k, v;
-				t0 = URL.parse( 'http://'+$rq.headers.host+$rq.url ), t1 = t0.hostname, i = 0, j = $sites.length;
+				url = t0 = URL.parse( 'http://'+$rq.headers.host+$rq.url ), t1 = t0.hostname, i = 0, j = $sites.length;
 				while( i < j ){
 					k = $sites[i++], v = $sites[i++];
 					if( k == t1 ) currsite = v, fileRoot[site = t0.hostname] = v.root, cache = v.cache, pause = 0,
@@ -403,7 +407,7 @@ bs.$method( 'crypt', (function(){
 		},
 		$fn.index = 'index', $fn.cache = 1, $fn.sessionTime = 1000 * 60 * 20,
 		$fn.$constructor = function( $sel ){
-			var self = this, router, nextstep, onData, file, path, currRule, idx;
+			var self = this, router, nextstep, onData, currRule, idx;
 			this.form = bs.form( $sel ),
 			this.form.$( 'encoding', 'utf-8', 'keepExtensions', 1, 'fileMax', 2 * 1024 * 1024, 'postMax', 5 * 1024 * 1024 ),
 			this.url = [], this.isStarted = 0,
