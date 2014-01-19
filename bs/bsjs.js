@@ -142,28 +142,46 @@ method( 'tmpl', (function(){
 	};
 })() ),
 method( 'jpage', (function(){
-	var jp, jpage, r0, r1, r2, s, e, cache;
-	jp = function( $v ){this.v = $v}, cache = {}, r0 = /\\/g, r1 = /["]/g, r2 = /\r\n|\r|\n/g, s = '<%', e = '%>',
+	var jp, jpage, r0, r1, r2, r3, s, e, cache, err;
+	jp = function( $v ){this.v = $v}, cache = {}, r0 = /\\/g, r1 = /["]/g, r2 = /\r\n|\r|\n/g, r3 = /at/g,  s = '<%', e = '%>', err = [];
 	jpage = function( $str, $data, $render, $end, $id ){
-		var t0, t1, i, j, k, v, importer, render;
+		var str, t0, t1, i, j, k, v, m, importer, render;
 		if( !( jpage.cache && ( v = cache[$id] ) ) ){
 			if( $str instanceof jp ) v = $str.v;
 			else{
-				$str = ( $str.substr(0,2) == '#T' ? bs.dom( $str ).$('@text') : $str.substr($str.length-5) == '.html' ? bs.$get( null, $str ) : $str ).split( s );
-				i = 0, j = $str.length, v = '';
+				str = ( $str.substr(0,2) == '#T' ? bs.dom( $str ).$('@text') : $str.substr($str.length-5) == '.html' ? bs.$get( null, $str ) : $str ).split( s );
+				i = 0, j = str.length, v = 'try{';
 				while( i < j ){
-					t0 = $str[i++];
-					if( ( k = t0.indexOf( e ) ) > -1 ) t1 = t0.substring( 0, k ), t0 = t0.substr( k + 2 ), v += t1.charAt(0) == '=' ? 'ECHO(' + t1.substr(1) + ');' : t1;
-					v += 'ECHO("' + t0.replace( r0, '\\\\' ).replace( r1, '\\"' ).replace( r2, '\\n' ) + '");';
+					t0 = str[i++];
+					if( ( k = t0.indexOf( e ) ) > -1 ){
+						t1 = t0.substring( 0, k ), t0 = t0.substr( k + 2 ),
+						v += '$$E[$$E.length]="<%' + t1.replace( r0, '\\\\' ).replace( r1, '\\"' ).replace( r2, '<br>' ) + '%>";' +
+							(t1.charAt(0) == '=' ? 'ECHO(' + t1.substr(1) + ');' : t1 + ';' );
+					}
+					v += 'ECHO($$E[$$E.length]="' + t0.replace( r0, '\\\\' ).replace( r1, '\\"' ).replace( r2, '\\n' ) + '");';
 				}
+				v += '}catch(e){return e;}';
 			}
 			t0 = $str.v ? $str : new jp(v);
 			if( jpage.cache && $id ) cache[$id] = v;
 		}
 		t1 = '',
 		importer = function( $url ){jpage( $url, $data, null, render, $url );},
-		render = $render ? function( $v ){t1 += $v, $render( $v );} : function( $v ){t1 += $v;},
-		new Function( 'ECHO, $, bs, IMPORT', v )( render, $data, bs, importer );
+		render = $render ? function( $v ){t1 += $v, $render( $v );} : function( $v ){t1 += $v;};
+		try{
+			err.length = 0,
+			i = new Function( 'ECHO, $, bs, IMPORT, $$E', v )( render, $data, bs, importer, err );
+			if( !( i instanceof Error ) ) i = 0;
+		}catch(e){i = e;}
+		if( i ){
+			str = '<h1>Invalid template error: bs.$jpage</h1><hr>';
+			if( m = err.length ) str += '<b>code:</b><br>'+err[err.length-1]+'<hr>';
+			j = Object.getOwnPropertyNames( i ), k = j.length;
+			while( k-- ) str += '<b>' + j[k] +'</b>: '+( i[j[k]].replace ? i[j[k]].replace( r3, '<br>at' ) : i[j[k]] )+'<br>';
+			if( m ) for( str += '<hr>', i = 0 ; i < m ; i++ ) if( err[i] ) str += '<b>block '+i+'</b><div>'+err[i]+'</div>';
+			t1 = str + '<hr><b>template:</b><br>'+ ( $str.replace ? $str.replace( r2, '<br>' ) : $str ) + 
+				( t1 ? '<hr><b>runned:</b><br>' + t1 : '' );
+		}
 		if( $end ) $end( t1 );
 		return t0;
 	}, jpage.cache = 1;
