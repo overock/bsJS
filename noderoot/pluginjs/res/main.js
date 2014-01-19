@@ -9,9 +9,9 @@ bs( function(){
 
     bs.css('#add').$( 'gradientBegin', '#AF7695', 'gradientEnd', '#FFFFFF' );
 
-	bs.css('.tab').$(  'text-shadow', '1px 1px 0 #000', 'border-radius', 5, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
-    bs.css('.tab:hover').$( 'gradientBegin', '#767EAF', 'gradientEnd', '#AAAFD1' );
-	bs.css('.VtabOn').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952');
+	bs.css('.tab').$(  'text-shadow', '1px 1px 0 #000', 'border-radius', 5, 'gradientBegin', '#917d68', 'gradientEnd', '#bd9d84' );
+    bs.css('.tab:hover').$( 'gradientBegin', '#bd9d84', 'gradientEnd', '#917d68' );
+	bs.css('.VtabOn').$( 'gradientBegin', '#bd9d84', 'gradientEnd', '#917d68');
 	
 	bs.css('.tableHead').$( 'text-shadow', '1px 1px 0 #000', 'gradientBegin', '#767EAF', 'gradientEnd', '#AAAFD1' );
 	bs.css('.tableHeadL').$( 'border-radius', '15px 0 0 15px' );
@@ -51,7 +51,7 @@ logined:function( $nick ){
 		else if( site.back && $e.key('b') ) site.back();
 	} );
 	return '<div id="Llogined"><a href="/member/" id="Llogined0"><span class="batch">&#xf170;</span> ' + $nick + '<sup>1</sup></a> &nbsp; '+
-		'<a href=""class="batch">&#xf04e</a> &nbsp &nbsp;<a href="/logout" id="Llogined1" class="batch">&#xf165;</a></div>';
+		'<a href="" class="batch">&#xf04e</a> &nbsp &nbsp;<a href="/logout" id="Llogined1" class="batch">&#xf165;</a></div>';
 },
 header:function(){
 	var isJoin, login, lend, jend, jcancel, jover, jout, jheight;
@@ -205,14 +205,15 @@ view:function(){
 	if( t0.result == 'ok' ){
 		t0 = t0.contents,
 		bs.dom( '#Vinfo' ).$( 'html',
-			'<table cellspacing="0" border="0" cellpadding="0" style="width:980px">'+
+			'<table cellspacing="0" border="0" cellpadding="0" style="width:980px;">'+
 			'<colgroup><col style="width:50px"/><col style="width:450px"/><col style="width:150px"/><col style="width:150px"/><col/></colgroup>'+
 			'<tr style="text-align:center"><td></td><td style="text-align:left;font-weight:normal;font-size:20px;height:130px">&nbsp;'+t0.title+
                 '<div style="background:#757dae;border-radius:15px;margin:5px auto;padding:4px 10px 4px 10px;color:#fff;font-size:12px;">UniqueName : '+t0.uname+'</div>' +
                 '<div style="background:#81acb3;border-radius:15px;margin:5px auto;padding:4px 10px 4px 10px;color:#fff;font-size:12px;">Keyward : '+'키워드,키워드,키워드'+'</div>'+
                 '</td>'+
                 '<td style="font-size:12px;font-weight:normal;color:#bfbec6">'+t0.type.charAt(0).toUpperCase()+t0.type.substr(1)+'</td><td style="font-size:12px;font-weight:normal;color:#bfbec6">'+t0.cat+'</td><td >'+t0.regdate+'</td></tr>'+
-                '<tr><td colspan="5" style="background:#eee;padding:20px 55px 20px 55px;line-height:24px">'+t0.contents+'</td></tr></table>'
+               '</table>'+
+                '<div style="background:#eee;padding:20px 55px 20px 55px;line-height:24px;margin-top:20px;border-radius:10px">'+t0.contents+'</div>'
 		);
 		bs.dom( '#Vtitle' ).$( 'html', t0.uname );
 		ver();
