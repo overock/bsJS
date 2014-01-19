@@ -1,6 +1,6 @@
 bs( function(){
 	bs.css('font-face@batch /res/batch');
-	bs.css('.add').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 20, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
+	bs.css('.add').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 10, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
 	bs.css('.add:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
 	bs.css('.addBack').$( 'gradientBegin', '#659CAD', 'gradientEnd', '#FFFFFF' );
 
@@ -18,17 +18,16 @@ bs( function(){
 	bs.css('.tableHeadR').$( 'border-radius', '0 15px 15px 0' );
 	bs.css('#menu').$( 'text-shadow', '1px 1px 0 #000' );
 
-    bs.css('#back').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 30, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
+    bs.css('#back').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 10, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
     bs.css('#back:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
 
-    bs.css('#pmModify').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 30, 'gradientBegin', '#AF7695', 'gradientEnd', '#C79FB4' );
+    bs.css('#pmModify').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 10, 'gradientBegin', '#AF7695', 'gradientEnd', '#C79FB4' );
     bs.css('#pmModify:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
 
 
-
-    bs.css('.Vver').$( 'float','left','width',175,'height',175,'font-size',11,'text-align','left','cursor','pointer','color','#54597c','margin',10,'border-radius',5)
-    bs.css('.Vver0').$('font-size',12,'font-weight','normal','position','absolute','margin-top',112,'background','#AF7695','padding','11px 15px 6px 10px','color','#fff','font-weight','bold' )
-    bs.css('.Vver1').$('font-size',12,'width',165,'height',28,'background','#AF7695','position','relative','color','#fff','padding','12px 0px 0px 10px','opacity',0.8 )
+    bs.css('.Vver').$( 'float','left','width',175,'height',175,'font-size',11,'text-align','left','cursor','pointer','color','#54597c','margin',10)
+    bs.css('.Vver0').$('font-size',12,'font-weight','normal','position','absolute','margin-top',112,'background','#AF7695','padding','11px 15px 6px 10px','color','#fff','font-weight','bold','border-top-right-radius',5)
+    bs.css('.Vver1').$('font-size',12,'width',165,'height',28,'background','#767EAF','position','relative','color','#fff','padding','12px 0px 0px 10px','opacity',0.8,'border-top-right-radius',10 ,'border-top-left-radius',10)
     bs.css('.Vver2').$( 'color','#fff','background','#65BCAD','height',20,'font-weight','bold','margin-top',105,'position','relative','padding','7px 15px 3px 10px','opacity',0.8 )
     bs.css('.Vver3').$( 'color','#fff','background','#22284f','height',20,'font-weight','bold','margin-top',105,'position','relative','padding','7px 15px 3px 10px','opacity',0.8)
 
@@ -228,7 +227,7 @@ view:function(){
 //				(t0[i].freezedate ? '<div class="Vver2">freezed<br>'+t0[i].freezedate+'</div>':'<div class="Vver3">warm<br>&nbsp;</div>' )+
 //				'</div>' ).$( '<', '#Vversions', 'down', function(){versionDetail( this.id.substr(1) );} );
             bs.dom( '<div id="v'+i+'" class="Vver">'+
-                    '<div style="position:absolute;"><img src="../res/draft/index_Bthumb_'+bs.$ex(1, '~',5)+'.png" width="175"></div>'+
+                    '<div style="position:absolute"><img src="../res/draft/index_Bthumb_'+bs.$ex(1, '~',5)+'.png" width="175" style="border-top-right-radius:10px;border-top-left-radius:10px;box-shadow: 0px 0px 15px rgba(0,0,0,.5);"></div>'+
 				'<div class="Vver0">Version '+t0[i].version+'</div>'+
 				'<div class="Vver1">UPDATED : '+t0[i].editdate+'</div>'+
 				(t0[i].freezedate ? '<div class="Vver2">FREEZE : '+t0[i].freezedate+'</div>':'<div class="Vver3">WARM<br>&nbsp;</div>' )+

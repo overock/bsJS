@@ -11,13 +11,13 @@ sup{font-size:10px}
 .batch{font-family:batch}
 .tableHead{height:45px;text-align:center;font-size:14px;color:#fff}
 .add{cursor:pointer;height:40px;line-height:40px;padding:0 15px;text-align:center;font-size:30px;color:#fff}
-.tab{float:left;height:30px;line-height:30px;padding:0 15px;margin:10px 0px 0px 5px;font-size:16px;color:#fff;cursor:pointer;
+.tab{float:left;height:30px;line-height:30px;padding:0 15px;margin:10px 0px 0px 5px;font-size:14px;color:#fff;cursor:pointer;
     border-top:1px solid #eee;border-right:1px solid #eee;border-left:1px solid #eee
 }
 .VtabOn{border-top:1px solid #eee;border-right:1px solid #eee;border-left:1px solid #eee}
-.pmEdit{cursor:pointer;padding:0 15px;text-align:center;font-size:12px;color:#fff}
+.pmEdit{cursor:pointer;padding:0 15px;text-align:center;font-size:14px;color:#fff}
 
-.top{width:100%;background:#757dae;height:45px;color:#fff}
+.top{width:100%;background:#757dae;height:45px;color:#fff;font-size:12px;}
 
 #back{margin:10px 0px 0px 0px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;cursor:pointer;font-size:20px;}
 #back:hover{margin:10px 0px 0px 0px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;font-size:20px;}
@@ -88,6 +88,7 @@ sup{font-size:10px}
 
 #Vadd{float:right;font-size:20px}
 #Vtitle{color:#81acb3;font-size:40px}
+
 
 
 #Vcode{width:938px;height:700px;font-size:15px;color:#eee;border:1px solid #eee;padding:10px;background:#fff}
