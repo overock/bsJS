@@ -5,29 +5,8 @@
 }%>
 
 <%IMPORT( '@head.html' );%>
-<!--<div id="add" style="display:none">-->
-    <!--<table cellspacing="0" border="0" cellpadding="0">-->
-        <!--<tr height="35px">-->
-            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">title</td><td style="background:#fff"><input type="text" id="Atitle" /></td>-->
-            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">uniquename</td><td style="background:#fff"><input type="text" id="Auname" /></td>-->
-            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">type</td><td style="background:#fff"><select id="Atype"><option value="1">method</option><option value="2">class</option><option value="3">static</option></select></td>-->
-            <!--<td style="background:#54597c;padding:0px 10px 0px 15px;color:#fff">category</td><td style="background:#fff"><select id="Acat">-->
-                <!--<%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>-->
-                <!--<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>-->
-                <!--<%}%>-->
-            <!--</select></td>-->
-        <!--</tr>-->
-        <!--<tr height="10px"></tr>-->
-        <!--<tr height="35px"><td colspan="8" style="background:#54597c;padding:0px 10px 0px 10px;color:#fff">description</td></tr>-->
-        <!--<tr ><td colspan="8"><textarea id="Adescription" style="width:900px;height:250px"></textarea></td></tr>-->
-        <!--<tr height="35px"><td colspan="1" style="background:#54597c;padding:0px 10px 0px 10px;color:#fff">keyword</td><td colspan="7" style="background:#fff"> <input type="text" id="Akeyword" /></td></tr>-->
-        <!--<tr height="10px"></tr>-->
-        <!--<tr height="35px"><td colspan="1" style="background:#54597c;padding:0px 10px 0px 10px;color:#fff">thumb url</td><td colspan="7" style="background:#fff"><input type="text" id="Athumb" /></td></tr>-->
-    <!--</table>-->
-    <!--<input type="button" id="Aadd" value="add" style=""/> <input type="button" id="Acancel" value="cancel" style=""/>-->
-<!--</div>-->
 <div id="add" style="display:none;overflow:hidden;">
-    <div style="width:856px;height:350px; margin:30px auto;padding:30px;background:#fff;border-radius:10px">
+    <div style="width:856px;height:350px; margin:30px auto;padding:30px;background:#fff;border-radius:10px;border:1px solid #eee;box-shadow:2px 2px 2px 2px rgba(50, 50, 50, 0.05)">
     <div><img src="../res/member/plugin_reg.png"></div>
 	<div class="title">TITLE</div>
     <div><input type="text" id="Atitle" class="value" /></div>
@@ -53,8 +32,9 @@
         <div><img src="../res/draft/index_Bthumb_1.png" width="105" style="border-radius:10px;margin-top:10px"> </div>
         <div class="title" style="margin:-100px 0px 0px 120px">Thumb URL</div>
         <div style="margin:-25px 0px 0px 210px;"><input type="text" id="Athumb" class="value" style="width:305px"/></div>
-        <div id="Aalert"></div>
-        <input type="button" id="Aadd" value="add"/> <input type="button" id="Acancel" value="cancel"/>
+        <div style="margin:8px 0px 0px 122px">Recommand Thumb size : 200*200</div>
+        <div id="Aalert" style="margin-left:120px"></div>
+        <input type="button" id="Aadd" value="Add Plugin" class="add" style="border:1px solid #eee;font-size:12px;margin:10px 3px 0px 120px;width:199px"/> <input type="button" id="Acancel" value="cancel" class="add" style="border:1px solid #eee;font-size:12px;width:200px"/>
     </div>
     </div>
 </div>

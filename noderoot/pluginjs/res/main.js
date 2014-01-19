@@ -7,7 +7,7 @@ bs( function(){
     bs.css('.pmEdit').$( 'text-shadow', '1px 1px 0 #000', 'border-radius', 5, 'gradientBegin', '#C79FB4', 'gradientEnd', '#AF7695' );
     bs.css('.pmEdit:hover').$( 'gradientBegin', '#65BCAD', 'gradientEnd', '#294952' );
 
-    bs.css('#add').$( 'gradientBegin', '#AF7695', 'gradientEnd', '#FFFFFF' );
+//    bs.css('#add').$( 'gradientBegin', '#AF7695', 'gradientEnd', '#FFFFFF' );
 
 	bs.css('.tab').$(  'text-shadow', '1px 1px 0 #000', 'border-radius', 5, 'gradientBegin', '#917d68', 'gradientEnd', '#bd9d84' );
     bs.css('.tab:hover').$( 'gradientBegin', '#bd9d84', 'gradientEnd', '#917d68' );
