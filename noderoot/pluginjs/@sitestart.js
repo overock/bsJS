@@ -61,23 +61,8 @@ bs.WEB.application(
 			t0 = bs.sql( $query ), t0.run.apply( t0, arg );
 			bs.WEB.pause();
 		};
-	})(),
-	'txt', function( $group, $key ){
-		return txt[$group][$key][bs.WEB.requestHeader('accept-language').substr(0,5) == 'ko-KR' ? 0 : 1];
-	}
+	})()
 );
-
-var txt = {
-top:{
-	recent:['신규등록','Recent'],hot:['인기항목','Hot'],updated:['업데이트','Updated'],category:['카테고리','category'],
-	search:['검색','search'],email:['이메일','email'],login:['로그인','login'],join:['가입','join']
-}
-
-};
-
-
-
-
 bs.sql( 'cat' ).run( function( $rs ){
 	bs.WEB.application( 'cat', $rs );
 	bs.sql( 'type' ).run( function( $rs ){

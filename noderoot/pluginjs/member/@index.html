@@ -8,31 +8,31 @@
 <div id="add" style="display:none;overflow:hidden;">
     <div style="width:856px;height:350px; margin:30px auto;padding:30px;background:#fff;border-radius:10px;border:1px solid #eee;box-shadow:2px 2px 2px 2px rgba(50, 50, 50, 0.05)">
     <div><img src="../res/member/plugin_reg.png"></div>
-	<div class="title"><%=bs.WEB.application('txt')('pluginAdd','title')%></div>
+	<div class="title"><%=bs.WEB.i18n('pluginAdd','title')%></div>
     <div><input type="text" id="Atitle" class="value" /></div>
-    <div class="title" ><%=bs.WEB.application('txt')('pluginAdd','unique')%></div>
+    <div class="title" ><%=bs.WEB.i18n('pluginAdd','unique')%></div>
     <div><input type="text" id="Auname" class="value"/></div>
-    <div  class="title"><%=bs.WEB.application('txt')('pluginAdd','type')%></div>
+    <div  class="title"><%=bs.WEB.i18n('pluginAdd','type')%></div>
     <div><select id="Atype" class="value">
     <%for( var t0 = bs.WEB.application( 'type' ), i = 0, j = t0.length; i < j ; i++ ){%>
     <option value="<%=t0[i].plugintype_rowid%>"><%=t0[i].title%></option>
     <%}%>
     </select></div>
-    <div class="title" ><%=bs.WEB.application('txt')('pluginAdd','category')%></div>
+    <div class="title" ><%=bs.WEB.i18n('pluginAdd','category')%></div>
     <div> <select id="Acat" class="value">
     <%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>
     <option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
     <%}%>
     </select></div>
-    <div class="title"><%=bs.WEB.application('txt')('pluginAdd','keyword')%></div>
+    <div class="title"><%=bs.WEB.i18n('pluginAdd','keyword')%></div>
     <div ><input type="text" id="Akeyword" class="value"/></div>
     <div style="position:relative;margin:-320px 0px 0px 330px">
-        <div class="title" style="margin-top:19px; float:left;  width:80px;font-size:14px;font-weight:bold"><%=bs.WEB.application('txt')('pluginAdd','description')%></div>
+        <div class="title" style="margin-top:19px; float:left;  width:80px;font-size:14px;font-weight:bold"><%=bs.WEB.i18n('pluginAdd','description')%></div>
         <div><textarea id="Adescription" style="padding:5px;width:98%; height:150px;" class="value"></textarea></div>
         <div><img src="../res/draft/index_Bthumb_1.png" width="105" style="border-radius:10px;margin-top:10px"> </div>
-        <div class="title" style="margin:-100px 0px 0px 120px"><%=bs.WEB.application('txt')('pluginAdd','thumb')%></div>
+        <div class="title" style="margin:-100px 0px 0px 120px"><%=bs.WEB.i18n('pluginAdd','thumb')%></div>
         <div style="margin:-25px 0px 0px 210px;"><input type="text" id="Athumb" class="value" style="width:305px"/></div>
-        <div style="margin:8px 0px 0px 122px"><%=bs.WEB.application('txt')('pluginAdd','rthumb')%> : 200*200</div>
+        <div style="margin:8px 0px 0px 122px"><%=bs.WEB.i18n('pluginAdd','rthumb')%> : 200*200</div>
         <div id="Aalert" style="margin-left:120px"></div>
         <input type="button" id="Aadd" value="Add Plugin" class="add" style="border:1px solid #eee;font-size:12px;margin:10px 3px 0px 120px;width:199px"/> <input type="button" id="Acancel" value="cancel" class="add" style="border:1px solid #eee;font-size:12px;width:200px"/>
     </div>
@@ -76,13 +76,13 @@
     <table cellspacing="0" border="0" cellpadding="0">
         <tr><td rowspan="4" width="115"><img src="../res/draft/index_Bthumb_1.png" height="100" width="100" style="border-radius:10px"></td><td style="font-size:20px;font-weight:bold"><%=bs.WEB.session('nick')%>'s plugin</td></tr>
         <tr><td><%=bs.WEB.session('email')%></td></tr>
-        <tr><td><div id="Padd" class="add"><span class="batch">&#xF14C;</span><%=bs.WEB.application('txt')('pluginAdd','addPlugin')%></div></td></tr>
+        <tr><td><div id="Padd" class="add"><span class="batch">&#xF14C;</span><%=bs.WEB.i18n('pluginAdd','addPlugin')%></div></td></tr>
     </table>
 </div>
 <div id="list">
 	<table cellspacing="0" border="0" cellpadding="0" style="width:980px"><tr>
-	<td style="border-radius:15px 0 0 15px;width:500px" class="tableHead"><%=bs.WEB.application('txt')('pluginAdd','title')%></td><td style="width:150px" class="tableHead"><%=bs.WEB.application('txt')('pluginAdd','type')%></td>
-	<td style="width:150px" class="tableHead"><%=bs.WEB.application('txt')('pluginAdd','category')%></td><td style="border-radius:0 15px 15px 0" class="tableHead"><%=bs.WEB.application('txt')('pluginAdd','date')%></td>
+	<td style="border-radius:15px 0 0 15px;width:500px" class="tableHead"><%=bs.WEB.i18n('pluginAdd','title')%></td><td style="width:150px" class="tableHead"><%=bs.WEB.i18n('pluginAdd','type')%></td>
+	<td style="width:150px" class="tableHead"><%=bs.WEB.i18n('pluginAdd','category')%></td><td style="border-radius:0 15px 15px 0" class="tableHead"><%=bs.WEB.i18n('pluginAdd','date')%></td>
 	</tr></table>
 	<div id="Plist" class="mlist"></div>
 	<div id="Ppage"></div>

@@ -5,6 +5,7 @@ bs.site( 'bsplugin' ).$(
 	'root', './noderoot/pluginjs/',
 	'db', 'mysql',
 	'cache', 0,
+	'locale', '@locale.js',
 	'siteStart', '@sitestart.js'
 	/*
 	'https', {key:'./key.pem',cert:'./cert.pem',port:4430},
