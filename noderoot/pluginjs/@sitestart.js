@@ -1,29 +1,29 @@
-if( bs.$os( 'hostname' ) == 'hika' ) bs.db( 'd@mysql' ).$( 'url', 'localhost:3306', 'id', 'root', 'pw', '1234', 'db', 'hika01' );
-else bs.db( 'd@mysql' ).$( 'url', '10.0.0.1:3306', 'id', 'hika01', 'pw', 'projectbs00', 'db', 'hika01' );
+if( bs.$os( 'hostname' ) == 'hika' ) bs.db( 'd@mysql').$( 'url', 'localhost:3306', 'id', 'root', 'pw', '1234', 'db', 'hika01' );
+else bs.db( 'd@mysql').$( 'url', '10.0.0.1:3306', 'id', 'hika01', 'pw', 'projectbs00', 'db', 'hika01' );
 
-bs.sql( 'cat' ).$( 'db', 'd@mysql', 'query', "select*from cat" );
-bs.sql( 'type' ).$( 'db', 'd@mysql', 'query', "select*from plugintype" );
+bs.sql( 'cat').$( 'db', 'd@mysql', 'query', "select*from cat" );
+bs.sql( 'type').$( 'db', 'd@mysql', 'query', "select*from plugintype" );
 
-bs.sql( 'login' ).$( 'db', 'd@mysql', 'query', "select member_rowid,email,nick,thumb from member where email='@email@' and pw='@pw@'" );
-bs.sql( 'join' ).$( 'db', 'd@mysql', 'query', "insert into member(email,pw,nick,thumb)values('@email@','@pw@','@nick@','@thumb@')" );
+bs.sql( 'login').$( 'db', 'd@mysql', 'query', "select member_rowid,email,nick,thumb from member where email='@email@' and pw='@pw@'" );
+bs.sql( 'join').$( 'db', 'd@mysql', 'query', "insert into member(email,pw,nick,thumb)values('@email@','@pw@','@nick@','@thumb@')" );
 
-bs.sql( 'Plist' ).$( 'db', 'd@mysql', 'query', 
+bs.sql( 'Plist').$( 'db', 'd@mysql', 'query', 
 	"select p.plugin_rowid,t.title type,p.title,p.uname,p.thumb,c.title cat,DATE_FORMAT(regdate,'%Y.%m.%d %H:%i')regdate from plugin p,plugintype t, cat c "+
 	"where p.plugintype_rowid=t.plugintype_rowid and p.cat_rowid=c.cat_rowid and p.member_rowid=@id@ order by regdate desc limit @p@,@rpp@" );
-bs.sql( 'Padd' ).$( 'db', 'd@mysql', 'query', 
+bs.sql( 'Padd').$( 'db', 'd@mysql', 'query', 
 	"insert into plugin(member_rowid,plugintype_rowid,uname,title,contents,cat_rowid,thumb)values("+
 	"@id@,@type@,'@uname@','@title@','@description@',@cat@,'@thumb@')"
 );
-bs.sql( 'Pview' ).$( 'db', 'd@mysql', 'query', 
+bs.sql( 'Pview').$( 'db', 'd@mysql', 'query', 
 	"select p.plugin_rowid,t.title type,p.title,p.contents,p.uname,p.thumb,c.title cat,DATE_FORMAT(regdate,'%Y.%m.%d %H:%i')regdate from plugin p,plugintype t, cat c "+
 	"where p.plugintype_rowid=t.plugintype_rowid and p.cat_rowid=c.cat_rowid and p.plugin_rowid=@r@" );
 
-bs.sql( 'Vlist' ).$( 'db', 'd@mysql', 'query', "select ver_rowid,version,DATE_FORMAT(freezeDate,'%y.%m.%d %H:%i')freezedate,DATE_FORMAT(editdate,'%y.%m.%d %H:%i')editdate,code,contents from ver where plugin_rowid=@r@ order by version" );
-bs.sql( 'Vadd' ).$( 'db', 'd@mysql', 'query', "insert into ver(plugin_rowid,version)values(@r@,@version@)" );
-bs.sql( 'Vupdate' ).$( 'db', 'd@mysql', 'query', "update ver set code='@code@',contents='@contents@',editdate=CURRENT_TIMESTAMP()where ver_rowid=@vr@" );
-bs.sql( 'Vfreezable' ).$( 'db', 'd@mysql', 'query', "select freezedate,(select max(i.version)from ver i where i.plugin_rowid=v.plugin_rowid and i.freezedate is not NULL)<version k from ver v where ver_rowid=@vr@" );
-bs.sql( 'Vfreeze' ).$( 'db', 'd@mysql', 'query', "update ver set freezeDate=CURRENT_TIMESTAMP()where ver_rowid=@vr@" );
-bs.sql( 'VfreezeDetail' ).$( 'db', 'd@mysql', 'query',
+bs.sql( 'Vlist').$( 'db', 'd@mysql', 'query', "select ver_rowid,version,DATE_FORMAT(freezeDate,'%y.%m.%d %H:%i')freezedate,DATE_FORMAT(editdate,'%y.%m.%d %H:%i')editdate,code,contents from ver where plugin_rowid=@r@ order by version" );
+bs.sql( 'Vadd').$( 'db', 'd@mysql', 'query', "insert into ver(plugin_rowid,version)values(@r@,@version@)" );
+bs.sql( 'Vupdate').$( 'db', 'd@mysql', 'query', "update ver set code='@code@',contents='@contents@',editdate=CURRENT_TIMESTAMP()where ver_rowid=@vr@" );
+bs.sql( 'Vfreezable').$( 'db', 'd@mysql', 'query', "select freezedate,(select max(i.version)from ver i where i.plugin_rowid=v.plugin_rowid and i.freezedate is not NULL)<version k from ver v where ver_rowid=@vr@" );
+bs.sql( 'Vfreeze').$( 'db', 'd@mysql', 'query', "update ver set freezeDate=CURRENT_TIMESTAMP()where ver_rowid=@vr@" );
+bs.sql( 'VfreezeDetail').$( 'db', 'd@mysql', 'query',
 	"select p.uname,v.version,t.title,v.code "+
 	"from ver v,plugin p,plugintype t "+
 	"where v.plugin_rowid=p.plugin_rowid and p.plugintype_rowid=t.plugintype_rowid and ver_rowid=@vr@" 
@@ -61,6 +61,9 @@ bs.WEB.application(
 			t0 = bs.sql( $query ), t0.run.apply( t0, arg );
 			bs.WEB.pause();
 		};
+	})(),
+	'root', (function(){
+		return bs.$os( 'hostname' ) == 'hika' ? '' : 'http://projectbs.github.io/bsJS/noderoot/pluginjs';
 	})()
 );
 bs.sql( 'cat' ).run( function( $rs ){

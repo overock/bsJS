@@ -1,94 +1,82 @@
+<%var R = bs.WEB.application('root'), i18n = bs.WEB.i18n;%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta name="description" content=""/>
-    <meta name="keyword" content=""/>
-    <meta charset="utf-8"/>
-    <meta name="viewport"
-          content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta http-equiv="Content-Style-Type" content="text/css"/>
-    <meta http-equiv="Content-Script-Type" content="text/javascript"/>
-    <meta http-equiv="imagetoolbar" content="no">
-    <meta property="og:title" content="bs-plugin"/>
-    <meta property="og:url" content="http://js.bsplugin.com/"/>
-    <meta property="og:image" content="i/logo.png"/>
-    <meta property="og:description" content="bs-plugin site"/>
-    <meta property="og:type" content="website"/>
-    <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
-    <link href="/res/main.css" rel="stylesheet" media="screen">
-    <!--<script type="text/javascript" src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>-->
-    <script type="text/javascript" src="http://www.bsidesoft.com/bs/bs5/bs/bsjs.js"></script>
-    <script>bs.$import('md5', 'last', 'test', 'last', 'rgbback', 'last');</script>
-    <script type="text/javascript" src="/res/main.js"></script>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta http-equiv="imagetoolbar" content="no">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="Content-Style-Type" content="text/css"/>
+	<meta http-equiv="Content-Script-Type" content="text/javascript"/>
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<meta name="keyword" content="bsjs,javascript,plugin"/>
+	<meta name="description" content="plugin management system for bsjs - https://github.com/projectBS/bsJS"/>
+	<meta property="og:title" content="bs-plugin"/>
+	<meta property="og:url" content="http://js.bsplugin.com/"/>
+	<meta property="og:image" content="i/logo.png"/>
+	<meta property="og:description" content="bs-plugin site"/>
+	<meta property="og:type" content="website"/>
+	<link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+	<link href="/res/main.css" rel="stylesheet" media="screen">
+	<!--<script type="text/javascript" src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>-->
+	<script type="text/javascript" src="http://www.bsidesoft.com/bs/bs5/bs/bsjs.js"></script>
+	<script type="text/javascript" src="<%=R%>/res/main.js"></script>
+	<script>
+	bs.$import('md5', 'last', 'test', 'last', 'rgbback', 'last');
+	site.R = '<%=R%>';
+	</script>
 <body>
-<div class="top">
+<div id="top">
 	<div class="contents">
-		<div id="logo"><a href="/"><img src="/res/draft/logo.jpg"></a></div>
-		<div id="menu">
-			<a href="/recent"><%=bs.WEB.i18n('top','recent')%></a> &nbsp; 
-			<a href="/hot"><%=bs.WEB.i18n('top','hot')%></a> &nbsp;
-			<a href="/updated"><%=bs.WEB.i18n('top','updated')%></a> &nbsp; 
-			<a href="/category"><%=bs.WEB.i18n('top','category')%></a>
+		<div id="topLogo" class="FL"><a href="/"><img src="<%=R%>/res/draft/logo.jpg"></a></div>
+		<div id="topMenu" class="FL TS2">
+			<a href="/recent"><%=i18n('top','recent')%></a> &nbsp; 
+			<a href="/hot"><%=i18n('top','hot')%></a> &nbsp;
+			<a href="/updated"><%=i18n('top','updated')%></a> &nbsp; 
+			<a href="/category"><%=i18n('top','category')%></a>
 		</div>
-		<div id="search">
-			<input type="text" id="searchTxt" placeholder="<%=bs.WEB.i18n('top','search')%>"/> &nbsp;
-			<span id="searchBtn" class="batch">&#xF097;</span>
+		<div id="topSearch" class="FL">
+			<input type="text" id="topSearchTxt" class="BS85 O5 BR7" placeholder="<%=i18n('top','search')%>"/> &nbsp;
+			<span id="topSearchBtn" class="O5 batch">&#xF097;</span>
 		</div>
-		<div id="personal">
+		<div id="topMember" class="FR">
 <%if( !bs.WEB.session('id') ){%>
-			<span class="batch">&#xf152;</span> <input type="text" id="Lemail" value="<%=bs.$ck('savedid')||''%>"/>
-			<span class="batch">&#xF0C0;</span> <input type="password" id="Lpw"/>
-			<div style="float:right">
-				<input type="image" id="Llogin" src="res/top/login/bt_login.png"/>
-				<input type="image" id="Ljoin" src="res/top/login/bt_join.png"/>
+			<div class="FL">
+				<span class="batch">&#xf152;</span> <input type="text" id="Lemail" class="BR7 O5 BS85" value="<%=bs.$ck('savedid')||''%>"/>
+				<span class="batch">&#xF0C0;</span> <input type="password" id="Lpw" class="BR7 O5 BS85"/>
+			</div>
+			<div class="FR">
+				<input type="image" id="Llogin" src="<%=R%>/res/top/login/bt_login.png"/>
+				<input type="image" id="Ljoin" src="<%=R%>/res/top/login/bt_join.png"/>
 			</div>
 			<div id="Lalert"></div>
 			<script>bs( site.header );</script>
 <%}else{%>
-			<script>bs( function(){bs.dom( '#personal' ).$( 'html', site.logined( '<%=bs.WEB.session('nick')%>' ) )} );</script>
+			<script>bs( function(){bs.dom('#topMember').$( 'html', site.logined( '<%=bs.WEB.session('nick')%>' ) )} );</script>
 <%}%>
 		</div>
 	</div>
 </div>
-<div id="join" class="addBack">
-    <div style="width:856px;height:285px; margin:30px auto;padding:30px;background:#fff;border-radius:10px;border:1px solid #eee;box-shadow:2px 2px 2px 2px rgba(50, 50, 50, 0.05)">
-    <div><img src="../res/member/plugin_reg.png"></div>
-    <div class="title"><%=bs.WEB.i18n('join','email')%></div>
-    <div><input type="text" id="Jemail" placeholder="email" class="value"/></div>
-    <div class="title"><%=bs.WEB.i18n('join','pw')%></div>
-    <div><input type="password" id="Jpw"  class="value"/></div>
-    <div class="title"><%=bs.WEB.i18n('join','pw2')%></div>
-    <div><input type="password" id="Jpwc"  class="value"/></div>
-    <div class="title"><%=bs.WEB.i18n('join','nick')%></div>
-    <div><input type="text" id="Jnick" placeholder="nick"  class="value"/></div>
-    <div style="position:relative;margin:-220px 0px 0px 330px;">
-        <div style="color:#000">어쩌고 저쩌고 이렇쿵 저렇쿵 쏼라쏼라<br>쏼라</div>
-        <div><img src="../res/draft/index_Bthumb_1.png" width="105" style="border-radius:10px;margin-top:10px"> </div>
-        <div class="title" style="margin:-100px 0px 0px 120px"><%=bs.WEB.i18n('join','thumb')%></div>
-        <div style="margin:-25px 0px 0px 210px;"><input type="text" class="value" style="width:305px"/></div>
-        <div style="margin:8px 0px 0px 122px;color:#000"><%=bs.WEB.i18n('join','rthumb')%> : 200*200</div>
-        <div><div id="Jalert">&nbsp;</div></div>
-        <div class="batch" id="Jjoin" style="color:#000">&#xf164;</div>
-        <div class="batch" id="Jcancel" style="color:#000">&#xf165;</div>
+<div id="topJoin" class="GR0">
+    <div id="topJoin0" class="BR10 BS2">
+		<div><img src="<%=R%>/res/member/plugin_reg.png"><div class="batch FR" id="Jcancel">&#xf165;</div></div>
+		<div id="topJoin1" class="FL">
+			<div class="title TS1"><%=i18n('join','email')%></div>
+			<div><input type="text" id="Jemail" placeholder="email" class="value BS5 BR5"/></div>
+			<div class="title TS1"><%=i18n('join','pw')%></div>
+			<div><input type="password" id="Jpw"  class="value BS5 BR5"/></div>
+			<div class="title TS1"><%=i18n('join','pw2')%></div>
+			<div><input type="password" id="Jpwc"  class="value BS5 BR5"/></div>
+			<div class="title TS1"><%=i18n('join','nick')%></div>
+			<div><input type="text" id="Jnick" placeholder="nick"  class="value BS5 BR5"/></div>
+		</div>
+		<div id="topJoin2" class="FL">
+			<div class="title TS1"><%=i18n('join','thumb')%></div>
+			<div><input type="text" id="Jthumb" class="value BS5 BR5" placeholder="<%=i18n('join','rthumb')%> : 200*200"/></div>
+			<div><img id="Jimg" onerror="this.src=\'<%=R%>/res/thumb/default.png\'" src="<%=R%>/res/thumb/default.png" class="THB0"></div>
+			<div id="Jalert">&nbsp;</div>
+			<span id="Jjoin" class="batch">&#xf164;</span>
+		</div>
     </div>
-    </div>
-
-	<!--<table border="0" cellpadding="0" cellspacing="0">-->
-        <!--<tr><td rowspan="6" style="padding-top:15px;width:150px"></td>-->
-        <!--<tr><td colspan="2" height="50" ><img src="res/top/login/joinTitle.png"></tr>-->
-		<!--<td style="width:100px">email</td><td style="width:400px"><input type="text" id="Jemail" placeholder="email"/></td>-->
-		<!--<td rowspan="6" style="text-align:center;">-->
-			<!--<div class="batch" id="Jjoin">&#xf164;</div>-->
-			<!--<div class="batch" id="Jcancel">&#xf165;</div>-->
-		<!--</td>-->
-	<!--</tr>-->
-	<!--<tr><td>pw <span style="font-size:10px">6~12</span></td><td><input type="password" id="Jpw"/></td></tr>-->
-	<!--<tr><td>pw <span style="font-size:10px">confirm</span></td><td><input type="password" id="Jpwc"/></td></tr>-->
-	<!--<tr><td>nick <span style="font-size:10px">4~10</span></td><td><input type="text" id="Jnick" placeholder="nick"/></td></tr>-->
-	<!--<tr><td colspan="2" style="text-align:center"><div id="Jalert">&nbsp;</div></td></tr>-->
-	<!--</table>-->
 </div>
-<div class="contents">

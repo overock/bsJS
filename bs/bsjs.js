@@ -144,7 +144,7 @@ method( 'tmpl', (function(){
 method( 'jpage', (function(){
 	var jp, jpage, r0, r1, r2, r3, r4, r5, s, e, cache, err, line, toHtml, toCode;
 	jp=function( $v ){this.v=$v;}, cache={}, s = '<%', e = '%>', err = [], line = [],
-	r0=/\\/g, r1=/["]|\n|\r\n|\r/g, r2=/at/g, r3=/["]|[<]|\t|[ ][ ]|\n|\r\n|\r/g, r4 = /\n|\r\n|\r/g, r5=/[<]|\t|[ ][ ]/g,
+	r0=/\\/g, r1=/["]|\n|\r\n|\r/g, r2=/at /g, r3=/["]|[<]|\t|[ ][ ]|\n|\r\n|\r/g, r4 = /\n|\r\n|\r/g, r5=/[<]|\t|[ ][ ]/g,
 	toCode = function( $0 ){switch( $0 ){case'"':return'\\"'; case'\n':case'\r\n':case'\r':return'\\n'; default:return $0;}},
 	toHtml = function( $0 ){switch( $0 ){case'"':return'\\"'; case'<':return'&lt;';case'\t':return'&nbsp; &nbsp; ';
 		case'  ':return'&nbsp; '; case'\n':case'\r\n':case'\r':return'<br>'; default:return $0;}},
@@ -167,7 +167,7 @@ method( 'jpage', (function(){
 			t0 = $str.v ? $str : new jp(v);
 			if( jpage.cache && $cacheId ) cache[$cacheId] = v;
 		}
-		t1 = '', importer = function( $url ){jpage( $url, $data, null, render, jpage.cache ? $url : 0 );},
+		t1 = '', importer = function( $url ){render( jpage( $url, $data, null, jpage.cache ? $url : 0 ) );},
 		render = $render ? function( $v ){t1 += $v, $render( $v );} : function( $v ){t1 += $v;};
 		try{
 			line[0] = err.length = 0, i = new Function( 'ECHO,IMPORT,$$E,$$L,$,bs', v )( render, importer, err, line, $data, bs );
@@ -177,11 +177,11 @@ method( 'jpage', (function(){
 			str = '<h1>Invalid template error: bs.$jpage</h1><hr>';
 			if( m = err.length ) str += '<b>code: </b>error occured line number - '+line[0]+'<br>'+err[err.length-1]+'<hr>';
 			j = Object.getOwnPropertyNames( i ), k = j.length;
-			while( k-- ) str += '<b>' + j[k] +'</b>: '+( i[j[k]].replace ? i[j[k]].replace( r2, '<br>at' ) : i[j[k]] )+'<br>';
+			while( k-- ) str += '<b>' + j[k] +'</b>: '+( i[j[k]].replace ? i[j[k]].replace( r2, '<br>at ' ) : i[j[k]] )+'<br>';
 			str += '<hr><b>template:</b><br>';
 			k = $str.replace ? $str.split(r4) : $str.v.split(r4);
 			for( i = 0, j = k.length ; i < j ; i++ ) str += '<div'+(m && (i+1 == line[0])?' style="background:#faa"':'')+'><b>'+(i+1)+':</b> ' + k[i].replace(r5,toHtml) + '</div>';
-			t1 = str;
+			return str;
 		}
 		return t1;
 	}, jpage.cache = 1;
@@ -728,11 +728,11 @@ function DOM(){
 			for( i = 0, j = t0.length ; i < j ; i++ ){
 				if( t0[i] ){
 					t0[i] = bs.$trim( t0[i].split('{') );
-					if( t0[i][0].charAt(0) != '@' ){
+					if( t0[i][0].indexOf('@') == -1 ){
 						c = bs.css( t0[i][0] ), t1 = bs.$trim( t0[i][1].split(';') ), k = t1.length, t2.length = 0;
 						while( k-- ) v = bs.$trim( t1[k].split(':') ), t2[t2.length] = v[0], t2[t2.length] = r.test(v[1]) ? parseFloat(v[1]) : v[1];
 						c.$.apply( c, t2 );
-					}
+					}else if( t0[i][0].substr( 0, 9 ) == 'font-face' ) bs.css( t0[i].join(' ') );
 				}
 			}
 		}, bs.$method( 'css', function( $v ){$v.substr( $v.length - 4 ) == '.css' ? bs.$get( parser, $v ) : parser( $v );} );

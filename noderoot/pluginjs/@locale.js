@@ -7,12 +7,16 @@ ko = {
 	},
 	join:{
 		email:'이메일',pw:'패스워드를 입력하세요(6~12자리)',pw2:'패스워드를 다시한번 입력하세요',
-		nick:'사용할 닉네임을 입력하세요',thumb:'섬네일 URL',rthumb:'권장 사이즈'
+		nick:'사용할 닉네임을 입력하세요(6~10자리)',thumb:'썸네일 URL',rthumb:'권장 사이즈'
 	},
-	pluginAdd:{
-		title:'타이틀',unique:"식별이름",type:"타입",category:"카테고리",keyword:"키워드(,단위로 입력하세요)",
-		description:'플러그인 설명',thumb:'섬네일 URL',rthumb:'권장 사이즈',
-		addPlugin:'새로운 플러그인 등록하기',date:'업로드 날짜',addNewVersion:'새 버전 추가',
+	mi:{
+		title:'님의 플러그인', add:'새로운 플러그인 등록하기', noplugin:'등록된 플러그인이 없습니다. 아직은..',
+		title0:'제 목'
+	},
+	miAdd:{
+		title:'설명용 제목(5~100자)',unique:"식별이름(소문자만 5~30)",type:"타입",category:"카테고리",keyword:"키워드(,단위로 입력하세요)",
+		description:'플러그인 설명',thumb:'썸네일 URL',rthumb:'권장 사이즈',
+		date:'업로드 날짜',addNewVersion:'새 버전 추가',
 		backList:'내 플러그인 보기',modify:'플러그인 정보 수정'
 	}
 },
@@ -26,12 +30,17 @@ en = {
 		email:'E-Mail',pw:'PassWord(6~12)',pw2:'PassWord(confirm)',
 		nick:'Nickname(4~10)',thumb:'Thumb URL',rthumb:'Recommand Thumb size'
 	},
-	pluginAdd:{
-		title:'TITLE',unique:'UNIQUE NAME',type:'TYPE',category:'CATEGORY',keyword:'KEYWORD',
+	mi:{
+		title:"'s Plugins", add:'Add New Plugin', noplugin:'No Registered Plugin..',
+		title0:'TITLE'
+	},
+	miAdd:{
+		title:'TITLE(for explain 5~100)',unique:'UNIQUE NAME(5~30)',type:'TYPE',category:'CATEGORY',keyword:'KEYWORD',
 		description:'Description',thumb:'Thumb URL',rthumb:'Recommand Thumb size',
-		addPlugin:'Add New Plugin',date:'Date',addNewVersion:'Add New Version',
+		date:'Date',addNewVersion:'Add New Version',
 		backList:'VIew My Plugin LIST',modify:'Modify This Plugin Info'
 	}
+	
 },
 bs.WEB.i18nAddDefault( 'en', en ),
 bs.WEB.i18nAdd( 'ko', ko );

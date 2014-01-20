@@ -1,0 +1,45 @@
+font-face@batch{/res/batch}
+
+.ADD{text-shadow:1px 1px 0 #000;border-radius:10;gradientBegin:#C79FB4;gradientEnd:#AF7695}
+.ADD:hover{gradientBegin:#65BCAD;gradientEnd:#294952}
+.THB0{width:105;height:105;border-radius:5}
+
+.TH{text-shadow:1px 1px 0 #000}
+.THL{text-shadow:1px 1px 0 #000;border-radius:15px 0 0 15px}
+.THR{text-shadow:1px 1px 0 #000;border-radius:0 15px 15px 0}
+
+.GR0{gradientBegin:#659CAD;gradientEnd:#FFFFFF}
+.GR1{gradientBegin:#C79FB4;gradientEnd:#AF7695}
+.GR2{gradientBegin:#767EAF;gradientEnd:#AAAFD1}
+.BS85{box-shadow:inset 0px 0px 85px rgba(0,0,0,.5)}
+.BS2{box-shadow:2px 2px 2px 2px rgba(50, 50, 50, 0.05)}
+.BS5{box-shadow:inset 0px 5px 5px 0px rgba(50, 50, 50, 0.05)}
+.O5{opacity:0.5}
+.BR5{border-radius:5}
+.BR7{border-radius:7}
+.BR10{border-radius:10}
+.BR15{border-radius:15}
+.TS1{text-shadow:1px 1px 0 #e7e7e7}
+.TS2{text-shadow:1px 1px 0 #000}
+
+
+.pmEdit{text-shadow:1px 1px 0 #000;border-radius:5;gradientBegin:#C79FB4;gradientEnd:#AF7695}
+.pmEdit:hover{gradientBegin:#65BCAD;gradientEnd:#294952}
+
+.tab{ text-shadow:1px 1px 0 #000;border-radius:5;gradientBegin:#917d68;gradientEnd:#bd9d84}
+.tab:hover{gradientBegin:#bd9d84;gradientEnd:#917d68}
+.VtabOn{gradientBegin:#bd9d84;gradientEnd:#917d68}
+
+
+#back{text-shadow:1px 1px 0 #000;border-radius:10;gradientBegin:#C79FB4;gradientEnd:#AF7695}
+#back:hover{gradientBegin:#65BCAD;gradientEnd:#294952}
+
+#pmModify{text-shadow:1px 1px 0 #000;border-radius:10;gradientBegin:#AF7695;gradientEnd:#C79FB4}
+#pmModify:hover{gradientBegin:#65BCAD;gradientEnd:#294952}
+
+
+
+.Vver0{border-top-right-radius:5}
+.Vver1{opacity:0.8;border-top-right-radius:10;border-top-left-radius:10}
+.Vver2{opacity:0.8}
+.Vver3{opacity:0.8}
