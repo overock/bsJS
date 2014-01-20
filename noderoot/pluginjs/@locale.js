@@ -1,6 +1,7 @@
 (function(){
 var ko, en;
 ko = {
+	common:{back:'이전으로'},
 	top:{
 		recent:'신규등록' ,hot:'인기항목', updated:'업데이트', category:'카테고리',
 		search:'검색', email:'이메일', login:'로그인', join:'가입'
@@ -17,11 +18,12 @@ ko = {
 		title:'설명용 제목(5~100자)',unique:"식별이름(소문자만 5~30)",type:"타입",category:"카테고리",keyword:"키워드(,단위로 입력하세요)",
 		description:'플러그인 설명',thumb:'썸네일 URL',rthumb:'권장 사이즈',
 		date:'업로드 날짜',addNewVersion:'새 버전 추가',
-		backList:'내 플러그인 보기',modify:'플러그인 정보 수정'
+		modify:'플러그인 정보 수정'
 	}
 },
 
 en = {
+	common:{back:'Back'},
 	top:{
 		recent:'Recent' ,hot:'Hot', updated:'Updated', category:'category',
 		search:'search', email:'email', login:'login', join:'join'
@@ -38,7 +40,7 @@ en = {
 		title:'TITLE(for explain 5~100)',unique:'UNIQUE NAME(5~30)',type:'TYPE',category:'CATEGORY',keyword:'KEYWORD',
 		description:'Description',thumb:'Thumb URL',rthumb:'Recommand Thumb size',
 		date:'Date',addNewVersion:'Add New Version',
-		backList:'VIew My Plugin LIST',modify:'Modify This Plugin Info'
+		modify:'Modify This Plugin Info'
 	}
 	
 },

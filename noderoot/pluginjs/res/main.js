@@ -139,14 +139,39 @@ mi:function(){
 				'<td class="miListT9">'+t0[i].cat+'</td>'+
 				'<td id="miListT10">'+t0[i].regdate+'</td>'+
 				'</tr>';
-			console.log( site.R );
 			bs.dom('#miList').$( 'html', t1 + '</table>' );
 		}
 	} )();
 },
 viewr:0,
 view:function(){
-	var version, vadd, tab = 0, r = site.viewr;
+	var t0, r, 
+	version, vadd, tab;
+	
+	r = site.viewr,
+	t0 = JSON.parse( bs.$post( null, '/member/view', 'r', r ) );
+	if( t0.result == 'ok' ){
+		t0 = t0.contents,
+		bs.dom('#mvTop0').$( '@src', t0.thumb ),
+		bs.dom('#mvTop1').$( 'html', t0.uname ),
+		bs.dom('#mvTop2').$( 'html', t0.title ),
+		bs.dom('#mvTop3').$( 'html', t0.cat ),
+		bs.dom('#mvTop4').$( 'html', t0.type ),
+		bs.dom('#mvTop5').$( 'html', t0.regdate ),
+		bs.dom('#mvTop6').$( 'html', t0.contents );
+		ver();
+	}else return bs.$back();
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	tab = 0;
+	
 	bs.dom('#Vtab0').$( 'down', function( $e ){
 		console.log('aaa');
 		bs.dom('#Vtab0').$( 'class+', 'VtabOn' );
@@ -183,23 +208,7 @@ view:function(){
 	}
 	bs.dom('#Vcode').$( 'scroll', s0('#Vcode') );
 	bs.dom('#Vcontents').$( 'scroll', s0('#Vcontents') );
-	var t0 = JSON.parse( bs.$post( null, '/member/view', 'r', r ) );
-	if( t0.result == 'ok' ){
-		t0 = t0.contents,
-		bs.dom('#Vinfo').$( 'html',
-			'<table cellspacing="0" border="0" cellpadding="0" style="width:980px;">'+
-			'<colgroup><col style="width:50px"/><col style="width:450px"/><col style="width:150px"/><col style="width:150px"/><col/></colgroup>'+
-			'<tr style="text-align:center"><td></td><td style="text-align:left;font-weight:normal;font-size:20px;height:130px">&nbsp;'+t0.title+
-                '<div style="background:#757dae;border-radius:15px;margin:5px auto;padding:4px 10px 4px 10px;color:#fff;font-size:12px;">UniqueName : '+t0.uname+'</div>' +
-                '<div style="background:#81acb3;border-radius:15px;margin:5px auto;padding:4px 10px 4px 10px;color:#fff;font-size:12px;">Keyward : '+'키워드,키워드,키워드'+'</div>'+
-                '</td>'+
-                '<td style="font-size:12px;font-weight:normal;color:#bfbec6">'+t0.type.charAt(0).toUpperCase()+t0.type.substr(1)+'</td><td style="font-size:12px;font-weight:normal;color:#bfbec6">'+t0.cat+'</td><td >'+t0.regdate+'</td></tr>'+
-               '</table>'+
-                '<div style="background:#eee;padding:20px 55px 20px 55px;line-height:24px;margin-top:20px;border-radius:10px">'+t0.contents+'</div>'
-		);
-		bs.dom('#Vtitle').$( 'html', t0.uname );
-		ver();
-	}else return bs.$back();
+	
 	
 	function ver(){
 		var t0, t1, i, j;

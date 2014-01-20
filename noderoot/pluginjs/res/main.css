@@ -11,7 +11,13 @@ h1{font-size:50px;font-weight:bold;color:#4b506c;margin:10px;padding:0}
 .contents{width:980px;margin:0 auto;overflow:hidden}
 .FL{float:left}
 .FR{float:right}
+.CLEAR{clear:both}
 .ADD{cursor:pointer;height:40px;line-height:40px;padding:0 15px;text-align:center;font-size:30px;color:#fff}
+#back{margin:10px 0;font-size:15px;width:100px}
+/*foot*/
+#bottom{clear:both;height:28px;width:100%;background:#757dae;margin-top:50px}
+#copy{font-size:12px;color:#fff;float:left;margin-top:8px}
+#site{font-size:11px;color:#ddd;float:right;margin-top:8px}
 /*top*/
 #top{width:100%;height:45px;background:#757dae;color:#fff;font-size:12px;}
 #topLogo{width:100px}
@@ -50,8 +56,6 @@ h1{font-size:50px;font-weight:bold;color:#4b506c;margin:10px;padding:0}
 #miTop1{width:395px;height:25px;line-height:25px}
 #miTop2{font-size:20px;font-weight:bold}
 #miTop3{width:450px;text-align:right}
-
-
 #miAdd{display:none;overflow:hidden}
 #miAdd0{width:856px;height:350px;margin:30px auto;padding:30px;background:#fff;border:1px solid #eee}
 #miAdd0 .title{margin:10px 0px 5px 5px;font-size:13px;font-weight:bold;color:#4c4c4c}
@@ -59,40 +63,34 @@ h1{font-size:50px;font-weight:bold;color:#4b506c;margin:10px;padding:0}
 #miAdd1{width:310px}
 #miAdd2{width:540px}
 #miAdd3{width:295px}
-
-
 #miListTop{width:980px}
 #miListTop td{height:45px;text-align:center;font-size:14px;color:#fff}
 #miListTop0{width:520px}
 .miListTop1{width:150px}
-
 #miList table{width:980px}
 #miList tr:hover{background:#eee}
 #miListT0{width:20px}
 #miListT1{width:110px}
 #miListT2{width:390px}
-#miListT3{width:150px}
-#miListT4{width:150px}
+#miListT3,#miListT4{width:150px}
 #miListT5{text-align:center;height:125px}
 #miListT6{text-align:left;font-weight:normal;font-size:22px}
-#miListT7{background:#81acb3;margin:5px 10px;padding:2px 10px 2px 10px;color:#fff;font-size:11px}
-#miListT8{background:#757dae;margin:5px 10px;padding:2px 10px;color:#fff;font-size:11px;width:30%;text-align:center}
+#miListT7,#miListT8{margin:5px 10px;padding:2px 10px;color:#fff;font-size:11px}
+#miListT7{background:#81acb3}
+#miListT8{background:#757dae;width:30%;text-align:center}
 .miListT9{font-size:15px;font-weight:bold;color:#4b506c}
 #miListT10{font-size:12px;color:#404040}
-
 #miList0{margin:10px;font-size:20px;text-align:center}
-
-#Padd{float:left;margin:10px 0px 0px 0px;font-size:20px}
+/*mi from*/
+#Padd{float:left;margin-top:10px;font-size:20px}
 #Acancel,#Aadd{font-size:50px;color:#4b506c;cursor:pointer}
 #Acancel{font-size:25px;margin:-20px -20px 0 0}
 #Adescription{padding:5px;width:525px;height:150px;color:#fff;border:1px solid #c3c3c3;background:#4b506c}
- 
- 
-.mlist td{height:45px;color:#4C516D;font-size:14px;border-bottom:1px dashed #999;font-weight:bold}
-.mlist a{color:#4C516D}
-.mlist tr:hover{background:#eee}
-
-
+/*mv:member/view*/
+#mvTop1{margin:5px 10px 0 0;padding:1px 10px;color:#fff;font-size:11px;background:#757dae}
+#mvTop2{margin:5px 0;font-size:25px;font-weight:bold}
+#mvTop3,#mvTop4{font-weight:bold;font-size:14px}
+#mvTop6{margin-top:10px;padding:10px;color:#fff;font-size:15px;border:1px solid #c3c3c3;background:#4b506c}
 
 
 .tab{float:left;height:30px;line-height:30px;padding:0 15px;margin:10px 0px 0px 5px;font-size:14px;color:#fff;cursor:pointer;
@@ -101,60 +99,15 @@ h1{font-size:50px;font-weight:bold;color:#4b506c;margin:10px;padding:0}
 .VtabOn{border-top:1px solid #eee;border-right:1px solid #eee;border-left:1px solid #eee}
 .pmEdit{cursor:pointer;padding:0 15px;text-align:center;font-size:14px;color:#fff}
 
-
-
-#back{margin:10px 0px 0px 0px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;cursor:pointer;font-size:20px;}
-#back:hover{margin:10px 0px 0px 0px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;font-size:20px;}
-#pmModify{margin:10px 0px 0px 10px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;cursor:pointer;font-size:20px;}
-#pmModify:hover{margin:10px 0px 0px 10px;float:left;height:40px;line-height:40px;padding:0 15px;color:#fff;font-size:20px;}
-
-
-
-#middleVisual{width: 100%; height: 494px;position:relative;overflow:hidden}
-.lists{margin: 10px;}
-.lists .list1{width: 240px;float: left; }
-.lists .list2{width: 300px;float: left }
-.lists .list3{float: left;}
-.lists .recommand{clear:both;margin-left: -10px;padding-bo: 20px}
-.lists .blockLine{ height: 17px}
-
-.lists h1{height: 1px;margin: 5px}
-.list3 a:visited {text-decoration: none;color: #4c516d }
-.list3 a:active {text-decoration: none;color: #4c516d }
-
-.lists .title{color: #bfbec3; margin-top:-37px;margin-left: 50px; font-size: 12px }
-.lists .hitNum{color: #4c516d; ;font-weight: bold;font-size: 11px;margin-top:5px}
-.lists .list3 .title{ font-size: 18px;color: #404040; margin-top: -95px; margin-left: 115px;}
-.lists .list3 .ex{color: #bbbbbb; width: 300px; height: 48px;margin-top:5px}
-.lists .list3 .ex2{ color: #81acac;}
-
-
-
-#pgMiddleVisual{width:100%; height:310px;position:relative;overflow:hidden}
-
-
-
 #Vadd{float:right;font-size:20px}
 #Vtitle{color:#81acb3;font-size:40px}
-
-
-
 #Vcode{width:938px;height:700px;font-size:15px;color:#eee;border:1px solid #eee;padding:10px;background:#fff}
 #Vcontents{width:938px;height:700px;font-size:15px;color:#eee;border:1px solid #eee;padding:10px;background:#fff;display:none}
-
-
-
-.bottom{clear:both;height:28px;width:100%;background:#757dae; margin-top:50px}
-.copy{font-size: 12px; color: #fff; float: left; margin-top:8px}
-.site{font-size: 11px; color: #ddd; float: right;margin-top:8px}
-
-
 .Vver{float:left;width:175px;height:175px;font-size:11px;text-align:left;cursor:pointer;color:#54597c;margin:10px}
 .Vver0{font-size:12px;font-weight:normal;position:absolute;margin-top:112px;background:#AF7695;padding:11px 15px 6px 10px;color:#fff;font-weight:bold}
 .Vver1{font-size:12px;width:165px;height:28px;background:#767EAF;position:relative;color:#fff;padding:12px 0px 0px 10px}
 .Vver2{color:#fff;background:#65BCAD;height:20px;font-weight:bold;margin-top:105px;position:relative;padding,7px 15px 3px 10px}
 .Vver3{color:#fff;background:#22284f;height:20px;font-weight:bold;margin-top:105px;position:relative;padding,7px 15px 3px 10px}
-
 
 
 

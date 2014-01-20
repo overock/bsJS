@@ -228,7 +228,8 @@ bs.$method( 'crypt', (function(){
 		};
 	})() ),
 	bs.$static( 'WEB', (function(){
-		var flush;
+		var flush, r0, r1;
+		r0 = /[<]/g, r1 = /\n|\r\n|\r/g,
 		head = [], response = [],
 		sessionName = '__bsNode', id = 0,
 		flush = {
@@ -322,7 +323,8 @@ bs.$method( 'crypt', (function(){
 					}
 				}
 				currsite.i18nTxt[$locale] = $data;
-			}
+			},
+			db2html:function( $str ){return $str.replace( r0, '&lt;' ).replace( r1, '<br/>' );}
 		};
 	})() ),
 	bs.$class( 'form', function( $fn, bs ){
@@ -490,9 +492,9 @@ bs.$method( 'crypt', (function(){
 				}
 			},
 			nextstep = function(){
-				var t0, i, j;
+				var t0, t1, i, j, r0, k, l;
 				if( idx < currRule.length ){
-					//try{
+					try{
 						i = currRule[idx++], j = currRule[idx++];
 						if( typeof j == 'string' ) j = j.replace( '@', '@'+file ), j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ), t0 = bs.$path( j );
 						switch( i ){
@@ -504,11 +506,19 @@ bs.$method( 'crypt', (function(){
 						default: pass();
 						}
 						if( !pause ) pass();
-					/*}catch($e){
-						console.log( t0,'::', $e );
+					}catch($e){
 						if( self.retry-- ) head.length = response.length = 0, data = {}, cookie = {}, path = path + file + '/', file = self.index, router();
-						else err( 500, '<h1>server error</h1><div>Error: '+$e+'</div>path: '+path+'<br>file: '+file+'<br>rule: '+i+'(idx:'+idx+')<br>target :'+j );
-					}*/
+						else{
+							r0 = /at /g,
+							t0 = '<h1>Server error</h1>'+
+								'<hr><b>path, file:</b><br>['+path+'], [' + file +']'+
+								'<hr><b>rule: </b>'+i+'(idx:'+idx+') <b>target: </b>'+j+
+								'<hr><b>error:</b><br>',
+							t1 = Object.getOwnPropertyNames( $e ), k = t1.length;
+							while( k-- ) t0 += '<b>' + t1[k] +'</b>: '+( $e[t1[k]].replace ? $e[t1[k]].replace( r0, '<br>at ' ) : $e[t1[k]] )+'<br>';
+							err( 500, t0 );
+						}
+					}
 				}else{
 					next = bs.WEB.flush;
 					runRule( self.pageEnd );

@@ -29,16 +29,6 @@ font-face@batch{/res/batch}
 .tab{ text-shadow:1px 1px 0 #000;border-radius:5;gradientBegin:#917d68;gradientEnd:#bd9d84}
 .tab:hover{gradientBegin:#bd9d84;gradientEnd:#917d68}
 .VtabOn{gradientBegin:#bd9d84;gradientEnd:#917d68}
-
-
-#back{text-shadow:1px 1px 0 #000;border-radius:10;gradientBegin:#C79FB4;gradientEnd:#AF7695}
-#back:hover{gradientBegin:#65BCAD;gradientEnd:#294952}
-
-#pmModify{text-shadow:1px 1px 0 #000;border-radius:10;gradientBegin:#AF7695;gradientEnd:#C79FB4}
-#pmModify:hover{gradientBegin:#65BCAD;gradientEnd:#294952}
-
-
-
 .Vver0{border-top-right-radius:5}
 .Vver1{opacity:0.8;border-top-right-radius:10;border-top-left-radius:10}
 .Vver2{opacity:0.8}

@@ -11,7 +11,7 @@
 			<div class="title"><%=i18n('miAdd','category')%></div>
 			<select id="Acat" class="value">
 <%for( t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>
-			<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
+				<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
 <%}%>
 			</select>
 			<div class="title"><%=i18n('miAdd','type')%></div>
@@ -29,7 +29,7 @@
 			<div><textarea id="Adescription"></textarea></div>
 			<div id="miAdd3" class="FL">
 				<div class="title"><%=i18n('miAdd','thumb')%></div>
-				<input type="text" id="Athumb" class="value" style="width:305px" placeholder="<%=i18n('miAdd','rthumb')%> : 200*200"/>
+				<input type="text" id="Athumb" class="value" placeholder="<%=i18n('miAdd','rthumb')%> : 200*200"/>
 				<div id="Aalert">&nbsp;</div>
 				<div id="Aadd" class="batch">&#xf164;</div>
 			</div>
