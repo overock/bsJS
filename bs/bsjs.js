@@ -145,26 +145,12 @@ method( 'jpage', (function(){
 	var jp, jpage, r0, r1, r2, r3, r4, r5, s, e, cache, err, line, toHtml, toCode;
 	jp=function( $v ){this.v=$v;}, cache={}, s = '<%', e = '%>', err = [], line = [],
 	r0=/\\/g, r1=/["]|\n|\r\n|\r/g, r2=/at/g, r3=/["]|[<]|\t|[ ][ ]|\n|\r\n|\r/g, r4 = /\n|\r\n|\r/g, r5=/[<]|\t|[ ][ ]/g,
-	toCode = function( $0 ){
-		switch( $0 ){
-		case'"':return'\\"';
-		case'\n':case'\r\n':case'\r':return'\\n';
-		default:return $0;
-		}
-	},
-	toHtml = function( $0 ){
-		switch( $0 ){
-		case'"':return'\\"';
-		case'<':return'&lt;';
-		case'\t':return'&nbsp; &nbsp; ';
-		case'  ':return'&nbsp; ';
-		case'\n':case'\r\n':case'\r':return'<br>';
-		default:return $0;
-		}
-	},
-	jpage = function( $str, $data, $render, $end, $id ){
+	toCode = function( $0 ){switch( $0 ){case'"':return'\\"'; case'\n':case'\r\n':case'\r':return'\\n'; default:return $0;}},
+	toHtml = function( $0 ){switch( $0 ){case'"':return'\\"'; case'<':return'&lt;';case'\t':return'&nbsp; &nbsp; ';
+		case'  ':return'&nbsp; '; case'\n':case'\r\n':case'\r':return'<br>'; default:return $0;}},
+	jpage = function( $str, $data, $render, $cacheId ){
 		var str, t0, t1, i, j, k, v, m, importer, render;
-		if( !( jpage.cache && ( v = cache[$id] ) ) ){
+		if( !( jpage.cache && ( v = cache[$cacheId] ) ) ){
 			if( $str instanceof jp ) v = $str.v; else{
 				str = ( $str.substr(0,2) == '#T' ? bs.dom( $str ).$('@text') : $str.substr($str.length-5) == '.html' ? bs.$get( null, $str ) : $str ).split( s );
 				v = 'try{', i = 0, j = str.length;
@@ -179,9 +165,9 @@ method( 'jpage', (function(){
 				v += '}catch(e){return e;}';
 			}
 			t0 = $str.v ? $str : new jp(v);
-			if( jpage.cache && $id ) cache[$id] = v;
+			if( jpage.cache && $cacheId ) cache[$cacheId] = v;
 		}
-		t1 = '', importer = function( $url ){jpage( $url, $data, null, render, $url );},
+		t1 = '', importer = function( $url ){jpage( $url, $data, null, render, jpage.cache ? $url : 0 );},
 		render = $render ? function( $v ){t1 += $v, $render( $v );} : function( $v ){t1 += $v;};
 		try{
 			line[0] = err.length = 0, i = new Function( 'ECHO,IMPORT,$$E,$$L,$,bs', v )( render, importer, err, line, $data, bs );
@@ -193,14 +179,11 @@ method( 'jpage', (function(){
 			j = Object.getOwnPropertyNames( i ), k = j.length;
 			while( k-- ) str += '<b>' + j[k] +'</b>: '+( i[j[k]].replace ? i[j[k]].replace( r2, '<br>at' ) : i[j[k]] )+'<br>';
 			str += '<hr><b>template:</b><br>';
-			if( $str.replace ){
-				k = $str.split(r4);
-				for( i = 0, j = k.length ; i < j ; i++ ) str += '<div'+(m && (i+1 == line[0])?' style="background:#faa"':'')+'><b>'+(i+1)+':</b> ' + k[i].replace(r5,toHtml) + '</div>';
-			}else str += $str;
+			k = $str.replace ? $str.split(r4) : $str.v.split(r4);
+			for( i = 0, j = k.length ; i < j ; i++ ) str += '<div'+(m && (i+1 == line[0])?' style="background:#faa"':'')+'><b>'+(i+1)+':</b> ' + k[i].replace(r5,toHtml) + '</div>';
 			t1 = str;
 		}
-		if( $end ) $end( t1 );
-		return t0;
+		return t1;
 	}, jpage.cache = 1;
 	return jpage;
 })() );

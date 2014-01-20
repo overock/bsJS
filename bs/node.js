@@ -402,7 +402,7 @@ bs.$method( 'crypt', (function(){
 		},
 		defaultRouter = ['template', '@.html'],
 		pass = function(){pause = 0, process.nextTick( next );},
-		defaultTmpl = function( $url, $template, $data, $end ){bs.$jpage( $template, $data, null, $end, this.cache ? $url : 0 );},
+		defaultTmpl = function( $url, $template, $data, $end ){bs.$jpage.cache = this.cache, $end( bs.$jpage( $template, $data, null, $url ) );},
 		$fn.start = function(){
 			var start, t0, self = this, k;
 			this.rulesArr = [];
