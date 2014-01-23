@@ -26,7 +26,7 @@ bs.$register( 'class', 'd3', (function(){
             if (keys[this.tiltup]) this.tilt += speed
             if (keys[this.tiltdown]) this.tilt -= speed
 
-            var world = bs.d('#' + list[0].div.$('<').id), w = world.$('w'), h = world.$('h')
+            var world = bs.dom('#' + list[0].div.$('<').id), w = world.$('w'), h = world.$('h')
             while (i--) {
                 var t = list[i], dx, dz, tx, tz, tScale, zIndex, width = t.width, height = t.height, farclip = this.farclip;
                 dx = t.x - this.x, dz = t.z - this.z;
@@ -65,7 +65,7 @@ bs.$register( 'class', 'd3', (function(){
     // d3
     return function($fn){
         var key, type = {"doom": 1};
-        bs.c('.D3').$('position', 'absolute'), bs.c('.D3 img').$('width', '100%', 'height', '100%', 'position', 'absolute'),
+        bs.css('.D3').$('position', 'absolute'), bs.css('.D3 img').$('width', '100%', 'height', '100%', 'position', 'absolute'),
 		(function () {
 			var t0, i;
 			t0 = 'x,y,z,width,height,material'.split(','), key = {}, i = t0.length;
@@ -74,7 +74,7 @@ bs.$register( 'class', 'd3', (function(){
 		$fn.$constructor = function ($key) {
 			var tname = $key.split('@')[1];
 			if ($key.indexOf('camera@') > -1) type[tname] ? console.log('cameraMode :', tname) : console.log('존재하지않는 카메라타입입니다'), bs.ANI.ani(d3Camera), this.camera = d3Camera
-			else if ($key.indexOf('plane@') > -1) this.x = this.y = this.z = this.width = this.height = 0, this.div = bs.d("<div class='D3' id='" + tname + "'>재질적용전</div>"), d3Camera.list.push(this), this.material = undefined
+			else if ($key.indexOf('plane@') > -1) this.x = this.y = this.z = this.width = this.height = 0, this.div = bs.dom("<div class='D3' id='" + tname + "'>재질적용전</div>"), d3Camera.list.push(this), this.material = undefined
 		},
 		$fn.$ = function () {
 			var i, j, k, v;
