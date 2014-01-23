@@ -40,7 +40,7 @@ bs.$register( 'class', 'd3', (function(){
                         'display', 'block',
                         // 멀리있는건 거리에 대해 스케일 비율이 달라짐
                         'width', tScale * .5 + width * tScale / 2, 'height', tScale * .5 + height * tScale / 2,
-                        'margin-left', (tx - width / 4) * tScale + w / 2, 'margin-top', this.tilt - tScale * this.y - (tScale + height / 2 * tScale ) / 2 + h / 2,// this.tilt+(this.y-height/4)* tScale-this.y*tScale+h/2,
+                        'margin-left', tx-(tScale * .5 + width * tScale / 2)/2 + w / 2, 'margin-top', this.tilt - tScale * this.y - (tScale + height / 2 * tScale ) / 2 + h / 2,// this.tilt+(this.y-height/4)* tScale-this.y*tScale+h/2,
                         'opacity', (farclip - tz) > farclip / 5 ? 1 : (farclip - tz + farclip / 5) / farclip,
                         // z소팅
                         'z-index', parseInt(100 * tScale)
