@@ -9,16 +9,21 @@
  */
 ( function( W, N ){
 'use strict';
-var VERSION, PLUGIN_REPO, bs, node, im = [], que, doc, id, STYLE,
-	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, re = {}, timeout = 5000, depend = {};
-PLUGIN_REPO = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/';//'http://projectbs.github.io/bsJS/bs/plugin/'//http://www.bsidesoft.com/bs/bs5/bs/plugin/
+var VERSION, PLUGIN_REPO,
+	im = [], re = {}, depend = {}, 
+	bs, node, que, doc, STYLE,
+	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g, timeout = 5000;
+	
 if( doc = W['document'] ) que=[],W[N=N||'bs']=bs=function(f){que?(que[que.length]=f):f();};
-else if( __dirname ){
+else if( process && process.version ){
 	node=require('./node'), module.exports = bs = function(f){f();};
-	bs.__root = require.main.filename.lastIndexOf( '\\' ) > -1 ? '\\' : '/',
-	bs.__root = require.main.filename.substring( 0, require.main.filename.lastIndexOf( bs.__root ) );
+	bs.__root = require.main.filename.substring( 0,
+		require.main.filename.lastIndexOf( require.main.filename.lastIndexOf( '\\' ) > -1 ? '\\' : '/' ) 
+	);
 }else throw new Error( 0, 'not supported platform' );
-bs.PLUGIN_REPO = PLUGIN_REPO, bs.VERSION = VERSION = 0.2;
+
+bs.PLUGIN_REPO = PLUGIN_REPO = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/',//'http://projectbs.github.io/bsJS/bs/plugin/'
+bs.VERSION = VERSION = 0.3;
 function error( $num, $msg ){if( doc ) throw new Error( $num, $msg ); else console.log( $num, $msg );}
 function dependency( $arg ){
 	var t0, i, j, k, v;
@@ -1333,15 +1338,18 @@ function ANI(){
 		};
 	})() );
 }
-id = setInterval( function(){
-	var start, i;
-	switch( i = document.readyState ){
-	case'complete':case'loaded':break;
-	case'interactive':if( document.documentElement.doScroll ) try{document.documentElement.doScroll('left');}catch(e){return;}
-	default:return;}
-	clearInterval( id ), start = function(){for( var i = 0, j = que.length ; i < j ; i++ ) que[i](); que = null;},
-	DETECT(), DOM(), ANI(), im.length ? ( im.unshift( start ), bs.$importer.apply( null, im ), im = null, bs.$del( '$import' ) ) : start();
-}, 1 );
+(function(){
+	var t0 = setInterval( function(){
+		var start, i;
+		switch( i = document.readyState ){
+		case'complete':case'loaded':break;
+		case'interactive':if( document.documentElement.doScroll ) try{document.documentElement.doScroll('left');}catch(e){return;}
+		default:return;}
+		clearInterval( t0 ), start = function(){for( var i = 0, j = que.length ; i < j ; i++ ) que[i](); que = null;},
+		DETECT(), DOM(), ANI(), im.length ? ( im.unshift( start ), bs.$importer.apply( null, im ), im = null, bs.$del( '$import' ) ) : start();
+	}, 1 );
+})();
+
 })( doc, bs );
 
 } )( this );

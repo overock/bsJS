@@ -20,7 +20,7 @@ if( bs.WEB.method() == 'POST' ){
 <div class="contents">
 	<div id="back" class="ADD"><span class="batch">&#xf158;</span> <%=i18n('common','back')%></div>
 	<table id="miTop" cellspacing="0" border="0" cellpadding="0">
-	<tr><td id="miTop0"><img id="mvTop0" src="<%=R%>/res/thumb/default.png" class="THB0"></td>
+	<tr><td id="miTop0"><img id="mvTop0" onerror="this.src=\'<%=R%>/res/thumb/default.png\'" src="<%=R%>/res/thumb/default.png" class="THB0"></td>
 		<td id="miTop1">
 		<div id="mvTop1" class="BR15 FL"></div>
 		<div id="mvTop2"></div>
@@ -35,36 +35,43 @@ if( bs.WEB.method() == 'POST' ){
 	<tr><td colspan="3"><div id="mvTop6" class="BR10"></div></td></tr>
 	</table>
 	
-	
-
-	
-	<div id="Vvadd" style="margin:29px 20px 10px 20px;height:50px">
-		<div style="float:left; width:54%; margin:10px 10px;">*기존 버전보다 높은 버전만 등록 하실 수 있습니다 / FREEZE 버전은 수정할 수 없습니다..</div>
-		<div style="float:left"><input type="text" id="Vversion" placeholder="version" style="padding-left:15px;width:180px;font-size:12px;height:35px;border:1px solid #ddd;border-radius:20px;box-shadow:inset 0px 0px 15px rgba(0,0,0,.1)"/></div>
-	
-		<div id="Vadd" class="add"><span class="batch">&#xF14C;</span><%=i18n('miAdd','addNewVersion')%></div>
+	<div id="mvAdd">
+		<div class="FL"><%=i18n('mv','caution')%></div>
+		<div class="FR">
+			<input type="text" id="Vversion" class="FL BR15 BS15" placeholder="<%=i18n('mv','version')%>"/>
+			<div id="Vadd" class="ADD FR"><span class="batch">&#xF14C;</span> <%=i18n('mv','addNewVersion')%></div>
+		</div>
 		<div id="Aalert" style="clear:both"></div>
 	</div>
 	
+	<div id="mvVersions"></div>
 	
-	<div id="Vversions"></div>
-	
-	<div id="Vdetail" style="clear:both;display:none;">
-		<input type="hidden" id="Vidx"/><input type="hidden" id="Vvr"/>
-		<div style="font-size:15px">&nbsp;</div>
-		<div id="Vtab" style="clear:both; background:#eaeaea;background-image:linear-gradient(#fafafa, #eaeaea);height:50px;border:1px solid #d8d8d8;border-top-left-radius:10px;border-top-right-radius:10px">
-			<div id="Vver" style="font-size:20px;margin:10px;float:left"></div>
-			<div id="Vdependency" style="font-size:35px;margin:10px;float:left"></div>
-			<div id="Vtab0" class="tab VtabOn">code</div>
-			<div id="Vtab1" class="tab">notice</div>
-			<div id="Valert" style="float:left"></div>
-			<div id="Vupdate" class="pmEdit" style="float:right;height:30px;line-height:30px;margin:10px 25px 10px 5px">update</div>
-			<div id="Vfreeze" class="pmEdit" style="float:right;height:30px;line-height:30px;margin:10px 5px">freeze</div>
-			
+	<div id="mvDetail"><a name="detail"></a>
+		<input type="hidden" id="Vidx"/>
+		<input type="hidden" id="Vvr"/>
+		<div id="mvDetail0" class="GR3 BRLR10">
+			<div id="Vver" class="FL mvDetail2"></div>
+			<div id="Vtab0" class="FL TS2 BR5 GR4 mvTab mvTabOn">code</div>
+			<div id="Vtab1" class="FL TS2 BR5 GR4 mvTab">notice</div>
+			<div id="Valert" class="FL"></div>
+			<div id="Vupdate" class="FR mvEdit GR1 BR5">update</div>
+			<div id="Vfreeze" class="FR mvEdit GR2 BR5">freeze</div>
 		</div>
-		<div style="background:#eaeaea;background-image:linear-gradient(#fafafa, #eaeaea);border:1px solid #d8d8d8;padding:10px;margin-top:-1px">
-			<textarea id="Vcode"></textarea>
-			<textarea id="Vcontents"></textarea>
+		<div class="mvDetail1 GR3">
+			<textarea id="Vcode" class="TS2 BR5 GR1"></textarea>
+			<textarea id="Vcontents" class="TS2 BR5 GR1"></textarea>
+		</div>
+		<div class="mvDetail1 GR3">&nbsp;
+			<div class="mvDetail2">Dependency</div>
+			<div>
+				<input type="text" id="Dname" class="BR15 BS15 FL" placeholder="<%=i18n('mv','dependName')%>"/>
+				<div id="Dsearch" class="ADD FL"><span class="batch">&#xF14C;</span> <%=i18n('mv','dependSearch')%></div>
+				<div id="Ddetail" class="FL">
+					<div id="Dver" class="FL"></div> 
+					<div id="Dadd" class="ADD FL"><span class="batch">&#xF14C;</span> <%=i18n('mv','dependAdd')%></div>
+				</div>
+			</div>
+			<div id="Vdependency" class="CLEAR"></div>
 		</div>
 	</div>
 </div>

@@ -22,13 +22,17 @@ header:function(){
 	//login
 	lend = function( $e ){bs.dom('#topMember').$( 'display', 'none' );},
 	bs.dom('#Llogin').$('down', login = function( $e ){
-		var t0 = bs.$post(null, '/login', 'email', bs.dom('#Lemail').$('@value'), 'pw', bs.$md5(bs.dom('#Lpw').$('@value')));
-		bs.dom('#Lalert').$( 'html', '' );
-		if( t0 ){
-			t0 = JSON.parse(t0);
-			if( t0.result == 'ok' ) bs.dom('#topMember').$('html', site.logined( t0.contents.nick ) );
-			else bs.dom('#Lalert').$('html', 'loginFailed:' + t0.contents);
-		}else bs.dom('#Lalert').$('html', 'loginFailed: no response');
+		if( bs.dom('#Llogin').downed ) return;
+		bs.dom('#Llogin').downed = 1;
+		bs.dom('#Lalert').$( 'html', '' ),
+		bs.$post( function( t0 ){
+			if( t0 ){
+				t0 = JSON.parse(t0);
+				if( t0.result == 'ok' ) bs.dom('#topMember').$('html', site.logined( t0.contents.nick ) );
+				else bs.dom('#Lalert').$('html', 'loginFailed:' + t0.contents);
+			}else bs.dom('#Lalert').$('html', 'loginFailed: no response');
+			bs.dom('#Llogin').downed = 0;
+		}, '/login', 'email', bs.dom('#Lemail').$('@value'), 'pw', bs.$md5(bs.dom('#Lpw').$('@value')));
 	}),
 	bs.dom('#Ljoin').$( 'down', function( $e ){
 		if( isJoin ) return;
@@ -48,7 +52,8 @@ header:function(){
 		bs.ANI.tween( bs.dom('#topJoin' ), 'height', 0, 'time', .2, 'end', jcancel );
 	} ),
 	bs.dom('#Jjoin').$( 'down', function( $e ){
-		var t0;
+		if( bs.dom('#Jjoin').downed ) return;
+		bs.dom('#Jjoin').downed = 1;
 		bs.dom('#Jalert').$( 'html', '' );
 		if( !bs.$test( '@email', '#Jemail|' ) ){
 			return bs.dom('#Jalert').$('html', 'invalid [email]'), setTimeout( jend, 1 );
@@ -61,16 +66,19 @@ header:function(){
 		}else if( t0 = bs.dom('#Jimg').$('@src') ){
 			bs.dom('#Jthumb').$('@value', t0.indexOf('/res/thumb/default.png') == -1 ? t0 : '' )
 		}
-		if( t0 = bs.$post( null, '/join',
+		bs.$post( function( t0 ){
+			if( t0 ){
+				t0 = JSON.parse(t0);
+				if( t0.result == 'ok' ){
+					bs.ANI.tween( bs.dom('#topMember').$( 'html', site.logined( t0.contents.nick ), 'display', 'block', 'this' ), 'opacity', 1, 'time', .3 ),
+					bs.ANI.tween( bs.dom('#topJoin' ), 'height', 0, 'time', .2, 'end', jcancel );
+				}else bs.dom('#Jalert').$('html', 'joinFailed:' + t0.contents);
+			}else bs.dom('#Jalert').$('html', 'joinFailed: no response');
+			bs.dom('#Jjoin').downed = 0;
+		}, '/join',
 			'email', bs.dom('#Jemail').$('@value'), 'pw', bs.$md5(bs.dom('#Jpw').$('@value')),
 			'nick', bs.dom('#Jnick').$('@value'), 'thumb', bs.dom('#Jthumb').$('@value') || ''
-		) ){
-			t0 = JSON.parse(t0);
-			if( t0.result == 'ok' ){
-				bs.ANI.tween( bs.dom('#topMember').$( 'html', site.logined( t0.contents.nick ), 'display', 'block', 'this' ), 'opacity', 1, 'time', .3 ),
-				bs.ANI.tween( bs.dom('#topJoin' ), 'height', 0, 'time', .2, 'end', jcancel );
-			}else bs.dom('#Jalert').$('html', 'joinFailed:' + t0.contents);
-		}else bs.dom('#Jalert').$('html', 'joinFailed: no response');
+		);
 	}),
 	bs.dom('#Jthumb').$( 'blur', function( $e ){if( $e.value ) bs.dom('#Jimg').$('@src', $e.value );},
 		'keydown', function( $e ){if( $e.key('enter') || $e.key('space') ) $e.prevent(), bs.dom('#Jimg').$('@src', $e.value );} );
@@ -95,6 +103,8 @@ mi:function(){
 	} ),
 	bs.dom('#Aadd').$( 'down', function( $e ){
 		var t0;
+		if( bs.dom('#Aadd').downed ) return;
+		bs.dom('#Aadd').downed = 1;
 		bs.dom('#Aalert').$( 'html', '' );
 		if( !bs.$test( '@range|5|100', '#Atitle|' ) ){
 			return bs.dom('#Aalert').$('html', 'invalid [title]'), setTimeout( function(){bs.dom('#Atitle').$('f');}, 1 );
@@ -103,171 +113,241 @@ mi:function(){
 		}else if( t0 = bs.dom('#Aimg').$('@src') ){
 			bs.dom('#Athumb').$('@value', t0.indexOf('/res/thumb/default.png') == -1 ? t0 : '' )
 		}
-		t0 = bs.$post( null, '/member/add', 
+		bs.$post( function( t0 ){
+			if( t0 ){
+				t0 = JSON.parse( t0 );
+				if( t0.result == 'ok' ) list( function(){bs.ANI.tween( bs.dom('#miAdd' ), 'height', 0, 'time', .2, 'end', acancel );});
+				else bs.dom('#Aalert').$( 'html', 'addFailed:'+ t0.contents );
+			}else bs.dom('#Aalert').$( 'html', 'addFailed: no response' );
+			bs.dom('#Atitle').$('@value', '' ), bs.dom('#Auname').$('@value', ''),
+			bs.dom('#Adescription').$('@value', ''), bs.dom('#Akeyword').$('@value', ''),
+			bs.dom('#Athumb').$('@value', ''), bs.dom('#Aimg').$('@src',site.R+'/res/member/title.png');
+			bs.dom('#Aadd').downed = 0;
+		}, '/member/add', 
 			'type', bs.dom('#Atype').$('@value'), 'uname', bs.dom('#Auname').$('@value'),
 			'title', bs.dom('#Atitle').$('@value'), 'description', bs.dom('#Adescription').$('@value'),
 			'cat', bs.dom('#Acat').$('@value'), 'keyword', bs.dom('#Akeyword').$('@value'),
 			'thumb', bs.dom('#Athumb').$('@value')
 		);
-		if( t0 ){
-			t0 = JSON.parse( t0 );
-			if( t0.result == 'ok' ){
-				list();
-				bs.ANI.tween( bs.dom('#miAdd' ), 'height', 0, 'time', .2, 'end', acancel );
-			}else bs.dom('#Aalert').$( 'html', 'addFailed:'+ t0.contents );
-		}else bs.dom('#Aalert').$( 'html', 'addFailed: no response' );
-		bs.dom('#Atitle').$('@value', '' ), bs.dom('#Auname').$('@value', ''),
-		bs.dom('#Adescription').$('@value', ''), bs.dom('#Akeyword').$('@value', ''),
-		bs.dom('#Athumb').$('@value', ''), bs.dom('#Aimg').$('@src',site.R+'/res/member/title.png');
 	} ),
 	bs.dom('#Athumb').$( 'blur', function( $e ){if( $e.value ) bs.dom('#Aimg').$('@src', $e.value );},
 		'keydown', function( $e ){if( $e.key('enter') || $e.key('space') ) $e.prevent(), bs.dom('#Aimg').$('@src', $e.value );} ),
-	( list = function(){
-		var t0, t1, i, j;
-		t0 = JSON.parse( bs.$post( null, '/member/' ) );
-		if( t0.result == 'ok' && ( t0 = t0.contents, j = t0.length ) ){
-			t1 = '<table cellspacing="0" border="0" cellpadding="0"><colgroup>'+
-				'<col id="miListT0"/><col id="miListT1"/><col id="miListT2"/><col id="miListT3"/><col id="miListT4"/><col/></colgroup>';
-			for( i = 0 ; i < j ; i++ ) console.log( j ), t1 += '<tr id="miListT5"><td></td>'+
-				'<td><img src="' + ( t0[i].thumb || site.R+'/res/thumb/default.png' ) + '" class="THB0"></td>'+
-				'<td id="miListT6">'+
-					'<a href="/member/view?r='+t0[i].plugin_rowid+'">'+t0[i].title+'</a>'+
-					'<div id="miListT7" class="BR15 FL">'+t0[i].uname+'</div>'+
-					'<div id="miListT8" class="BR15">---</div>'+
-				'</td>'+
-				'<td class="miListT9">'+t0[i].type.charAt(0).toUpperCase()+t0[i].type.substr(1)+'</td>'+
-				'<td class="miListT9">'+t0[i].cat+'</td>'+
-				'<td id="miListT10">'+t0[i].regdate+'</td>'+
-				'</tr>';
-			bs.dom('#miList').$( 'html', t1 + '</table>' );
-		}
+	( list = function( $f ){
+		bs.$post( function( t0 ){
+			var t1, i, j;
+			if( t0 ){
+				t0 = JSON.parse( t0 );
+				if( t0.result == 'ok' && ( t0 = t0.contents, j = t0.length ) ){
+					t1 = '<table cellspacing="0" border="0" cellpadding="0"><colgroup>'+
+						'<col id="miListT0"/><col id="miListT1"/><col id="miListT2"/><col id="miListT3"/><col id="miListT4"/><col/></colgroup>';
+					for( i = 0 ; i < j ; i++ ) t1 += '<tr id="miListT5"><td></td>'+
+						'<td><img src="' + ( t0[i].thumb || site.R+'/res/thumb/default.png' ) + '" class="THB0"></td>'+
+						'<td id="miListT6">'+
+							'<a href="/member/view?r='+t0[i].plugin_rowid+'">'+t0[i].title+'</a>'+
+							'<div id="miListT7" class="BR15 FL">'+t0[i].uname+'</div>'+
+							'<div id="miListT8" class="BR15">---</div>'+
+						'</td>'+
+						'<td class="miListT9">'+t0[i].type.charAt(0).toUpperCase()+t0[i].type.substr(1)+'</td>'+
+						'<td class="miListT9">'+t0[i].cat+'</td>'+
+						'<td id="miListT10">'+t0[i].regdate+'</td>'+
+						'</tr>';
+					bs.dom('#miList').$( 'html', t1 + '</table>' );
+				}
+			}
+			if( $f ) $f();
+		}, '/member/' );
 	} )();
 },
 viewr:0,
 view:function(){
-	var t0, r, 
-	version, vadd, tab;
-	
+	var r, ver, detail, add, version, depend, isFreezed;
 	r = site.viewr,
-	t0 = JSON.parse( bs.$post( null, '/member/view', 'r', r ) );
-	if( t0.result == 'ok' ){
-		t0 = t0.contents,
-		bs.dom('#mvTop0').$( '@src', t0.thumb ),
-		bs.dom('#mvTop1').$( 'html', t0.uname ),
-		bs.dom('#mvTop2').$( 'html', t0.title ),
-		bs.dom('#mvTop3').$( 'html', t0.cat ),
-		bs.dom('#mvTop4').$( 'html', t0.type ),
-		bs.dom('#mvTop5').$( 'html', t0.regdate ),
-		bs.dom('#mvTop6').$( 'html', t0.contents );
-		ver();
-	}else return bs.$back();
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	tab = 0;
-	
+	//start
+	bs.$post( function( t0 ){
+		t0 = JSON.parse( t0 );
+		if( t0.result == 'ok' ){
+			t0 = t0.contents;
+			if( t0.thumb ) bs.dom('#mvTop0').$( '@src', t0.thumb );
+			bs.dom('#mvTop1').$( 'html', t0.uname ),
+			bs.dom('#mvTop2').$( 'html', t0.title ),
+			bs.dom('#mvTop3').$( 'html', t0.cat ),
+			bs.dom('#mvTop4').$( 'html', t0.type ),
+			bs.dom('#mvTop5').$( 'html', t0.regdate ),
+			bs.dom('#mvTop6').$( 'html', t0.contents ),
+			ver();
+		}else return bs.$back();
+	}, '/member/view', 'r', r ),
+	//base function
+	ver = function( $d, $id ){
+		if( ver.isRun ) return;
+		ver.isRun = 1;
+		bs.$post( function( t0 ){
+			var t1, i, j;
+			bs.dom('#mvVersions').$('html',''),
+			t1 = bs.dom('mvTop0').$( '@src' ),
+			version = t0 = JSON.parse( t0 ).contents;
+			for( i = 0, j = t0.length ; i < j ; i++ )
+				bs.dom(
+				'<div id="V'+i+'" class="mvVersions0 BRLR10">'+
+					'<img onerror="this.src=\''+site.R+'/res/thumb/default.png\'" src="'+t1+'">'+
+					'<div class="mvVersions1">Version '+t0[i].version+'</div>'+
+					'<div class="mvVersions2 O8">UPDATED : '+t0[i].editdate+'</div>'+
+					(t0[i].freezedate ? '<div class="mvVersions3 O8">FREEZE : '+t0[i].freezedate+'</div>':'<div class="mvVersions4 O8">WARM<br>&nbsp;</div>' )+
+				'</div>').$( '<', '#mvVersions', 'this' )[0].onmousedown = detail;
+			ver.isRun = 0;
+			if( $d ) $d( $id );
+		}, '/member/ver', 'r', r );
+	},
+	detail = function( t0 ){
+		bs.dom('#Vidx').$( '@value', t0 = typeof t0 == 'number' ? t0 : this.id.substr(1) ),
+		t0 = version[t0],
+		isFreezed = t0.freezedate;
+		bs.dom('#Dname').$('display', isFreezed ? 'none' : 'block' ),
+		bs.dom('#Dsearch').$('display', isFreezed ? 'none' : 'block' ),
+		bs.dom('#Vupdate').$('display', isFreezed ? 'none' : 'block' ),
+		bs.dom('#Vfreeze').$('display', isFreezed ? 'none' : 'block' ),
+		bs.dom('#Vver').$( 'html', 'v.'+t0.version ), bs.dom('#Vvr').$( '@value', t0.ver_rowid ),
+		bs.dom('#Vcode').$( '@value', t0.code || '' ), bs.dom('#Vcontents').$( '@value', t0.contents || '' ),
+		bs.dom('#mvDetail').$( 'display', 'block' ),
+		bs.$go('#detail');
+		depend();
+	},
+	depend = function(){
+		bs.$post( function( t0 ){
+			var t1, t2, i, j, drs;
+			t1 = 'no dependency';
+			if( t0 ){
+				t0 = JSON.parse( t0 ), t0 = t0.contents, j = t0.length;
+				if( j ){
+					for( t1 = '', i = 0 ; i < j ; i++ ){
+						t2 = bs.dom('<div class="mvDetail3"></div>' ).$( '<', '#Vdependency', 'this' );
+						if( isFreezed ) t2.$( '>', (function( dr ){
+							var d;
+							d = bs.dom('<div class="mvDetail2 ADD FL"><span class="batch">&#xF14D;</span></div>'),
+							d[0].onmousedown = function( $e ){
+								if( drs[dr] ) return;
+								drs[dr] = 1;
+								bs.$post( function( t0 ){
+									if( t0 ){
+										t0 = JSON.parse( t0 );
+										if( t0.result == 'ok' ) depend();
+									}
+									drs[dr] = 0;
+								}, '/member/dDel', 'dr', dr );
+							};
+							return d;
+						})(t0[i].depend_rowid) );
+						t2.$( '>', '<div class="FL">'+t0[i].uname+' ('+t0[i].version+')</div>',
+							'>', '<div class="CLEAR mvDetail4"></div>' );
+					}
+					return drs = {};
+				}
+			}
+			bs.dom('#Vdependency').$( 'html', t1 );
+		}, '/member/dList', 'vr', bs.dom('#Vvr').$( '@value' ) );
+	},
+	//version add
+	bs.dom('#Vadd').$( 'down', add = function( $e ){
+		if( bs.dom('#Vadd').downed ) return;
+		bs.dom('#Vadd').downed = 1;
+		bs.$post( function(t0){
+			if( t0 ) t0 = JSON.parse( t0 ), t0.result == 'ok' ? ver() : bs.dom('#Aalert').$( 'html', 'addFailed:'+ t0.contents );
+			else bs.dom('#Aalert').$( 'html', 'addFailed: no response' );
+			bs.dom('#Vadd').downed = 0;
+		}, '/member/vAdd', 'version', parseFloat( bs.dom('#Vversion').$('@value') ), 'r', r );
+	} ),
+	bs.dom('#Vversion').$( 'keydown', function( $e ){if( $e.key('enter') ) add(), this.value = '';} ),
+	//detail edit	
 	bs.dom('#Vtab0').$( 'down', function( $e ){
-		console.log('aaa');
-		bs.dom('#Vtab0').$( 'class+', 'VtabOn' );
-		bs.dom('#Vtab1').$( 'class-', 'VtabOn' );
-		bs.dom('#Vcode').$( 'display', 'block' );
-		bs.dom('#Vcontents').$( 'display', 'none' );
-	} );
+		bs.dom('#Vtab0').$( 'class+', 'mvTabOn' ), bs.dom('#Vtab1').$( 'class-', 'mvTabOn' ),
+		bs.dom('#Vcode').$( 'display', 'block' ), bs.dom('#Vcontents').$( 'display', 'none' );
+	} ),
 	bs.dom('#Vtab1').$( 'down', function( $e ){
-		bs.dom('#Vtab0').$( 'class-', 'VtabOn' );
-		bs.dom('#Vtab1').$( 'class+', 'VtabOn' );
-		bs.dom('#Vcode').$( 'display', 'none' );
-		bs.dom('#Vcontents').$( 'display', 'block' );
-	} );
-	function k0(t){
-		return function($e){
-			var i;
-			if( $e.key('tab') ) $e.prevent(),
-				bs.dom(t).$( '@value', $e.value.substring( 0, i = bs.dom(t).$( 'cursorPos' ).start ) + '\t' + $e.value.substr( i ) ),
-				setTimeout( function(){bs.dom(t).$( 'f', null, 'cursorPos', i + 1 );},1);
-		};
-	}
-	bs.dom('#Vcode').$(
-		'focus', function($e){bs.dom('#Vcode').$( 'color', '#444' );},
-		'blur', function($e){bs.dom('#Vcode').$( 'color', '#222' );},
-		'keydown', k0('#Vcode')
-	);
-	bs.dom('#Vcontents').$(
-		'focus', function( $e ){bs.dom('#Vcontents').$( 'color', '#444' );},
-		'blur', function( $e ){bs.dom('#Vcontents').$( 'color', '#222' );},
-		'keydown', k0('#Vcontents')
-	);
-	function s0( t ){
-		return function( $e ){if( bs.dom(t).$( 'height' ) || 0 != this.scrollHeight ) bs.dom('#Vcode').$( 'height', this.scrollHeight );};
-	}
-	bs.dom('#Vcode').$( 'scroll', s0('#Vcode') );
-	bs.dom('#Vcontents').$( 'scroll', s0('#Vcontents') );
-	
-	
-	function ver(){
-		var t0, t1, i, j;
-		for( t0 = JSON.parse( bs.$post( null, '/member/ver', 'r', r ) ), bs.dom('#Vversions').$('html',''), version = t0 = t0.contents, i = 0, j = t0.length ; i < j ; i++ ){
-//			bs.dom('<div id="v'+i+'" class="Vver">'+
-//				'<div class="Vver0">'+t0[i].version+'</div>'+
-//				'<div class="Vver1">last updated<br>'+t0[i].editdate+'</div>'+
-//				(t0[i].freezedate ? '<div class="Vver2">freezed<br>'+t0[i].freezedate+'</div>':'<div class="Vver3">warm<br>&nbsp;</div>' )+
-//				'</div>').$( '<', '#Vversions', 'down', function(){versionDetail( this.id.substr(1) );} );
-            bs.dom('<div id="v'+i+'" class="Vver">'+
-                    '<div style="position:absolute"><img src="../res/draft/index_Bthumb_'+bs.$ex(1, '~',5)+'.png" width="175" style="border-top-right-radius:10px;border-top-left-radius:10px;box-shadow: 0px 0px 15px rgba(0,0,0,.5);"></div>'+
-				'<div class="Vver0">Version '+t0[i].version+'</div>'+
-				'<div class="Vver1">UPDATED : '+t0[i].editdate+'</div>'+
-				(t0[i].freezedate ? '<div class="Vver2">FREEZE : '+t0[i].freezedate+'</div>':'<div class="Vver3">WARM<br>&nbsp;</div>' )+
-				'</div>').$( '<', '#Vversions', 'down', function(){versionDetail( this.id.substr(1) );} );
-
-        }
-
-	}
-	function versionDetail( $v ){
-		var t0;
-		bs.dom('#Vidx').$( '@value', $v );
-		$v = version[$v];
-		bs.dom('#Vupdate').$('display', $v.freezedate ? 'none' : 'block' );
-		bs.dom('#Vfreeze').$('display', $v.freezedate ? 'none' : 'block' );
-		bs.dom('#Vver').$( 'html', 'v.'+$v.version );
-		bs.dom('#Vvr').$( '@value', $v.ver_rowid );
-		bs.dom('#Vcode').$( '@value', $v.code || '' );
-		bs.dom('#Vcontents').$( '@value', $v.contents || '' );
-		bs.dom('#Vdetail').$( 'display', 'block' );
-	}
+		bs.dom('#Vtab0').$( 'class-', 'mvTabOn' ), bs.dom('#Vtab1').$( 'class+', 'mvTabOn' ),
+		bs.dom('#Vcode').$( 'display', 'none' ), bs.dom('#Vcontents').$( 'display', 'block' );
+	} ),
 	bs.dom('#Vupdate').$( 'down', function( $e ){
-		var t0;
-		t0 = bs.$post( null, '/member/vUp', 'vr', bs.dom('#Vvr').$('@value'), 'code', bs.dom('#Vcode').$('@value'), 'contents', bs.dom('#Vcontents').$('@value') );
-		if( t0 ){
-			t0 = JSON.parse( t0 );
-			if( t0.result == 'ok' ) bs.dom('#Valert').$( 'html', 'updateOK' );
-			else bs.dom('#Valert').$( 'html', 'updateFailed:'+ t0.contents );
-			ver(), versionDetail( bs.dom('#Vidx').$('@value') );
-		}else bs.dom('#Valert').$( 'html', 'updateFailed: no response' );
+		if( bs.dom('#Vupdate').downed ) return;
+		bs.dom('#Vupdate').downed = 1;
+		bs.$post( function(t0){
+			if( t0 ){
+				t0 = JSON.parse( t0 );
+				if( t0.result == 'ok' ) bs.dom('#Valert').$( 'html', 'updateOK' );
+				else bs.dom('#Valert').$( 'html', 'updateFailed:'+ t0.contents );
+				ver(), detail.call( bs.dom('#Vidx')[0] );
+			}else bs.dom('#Valert').$( 'html', 'updateFailed: no response' );
+			bs.dom('#Vupdate').downed = 0;
+		}, '/member/vUp', 'vr', bs.dom('#Vvr').$('@value'), 'code', bs.dom('#Vcode').$('@value'), 'contents', bs.dom('#Vcontents').$('@value') );
 	} );
 	bs.dom('#Vfreeze').$( 'down', function(){
-		var t0;
-		t0 = bs.$post( null, '/member/vFrz', 'vr', bs.dom('#Vvr').$('@value') );
-		if( t0 ){
-			t0 = JSON.parse( t0 );
-			if( t0.result == 'ok' ){
-				bs.dom('#Valert').$( 'html', 'freezeOK' );
-				ver(), versionDetail( bs.dom('#Vidx').$('@value') );
-			}else bs.dom('#Valert').$( 'html', 'freezeFailed:'+ t0.contents );
-		}else bs.dom('#Valert').$( 'html', 'freezeFailed: no response' );
+		if( bs.dom('#Vfreeze').downed ) return;
+		bs.dom('#Vfreeze').downed = 1;
+		bs.$post( function( t0 ){
+			if( t0 ){
+				t0 = JSON.parse( t0 );
+				if( t0.result == 'ok' ){
+					bs.dom('#Valert').$( 'html', 'freezeOK' );
+					ver(), versionDetail( bs.dom('#Vidx').$('@value') );
+				}else bs.dom('#Valert').$( 'html', 'freezeFailed:'+ t0.contents );
+			}else bs.dom('#Valert').$( 'html', 'freezeFailed: no response' );
+			bs.dom('#Vfreeze').downed = 0;
+		}, '/member/vFrz', 'vr', bs.dom('#Vvr').$('@value') );
 	} );
-	bs.dom('#Vversion').$( 'keydown', function( $e ){if( $e.key('enter') ) vadd(), this.value = '';} );
-	bs.dom('#Vadd').$( 'down', vadd = function( $e ){
-		var t0;
-		t0 = bs.$post( null, '/member/vAdd', 'version', parseFloat( bs.dom('#Vversion').$('@value') ), 'r', r );
-		if( t0 ) t0 = JSON.parse( t0 ), t0.result == 'ok' ? ver() : bs.dom('#Aalert').$( 'html', 'addFailed:'+ t0.contents );
-		else bs.dom('#Aalert').$( 'html', 'addFailed: no response' );
+	(function(){
+		function f0(t){return function($e){bs.dom(t).$( 'color', '#444' );};}
+		function f1(t){return function($e){bs.dom(t).$( 'color', '#222' );};}
+		function f2(t){
+			return function($e){
+				var i;
+				if( $e.key('tab') ) $e.prevent(),
+					bs.dom(t).$( '@value', $e.value.substring( 0, i = bs.dom(t).$( 'cursorPos' ).start ) + '\t' + $e.value.substr( i ) ),
+					setTimeout( function(){bs.dom(t).$( 'f', null, 'cursorPos', i + 1 );},1);
+			};
+		}
+		function f3( t ){
+			return function( $e ){if( bs.dom(t).$( 'height' ) || 0 != this.scrollHeight ) bs.dom('#Vcode').$( 'height', this.scrollHeight );};
+		}
+		bs.dom('#Vcode').$( 'focus', f0('#Vcode'), 'blur', f1('#Vcode'), 'keydown', f2('#Vcode'), 'scroll', f3('#Vcode') );
+		bs.dom('#Vcontents').$( 'focus', f0('#Vcontents'), 'blur', f1('#Vcontents'), 'keydown', f2('#Vcontents'), 'scroll', f3('#Vcontents') );
+	})();
+	//dependency	
+	bs.dom( '#Dsearch' ).$( 'down', function( $e ){
+		if( bs.dom('#Dsearch').downed ) return;
+		bs.dom('#Dsearch').downed = 1;
+		bs.$post( function( t0 ){
+			var t1, i, j;
+			if( t0 ){
+				t0 = JSON.parse( t0 );
+				if( t0.result == 'ok' ){
+					t0 = t0.contents, j = t0.length;
+					if( j ){
+						for( t1 = '', i = 0 ; i < j ; i++ )
+							t1 += '<option value="'+t0[i].ver_rowid+'">'+t0[i].version+'</option>';
+						bs.dom('#Dver').$( 'html', '<select id="Dversion">' + t1 + '</select>' ),
+						bs.dom('#Ddetail').$( 'display', 'block' );
+						bs.dom('#Dadd').downed = 0;
+					}else bs.dom('#Dname').$( '@value', 'no freezed version' );
+				}else bs.dom('#Dname').$( '@value', 'invalid name' );
+			}else bs.dom('#Dname').$( '@value', 'invalid name' );
+			bs.dom('#Dsearch').downed = 0;
+		}, '/member/search', 'title', bs.dom('#Dname').$('@value'), 'r', r );
 	} );
+	bs.dom( '#Dadd' ).$( 'down', function( $e ){
+		if( bs.dom('#Dadd').downed ) return;
+		bs.dom('#Dadd').downed = 1;
+		bs.$post( function( t0 ){
+			var t1, i, j;
+			if( t0 ){
+				t0 = JSON.parse( t0 );
+				if( t0.result == 'ok' ) depend(); else bs.dom('#Dname').$( '@value', t0.contents );
+			}else bs.dom('#Dname').$( '@value', 'error' );
+			bs.dom('#Dadd').downed = 0;
+			bs.dom('#Dver').$( 'html', '' ),
+			bs.dom('#Dname').$('@value', '' ),
+			bs.dom('#Ddetail').$( 'display', 'none' );
+		}, '/member/dAdd', 'vr1', bs.dom('#Vvr').$('@value'), 'vr2', bs.dom('#Dversion').$('@value'), 'r', r );
+	} );
+	bs.dom('#Dadd').downed = 1;
 }
 
 };

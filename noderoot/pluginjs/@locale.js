@@ -17,8 +17,16 @@ ko = {
 	miAdd:{
 		title:'설명용 제목(5~100자)',unique:"식별이름(소문자만 5~30)",type:"타입",category:"카테고리",keyword:"키워드(,단위로 입력하세요)",
 		description:'플러그인 설명',thumb:'썸네일 URL',rthumb:'권장 사이즈',
-		date:'업로드 날짜',addNewVersion:'새 버전 추가',
+		date:'업로드 날짜',
 		modify:'플러그인 정보 수정'
+	},
+	mv:{
+		caution:'기존보다 높은 버전만 등록가능!<br>FREEZE 되면 수정할 수 없음!!',
+		version:'숫자만 가능 1,0.3,1.5..',
+		addNewVersion:'새 버전 추가',
+		dependName:'플러그인이름',
+		dependSearch:'플러그인검색',
+		dependAdd:'의존성추가'
 	}
 },
 
@@ -39,10 +47,17 @@ en = {
 	miAdd:{
 		title:'TITLE(for explain 5~100)',unique:'UNIQUE NAME(5~30)',type:'TYPE',category:'CATEGORY',keyword:'KEYWORD',
 		description:'Description',thumb:'Thumb URL',rthumb:'Recommand Thumb size',
-		date:'Date',addNewVersion:'Add New Version',
+		date:'Date',
 		modify:'Modify This Plugin Info'
+	},
+	mv:{
+		caution:'Register only higher version!<br>Can`t update after FREEZE!!',
+		version:'only number 1,0.3,1.5..',
+		addNewVersion:'Add New Version',
+		dependName:'Plugin Name',
+		dependSearch:'Search',
+		dependAdd:'Add Dependency'
 	}
-	
 },
 bs.WEB.i18nAddDefault( 'en', en ),
 bs.WEB.i18nAdd( 'ko', ko );

@@ -18,16 +18,22 @@ bs.sql( 'Pview').$( 'db', 'd@mysql', 'query',
 	"select p.plugin_rowid,t.title type,p.title,p.contents,p.uname,p.thumb,c.title cat,DATE_FORMAT(regdate,'%Y.%m.%d %H:%i')regdate from plugin p,plugintype t, cat c "+
 	"where p.plugintype_rowid=t.plugintype_rowid and p.cat_rowid=c.cat_rowid and p.plugin_rowid=@r@" );
 
-bs.sql( 'Vlist').$( 'db', 'd@mysql', 'query', "select ver_rowid,version,DATE_FORMAT(freezeDate,'%y.%m.%d %H:%i')freezedate,DATE_FORMAT(editdate,'%y.%m.%d %H:%i')editdate,code,contents from ver where plugin_rowid=@r@ order by version" );
-bs.sql( 'Vadd').$( 'db', 'd@mysql', 'query', "insert into ver(plugin_rowid,version)values(@r@,@version@)" );
-bs.sql( 'Vupdate').$( 'db', 'd@mysql', 'query', "update ver set code='@code@',contents='@contents@',editdate=CURRENT_TIMESTAMP()where ver_rowid=@vr@" );
-bs.sql( 'Vfreezable').$( 'db', 'd@mysql', 'query', "select freezedate,(select max(i.version)from ver i where i.plugin_rowid=v.plugin_rowid and i.freezedate is not NULL)<version k from ver v where ver_rowid=@vr@" );
-bs.sql( 'Vfreeze').$( 'db', 'd@mysql', 'query', "update ver set freezeDate=CURRENT_TIMESTAMP()where ver_rowid=@vr@" );
-bs.sql( 'VfreezeDetail').$( 'db', 'd@mysql', 'query',
+bs.sql('Dlist').$( 'db', 'd@mysql', 'query', "select d.depend_rowid,v.version,p.uname from depend d,ver v,plugin p where p.plugin_rowid=v.plugin_rowid and v.ver_rowid=d.ver_rowid1 and d.ver_rowid1=@vr@ order by p.uname" );
+bs.sql('Dadd').$( 'db', 'd@mysql', 'query', "insert into depend(ver_rowid1,ver_rowid2)values(@vr1@,@vr2@)" );
+bs.sql('Ddel').$( 'db', 'd@mysql', 'query', "delete from depend where depend_rowid=@dr@" );
+
+bs.sql('Vlist').$( 'db', 'd@mysql', 'query', "select ver_rowid,version,DATE_FORMAT(freezeDate,'%y.%m.%d %H:%i')freezedate,DATE_FORMAT(editdate,'%y.%m.%d %H:%i')editdate,code,contents from ver where plugin_rowid=@r@ order by version desc" );
+bs.sql('Vsearch').$( 'db', 'd@mysql', 'query', "select v.ver_rowid,v.version from plugin p,ver v where p.plugin_rowid=v.plugin_rowid and p.uname='@title@' and p.plugin_rowid<>@r@ and v.freezedate is null order by v.version" );
+bs.sql('Vadd').$( 'db', 'd@mysql', 'query', "insert into ver(plugin_rowid,version)values(@r@,@version@)" );
+bs.sql('Vupdate').$( 'db', 'd@mysql', 'query', "update ver set code='@code@',contents='@contents@',editdate=CURRENT_TIMESTAMP()where ver_rowid=@vr@" );
+bs.sql('Vfreezable').$( 'db', 'd@mysql', 'query', "select freezedate,(select max(i.version)from ver i where i.plugin_rowid=v.plugin_rowid and i.freezedate is not NULL)<version k from ver v where ver_rowid=@vr@" );
+bs.sql('Vfreeze').$( 'db', 'd@mysql', 'query', "update ver set freezeDate=CURRENT_TIMESTAMP()where ver_rowid=@vr@" );
+bs.sql('VfreezeDetail').$( 'db', 'd@mysql', 'query',
 	"select p.uname,v.version,t.title,v.code "+
 	"from ver v,plugin p,plugintype t "+
 	"where v.plugin_rowid=p.plugin_rowid and p.plugintype_rowid=t.plugintype_rowid and ver_rowid=@vr@" 
 );
+
 bs.WEB.application( 
 	'post', function( $isSession ){
 		var t0, i, j, k, v;
