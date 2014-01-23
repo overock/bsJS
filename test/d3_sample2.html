@@ -22,7 +22,7 @@
 <script src="../bs/bsjs.js"></script>
 <script>
     bs.$import('d3', 'last');
-    bs.$import( 'sprite', 'last' );
+    bs.$import('sprite', 'last');
     bs(function() {
         bs.dom("<div></div>").$('<', 'body', '@id', 'stage')
         bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%')
@@ -37,7 +37,7 @@
             bs.dom("#stage").$('width', w, 'height', h)
             if(started) return;
 
-            var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 5 : 30
+            var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 5 : 100
             started=1, i=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 50 : 150;
 
             for(var i=0; i < planeMax; i++) {
@@ -48,13 +48,10 @@
                 k=bs.$ex(0, '~', 1), s=bs.$ex(3, '~', 75);
                 bs.ANI.tween(
                         bs.dom('<div></div>').$(
-                                'border-radius', s, 'opacity', 1,
-                                'left', w * .5 + sw, 'top', h * .5 + sh, 'width', 1, 'height', 1,
-                                'background', 'rgb(' + bs.$ex(210, '~', 255) + ',' + bs.$ex(210, '~', 255) + ',' + bs.$ex(150, '~', 200) + ')',
+                                'border-radius', s, 'opacity', 1, 'left', w * .5 + sw, 'top', h * .5 + sh, 'width', 1, 'height', 1, 'background', 'rgb(' + bs.$ex(210, '~', 255) + ',' + bs.$ex(210, '~', 255) + ',' + bs.$ex(150, '~', 200) + ')',
                                 'class', 'ani', '<', '#stage', 'this'
                         ),
-                        'opacity', 0, 'width', s, 'height', s,
-                        'left', k ? bs.$ex(0, '~', 1) ? 0 : w - 30 : bs.$ex(0, '~', w - 30), 'top', k ? bs.$ex(0, '~', h - 30) : bs.$ex(0, '~', 1) ? 0 : h - 30,
+                        'opacity', 0, 'width', s, 'height', s, 'left', k ? bs.$ex(0, '~', 1) ? 0 : w - 30 : bs.$ex(0, '~', w - 30), 'top', k ? bs.$ex(0, '~', h - 30) : bs.$ex(0, '~', 1) ? 0 : h - 30,
                         'delay', bs.$ex(0, '~f', 2), 'time', bs.$ex(.5, '~f', 5), 'loop', 0
                 );
             }
@@ -72,40 +69,28 @@
             bs.ANI.tween(bs.dom('#btFlight2').$('opacity', 0, 'this'), 'opacity', 1, 'ease', 'sineOut', 'delay', 2, 'time', 1, 'loop', 1)
 
 
-
             var s0, inited;
-            bs.sprite( 'explosion' ).$( 'src', 'hika/explosion.png', 'col', 29, 'row', 1 );
-            bs.WIN.sizer( function( w, h ){
-                if( inited ) return;
-                inited = 1;
-                bs.dom( '#stage' ).$( '>', bs.sprite( 'explosion' ).$( '@0', 'position', 'absolute', 'div' ),
+            bs.sprite('explosion').$('src', 'hika/explosion.png', 'col', 29, 'row', 1);
+            bs.WIN.sizer(function(w, h) {
+                if(inited) return;
+                inited=1;
+                bs.dom('#stage').$('>', bs.sprite('explosion').$('@0', 'position', 'absolute', 'div'),
                         'overflow', 'hidden', 'background', '#000', 'width', w, 'height', h,
-                        'down', function( $e ){
+                        'down', function($e) {
                             var s;
-                            bs.sprite( 'explosion' ).$( '@0',
-                                    'time', bs.$ex( .3, '~f', 0.5),
-                                    'width', s = bs.$ex( 50, '~', 500 ), 'height', s,'left', $e.x - s*.5, 'top', $e.y - s*.5,
+                            bs.sprite('explosion').$('@0',
+                                    'time', bs.$ex(0.7, '~f', 1),
+                                    'width', s=bs.$ex(50, '~', 500), 'height', s, 'left', $e.x - s * .5, 'top', $e.y - s * .5,
                                     '@'
                             );
                         }
                 ),
-                        bs.sprite( 'explosion' ).$( '@1', 'width', 70, 'height', 70, 'frame', 15 );
-            } );
-
-
-
-
-
-
-
-
-
-
-
-
+                        bs.sprite('explosion').$('@1', 'width', 70, 'height', 70, 'frame', 15);
+            });
 
 
             var lightOn=true
+
             function loopLight($target) {
                 if(lightOn) bs.ANI.tween($target, 'opacity', 0, 'ease', 'sineOut', 'time', 1, 'loop', 1, 'end', loopLight), bs.ANI.tween(bs.dom('#btFlight2'), 'opacity', 0, 'ease', 'sineOut', 'time', 1, 'loop', 1), lightOn=false
                 else bs.ANI.tween($target, 'opacity', 1, 'ease', 'sineOut', 'time', 1, 'loop', 1, 'end', loopLight), bs.ANI.tween(bs.dom('#btFlight2'), 'opacity', 1, 'ease', 'sineOut', 'time', 1, 'loop', 1), lightOn=true
@@ -124,6 +109,7 @@
                         }
                 )
             };
+
 
             function setDebuger() {
                 bs.dom('<div></div>').$('<', 'body', '@id', 'debuger', 'left', 15, 'top', 15, 'font-size', 11, 'background', '#333', 'width', 190, 'padding', 15, 'z-index', 10000000000, 'position', 'absolute', 'opacity', 0.3, 'color', '#fff', 'border-radius', 5, 'box-shadow', 'inset 0 1px 0 #aaa')
@@ -160,7 +146,7 @@
                         'position', 'absolute', 'top', 170, 'left', 15, 'padding', 10,
                         'color', '#fff', 'cursor', 'pointer', 'font-size', 12, 'opacity', 0.5,
                         'background', '#333',
-                        'box-shadow', 'inset 0 1px 0 #aaa','border-radius', 5,
+                        'box-shadow', 'inset 0 1px 0 #aaa', 'border-radius', 5,
                         'down', function($e) {
                             cameraFlow.pause= !cameraFlow.pause
                             if(!cameraFlow.pause) bs.ANI.ani(cameraFlow)
@@ -186,7 +172,8 @@
 
             setDebuger(), particleToggle(), setCameraFlow()
         })
-    });
+    })
+    ;
 
 </script>
 </body>
