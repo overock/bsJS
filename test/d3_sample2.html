@@ -27,9 +27,7 @@
         bs.dom("<div></div>").$('<', 'body', '@id', 'stage')
         bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%')
         bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('forward', 'w', 'backward', 's', 'left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
-        bs.d3m('mat').$('html', "<img src='redcamel_test_demo2_asset/ship.png'>");
-        bs.d3m('mat2').$('html', "<img src='redcamel_test_demo2_asset/rock.png'>");
-        bs.d3m('mat3').$('html', "<img src='redcamel_test_demo2_asset/rock2.png'>");
+        bs.d3m('mat').$('html', "<img src='redcamel_test_demo2_asset/ship.png'>"), bs.d3m('mat2').$('html', "<img src='redcamel_test_demo2_asset/rock.png'>"), bs.d3m('mat3').$('html', "<img src='redcamel_test_demo2_asset/rock2.png'>");
 
         var started;
         bs.css('body').$('background', '#000', 'overflow', 'hidden'), bs.css('.ani').$('position', 'absolute');
@@ -40,11 +38,12 @@
 
             var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 5 : 100
             for(var i=0; i < planeMax; i++) {
-                var s= bs.$ex(1,'~f',2)
-                if(i % 3 ==0) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 256*s, 'height', 64*s, 'material', 'mat')
-                else if(i % 3==1) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128*s, 'height', 128*s,'material', 'mat2')
-                else bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128*s, 'height', 128*s, 'material', 'mat3')
+                var s=bs.$ex(1, '~f', 2)
+                if(i % 3==0) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 256 * s, 'height', 64 * s, 'material', 'mat')
+                else if(i % 3==1) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128 * s, 'height', 128 * s, 'material', 'mat2')
+                else bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128 * s, 'height', 128 * s, 'material', 'mat3')
             }
+
             started=1, i=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 30 : 50;
             while(i--) {
                 k=bs.$ex(0, '~', 1), s=bs.$ex(3, '~', 35);
@@ -82,8 +81,7 @@
                         'overflow', 'hidden', 'background', '#000', 'width', w, 'height', h,
                         'down', function($e) {
                             var s;
-                            bs.sprite('explosion').$('@0',
-                                    'time', bs.$ex(0.7, '~f', 1),
+                            bs.sprite('explosion').$('@0', 'time', bs.$ex(0.7, '~f', 1),
                                     'width', s=bs.$ex(50, '~', 500), 'height', s, 'left', $e.x - s * .5, 'top', $e.y - s * .5,
                                     '@'
                             );
@@ -99,26 +97,13 @@
                     ANI: function() {
                         var s=0
                         checkLoop++
-                        if(checkLoop==60) bs.sprite('explosion').$('@1','time', bs.$ex(0.5, '~f', 1),
-                                'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h),
-                                '@'
-                        )
-                        else if(checkLoop==90) bs.sprite('explosion').$('@2','time', bs.$ex(0.5, '~f', 1),
-                                'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h),
-                                '@'
-                        )
-                        else if(checkLoop==150) bs.sprite('explosion').$('@3','time', bs.$ex(0.5, '~f', 1),
-                                'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h),
-                                '@'
-                        )
-
-                        if( checkLoop = 210)  checkLoop = 0
-
+                        if(checkLoop==60) bs.sprite('explosion').$('@1', 'time', bs.$ex(0.5, '~f', 1), 'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h), '@')
+                        else if(checkLoop==90) bs.sprite('explosion').$('@2', 'time', bs.$ex(0.5, '~f', 1), 'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h), '@')
+                        else if(checkLoop==150) bs.sprite('explosion').$('@3', 'time', bs.$ex(0.5, '~f', 1), 'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h), '@')
+                        if(checkLoop==210) checkLoop=0
                     }
                 }
-
                 bs.ANI.ani(fire)
-
             });
 
 
@@ -141,7 +126,7 @@
                             targetArrowRotation++, bs.dom('#targetArrow').$('left', $e.x - 100, 'top', $e.y - 100), bs.dom('#localPoint').$('html', 'X :' + $e.x + "/" + 'Y :' + $e.y), bs.dom('#targetArrow1').$('transform', 'rotateZ(' + targetArrowRotation + 'deg)')
                         }
                 )
-            };
+            }
 
 
             function setDebuger() {
@@ -162,7 +147,8 @@
                     }
                 }
                 bs.ANI.ani(debuger)
-            };
+            }
+
             function setCameraFlow() {
                 var camera=bs.d3('camera@doom').$('camera')
                 var cameraFlow={
@@ -187,7 +173,7 @@
                             bs.dom("#toggleControll").$('html', isPause ? msg2 : msg1);
                         }
                 )
-            };
+            }
 
             function particleToggle() {
                 bs.dom('<div id="toggle"></div>').$('<', 'body',
@@ -201,13 +187,11 @@
                             bs.dom("#toggle").$('html', isPause ? 'resume' : 'pause', 'background', 'color', '#fff');
                         }
                 )
-            };
+            }
 
             setDebuger(), particleToggle(), setCameraFlow()
         })
     })
-    ;
-
 </script>
 </body>
 </html>
