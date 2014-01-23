@@ -29,6 +29,7 @@
         bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('forward', 'w', 'backward', 's', 'left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
         bs.d3m('mat').$('html', "<img src='redcamel_test_demo2_asset/ship.png'>");
         bs.d3m('mat2').$('html', "<img src='redcamel_test_demo2_asset/rock.png'>");
+        bs.d3m('mat3').$('html', "<img src='redcamel_test_demo2_asset/rock2.png'>");
 
         var started;
         bs.css('body').$('background', '#000', 'overflow', 'hidden'), bs.css('.ani').$('position', 'absolute');
@@ -37,22 +38,25 @@
             bs.dom("#stage").$('width', w, 'height', h)
             if(started) return;
 
-            var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 5 : 100
+            var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 5 : 70
             started=1, i=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 50 : 150;
 
             for(var i=0; i < planeMax; i++) {
-                if(i % 2) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 256, 'height', 64, 'material', 'mat')
-                else bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128, 'height', 128, 'material', 'mat2')
+                if(i % 3 ==0) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 256, 'height', 64, 'material', 'mat')
+                else if(i % 3==1) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128, 'height', 128, 'material', 'mat2')
+                else bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128, 'height', 128, 'material', 'mat3')
             }
             while(i--) {
                 k=bs.$ex(0, '~', 1), s=bs.$ex(3, '~', 75);
                 bs.ANI.tween(
                         bs.dom('<div></div>').$(
-                                'border-radius', s, 'opacity', 1, 'left', w * .5 + sw, 'top', h * .5 + sh, 'width', 1, 'height', 1, 'background', 'rgb(' + bs.$ex(210, '~', 255) + ',' + bs.$ex(210, '~', 255) + ',' + bs.$ex(150, '~', 200) + ')',
+                                'border-radius', s, 'opacity', 1, 'left', w * .5 + sw, 'top', h * .5 + sh, 'width', 1, 'height', 1,
+                                'background', 'rgb(' + bs.$ex(210, '~', 255) + ',' + bs.$ex(210, '~', 255) + ',' + bs.$ex(150, '~', 200) + ')',
+//                                'html', "<img src='redcamel_test_demo2_asset/bullet.png' width='100%' height='100%'>",
                                 'class', 'ani', '<', '#stage', 'this'
                         ),
                         'opacity', 0, 'width', s, 'height', s, 'left', k ? bs.$ex(0, '~', 1) ? 0 : w - 30 : bs.$ex(0, '~', w - 30), 'top', k ? bs.$ex(0, '~', h - 30) : bs.$ex(0, '~', 1) ? 0 : h - 30,
-                        'delay', bs.$ex(0, '~f', 2), 'time', bs.$ex(.5, '~f', 5), 'loop', 0
+                        'delay', bs.$ex(0, '~f', 2), 'time', bs.$ex(.5, '~f', 2), 'loop', 0
                 );
             }
 
@@ -84,8 +88,36 @@
                                     '@'
                             );
                         }
-                ),
-                        bs.sprite('explosion').$('@1', 'width', 70, 'height', 70, 'frame', 15);
+                )
+
+
+                bs.sprite('explosion').$('@1', 'position', 'absolute', '<', '#stage', 'opacity', 0.5, 'div')
+                bs.sprite('explosion').$('@2', 'position', 'absolute', '<', '#stage', 'opacity', 0.5, 'div')
+                bs.sprite('explosion').$('@3', 'position', 'absolute', '<', '#stage', 'opacity', 0.5, 'div')
+
+                var checkLoop=0
+                var fire={
+                    ANI: function() {
+                        var s=0
+                        checkLoop++
+                        if(checkLoop==60) bs.sprite('explosion').$('@1','time', bs.$ex(0.5, '~f', 1),
+                                'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h),
+                                '@'
+                        )
+                        else if(checkLoop==90) bs.sprite('explosion').$('@2','time', bs.$ex(0.5, '~f', 1),
+                                'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h),
+                                '@'
+                        )
+                        else if(checkLoop==150) bs.sprite('explosion').$('@3','time', bs.$ex(0.5, '~f', 1),
+                                'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h),
+                                '@'
+                        ), checkLoop = 0
+
+                    }
+                }
+
+                bs.ANI.ani(fire)
+
             });
 
 
