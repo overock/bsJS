@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<title>space</title>
+<meta name="keywords" content="bs5"/>
+<meta name="description" content="bs5 Test suite"/>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="viewport"
+      content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi"/>
+<link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<a href="https://github.com/projectBS/bsJS">
+    <img style="position: fixed; top: 0; right: 0; border: 0;z-index:10000000000000000000000"
+         src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+</a>
+
+<div id="stage"></div>
+<script src="../bs/bsjs.js"></script>
+<script>
+    bs.$import('d3', 'last');
+    bs.$import( 'sprite', 'last' );
+    bs(function() {
+        bs.dom("<div></div>").$('<', 'body', '@id', 'stage')
+        bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%')
+        bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('forward', 'w', 'backward', 's', 'left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
+        bs.d3m('mat').$('html', "<img src='redcamel_test_demo2_asset/ship.png'>");
+        bs.d3m('mat2').$('html', "<img src='redcamel_test_demo2_asset/rock.png'>");
+
+        var started;
+        bs.css('body').$('background', '#000', 'overflow', 'hidden'), bs.css('.ani').$('position', 'absolute');
+        bs.WIN.sizer(function(w, h) {
+            var i, k, s, sh=0, sw=0;
+            bs.dom("#stage").$('width', w, 'height', h)
+            if(started) return;
+
+            var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 5 : 30
+            started=1, i=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 50 : 150;
+
+            for(var i=0; i < planeMax; i++) {
+                if(i % 2) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 256, 'height', 64, 'material', 'mat')
+                else bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128, 'height', 128, 'material', 'mat2')
+            }
+            while(i--) {
+                k=bs.$ex(0, '~', 1), s=bs.$ex(3, '~', 75);
+                bs.ANI.tween(
+                        bs.dom('<div></div>').$(
+                                'border-radius', s, 'opacity', 1,
+                                'left', w * .5 + sw, 'top', h * .5 + sh, 'width', 1, 'height', 1,
+                                'background', 'rgb(' + bs.$ex(210, '~', 255) + ',' + bs.$ex(210, '~', 255) + ',' + bs.$ex(150, '~', 200) + ')',
+                                'class', 'ani', '<', '#stage', 'this'
+                        ),
+                        'opacity', 0, 'width', s, 'height', s,
+                        'left', k ? bs.$ex(0, '~', 1) ? 0 : w - 30 : bs.$ex(0, '~', w - 30), 'top', k ? bs.$ex(0, '~', h - 30) : bs.$ex(0, '~', 1) ? 0 : h - 30,
+                        'delay', bs.$ex(0, '~f', 2), 'time', bs.$ex(.5, '~f', 5), 'loop', 0
+                );
+            }
+
+            var imgPath='redcamel_test_demo2_asset/redcamel_imgs/';
+            bs.dom('<div><img src=' + imgPath + "frame_bottom.jpg width=100%" + '></div>').$('<', '#stage', '@id', 'btFc', 'position', 'absolute', 'top', h, 'width', '100%', 'height', '100', 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_left.png' + '></div>').$('<', '#stage', '@id', 'btFl', 'position', 'absolute', 'top', h - 176, 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_right.png' + '></div>').$('<', '#stage', '@id', 'btFr', 'position', 'absolute', 'left', w, 'top', h - 176, 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_Light.png' + '></div>').$('<', '#stage', '@id', 'btFlight', 'position', 'absolute', 'top', h - 289, 'left', 76, 'opacity', 0, 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_Light2.png' + '></div>').$('<', '#stage', '@id', 'btFlight2', 'position', 'absolute', 'top', h - 281, 'left', w - 230, 'opacity', 0, 'z-index', 100000000001)
+            bs.ANI.tween(bs.dom('#btFc').$('opacity', 0, 'this'), 'top', h - 50, 'opacity', 1, 'ease', 'sineOut', 'time', 0.5, 'loop', 1)
+            bs.ANI.tween(bs.dom('#btFl').$('left', -312, 'this'), 'left', 0, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
+            bs.ANI.tween(bs.dom('#btFr').$('left', w, 'this'), 'left', w - 270, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
+            bs.ANI.tween(bs.dom('#btFlight').$('opacity', 0, 'this'), 'opacity', 1, 'ease', 'sineOut', 'delay', 2, 'time', 1, 'loop', 1, 'end', loopLight) // 라이트 온오프
+            bs.ANI.tween(bs.dom('#btFlight2').$('opacity', 0, 'this'), 'opacity', 1, 'ease', 'sineOut', 'delay', 2, 'time', 1, 'loop', 1)
+
+
+
+            var s0, inited;
+            bs.sprite( 'explosion' ).$( 'src', 'hika/explosion.png', 'col', 29, 'row', 1 );
+            bs.WIN.sizer( function( w, h ){
+                if( inited ) return;
+                inited = 1;
+                bs.dom( '#stage' ).$( '>', bs.sprite( 'explosion' ).$( '@0', 'position', 'absolute', 'div' ),
+                        'overflow', 'hidden', 'background', '#000', 'width', w, 'height', h,
+                        'down', function( $e ){
+                            var s;
+                            bs.sprite( 'explosion' ).$( '@0',
+                                    'time', bs.$ex( .3, '~f', 0.5),
+                                    'width', s = bs.$ex( 50, '~', 500 ), 'height', s,'left', $e.x - s*.5, 'top', $e.y - s*.5,
+                                    '@'
+                            );
+                        }
+                ),
+                        bs.sprite( 'explosion' ).$( '@1', 'width', 70, 'height', 70, 'frame', 15 );
+            } );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            var lightOn=true
+            function loopLight($target) {
+                if(lightOn) bs.ANI.tween($target, 'opacity', 0, 'ease', 'sineOut', 'time', 1, 'loop', 1, 'end', loopLight), bs.ANI.tween(bs.dom('#btFlight2'), 'opacity', 0, 'ease', 'sineOut', 'time', 1, 'loop', 1), lightOn=false
+                else bs.ANI.tween($target, 'opacity', 1, 'ease', 'sineOut', 'time', 1, 'loop', 1, 'end', loopLight), bs.ANI.tween(bs.dom('#btFlight2'), 'opacity', 1, 'ease', 'sineOut', 'time', 1, 'loop', 1), lightOn=true
+            }
+
+            bs.$img(setTarget, imgPath + 'targetArrow.png', imgPath + 'targetArrowRotationA.png'); // 이미지 부르고 콜백검
+            function setTarget($images) {
+                bs.dom('<div></div>').$('<', '#stage', '@id', 'targetArrow', 'position', 'absolute') // 타겟포인트 div
+                var i=$images.length
+                while(i--) bs.dom('<div></div>').$('<', '#targetArrow', '@id', 'targetArrow' + i, 'position', 'absolute', 'top', (198 - $images[i].width) / 2, 'left', (198 - $images[i].height) / 2, '>', $images[i])
+                bs.ANI.tween(bs.dom('#targetArrow').$('width', $images[1].width, 'height', $images[1].height, 'opacity', 0, 'this'), 'opacity', 1, 'time', 0.5, 'loop', 1)
+                bs.dom('<div></div>').$('<', '#targetArrow', '@id', 'localPoint', 'position', 'absolute', 'font-size', 11, 'text-align', 'center', 'color', '#fff', 'width', '100%', 'top', 155)
+                var targetArrowRotation=0
+                bs.dom('#stage').$('mousemove', function($e) {
+                            targetArrowRotation++, bs.dom('#targetArrow').$('left', $e.x - 100, 'top', $e.y - 100), bs.dom('#localPoint').$('html', 'X :' + $e.x + "/" + 'Y :' + $e.y), bs.dom('#targetArrow1').$('transform', 'rotateZ(' + targetArrowRotation + 'deg)')
+                        }
+                )
+            };
+
+            function setDebuger() {
+                bs.dom('<div></div>').$('<', 'body', '@id', 'debuger', 'left', 15, 'top', 15, 'font-size', 11, 'background', '#333', 'width', 190, 'padding', 15, 'z-index', 10000000000, 'position', 'absolute', 'opacity', 0.3, 'color', '#fff', 'border-radius', 5, 'box-shadow', 'inset 0 1px 0 #aaa')
+                // 디버거 세팅
+                var debuger={
+                    ANI: function($time) {
+                        var camera=bs.d3('camera@doom').$('camera')
+                        var str="bs.d3('camera@doom').$('camera')"
+                        str+='<br><br>x :' + camera.x
+                        str+='<br>y :' + camera.y
+                        str+='<br>z :' + camera.z
+                        str+='<br>pan :' + camera.pan
+                        str+='<br>tilt :' + camera.tilt
+                        str+='<br>speed :' + camera.speed
+                        str+='<br>farclip :' + camera.farclip
+                        bs.dom('#debuger').$('html', str)
+                    }
+                }
+                bs.ANI.ani(debuger)
+            };
+            function setCameraFlow() {
+                var camera=bs.d3('camera@doom').$('camera')
+                var cameraFlow={
+                    pause: false,
+                    ANI: function($time) {
+                        var sin=Math.sin($time / 1000) , cos=Math.cos($time / 1000)
+                        return camera.x=sin * 500, camera.z=cos * 500, camera.y=cos * 50, camera.tilt=sin / 10, camera.pan=sin, camera.y=sin * 100 + 50, this.pause
+                    }
+                };
+                bs.ANI.ani(cameraFlow);
+                var msg1='Camera Controll Off', msg2='Camera Controll On';
+                bs.dom('<div id="toggleControll"></div>').$('<', 'body',
+                        'html', msg1,
+                        'position', 'absolute', 'top', 170, 'left', 15, 'padding', 10,
+                        'color', '#fff', 'cursor', 'pointer', 'font-size', 12, 'opacity', 0.5,
+                        'background', '#333',
+                        'box-shadow', 'inset 0 1px 0 #aaa','border-radius', 5,
+                        'down', function($e) {
+                            cameraFlow.pause= !cameraFlow.pause
+                            if(!cameraFlow.pause) bs.ANI.ani(cameraFlow)
+                            var isPause=cameraFlow.pause
+                            bs.dom("#toggleControll").$('html', isPause ? msg2 : msg1);
+                        }
+                )
+            };
+
+            function particleToggle() {
+                bs.dom('<div id="toggle"></div>').$('<', 'body',
+                        'html', 'pause ',
+                        'position', 'absolute', 'top', 210, 'left', 15, 'padding', 10,
+                        'color', '#fff', 'cursor', 'pointer', 'font-size', 12, 'opacity', 0.5,
+                        'background', '#333',
+                        'box-shadow', 'inset 0 1px 0 #aaa', 'border-radius', 5,
+                        'down', function($e) {
+                            var isPause=bs.ANI.toggle();
+                            bs.dom("#toggle").$('html', isPause ? 'resume' : 'pause', 'background', 'color', '#fff');
+                        }
+                )
+            };
+
+            setDebuger(), particleToggle(), setCameraFlow()
+        })
+    });
+
+</script>
+</body>
+</html>
