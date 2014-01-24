@@ -115,7 +115,7 @@ h1{font-size:50px;font-weight:bold;color:#4b506c;margin:10px;padding:0}
 #Valert{margin-left:10px}		
 #Vupdate{height:30px;line-height:30px;margin:10px 25px 10px 5px}
 #Vfreeze{height:30px;line-height:30px;margin:10px 5px}
-#Vcode,#Vcontents{width:938px;height:700px;font-size:15px;color:#eee;border:1px solid #eee;padding:10px;background:#4b506c}
+#Vcode,#Vcontents{width:938px;height:700px;font-size:15px;color:#ddd;border:1px solid #eee;padding:10px;background:#4b506c}
 #Vcontents{display:none}
 #Dname{padding-left:15px;width:200px;height:35px;border:1px solid #ddd;margin:0 10px}
 #Ddetail{display:none}

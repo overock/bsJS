@@ -42,7 +42,7 @@ bs.WEB.application(
 		t0 = [], i = 1, j = arguments.length;
 		while( i < j ){
 			k = arguments[i++];
-			if( !( v = bs.WEB.post( k ) ) ) return bs.WEB.response( JSON.stringify( {result:'fail',contents:'no data:' + k} ) ), 0;
+			if( ( v = bs.WEB.post( k ) ) === undefined ) return bs.WEB.response( JSON.stringify( {result:'fail',contents:'no data:' + k} ) ), 0;
 			switch( arguments[i++] ){
 			case'i':t0[k] = parseInt( v, 10 ); break;
 			case'f':t0[k] = parseFloat( v );break;

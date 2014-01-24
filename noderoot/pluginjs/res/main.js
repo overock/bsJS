@@ -63,8 +63,8 @@ header:function(){
 			return bs.dom('#Jalert').$('html', 'not equal [isPw]'), setTimeout( function(){bs.dom('#Jpwc').$('@value','','f');}, 1 );
 		}else if( !bs.$test( '@alphanum', '#Jnick|' ) || !bs.$test( '@range|4|10', '#Jnick|' ) ){
 			return bs.dom('#Jalert').$('html', 'invalid [nick]'), setTimeout( function(){bs.dom('#Jnick').$('@value','','f');}, 1 );
-		}else if( t0 = bs.dom('#Jimg').$('@src') ){
-			bs.dom('#Jthumb').$('@value', t0.indexOf('/res/thumb/default.png') == -1 ? t0 : '' )
+		}else if( t0 = bs.$trim( bs.dom('#Jthumb').$('@value') ) ){
+			if( !bs.$test( '@url', t0 ) ) return bs.dom('#Jalert').$('html', 'invalid [thumb]'), setTimeout( function(){bs.dom('#Jthumb').$('@value','','f');}, 1 );
 		}
 		bs.$post( function( t0 ){
 			if( t0 ){
@@ -81,7 +81,7 @@ header:function(){
 		);
 	}),
 	bs.dom('#Jthumb').$( 'blur', function( $e ){if( $e.value ) bs.dom('#Jimg').$('@src', $e.value );},
-		'keydown', function( $e ){if( $e.key('enter') || $e.key('space') ) $e.prevent(), bs.dom('#Jimg').$('@src', $e.value );} );
+		'keydown', function( $e ){bs.dom('#Jimg').$('@src', $e.value );} );
 },
 mi:function(){
 	var height, isAdd, acancel, list;
@@ -108,7 +108,7 @@ mi:function(){
 		bs.dom('#Aalert').$( 'html', '' );
 		if( !bs.$test( '@range|5|100', '#Atitle|' ) ){
 			return bs.dom('#Aalert').$('html', 'invalid [title]'), setTimeout( function(){bs.dom('#Atitle').$('f');}, 1 );
-		}else if( !bs.$test( '@range|5|100', '#Auname|' ) ){
+		}else if( !bs.$test( '@range|3|100', '#Auname|' ) ){
 			return bs.dom('#Aalert').$('html', 'invalid [uname]'), setTimeout( function(){bs.dom('#Auname').$('f');}, 1 );
 		}else if( t0 = bs.dom('#Aimg').$('@src') ){
 			bs.dom('#Athumb').$('@value', t0.indexOf('/res/thumb/default.png') == -1 ? t0 : '' )
@@ -294,8 +294,8 @@ view:function(){
 		}, '/member/vFrz', 'vr', bs.dom('#Vvr').$('@value') );
 	} );
 	(function(){
-		function f0(t){return function($e){bs.dom(t).$( 'color', '#444' );};}
-		function f1(t){return function($e){bs.dom(t).$( 'color', '#222' );};}
+		function f0(t){return function($e){bs.dom(t).$( 'color', '#fff' );};}
+		function f1(t){return function($e){bs.dom(t).$( 'color', '#ddd' );};}
 		function f2(t){
 			return function($e){
 				var i;
