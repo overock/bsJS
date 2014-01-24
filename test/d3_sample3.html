@@ -27,7 +27,12 @@
         bs.css('img').$('transform', 'rotateZ(0deg)')
         bs.css('div').$('transform', 'rotateZ(0deg)')
         bs.dom("<div></div>").$('<', 'body', '@id', 'stage')
-        bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%', '@id', 'bgImage')
+       if(  bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ){
+           bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg_m.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%', '@id', 'bgImage')
+       }else{
+           bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%', '@id', 'bgImage')
+       }
+
 //        bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('forward', 'w', 'backward', 's', 'left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
         bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
         bs.d3('camera@doom').$('camera').y= -300
@@ -43,7 +48,7 @@
                 bs.dom('#btFc').$('top', h - 25), bs.dom('#btFl').$('top', h - 88, 'left', 0), bs.dom('#btFr').$('top', h - 88, 'left', w - 135), bs.dom('#btFlight').$('top', h - 145, 'left', 38), bs.dom('#btFlight2').$('top', h - 140, 'left', w - 115)
                 return;
             }
-            var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 5 : 50
+            var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 10 : 50
 
             var planeNum=0
             var ufos=[], rocks=[]
@@ -87,7 +92,7 @@
 
             bs.ANI.ani(ufo)
 
-            started=1, i=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 30 : 50;
+            started=1, i=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 0 : 50;
             while(i--) {
                 k=bs.$ex(0, '~', 1), s=bs.$ex(3, '~', 25);
                 bs.ANI.tween(
