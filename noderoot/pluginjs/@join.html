@@ -1,6 +1,7 @@
 <%
 if( !bs.WEB.session('id') ){
 	var post = bs.WEB.application('post')( false, 'email', 's', 'pw', 's', 'nick', 's', 'thumb', 's' );
+	console.log( post );
 	if( post ) bs.WEB.application('db')( 'join', post, function( $data, $rs, $e ){
 		if( $rs ){
 			bs.WEB.application('db')( 'login', ['email', post.email, 'pw', post.pw], function( $data, $rs, $e ){
