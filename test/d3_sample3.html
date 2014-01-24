@@ -28,7 +28,8 @@
         bs.css('div').$('transform', 'rotateZ(0deg)')
         bs.dom("<div></div>").$('<', 'body', '@id', 'stage')
         bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%', '@id', 'bgImage')
-        bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('forward', 'w', 'backward', 's', 'left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
+//        bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('forward', 'w', 'backward', 's', 'left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
+        bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
         bs.d3('camera@doom').$('camera').y= -300
         bs.d3('camera@doom').$('camera').tilt= -130
         bs.d3m('mat').$('html', "<img src='redcamel_test_demo2_asset/ship.png'>"), bs.d3m('mat2').$('html', "<img src='redcamel_test_demo2_asset/rock.png'>"), bs.d3m('mat3').$('html', "<img src='redcamel_test_demo2_asset/rock2.png'>");
@@ -39,7 +40,7 @@
             var i, k, s, sh=0, sw=0;
             bs.dom("#stage").$('width', w, 'height', h)
             if(started) {
-                bs.dom('#btFc').$('top', h - 50), bs.dom('#btFl').$('top', h - 176, 'left', 0), bs.dom('#btFr').$('top', h - 176, 'left', w - 270), bs.dom('#btFlight').$('top', h - 289, 'left', 76), bs.dom('#btFlight2').$('top', h - 281, 'left', w - 230)
+                bs.dom('#btFc').$('top', h - 25), bs.dom('#btFl').$('top', h - 88, 'left', 0), bs.dom('#btFr').$('top', h - 88, 'left', w - 135), bs.dom('#btFlight').$('top', h - 145, 'left', 38), bs.dom('#btFlight2').$('top', h - 140, 'left', w - 115)
                 return;
             }
             var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 5 : 50
@@ -103,13 +104,13 @@
 
             var imgPath='redcamel_test_demo2_asset/redcamel_imgs/';
             bs.dom('<div><img src=' + imgPath + "frame_bottom.jpg width=100%" + '></div>').$('<', '#stage', '@id', 'btFc', 'position', 'absolute', 'top', h, 'width', '100%', 'height', '100', 'z-index', 100000000001)
-            bs.dom('<div><img src=' + imgPath + 'frame_left.png' + '></div>').$('<', '#stage', '@id', 'btFl', 'position', 'absolute', 'top', h - 176, 'z-index', 100000000001)
-            bs.dom('<div><img src=' + imgPath + 'frame_right.png' + '></div>').$('<', '#stage', '@id', 'btFr', 'position', 'absolute', 'left', w, 'top', h - 176, 'z-index', 100000000001)
-            bs.dom('<div><img src=' + imgPath + 'frame_Light.png' + '></div>').$('<', '#stage', '@id', 'btFlight', 'position', 'absolute', 'top', h - 289, 'left', 76, 'opacity', 0, 'z-index', 100000000001)
-            bs.dom('<div><img src=' + imgPath + 'frame_Light2.png' + '></div>').$('<', '#stage', '@id', 'btFlight2', 'position', 'absolute', 'top', h - 281, 'left', w - 230, 'opacity', 0, 'z-index', 100000000001)
-            bs.ANI.tween(bs.dom('#btFc').$('opacity', 0, 'this'), 'top', h - 50, 'opacity', 1, 'ease', 'sineOut', 'time', 0.5, 'loop', 1)
-            bs.ANI.tween(bs.dom('#btFl').$('left', -312, 'this'), 'left', 0, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
-            bs.ANI.tween(bs.dom('#btFr').$('left', w, 'this'), 'left', w - 270, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
+            bs.dom('<div><img src=' + imgPath + 'frame_left.png' + '></div>').$('<', '#stage', '@id', 'btFl', 'position', 'absolute', 'top', h - 88, 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_right.png' + '></div>').$('<', '#stage', '@id', 'btFr', 'position', 'absolute', 'left', w, 'top', h - 88, 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_Light.png' + '></div>').$('<', '#stage', '@id', 'btFlight', 'position', 'absolute', 'top', h - 145, 'left', 38, 'opacity', 0, 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_Light2.png' + '></div>').$('<', '#stage', '@id', 'btFlight2', 'position', 'absolute', 'top', h - 140, 'left', w - 115, 'opacity', 0, 'z-index', 100000000001)
+            bs.ANI.tween(bs.dom('#btFc').$('opacity', 0, 'this'), 'top', h - 25, 'opacity', 1, 'ease', 'sineOut', 'time', 0.5, 'loop', 1)
+            bs.ANI.tween(bs.dom('#btFl').$('left', -156, 'this'), 'left', 0, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
+            bs.ANI.tween(bs.dom('#btFr').$('left', w, 'this'), 'left', w - 135, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
             bs.ANI.tween(bs.dom('#btFlight').$('opacity', 0, 'this'), 'opacity', 1, 'ease', 'sineOut', 'delay', 2, 'time', 1, 'loop', 1, 'end', loopLight) // 라이트 온오프
             bs.ANI.tween(bs.dom('#btFlight2').$('opacity', 0, 'this'), 'opacity', 1, 'ease', 'sineOut', 'delay', 2, 'time', 1, 'loop', 1)
 
@@ -134,13 +135,16 @@
 
             bs.$img(setTarget, imgPath + 'targetArrow.png', imgPath + 'targetArrowRotationA.png'); // 이미지 부르고 콜백검
             function setTarget($images) {
-                bs.dom('<div></div>').$('<', '#stage', '@id', 'targetArrow', 'position', 'absolute', 'left', w / 2 - 100, 'top', h / 2 - 100, 'z-index', 1000000000010) // 타겟포인트 div
+                bs.dom('<div></div>').$('<', '#stage', '@id', 'targetArrow', 'position', 'absolute') // 타겟포인트 div
                 var i=$images.length
                 while(i--) bs.dom('<div></div>').$('<', '#targetArrow', '@id', 'targetArrow' + i, 'position', 'absolute', 'top', (198 - $images[i].width) / 2, 'left', (198 - $images[i].height) / 2, '>', $images[i])
                 bs.ANI.tween(bs.dom('#targetArrow').$('width', $images[1].width, 'height', $images[1].height, 'opacity', 0, 'this'), 'opacity', 1, 'time', 0.5, 'loop', 1)
                 bs.dom('<div></div>').$('<', '#targetArrow', '@id', 'localPoint', 'position', 'absolute', 'font-size', 11, 'text-align', 'center', 'color', '#fff', 'width', '100%', 'top', 155)
                 var targetArrowRotation=0
-
+                bs.dom('#stage').$('mousemove', function($e) {
+                            targetArrowRotation++, bs.dom('#targetArrow').$('left', $e.cx - 100, 'top', $e.cy - 100), bs.dom('#localPoint').$('html', 'X :' + $e.cx + "/" + 'Y :' + $e.cy), bs.dom('#targetArrow1').$('transform', 'rotateZ(' + targetArrowRotation + 'deg)')
+                        }
+                )
             }
 
 
