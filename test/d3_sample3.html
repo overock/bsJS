@@ -27,32 +27,72 @@
         bs.css('img').$('transform', 'rotateZ(0deg)')
         bs.css('div').$('transform', 'rotateZ(0deg)')
         bs.dom("<div></div>").$('<', 'body', '@id', 'stage')
-        bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%', '@id', 'bgImage')
-        bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('forward', 'w', 'backward', 's', 'left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
+       if(  bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ){
+           bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg_m.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%', '@id', 'bgImage')
+       }else{
+           bs.dom('<div><img src="redcamel_test_demo2_asset/spaceBg.png" width="100%" ></div>').$('<', '#stage', 'position', 'absolute', 'width', '100%', '@id', 'bgImage')
+       }
+
+//        bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('forward', 'w', 'backward', 's', 'left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
+        bs.d3('camera@doom'), bs.d3('camera@doom').$('camera').$('left', 'a', 'right', 'd', 'panleft', 'q', 'panright', 'e', 'tiltup', 't', 'tiltdown', 'g', 'up', 'r', 'down', 'f')
+        bs.d3('camera@doom').$('camera').y= -300
+        bs.d3('camera@doom').$('camera').tilt= -130
         bs.d3m('mat').$('html', "<img src='redcamel_test_demo2_asset/ship.png'>"), bs.d3m('mat2').$('html', "<img src='redcamel_test_demo2_asset/rock.png'>"), bs.d3m('mat3').$('html', "<img src='redcamel_test_demo2_asset/rock2.png'>");
 
         var started;
-        bs.css('body').$('background', '#000', 'overflow', 'hidden'), bs.css('.ani').$('position', 'absolute');
+        bs.css('body').$('background', '#000', 'overflow', 'hidden', 'margin', 0), bs.css('.ani').$('position', 'absolute');
         bs.WIN.sizer(function(w, h) {
             var i, k, s, sh=0, sw=0;
             bs.dom("#stage").$('width', w, 'height', h)
             if(started) {
-                bs.dom('#btFc').$('top', h - 50)
-                bs.dom('#btFl').$('top', h-176,'left',0)
-                bs.dom('#btFr').$('top',h-176,'left',w-270)
-                bs.dom('#btFlight').$('top',h-289,'left',76)
-                bs.dom('#btFlight2').$('top',h-281,'left',w-230)
+                bs.dom('#btFc').$('top', h - 25), bs.dom('#btFl').$('top', h - 88, 'left', 0), bs.dom('#btFr').$('top', h - 88, 'left', w - 135), bs.dom('#btFlight').$('top', h - 145, 'left', 38), bs.dom('#btFlight2').$('top', h - 140, 'left', w - 115)
                 return;
             }
-            var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 5 : 100
-            for(var i=0; i < planeMax; i++) {
+            var planeMax=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 10 : 50
+
+            var planeNum=0
+            var ufos=[], rocks=[]
+            var ufo={
+                ANI: function() {
+                    var dt
+                    if(ufos.length==planeMax) {
+                        dt=ufos.shift()
+                        if(dt) dt.$(null)
+                    }
+                    if(rocks.length==planeMax) {
+                        dt=rocks.shift()
+                        if(dt) dt.$(null)
+                    }
+                    if(++planeNum % 20==0) ufos.push(bs.d3('plane@aa' + planeNum)), addItem(ufos, 'mat')
+                    else if(++planeNum % 29==0) rocks.push(bs.d3('plane@aa' + planeNum)), addItem(rocks, 'mat1')
+                    else if(++planeNum % 15==0) rocks.push(bs.d3('plane@aa' + planeNum)), addItem(rocks, 'mat2')
+
+                    for(var i=0; i < ufos.length; i++) ufos[i].$('z', ufos[i].$('z') + 10)
+                    for(var i=0; i < rocks.length; i++) rocks[i].$('z', rocks[i].$('z') - 20)
+                }
+            }
+            function addItem($list, $map) {
                 var s=bs.$ex(0.5, '~f', 2)
-                if(i % 3==0) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-300, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 256 * s, 'height', 64 * s, 'material', 'mat', 'transform', 'rotateZ(' + bs.$ex(-10, '~', 10) + 'deg)')
-                else if(i % 3==1) bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128 * s, 'height', 128 * s, 'material', 'mat2', 'transform', 'rotateZ(' + bs.$ex(-60, '~', 60) + 'deg)')
-                else bs.d3('plane@aa' + i).$('<', '#stage', 'x', bs.$ex(-1000, '~', 1000), 'z', bs.$ex(0, '~', 3000), 'width', 128 * s, 'height', 128 * s, 'material', 'mat3', 'transform', 'rotateZ(' + bs.$ex(-60, '~', 60) + 'deg)')
+                if($list==rocks) {
+                    $list[$list.length - 1].$('<', '#stage', 'x', bs.$ex(-w / 2, '~', w / 2), 'z', 2500, 'width', 128 * s, 'height', 128 * s, 'material', $map, 'transform', 'rotateZ(' + bs.$ex(-10, '~', 10) + 'deg)',
+                            'mousedown', function($e) {
+                                var w=bs.dom($e.target).$('width')
+                                bs.sprite('explosion').$('@0', 'time', bs.$ex(0.5, '~f', 1), 'width', w, 'height', w, 'left', $e.cx - w / 2, 'top', $e.cy - w / 2, '@')
+                                bs.dom($e.target).$(null)
+                            })
+                } else {
+                    $list[$list.length - 1].$('<', '#stage', 'x', bs.$ex(-w / 2, '~', w / 2), 'z', 0, 'width', 256 * s, 'height', 64 * s, 'material', $map, 'transform', 'rotateZ(' + bs.$ex(-10, '~', 10) + 'deg)',
+                            'mousedown', function($e) {
+                                var w=bs.dom($e.target).$('width')
+                                bs.sprite('explosion').$('@0', 'time', bs.$ex(0.5, '~f', 1), 'width', w, 'height', w, 'left', $e.cx - w / 2, 'top', $e.cy - w / 2, '@')
+                                bs.dom($e.target).$(null)
+                            })
+                }
             }
 
-            started=1, i=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 30 : 50;
+            bs.ANI.ani(ufo)
+
+            started=1, i=bs.DETECT.device=='tablet'||bs.DETECT.device=='mobile' ? 0 : 50;
             while(i--) {
                 k=bs.$ex(0, '~', 1), s=bs.$ex(3, '~', 25);
                 bs.ANI.tween(
@@ -69,45 +109,25 @@
 
             var imgPath='redcamel_test_demo2_asset/redcamel_imgs/';
             bs.dom('<div><img src=' + imgPath + "frame_bottom.jpg width=100%" + '></div>').$('<', '#stage', '@id', 'btFc', 'position', 'absolute', 'top', h, 'width', '100%', 'height', '100', 'z-index', 100000000001)
-            bs.dom('<div><img src=' + imgPath + 'frame_left.png' + '></div>').$('<', '#stage', '@id', 'btFl', 'position', 'absolute', 'top', h - 176, 'z-index', 100000000001)
-            bs.dom('<div><img src=' + imgPath + 'frame_right.png' + '></div>').$('<', '#stage', '@id', 'btFr', 'position', 'absolute', 'left', w, 'top', h - 176, 'z-index', 100000000001)
-            bs.dom('<div><img src=' + imgPath + 'frame_Light.png' + '></div>').$('<', '#stage', '@id', 'btFlight', 'position', 'absolute', 'top', h - 289, 'left', 76, 'opacity', 0, 'z-index', 100000000001)
-            bs.dom('<div><img src=' + imgPath + 'frame_Light2.png' + '></div>').$('<', '#stage', '@id', 'btFlight2', 'position', 'absolute', 'top', h - 281, 'left', w - 230, 'opacity', 0, 'z-index', 100000000001)
-            bs.ANI.tween(bs.dom('#btFc').$('opacity', 0, 'this'), 'top', h - 50, 'opacity', 1, 'ease', 'sineOut', 'time', 0.5, 'loop', 1)
-            bs.ANI.tween(bs.dom('#btFl').$('left', -312, 'this'), 'left', 0, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
-            bs.ANI.tween(bs.dom('#btFr').$('left', w, 'this'), 'left', w - 270, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
+            bs.dom('<div><img src=' + imgPath + 'frame_left.png' + '></div>').$('<', '#stage', '@id', 'btFl', 'position', 'absolute', 'top', h - 88, 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_right.png' + '></div>').$('<', '#stage', '@id', 'btFr', 'position', 'absolute', 'left', w, 'top', h - 88, 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_Light.png' + '></div>').$('<', '#stage', '@id', 'btFlight', 'position', 'absolute', 'top', h - 145, 'left', 38, 'opacity', 0, 'z-index', 100000000001)
+            bs.dom('<div><img src=' + imgPath + 'frame_Light2.png' + '></div>').$('<', '#stage', '@id', 'btFlight2', 'position', 'absolute', 'top', h - 140, 'left', w - 115, 'opacity', 0, 'z-index', 100000000001)
+            bs.ANI.tween(bs.dom('#btFc').$('opacity', 0, 'this'), 'top', h - 25, 'opacity', 1, 'ease', 'sineOut', 'time', 0.5, 'loop', 1)
+            bs.ANI.tween(bs.dom('#btFl').$('left', -156, 'this'), 'left', 0, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
+            bs.ANI.tween(bs.dom('#btFr').$('left', w, 'this'), 'left', w - 135, 'delay', 1, 'ease', 'backOut', 'time', 1, 'loop', 1)
             bs.ANI.tween(bs.dom('#btFlight').$('opacity', 0, 'this'), 'opacity', 1, 'ease', 'sineOut', 'delay', 2, 'time', 1, 'loop', 1, 'end', loopLight) // 라이트 온오프
             bs.ANI.tween(bs.dom('#btFlight2').$('opacity', 0, 'this'), 'opacity', 1, 'ease', 'sineOut', 'delay', 2, 'time', 1, 'loop', 1)
 
 
-            function makeFire(){
+            function makeFire() {
                 bs.sprite('explosion').$('src', 'hika/explosion.png', 'col', 29, 'row', 1);
-                bs.dom('#stage').$('>', bs.sprite('explosion').$('@0', 'position', 'absolute', 'div'),
-                        'overflow', 'hidden', 'background', '#000', 'width', w, 'height', h,
-                        'down', function($e) {
-                            var s;
-                            bs.sprite('explosion').$('@0', 'time', bs.$ex(0.7, '~f', 1),
-                                    'width', s=bs.$ex(50, '~', 500), 'height', s, 'left', $e.x - s * .5, 'top', $e.y - s * .5,
-                                    '@'
-                            );
-                        }
+                bs.dom('#stage').$('>', bs.sprite('explosion').$('@0', 'position', 'absolute', 'z-index', 10000000000001, 'div'),
+                        'overflow', 'hidden', 'background', '#000', 'width', w, 'height', h
                 )
-                bs.sprite('explosion').$('@1', 'position', 'absolute', '<', '#stage', 'opacity', 0.5, 'div')
-                bs.sprite('explosion').$('@2', 'position', 'absolute', '<', '#stage', 'opacity', 0.5, 'div')
-                bs.sprite('explosion').$('@3', 'position', 'absolute', '<', '#stage', 'opacity', 0.5, 'div')
-                var checkLoop=0
-                var fire={
-                    ANI: function() {
-                        var s=0
-                        checkLoop++
-                        if(checkLoop==60) bs.sprite('explosion').$('@1', 'time', bs.$ex(0.5, '~f', 1), 'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h), '@')
-                        else if(checkLoop==90) bs.sprite('explosion').$('@2', 'time', bs.$ex(0.5, '~f', 1), 'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h), '@')
-                        else if(checkLoop==150) bs.sprite('explosion').$('@3', 'time', bs.$ex(0.5, '~f', 1), 'width', s=bs.$ex(250, '~', 500), 'height', s, 'left', bs.$ex(0, '~', w), 'top', bs.$ex(0, '~', h), '@')
-                        if(checkLoop==210) checkLoop=0
-                    }
-                }
-                bs.ANI.ani(fire)
+
             }
+
             makeFire()
 
 
@@ -127,7 +147,7 @@
                 bs.dom('<div></div>').$('<', '#targetArrow', '@id', 'localPoint', 'position', 'absolute', 'font-size', 11, 'text-align', 'center', 'color', '#fff', 'width', '100%', 'top', 155)
                 var targetArrowRotation=0
                 bs.dom('#stage').$('mousemove', function($e) {
-                            targetArrowRotation++, bs.dom('#targetArrow').$('left', $e.x - 100, 'top', $e.y - 100), bs.dom('#localPoint').$('html', 'X :' + $e.x + "/" + 'Y :' + $e.y), bs.dom('#targetArrow1').$('transform', 'rotateZ(' + targetArrowRotation + 'deg)')
+                            targetArrowRotation++, bs.dom('#targetArrow').$('left', $e.cx - 100, 'top', $e.cy - 100), bs.dom('#localPoint').$('html', 'X :' + $e.cx + "/" + 'Y :' + $e.cy), bs.dom('#targetArrow1').$('transform', 'rotateZ(' + targetArrowRotation + 'deg)')
                         }
                 )
             }
@@ -154,31 +174,31 @@
                 bs.ANI.ani(debuger)
             }
 
-            function setCameraFlow() {
-                var camera=bs.d3('camera@doom').$('camera')
-                var cameraFlow={
-                    pause: false,
-                    ANI: function($time) {
-                        var sin=Math.sin($time / 1000) , cos=Math.cos($time / 1000)
-                        return camera.x=sin * 500, camera.z=cos * 500, camera.y=cos * 50, camera.tilt=sin / 10, camera.pan=sin, camera.y=sin * 100 + 50, this.pause
-                    }
-                };
-                bs.ANI.ani(cameraFlow);
-                var msg1='Camera Controll Off', msg2='Camera Controll On';
-                bs.dom('<div id="toggleControll"></div>').$('<', 'body',
-                        'html', msg1,
-                        'position', 'absolute', 'top', 170, 'left', 15, 'padding', 10,
-                        'color', '#fff', 'cursor', 'pointer', 'font-size', 12, 'opacity', 0.5,
-                        'background', '#333',
-                        'box-shadow', 'inset 0 1px 0 #aaa', 'border-radius', 5,
-                        'down', function($e) {
-                            cameraFlow.pause= !cameraFlow.pause
-                            if(!cameraFlow.pause) bs.ANI.ani(cameraFlow)
-                            var isPause=cameraFlow.pause
-                            bs.dom("#toggleControll").$('html', isPause ? msg2 : msg1);
-                        }
-                )
-            }
+//            function setCameraFlow() {
+//                var camera=bs.d3('camera@doom').$('camera')
+//                var cameraFlow={
+//                    pause: true,
+//                    ANI: function($time) {
+//                        var sin=Math.sin($time / 1000) , cos=Math.cos($time / 1000)
+//                        return camera.x=sin * 500, camera.z=cos * 500, camera.y=cos * 50, camera.tilt=sin / 10, camera.pan=sin, camera.y=sin * 100 + 50, this.pause
+//                    }
+//                };
+//                bs.ANI.ani(cameraFlow);
+//                var msg1='Camera Controll Off', msg2='Camera Controll On';
+//                bs.dom('<div id="toggleControll"></div>').$('<', 'body',
+//                        'html', msg1,
+//                        'position', 'absolute', 'top', 170, 'left', 15, 'padding', 10,
+//                        'color', '#fff', 'cursor', 'pointer', 'font-size', 12, 'opacity', 0.5,
+//                        'background', '#333',
+//                        'box-shadow', 'inset 0 1px 0 #aaa', 'border-radius', 5,
+//                        'down', function($e) {
+//                            cameraFlow.pause= !cameraFlow.pause
+//                            if(!cameraFlow.pause) bs.ANI.ani(cameraFlow)
+//                            var isPause=cameraFlow.pause
+//                            bs.dom("#toggleControll").$('html', isPause ? msg2 : msg1);
+//                        }
+//                )
+//            }
 
             function particleToggle() {
                 bs.dom('<div id="toggle"></div>').$('<', 'body',
@@ -194,7 +214,7 @@
                 )
             }
 
-            setDebuger(), particleToggle(), setCameraFlow()
+            setDebuger(), particleToggle()//, setCameraFlow()
         })
     })
 </script>
