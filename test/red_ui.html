@@ -35,29 +35,28 @@
     // 걍일단 되는대로 구현해봅세...
 
     bs(function() {
-
+        bs.dom("<h2>기본적 부트 스트랩 클래스는 뭐 당연히 다이용가능하것고..</h2>").$('<', 'body')
         // 테스트 버튼
-        bs.dom('<div>click 기본테마적용</div>').$('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10,
+        bs.dom('<div>click 기본테마적용</div>').$('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10,'cursor','pointer',
                 'click', function() {
                     document.getElementById('theme').setAttribute('href', 'http://bootstrapk.com/BS3/dist/css/bootstrap-theme.min.css')
                 })
-        bs.dom('<div>click 커스텀테마적용1</div>').$('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10,
+        bs.dom('<div>click 커스텀테마적용1</div>').$('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10,'cursor','pointer',
                 'click', function() {
                     document.getElementById('theme').setAttribute('href', 'http://bootswatch.com/amelia/bootstrap.css')
                 });
 
-        bs.dom('<div>click 커스텀테마적용2</div>').$('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10,
+        bs.dom('<div>click 커스텀테마적용2</div>').$('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10,'cursor','pointer',
                 'click', function() {
                     document.getElementById('theme').setAttribute('href', 'http://bootswatch.com/slate/bootstrap.css')
                 });
-        bs.dom('<div>click 커스텀테마적용3</div>').$('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10,
+        bs.dom('<div>click 커스텀테마적용3</div>').$('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10,'cursor','pointer',
                 'click', function() {
                     document.getElementById('theme').setAttribute('href', 'http://infynitix.cyberscriptsolutions.com/esthetics_admin/css/style.css')
                 });
-
+        ////////////////////////////////////////////////////////////
         // bs.ui 프로토타입 목업
         bs.ui=(function() {
-
             // ui가 정의될때 코어 css와 부트 스트랩 기본 테마가 로딩되어있어야함...
             function cssLoad() {
                 var headID=document.getElementsByTagName("head")[0];
@@ -75,23 +74,25 @@
             // 필요한 기본 요소들을 싸그리등록
             // 추가 확장 형 ui들은 별도의 키네임 혹은 플러그인을 이용해서 제공
             return function() {
-                var btnStyle=arguments[1] ? arguments[1] : 'btn-default'
-                if(arguments.length > 2) for(var i=2; i=arguments.length; i++) btnStyle+=" " + arguments[i]
+                // TODO 타입을 체크하고 기본이 되는 스타일리스트를 제공해야할듯
+                var addStyle=arguments[1] ? arguments[1] : ''
+                if(arguments.length > 2) for(var i=2; i=arguments.length; i++) addStyle+=" " + arguments[i]
 
 
                 switch(arguments[0]) {
+                    ///////////////////// 기본 폼
                     case "form" :
-                        return bs.dom('<form></form>').$('this')
+                        return bs.dom('<form></form>').$('@class', addStyle, 'this')
                     case "formGroup" :
                         return bs.dom('<div></div>').$('@class', 'form-group', 'this')
                     case "label" :
-                        return bs.dom('<label></label>').$('@value', 'email', 'this')
+                        return bs.dom('<label></label>').$('@value', 'email', '@class', addStyle, 'this')
                     case "submit" :
-                        return bs.dom('<input type="submit"/>').$('@class', 'btn ' + btnStyle, 'this')
+                        return bs.dom('<input type="submit"/>').$('@class', 'btn ' + addStyle, 'this')
                     case "reset" :
-                        return bs.dom('<input type="reset"/>').$('@class', 'btn ' + btnStyle, 'this')
+                        return bs.dom('<input type="reset"/>').$('@class', 'btn ' + addStyle, 'this')
                     case "button" :
-                        return bs.dom('<input type="button"/>').$('@class', 'btn ' + btnStyle, 'this')
+                        return bs.dom('<input type="button"/>').$('@class', 'btn ' + addStyle, 'this')
                     case "text" :
                         return bs.dom('<input type="text"/>').$('@class', 'form-control', '@value', 'textField', 'this')
                     case "email" :
@@ -99,24 +100,36 @@
                     case "password" :
                         return bs.dom('<input type="password"/>').$('@class', 'form-control', '@value', 'email', 'this')
 
-                    /////////////////////
+                    ///////////////////// help
+                    case "close" :
+                        return bs.dom('<button type="button" class="close" aria-hidden="true">&times;</button>').$('this')
+                    case "carets" :
+                        return bs.dom('<span class="caret"></span>').$('this')
+                    case "alert" :
+                        return bs.dom('<div></div>').$('@class', 'alert ' + addStyle, 'this')
+                    ///////////////////// 축약
                     case "abbr" :
                         return bs.dom('<abbr></abbr>')
+                    ///////////////////// img
+                    case 'img' :
+                        return bs.dom('<img>').$('@class', 'img ' + addStyle, 'this')
+
 
                 }
             }
         })();
-
         // 폼 코드 테스트
+        bs.dom("<h2>form 테스트</h2>").$('<', 'body')
         bs.ui('form').$('<', 'body', '@id', 'formBox', 'margin', 5)
         bs.ui('formGroup').$('<', '#formBox', '>', bs.ui("label").$('html', 'textField', 'this'), '>', bs.ui("text").$('html', 'test', 'this'))
         bs.ui('formGroup').$('<', '#formBox', '>', bs.ui("label").$('html', 'email', 'this'), '>', bs.ui("email").$('html', 'test', 'this'))
         bs.ui('formGroup').$('<', '#formBox', '>', bs.ui("label").$('html', 'password', 'this'), '>', bs.ui("password").$('html', 'test', 'this'))
+        bs.ui("submit", 'btn-default').$('<', '#formBox', 'margin', 5)
+        bs.ui("reset", 'btn-default').$('<', '#formBox', 'margin', 5)
 
-        bs.ui("submit").$('<', '#formBox', 'margin', 5)
-        bs.ui("reset").$('<', '#formBox', 'margin', 5)
 
-        bs.ui("button").$('<', '#formBox', 'margin', 5, '@value', 'default')
+        bs.dom("<h2>button 버튼 기본 들</h2>").$('<', '#formBox')
+        bs.ui("button", 'btn-default').$('<', '#formBox', 'margin', 5, '@value', 'default')
         bs.ui("button", 'btn-primary').$('<', '#formBox', 'margin', 5, '@value', 'primary')
         bs.ui("button", 'btn-success').$('<', '#formBox', 'margin', 5, '@value', 'success')
         bs.ui("button", 'btn-info').$('<', '#formBox', 'margin', 5, '@value', 'info')
@@ -124,6 +137,7 @@
         bs.ui("button", 'btn-danger').$('<', '#formBox', 'margin', 5, '@value', 'danger')
         bs.ui("button", 'btn-link').$('<', '#formBox', 'margin', 5, '@value', 'link')
 
+        bs.dom("<h2>button 텍스트 사이즈 적용</h2>").$('<', '#formBox')
         bs.ui("button", 'btn-primary btn-lg').$('<', '#formBox', 'margin', 5, '@value', 'primary')
         bs.ui("button", 'btn-success btn-lg').$('<', '#formBox', 'margin', 5, '@value', 'success')
         bs.ui("button", 'btn-info btn-sm').$('<', '#formBox', 'margin', 5, '@value', 'info')
@@ -131,23 +145,78 @@
         bs.ui("button", 'btn-danger btn-xs').$('<', '#formBox', 'margin', 5, '@value', 'danger')
         bs.ui("button", 'btn-link btn-xs').$('<', '#formBox', 'margin', 5, '@value', 'link')
 
+        bs.dom("<h2>button disabled적용</h2>").$('<', '#formBox')
+        bs.ui("button", 'btn-primary disabled').$('<', '#formBox', 'margin', 5, '@value', 'primary')
+        bs.ui("button", 'btn-success disabled').$('<', '#formBox', 'margin', 5, '@value', 'success')
+        bs.ui("button", 'btn-info disabled').$('<', '#formBox', 'margin', 5, '@value', 'info')
+        bs.ui("button", 'btn-warning disabled').$('<', '#formBox', 'margin', 5, '@value', 'warning')
+        bs.ui("button", 'btn-danger disabled').$('<', '#formBox', 'margin', 5, '@value', 'danger')
+        bs.ui("button", 'btn-link disabled').$('<', '#formBox', 'margin', 5, '@value', 'link')
+        bs.dom("<h2>button active적용</h2>").$('<', '#formBox')
+        bs.ui("button", 'btn-primary active').$('<', '#formBox', 'margin', 5, '@value', 'primary')
+        bs.ui("button", 'btn-success active').$('<', '#formBox', 'margin', 5, '@value', 'success')
+        bs.ui("button", 'btn-info active').$('<', '#formBox', 'margin', 5, '@value', 'info')
+        bs.ui("button", 'btn-warning active').$('<', '#formBox', 'margin', 5, '@value', 'warning')
+        bs.ui("button", 'btn-danger active').$('<', '#formBox', 'margin', 5, '@value', 'danger')
+        bs.ui("button", 'btn-link active').$('<', '#formBox', 'margin', 5, '@value', 'link')
 
-
-        // 기본적 부트 스트랩 클래스는 뭐 당연히 다이용가능하것고..
-        bs.ui("label").$('html', '기본적 부트 스트랩 클래스는 뭐 당연히 다이용가능하것고..', '<', 'body')
-        bs.ui("label").$('html', '텍스트 정렬클래스', '<', 'body')
+        ////////////////////////////////////////////////////////////
+        bs.dom("<h2>텍스트 정렬 클래스</h2>").$('<', 'body')
         bs.dom("<div>left</div>").$('<', 'body', '@class', 'text-left', 'margin', 5, 'padding', 5, 'background', '#eee')
         bs.dom("<div>center</div>").$('<', 'body', '@class', 'text-center', 'margin', 5, 'padding', 5, 'background', '#eee')
         bs.dom("<div>right</div>").$('<', 'body', '@class', 'text-right', 'margin', 5, 'padding', 5, 'background', '#eee')
+        ////////////////////////////////////////////////////////////
         // 텍스트 강조 클래스
-        bs.ui("label").$('html', '텍스트 강조 클래스', '<', 'body')
+        bs.dom("<h2>텍스트 강조 클래스</h2>").$('<', 'body')
         bs.dom("<div>text-muted</div>").$('<', 'body', '@class', 'text-muted', 'margin', 5, 'padding', 5)
         bs.dom("<div>text-warning</div>").$('<', 'body', '@class', 'text-warning', 'margin', 5, 'padding', 5)
         bs.dom("<div>text-error</div>").$('<', 'body', '@class', 'text-error', 'margin', 5, 'padding', 5)
         bs.dom("<div>text-info</div>").$('<', 'body', '@class', 'text-info', 'margin', 5, 'padding', 5)
         bs.dom("<div>text-success</div>").$('<', 'body', '@class', 'text-success', 'margin', 5, 'padding', 5)
 
+
+        ////////////////////////////////////////////////////////////
+        // form inline 테스트
+        bs.dom("<h2>form inline 테스트</h2>").$('<', 'body')
+        bs.ui('form', 'form-inline').$('<', 'body', '@id', 'formBox2', 'margin', 5)
+        bs.ui('formGroup').$('<', '#formBox2', '>', bs.ui("label").$('html', 'textField', 'this'), '>', bs.ui("text").$('html', 'test', 'this'))
+        bs.ui('formGroup').$('<', '#formBox2', '>', bs.ui("label").$('html', 'email', 'this'), '>', bs.ui("email").$('html', 'test', 'this'))
+        bs.ui('formGroup').$('<', '#formBox2', '>', bs.ui("label").$('html', 'password', 'this'), '>', bs.ui("password").$('html', 'test', 'this'))
+        bs.ui("submit", 'btn-default').$('<', '#formBox2', 'margin', 5)
+        bs.ui("reset", 'btn-default').$('<', '#formBox2', 'margin', 5)
+
+        // label sr- 테스트
+        bs.dom("<h2>label sr- 테스트</h2>").$('<', 'body')
+        bs.ui('form').$('<', 'body', '@id', 'formBox3', 'margin', 5)
+        bs.ui('formGroup').$('<', '#formBox3', '>', bs.ui("label", 'sr-only').$('html', 'textField', 'this'), '>', bs.ui("text").$('html', 'test', 'this'))
+        bs.ui('formGroup').$('<', '#formBox3', '>', bs.ui("label", 'sr-only').$('html', 'email', 'this'), '>', bs.ui("email").$('html', 'test', 'this'))
+        bs.ui('formGroup').$('<', '#formBox3', '>', bs.ui("label", 'sr-only').$('html', 'password', 'this'), '>', bs.ui("password").$('html', 'test', 'this'))
+        bs.ui("submit", 'btn-default').$('<', '#formBox3', 'margin', 5)
+        bs.ui("reset", 'btn-default').$('<', '#formBox3', 'margin', 5)
+
+
+        ////////////////////////////////////////////////////////////
+        // 축약어
+        bs.dom("<h2>축약어</h2>").$('<', 'body')
         bs.ui("abbr").$('<', 'body', 'margin', 5, '@title', '축약어확장!', 'html', '축약어')
+        ////////////////////////////////////////////////////////////
+        // help
+        bs.dom("<h2>helps</h2>").$('<', 'body')
+        bs.ui("close").$('<', 'body')
+        bs.ui("carets").$('<', 'body')
+        ////////////////////////////////////////////////////////////
+        // 알러트
+        bs.dom("<h2>alert</h2>").$('<', 'body')
+        bs.ui("alert", 'alert-success').$('html', 'alert', '<', 'body')
+        bs.ui("alert", 'alert-info').$('html', 'alert', '<', 'body')
+        bs.ui("alert", 'alert-warning').$('html', 'alert', '<', 'body')
+        bs.ui("alert", 'alert-danger').$('html', 'alert', '<', 'body')
+        ////////////////////////////////////////////////////////////
+        // img
+        bs.dom("<h2>img</h2>").$('<', 'body')
+        bs.ui("img", 'img-round').$('<', 'body', '@src', 'http://projectbs.github.io/bsJS/test/redcamel_test_demo2_asset/1.png')
+        bs.ui("img", 'img-circle').$('<', 'body', '@src', 'http://projectbs.github.io/bsJS/test/redcamel_test_demo2_asset/1.png')
+        bs.ui("img", 'img-thumbnail').$('<', 'body', '@src', 'http://projectbs.github.io/bsJS/test/redcamel_test_demo2_asset/1.png')
 
     })
 </script>
