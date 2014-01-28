@@ -75,7 +75,10 @@
             // 필요한 기본 요소들을 싸그리등록
             // 추가 확장 형 ui들은 별도의 키네임 혹은 플러그인을 이용해서 제공
             return function() {
-                var btnStyle = arguments[1] ? 'btn-'+arguments[1] : 'btn-default'
+                var btnStyle=arguments[1] ? arguments[1] : 'btn-default'
+                if(arguments.length > 2) for(var i=2; i=arguments.length; i++) btnStyle+=" " + arguments[i]
+
+
                 switch(arguments[0]) {
                     case "form" :
                         return bs.dom('<form></form>').$('this')
@@ -84,11 +87,11 @@
                     case "label" :
                         return bs.dom('<label></label>').$('@value', 'email', 'this')
                     case "submit" :
-                        return bs.dom('<input type="submit"/>').$('@class', 'btn '+btnStyle, 'this')
+                        return bs.dom('<input type="submit"/>').$('@class', 'btn ' + btnStyle, 'this')
                     case "reset" :
-                        return bs.dom('<input type="reset"/>').$('@class', 'btn '+btnStyle, 'this')
+                        return bs.dom('<input type="reset"/>').$('@class', 'btn ' + btnStyle, 'this')
                     case "button" :
-                        return bs.dom('<input type="button"/>').$('@class', 'btn '+btnStyle, 'this')
+                        return bs.dom('<input type="button"/>').$('@class', 'btn ' + btnStyle, 'this')
                     case "text" :
                         return bs.dom('<input type="text"/>').$('@class', 'form-control', '@value', 'textField', 'this')
                     case "email" :
@@ -113,30 +116,38 @@
         bs.ui("submit").$('<', '#formBox', 'margin', 5)
         bs.ui("reset").$('<', '#formBox', 'margin', 5)
 
-        bs.ui("button").$('<', '#formBox', 'margin', 5,'@value','default')
-        bs.ui("button",'primary').$('<', '#formBox', 'margin', 5,'@value','primary')
-        bs.ui("button",'success').$('<', '#formBox', 'margin', 5,'@value','success')
-        bs.ui("button",'info').$('<', '#formBox', 'margin', 5,'@value','info')
-        bs.ui("button",'warning').$('<', '#formBox', 'margin', 5,'@value','warning')
-        bs.ui("button",'danger').$('<', '#formBox', 'margin', 5,'@value','danger')
-        bs.ui("button",'link').$('<', '#formBox', 'margin', 5,'@value','link')
+        bs.ui("button").$('<', '#formBox', 'margin', 5, '@value', 'default')
+        bs.ui("button", 'btn-primary').$('<', '#formBox', 'margin', 5, '@value', 'primary')
+        bs.ui("button", 'btn-success').$('<', '#formBox', 'margin', 5, '@value', 'success')
+        bs.ui("button", 'btn-info').$('<', '#formBox', 'margin', 5, '@value', 'info')
+        bs.ui("button", 'btn-warning').$('<', '#formBox', 'margin', 5, '@value', 'warning')
+        bs.ui("button", 'btn-danger').$('<', '#formBox', 'margin', 5, '@value', 'danger')
+        bs.ui("button", 'btn-link').$('<', '#formBox', 'margin', 5, '@value', 'link')
+
+        bs.ui("button", 'btn-primary btn-lg').$('<', '#formBox', 'margin', 5, '@value', 'primary')
+        bs.ui("button", 'btn-success btn-lg').$('<', '#formBox', 'margin', 5, '@value', 'success')
+        bs.ui("button", 'btn-info btn-sm').$('<', '#formBox', 'margin', 5, '@value', 'info')
+        bs.ui("button", 'btn-warning btn-sm').$('<', '#formBox', 'margin', 5, '@value', 'warning')
+        bs.ui("button", 'btn-danger btn-xs').$('<', '#formBox', 'margin', 5, '@value', 'danger')
+        bs.ui("button", 'btn-link btn-xs').$('<', '#formBox', 'margin', 5, '@value', 'link')
+
 
 
         // 기본적 부트 스트랩 클래스는 뭐 당연히 다이용가능하것고..
-        bs.ui("label").$('html', '기본적 부트 스트랩 클래스는 뭐 당연히 다이용가능하것고..', '<','body')
-        bs.ui("label").$('html', '텍스트 정렬클래스', '<','body')
-        bs.dom("<div>left</div>").$('<', 'body', '@class', 'text-left', 'margin', 5,'padding',5,'background','#eee')
-        bs.dom("<div>center</div>").$('<', 'body', '@class', 'text-center', 'margin', 5,'padding',5,'background','#eee')
-        bs.dom("<div>right</div>").$('<', 'body', '@class', 'text-right', 'margin', 5,'padding',5,'background','#eee')
+        bs.ui("label").$('html', '기본적 부트 스트랩 클래스는 뭐 당연히 다이용가능하것고..', '<', 'body')
+        bs.ui("label").$('html', '텍스트 정렬클래스', '<', 'body')
+        bs.dom("<div>left</div>").$('<', 'body', '@class', 'text-left', 'margin', 5, 'padding', 5, 'background', '#eee')
+        bs.dom("<div>center</div>").$('<', 'body', '@class', 'text-center', 'margin', 5, 'padding', 5, 'background', '#eee')
+        bs.dom("<div>right</div>").$('<', 'body', '@class', 'text-right', 'margin', 5, 'padding', 5, 'background', '#eee')
         // 텍스트 강조 클래스
-        bs.ui("label").$('html', '텍스트 강조 클래스', '<','body')
-        bs.dom("<div>text-muted</div>").$('<', 'body', '@class', 'text-muted', 'margin', 5,'padding',5)
-        bs.dom("<div>text-warning</div>").$('<', 'body', '@class', 'text-warning', 'margin',5,'padding',5)
-        bs.dom("<div>text-error</div>").$('<', 'body', '@class', 'text-error', 'margin', 5,'padding',5)
-        bs.dom("<div>text-info</div>").$('<', 'body', '@class', 'text-info', 'margin', 5,'padding',5)
-        bs.dom("<div>text-success</div>").$('<', 'body', '@class', 'text-success', 'margin', 5,'padding',5)
+        bs.ui("label").$('html', '텍스트 강조 클래스', '<', 'body')
+        bs.dom("<div>text-muted</div>").$('<', 'body', '@class', 'text-muted', 'margin', 5, 'padding', 5)
+        bs.dom("<div>text-warning</div>").$('<', 'body', '@class', 'text-warning', 'margin', 5, 'padding', 5)
+        bs.dom("<div>text-error</div>").$('<', 'body', '@class', 'text-error', 'margin', 5, 'padding', 5)
+        bs.dom("<div>text-info</div>").$('<', 'body', '@class', 'text-info', 'margin', 5, 'padding', 5)
+        bs.dom("<div>text-success</div>").$('<', 'body', '@class', 'text-success', 'margin', 5, 'padding', 5)
 
-        bs.ui("abbr").$('<', 'body', 'margin', 5,'@title','축약어확장!','html','축약어')
+        bs.ui("abbr").$('<', 'body', 'margin', 5, '@title', '축약어확장!', 'html', '축약어')
 
     })
 </script>
