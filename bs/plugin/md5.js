@@ -1,4 +1,4 @@
-bs.$register( 'method', 'md5', (function(){
+bs['plugin+']( 'method', 'md5', (function(){
 	var t0 = {
 		_hexcase:0, _b64pad:"",
 		_hex_md5:function(a){

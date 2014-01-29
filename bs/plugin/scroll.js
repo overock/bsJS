@@ -1,4 +1,4 @@
-bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
+bs['plugin+']( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 	var rAF = window.requestAnimationFrame	||
 	window.webkitRequestAnimationFrame	||
 	window.mozRequestAnimationFrame		||
@@ -132,7 +132,7 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 	})();
 	
 	var s,key,rTagName;
-	bs.css( '.BSSCRW' ).$( 'overflow', 'hidden' );
+	bs.Css( '.BSSCRW' ).S( 'overflow', 'hidden' );
 	(function(){
 		var t0, i;
 		t0 = 'startX,startY,scrollX,scrollY,freeScroll,tab,click,snap,mouseWheel,enabled,'+
@@ -144,21 +144,20 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 		while( i-- ) key[t0[i]] = 1;
 	})(),
 	rTagName = /^(INPUT|TEXTAREA|BUTTON|SELECT)$/,
-	$fn.$constructor = function( $key ){
+	$fn.NEW = function( $key ){
 		console.log( 'init' );
 
-		this.__k = $key;
-		this.__wrapper = bs.dom( $key ).$( 'class+', 'BSSCRW', 'this' );
+		this.__wrapper = bs.Dom( $key ).S( 'class+', 'BSSCRW', 'this' );
 		/// 포지션 검사해야함
 	
-		this.wrapper = bs.dom( $key )[0];
+		this.wrapper = bs.Dom( $key )[0];
 		this.scroller = this.wrapper.children[0];
 		
 		/// 레퍼의 자식 검사
 		this.scrollerStyle = this.scroller.style;		// cache style for better performance
-		this.__scroller = bs.dom( this.scroller );
-		this.__scroller.$( '@SCROLL', this );
-		this.__scroller.$( 'class+', 'BSSCROLLER' );
+		this.__scroller = bs.Dom( this.scroller );
+		this.__scroller.S( '@SCROLL', this );
+		this.__scroller.S( 'class+', 'BSSCROLLER' );
 		
 		///옵션은 this.oXxxx
 		this.options = {		
@@ -181,14 +180,14 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 			useTransition: true,
 			useTransform: true
 		};
-		this.options.startX = this.__scroller.$( 'left' ) || this.__scroller.$( 'left', 0 );
-		this.options.startY = this.__scroller.$( 'left' ) || this.__scroller.$( 'left', 0 );
-		this.__scroller.$( 'transitionend', [this, this._transitionEnd] );
-		this.__wrapper.$( 'down', this );
-		bs.WIN.on( 'move', '@bsscrollmove', this );
-		bs.WIN.on( 'up', '@bsscrollup', this );
+		this.options.startX = this.__scroller.S( 'left' ) || this.__scroller.S( 'left', 0 );
+		this.options.startY = this.__scroller.S( 'left' ) || this.__scroller.S( 'left', 0 );
+		this.__scroller.S( 'transitionend', [this, this._transitionEnd] );
+		this.__wrapper.S( 'down', this );
+		bs.WIN.on( 'move', this );
+		bs.WIN.on( 'up', this );
 	},
-	$fn.$ = function(){
+	$fn.S = function(){
 		var t0, i, j, k, v;
 		if( arguments[0] === null ){
 			this.destroy();
@@ -239,11 +238,11 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 		this.enable();	
 	},
 	$fn.destroy = function(){
-		this.__wrapper.$( 'down', null );
-		bs.WIN.on( 'move', '@bsscrollmove', null );
-		bs.WIN.on( 'up', '@bsscrollup', null );
+		this.__wrapper.S( 'down', null );
+		bs.WIN.on( 'move', null );
+		bs.WIN.on( 'up', null );
 		this._execEvent('destroy');
-		this.destroyer();
+		this.END();
 	},
 	$fn._transitionEnd = function(e){
 		console.log( '_transitionEnd' );
@@ -540,8 +539,8 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 	},
 	$fn._transitionTime = function(time){
 		time = time || 0;
-		this.__scroller.$( 'transitionDuration', time + 'ms' );	
-		if( !time && utils.isBadAndroid ) this.__scroller.$( 'transitionDuration', '0.001s' );
+		this.__scroller.S( 'transitionDuration', time + 'ms' );	
+		if( !time && utils.isBadAndroid ) this.__scroller.S( 'transitionDuration', '0.001s' );
 		if( this.indicators ){
 			for ( var i = this.indicators.length; i--; ){
 				this.indicators[i].transitionTime(time);
@@ -549,7 +548,7 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 		}
 	},
 	$fn._transitionTimingFunction = function(easing){
-		this.__scroller.$( 'transitionTimingFunction', easing );
+		this.__scroller.S( 'transitionTimingFunction', easing );
 		if( this.indicators ){
 			for ( var i = this.indicators.length; i--; ){
 				this.indicators[i].transitionTimingFunction(easing);
@@ -558,11 +557,11 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 	},
 	$fn._translate = function(x, y){
 		if( this.options.useTransform ){
-			this.__scroller.$( 'transform', 'translate(' + x + 'px,' + y + 'px)' + this.translateZ );
+			this.__scroller.S( 'transform', 'translate(' + x + 'px,' + y + 'px)' + this.translateZ );
 		} else {
 			x = Math.round(x);
 			y = Math.round(y);
-			this.__scroller.$( 'left', x, 'top', y );
+			this.__scroller.S( 'left', x, 'top', y );
 		}
 		this.x = x;
 		this.y = y;
@@ -672,9 +671,9 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 		});
 	},
 	$fn._initWheel = function(){
-		this.__wrapper.$( 'wheel', [this, this._wheel], 'mousewheel', [this, this._wheel], 'DOMMouseScroll', [this, this._wheel] );
+		this.__wrapper.S( 'wheel', [this, this._wheel], 'mousewheel', [this, this._wheel], 'DOMMouseScroll', [this, this._wheel] );
 		this.on('destroy', function(){
-			this.__wrapper.$( 'wheel', null, 'mousewheel', null, 'DOMMouseScroll', null );
+			this.__wrapper.S( 'wheel', null, 'mousewheel', null, 'DOMMouseScroll', null );
 		});
 	},
 	$fn._wheel = function(e){
@@ -1072,36 +1071,36 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 	function createDefaultScrollbar (direction, interactive, type){
 		if( type !== true ) return;
 		
-		var __scrollbar = bs.dom( '<div></div>' ),
-			__indicator = bs.dom( '<div></div>' ),
+		var __scrollbar = bs.Dom( '<div></div>' ),
+			__indicator = bs.Dom( '<div></div>' ),
 			scrollbar = __scrollbar[0],
 			indicator = __indicator[0];
 
-		bs.css( '.BSSCRBar' ).$( 'position', 'absolute', 'z-index', 9999, 'overflow', 'hidden' );
-		bs.css( '.BSSCRIn' ).$( 'box-sizing', 'border-box', 'position', 'absolute', 'background', 'rgba(0,0,0,0.5)', 'border', '1px solid rgba(255,255,255,0.9)', 'border-radius', 3 );	
+		bs.Css( '.BSSCRBar' ).S( 'position', 'absolute', 'z-index', 9999, 'overflow', 'hidden' );
+		bs.Css( '.BSSCRIn' ).S( 'box-sizing', 'border-box', 'position', 'absolute', 'background', 'rgba(0,0,0,0.5)', 'border', '1px solid rgba(255,255,255,0.9)', 'border-radius', 3 );	
 
 		if( direction == 'h' ){
-			__scrollbar.$( 'class', 'iScrollHorizontalScrollbar BSSCRBar' );
-			__scrollbar.$( 'height', 7, 'left', 2, 'right', 2, 'bottom', 0 );
-			__indicator.$( 'height', '100%' );
+			__scrollbar.S( 'class', 'iScrollHorizontalScrollbar BSSCRBar' );
+			__scrollbar.S( 'height', 7, 'left', 2, 'right', 2, 'bottom', 0 );
+			__indicator.S( 'height', '100%' );
 		} else {
-			__scrollbar.$( 'class', 'iScrollVerticalScrollbar BSSCRBar' );
-			__scrollbar.$( 'width', 7, 'bottom', 2, 'top', 2, 'right', 1 );
-			__indicator.$( 'width', '100%' );
+			__scrollbar.S( 'class', 'iScrollVerticalScrollbar BSSCRBar' );
+			__scrollbar.S( 'width', 7, 'bottom', 2, 'top', 2, 'right', 1 );
+			__indicator.S( 'width', '100%' );
 		}
 
-		if( !interactive ) __scrollbar.$( 'pointerEvents', 'none' );	
-		__indicator.$( 'class', 'iScrollIndicator BSSCRIn' );
-		__scrollbar.$( '>', indicator );
+		if( !interactive ) __scrollbar.S( 'pointerEvents', 'none' );	
+		__indicator.S( 'class', 'iScrollIndicator BSSCRIn' );
+		__scrollbar.S( '>', indicator );
 
 		return scrollbar;
 	}
 	
 	function Indicator (scroller, options){
 		this.wrapper = typeof options.el == 'string' ? document.querySelector(options.el) : options.el;
-		this.__wrapper = bs.dom( this.wrapper );
+		this.__wrapper = bs.Dom( this.wrapper );
 		this.indicator = this.wrapper.children[0];
-		this.__indicator = bs.dom( this.indicator );
+		this.__indicator = bs.Dom( this.indicator );
 		this.scroller = scroller;
 		this.options = {
 			listenX: true,
@@ -1122,18 +1121,18 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 		this.maxPosX = 0;
 		this.maxPosY = 0;
 		if( this.options.interactive ){
-			this.__indicator.$( 'down', this );
+			this.__indicator.S( 'down', this );
 			bs.WIN.on( 'up', '@Indicatorup', this );
 		}
 		if( this.options.fade ){
-			this.__scroller.$( 'transform', this.scroller.translateZ, 'transitionDuration', (utils.isBadAndroid ? '0.001s' : '0ms'), 'opacity', 0 );
+			this.__scroller.S( 'transform', this.scroller.translateZ, 'transitionDuration', (utils.isBadAndroid ? '0.001s' : '0ms'), 'opacity', 0 );
 		}
 	}
 	
 	Indicator.prototype = {
 		destroy: function(){
 			if( this.options.interactive ){
-				this.__indicator.$( 'down', null );
+				this.__indicator.S( 'down', null );
 				bs.WIN.on( 'up', '@Indicatorup', null );
 			}
 			if( this.options.defaultScrollbars ){
@@ -1194,40 +1193,40 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 	
 		transitionTime: function(time){
 			time = time || 0;
-			this.__indicator.$( 'transitionDuration', time + 'ms' );
+			this.__indicator.S( 'transitionDuration', time + 'ms' );
 
-			if( !time && utils.isBadAndroid ) this.__indicator.$( 'transitionDuration', '0.001s' );	
+			if( !time && utils.isBadAndroid ) this.__indicator.S( 'transitionDuration', '0.001s' );	
 		},
 		transitionTimingFunction: function(easing){
-			this.__indicator.$( 'transitionTimingFunction', easing );
+			this.__indicator.S( 'transitionTimingFunction', easing );
 		},
 		refresh: function(){
 			this.transitionTime();
 	
 			if( this.options.listenX && !this.options.listenY ){
-				this.__indicator.$( 'display', this.scroller.hasHorizontalScroll ? 'block' : 'none' );
+				this.__indicator.S( 'display', this.scroller.hasHorizontalScroll ? 'block' : 'none' );
 			} else if( this.options.listenY && !this.options.listenX ){
-				this.__indicator.$( 'display', this.scroller.hasVerticalScroll ? 'block' : 'none' );
+				this.__indicator.S( 'display', this.scroller.hasVerticalScroll ? 'block' : 'none' );
 			} else {
-				this.__indicator.$( 'display', this.scroller.hasHorizontalScroll || this.scroller.hasVerticalScroll ? 'block' : 'none' );
+				this.__indicator.S( 'display', this.scroller.hasHorizontalScroll || this.scroller.hasVerticalScroll ? 'block' : 'none' );
 			}
 	
 			if( this.scroller.hasHorizontalScroll && this.scroller.hasVerticalScroll ){
 				
-				this.__wrapper.$( 'class+', 'iScrollBothScrollbars');
-				this.__wrapper.$( 'class-', 'iScrollLoneScrollbar');
+				this.__wrapper.S( 'class+', 'iScrollBothScrollbars');
+				this.__wrapper.S( 'class-', 'iScrollLoneScrollbar');
 
 				if( this.options.defaultScrollbars && this.options.customStyle ){
-					if( this.options.listenX ) this.__wrapper.$( 'right', 8 );
-					else this.__wrapper.$( 'bottom', 8 );
+					if( this.options.listenX ) this.__wrapper.S( 'right', 8 );
+					else this.__wrapper.S( 'bottom', 8 );
 				}
 			} else {
-				this.__wrapper.$( 'class-', 'iScrollBothScrollbars');
-				this.__wrapper.$( 'class+', 'iScrollLoneScrollbar');	
+				this.__wrapper.S( 'class-', 'iScrollBothScrollbars');
+				this.__wrapper.S( 'class+', 'iScrollLoneScrollbar');	
 	
 				if( this.options.defaultScrollbars && this.options.customStyle ){
-					if( this.options.listenX ) this.__wrapper.$( 'right', 2 );
-					else this.__wrapper.$( 'bottom', 2 );
+					if( this.options.listenX ) this.__wrapper.S( 'right', 2 );
+					else this.__wrapper.S( 'bottom', 2 );
 				}
 			}
 	
@@ -1237,7 +1236,7 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 				this.wrapperWidth = this.wrapper.clientWidth;
 				if( this.options.resize ){
 					this.indicatorWidth = Math.max(Math.round(this.wrapperWidth * this.wrapperWidth / (this.scroller.scrollerWidth || this.wrapperWidth || 1)), 8);
-					this.__indicator.$( 'width', this.indicatorWidth );
+					this.__indicator.S( 'width', this.indicatorWidth );
 				} else {
 					this.indicatorWidth = this.indicator.clientWidth;
 				}
@@ -1259,7 +1258,7 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 				this.wrapperHeight = this.wrapper.clientHeight;
 				if( this.options.resize ){
 					this.indicatorHeight = Math.max(Math.round(this.wrapperHeight * this.wrapperHeight / (this.scroller.scrollerHeight || this.wrapperHeight || 1)), 8);
-					this.__indicator.$( 'height', this.indicatorHeight );
+					this.__indicator.S( 'height', this.indicatorHeight );
 				} else {
 					this.indicatorHeight = this.indicator.clientHeight;
 				}
@@ -1287,39 +1286,39 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 				if( x < this.minBoundaryX ){
 					if( this.options.shrink == 'scale' ){
 						this.width = Math.max(this.indicatorWidth + x, 8);
-						this.__indicator.$( 'width', this.width );
+						this.__indicator.S( 'width', this.width );
 					}
 					x = this.minBoundaryX;
 				} else if( x > this.maxBoundaryX ){
 					if( this.options.shrink == 'scale' ){
 						this.width = Math.max(this.indicatorWidth - (x - this.maxPosX), 8);
-						this.__indicator.$( 'width', this.width );
+						this.__indicator.S( 'width', this.width );
 						x = this.maxPosX + this.indicatorWidth - this.width;
 					} else {
 						x = this.maxBoundaryX;
 					}
 				} else if( this.options.shrink == 'scale' && this.width != this.indicatorWidth ){
 					this.width = this.indicatorWidth;
-					this.__indicator.$( 'width', this.width );
+					this.__indicator.S( 'width', this.width );
 				}
 	
 				if( y < this.minBoundaryY ){
 					if( this.options.shrink == 'scale' ){
 						this.height = Math.max(this.indicatorHeight + y * 3, 8);
-						this.__indicator.$( 'height', this.height );
+						this.__indicator.S( 'height', this.height );
 					}
 					y = this.minBoundaryY;
 				} else if( y > this.maxBoundaryY ){
 					if( this.options.shrink == 'scale' ){
 						this.height = Math.max(this.indicatorHeight - (y - this.maxPosY) * 3, 8);
-						this.__indicator.$( 'height', this.height );
+						this.__indicator.S( 'height', this.height );
 						y = this.maxPosY + this.indicatorHeight - this.height;
 					} else {
 						y = this.maxBoundaryY;
 					}
 				} else if( this.options.shrink == 'scale' && this.height != this.indicatorHeight ){
 					this.height = this.indicatorHeight;
-					this.__indicator.$( 'height', this.height );
+					this.__indicator.S( 'height', this.height );
 				}
 			}
 	
@@ -1327,9 +1326,9 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 			this.y = y;
 	
 			if( this.scroller.options.useTransform ){
-				this.__indicator.$( 'transform', 'translate(' + x + 'px,' + y + 'px)' + this.scroller.translateZ );
+				this.__indicator.S( 'transform', 'translate(' + x + 'px,' + y + 'px)' + this.scroller.translateZ );
 			} else {
-				this.__indicator.$( 'left', x, 'top', y );
+				this.__indicator.S( 'left', x, 'top', y );
 			}
 		},
 	
@@ -1357,9 +1356,9 @@ bs.$register( 'class', 'scroll', function( $fn ){ console.log( 'scroll' );
 				delay = val ? 0 : 300;
 	
 			val = val ? '1' : '0';
-			this.__scroller.$( 'transitionDuration', time + 'ms' );
+			this.__scroller.S( 'transitionDuration', time + 'ms' );
 			this.fadeTimeout = setTimeout((function(val){
-				this.__scroller.$( 'opacity', val );
+				this.__scroller.S( 'opacity', val );
 				this.visible = +val;
 			}).bind(this, val), delay);
 		}

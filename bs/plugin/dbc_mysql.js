@@ -1,4 +1,4 @@
-bs.$registerdbc( 'mysql', (function(){
+bs.registerdbc( 'mysql', (function(){
 	var d;
 	d = function(){},
 	d.require =  'mysql';

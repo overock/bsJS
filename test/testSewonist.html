@@ -32,22 +32,22 @@
 <script>
 bs( function(){
 	
-bs.css( '#stage' ).$( 'border', '1px solid #f00', 'margin-top', 30, 'width', '90:%', 'padding', 10, 'background-color', '#eee' );
-bs.css( 'ol, ul' ).$( 'list-style', 'none' );
-bs.css( 'li' ).$( 'position', 'relative', 'margin', '15px' );
-bs.css( '.off' ).$( 
+bs.Css( '#stage' ).S( 'border', '1px solid #f00', 'margin-top', 30, 'width', '90:%', 'padding', 10, 'background-color', '#eee' );
+bs.Css( 'ol, ul' ).S( 'list-style', 'none' );
+bs.Css( 'li' ).S( 'position', 'relative', 'margin', '15px' );
+bs.Css( '.off' ).S( 
 	'display', 'block', 'background-color', '#34AADC', 
 	'color', '#FFF', 'font-weight', 'bold', 'text-align', 'center', 'line-height', '80px',
 	'width', '200px', 'height', '80px'
 );
-bs.css( '.on' ).$(
+bs.Css( '.on' ).S(
 	'display', 'block', 'background-color', '#4CD964', 
 	'color', '#FFF', 'font-weight', 'bold', 'text-align', 'center', 'line-height', '80px',
 	'width', '200px', 'height', '80px', 
 	'position', 'absolute', 'top', '0px', 'left', '0px'
 );
 
-bs.dom( '.on' ).$(
+bs.Dom( '.on' ).S(
 	"mouseover", function(e){
 		bs.ANI.tweenStop(this);
 		bs.ANI.tween( this, "opacity", 1, "time", .3, "ease", "sineOut" );

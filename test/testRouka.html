@@ -68,12 +68,12 @@
 
     bs( function() {
 
-        var $stage = bs.dom("#stage"),
-            $display = bs.dom("#display");
+        var $stage = bs.Dom("#stage"),
+            $display = bs.Dom("#display");
 
-        $stage.$("html", $stage.$("text").toUpperCase());
+        $stage.S("html", $stage.S("text").toUpperCase());
 
-        bs.dom("#stage").$(
+        bs.Dom("#stage").S(
             "color", "white",
             "width", "98%",
             "padding", "1%",
@@ -81,17 +81,17 @@
             "cursor", "pointer",
             "font-size", "200%",
             "click", function() {
-                alert("document text only >>\n" + bs.dom("body").$("text"));
+                alert("document text only >>\n" + bs.Dom("body").S("text"));
             }
         );
 
-        bs.$get(function(res){
+        bs.get(function(res){
             var jData = JSON.parse(res);
             bsTest(printer, "XHR Test",
-                    "bs.$get(handler, '" + url + "') data", jData.a, 1,
-                    "bs.$get(handler, '" + url + "') data", jData.b, 2);
+                    "bs.get(handler, '" + url + "') data", jData.a, 1,
+                    "bs.get(handler, '" + url + "') data", jData.b, 2);
 
-            $display.$(
+            $display.S(
                     "background-color", "#EFEFEF",
                     "padding", "10px",
                     "margin", "10px",
@@ -100,7 +100,7 @@
         }, url);
 
         bsTest(printer, "DOM Control & CSS",
-                "bs.dom('#stage').$(html) text", $stage.$("text"), "TEST STAGE");
+                "bs.Dom('#stage').S(html) text", $stage.S("text"), "TEST STAGE");
     } );
 
 }();

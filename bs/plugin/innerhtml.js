@@ -1,4 +1,4 @@
-bs.$register( 'method', 'innerhtml', (function(){console.log( 'innerhtml' );
+bs['plugin+']( 'method', 'innerhtml', (function(){console.log( 'innerhtml' );
 	var 	t0, t1, t2, t3,
 		i,
 		n0, n1, n2,

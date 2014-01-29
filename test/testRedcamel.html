@@ -22,17 +22,17 @@
 <script src="../bs/bsTest.js"></script>
 <script>
 bs(function () {
-	bs.dom("<div></div>").$(
+	bs.Dom("<div></div>").S(
 			'<', 'body', '@id', 'stage',
 			'width', '500px', 'height', '500px',
 			'color', '#ffffff', 'position', 'absolute',
 			'background-color', '#000000',
 			'html', 'Click!! MakeDiv And Tween',
 			'mousemove', function ($e) {
-				bs.dom('#stocker').$('left', $e.lx + 50, 'top', $e.ly + 50, 'html', ($e.lx + " : " + $e.ly), 'text-align', 'center')
+				bs.Dom('#stocker').S('left', $e.lx + 50, 'top', $e.ly + 50, 'html', ($e.lx + " : " + $e.ly), 'text-align', 'center')
 			},
 			'mousedown', function ($e) {
-				bs.ANI.tween(bs.dom('<div></div>').$(
+				bs.ANI.tween(bs.Dom('<div></div>').S(
 						'<', 'body','position', 'absolute',
 						'opacity',1,'width', 50, 'height', 50, 'background-color', '#ffffff',
 						'left', $e.lx, 'top', $e.ly, 'this'
@@ -43,9 +43,9 @@ bs(function () {
 			}
 	);
 
-	console.log(bs.dom('stage'))
+	console.log(bs.Dom('stage'))
 
-	bs.dom("<div></div>").$(
+	bs.Dom("<div></div>").S(
 			'<', 'body', '@id', 'stocker',
 			'position', 'absolute', 'background-color', '#ffffff',
 			'width', '100px', 'height', '100px'

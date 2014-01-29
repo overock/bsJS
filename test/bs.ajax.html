@@ -13,9 +13,6 @@
 <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
 </head>
 <body>
-<a href="https://github.com/projectBS/bsJS">
-	<img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
-</a>
 <div id="result"></div>
 <div id="test"></div>
 <script src="../bs/bsjs.js"></script>
@@ -23,32 +20,40 @@
 <script src="./printer.js"></script>
 <script>
 bs( function(){
-	var syncRS;
-	/*
-		config
-	*/
-	bsTest.result = function(r){ document.getElementById('result').innerHTML = r; }
-
-	/*
-		pre process
-	*/
-	bsTest.tear( '스타일설정', function(){
-		syncRS = JSON.parse( bs.$get(null, 'ajax.json') );
+	bsTest.tear( 'ajax.json', function(){
+		/*{"a": 1, "b": 2, "c": 3}*/
 	} );
-	/*
-		test case
-	*/
-	bs.$get( function( rs ){
-		var r = JSON.parse( rs );
-		bsTest( printer, 'ajax async',
-			"bs.$get( cb , url ) url.a", 1, r.a,
-			"bs.$get( cb , url ) url.c", 3, r.c
+	bs.get( function( rs ){
+		var r = JSON.parse(rs);
+		bsTest( 'ajax async',
+			function(){
+				/*
+				bs.get( function( rs ){
+					var r = JSON.parse(rs);
+					r.a
+				}, 'ajax.json' );
+				*/
+				return r.a;
+			}, 1,
+			function(){
+				/*
+				bs.get( function( rs ){
+					var r = JSON.parse(rs);
+					r.c
+				}, 'ajax.json' );
+				*/
+				return r.c;
+			}, 3
 		);
-	},  'ajax.json' );
+	}, 'ajax.json' );
 
-	bsTest( printer, 'ajax sync',
-		"bs.$get( null , url ) url.a", 1, syncRS.a ,
-		"bs.$get( null , url ) url.c", 3, syncRS.c
+	bsTest( 'ajax sync',
+		function(){
+			return JSON.parse( bs.get( null, 'ajax.json' ) ).a;
+		}, 1,
+		function(){
+			return JSON.parse( bs.get( null, 'ajax.json' ) ).b;
+		}, 2
 	);
 
 } );

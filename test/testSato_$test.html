@@ -22,11 +22,11 @@
 <script>
 bs( function(){
 	bsTest.tear( 'test init', function(){
-		bs.dom( '<input id="id" type="text" value="hika00"/>' ).$('<','#stage' );
-		bs.dom( '<input id="pw" type="text" value="hika00"/>' ).$('<','#stage' );
+		bs.Dom( '<input id="id" type="text" value="hika00"/>' ).S('<','#stage' );
+		bs.Dom( '<input id="pw" type="text" value="hika00"/>' ).S('<','#stage' );
 
 		// Define RULEs
-		bs.$test( 'rule',
+		bs.test( 'rule',
 			'Falpha', '/^[a-z]/',
 			'alpha', '/^[a-z]+$/',
 			'alphanum', '/^[a-z0-9]+$/',
@@ -36,50 +36,50 @@ bs( function(){
 		);
 
 		// Define GROUPs
-		bs.$test( 'group', 'group1',
+		bs.test( 'group', 'group1',
 			'userid', '#id|@value',
 			'pw', '#pw|@value'
 		);
 
 		// Define SETs
-		bs.$test( 'set',
+		bs.test( 'set',
 			'set1', 'userid, pw = Falpha, alphanum'
 		);
 	} );
 
 	bsTest( 'test - SET & GROUP',
 		function(){
-			return bs.$test( 'set1', '@group1' );
+			return bs.test( 'set1', '@group1' );
 		}, 1
 	);
 	bsTest( 'test - Runtime SET',
 		function(){
-			return bs.$test( 'userid, pw = Falpha, alphanum, len|6', 'userid', '#id|@value', 'pw', '#pw|@value' );
+			return bs.test( 'userid, pw = Falpha, alphanum, len|6', 'userid', '#id|@value', 'pw', '#pw|@value' );
 		}, 1
 	);
 	bsTest( 'test - ext. file SET',
 		function(){
-			return bs.$test( 'bs.vali.set.html', 'userid', '#id|@value', 'pw', '#pw|@value' );
+			return bs.test( 'bs.vali.set.html', 'userid', '#id|@value', 'pw', '#pw|@value' );
 		}, 1
 	);
 	bsTest( 'test - direct access to RULE',
 		function(){
-			return bs.$test( '@len|6', '#id|@value', '#pw|@value' );
+			return bs.test( '@len|6', '#id|@value', '#pw|@value' );
 		}, 1,
 		function(){
-			return bs.$test( '@japanese', 'あいうえお日本語ニホンゴ' );
+			return bs.test( '@japanese', 'あいうえお日本語ニホンゴ' );
 		}, 1,
 		function(){
-			return bs.$test( '@japanese', '！“”＃＄％＆‘’（）＊＋，−．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜「」・' );
+			return bs.test( '@japanese', '！“”＃＄％＆‘’（）＊＋，−．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜「」・' );
 		}, 1,
 		function(){
-			return bs.$test( '@japanese', '１２３４５６７８９０' );
+			return bs.test( '@japanese', '１２３４５６７８９０' );
 		}, 1,
 		function(){
-			return bs.$test( '@japanese', 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょ');
+			return bs.test( '@japanese', 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょ');
 		}, 1,
 		function(){
-			return bs.$test( '@japanese', 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポァィゥェォャュョヴ');
+			return bs.test( '@japanese', 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポァィゥェォャュョヴ');
 		}, 1
 	);
 } );

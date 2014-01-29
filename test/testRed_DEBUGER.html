@@ -21,31 +21,31 @@
 <div>IE8이하 vmware를 이용할때 개발자도구를 열면 체크불가능할 정도로 성능이 떨어짐</div>
 <div>그냥 -_- IE8이하에서 console확인좀 편하게 좀 확인만 하자고 만듬...</div>
 <div>사용법</div>
-<div>1. bs.$import('debuger', 'last');</div>
+<div>1. bs.plugin('debuger', 'last');</div>
 <div>2. console.log 찍고싶은대로 찍는다.</div>
 <div>3. bs.DEBUGER.show() /bs.DEBUGER.hide()를 이용하여 디버그창을 열고 닫는다. </div>
 <div>4. show()/hide() 기본 단축키는 pause키~ </div>
 <script src="../bs/bsjs.js"></script>
 <script>
-    bs.$import('debuger', 'last');
+    bs.plugin('debuger', 'last');
 
     bs(function () {
-        bs.css('div').$('font-size','11px')
+        bs.Css('div').S('font-size','11px')
         var i = 100
         while(i--)  console.log('test'+i, 'arg2_'+i)
 
         setInterval(test,1000)
         function test(){
-            console.log('console.log 테스트 - '+bs.$ex(0,'~',100))
+            console.log('console.log 테스트 - '+bs.ex(0,'~',100))
         }
 
-        bs.dom("<input type='button'>").$('<', 'body',
+        bs.Dom("<input type='button'>").S('<', 'body',
                 '@value', 'bs.DEBUGER.show()',
                 'down', function ($e) {
                     bs.DEBUGER.show()
                 }
         )
-        bs.dom("<input type='button'>").$('<', 'body',
+        bs.Dom("<input type='button'>").S('<', 'body',
                 '@value', 'bs.DEBUGER.hide()',
                 'down', function ($e) {
                     bs.DEBUGER.hide()
