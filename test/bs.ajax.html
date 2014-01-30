@@ -49,11 +49,15 @@ bs( function(){
 
 	bsTest( 'ajax sync',
 		function(){
-			return JSON.parse( bs.get( null, 'ajax.json' ) ).a;
+			return JSON.parse(bs.get( null, 'ajax.json' )).a;
 		}, 1,
 		function(){
-			return JSON.parse( bs.get( null, 'ajax.json' ) ).b;
-		}, 2
+			return JSON.parse(bs.get( null, 'ajax.json', 'a', 1, 'b', 2 )).b;
+		}, 2,
+		function(){
+			var t0 = {a:3,b:5};
+			return JSON.parse(bs.post( null, 'http://www.bsidesoft.com/bs/bs5/test/ajax.php', 'data', JSON.stringify(t0) )).b;
+		}, 5
 	);
 
 } );

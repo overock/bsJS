@@ -6,7 +6,7 @@
 ( function( W, N ){
 'use strict';
 var VERSION = 0.3, REPOSITORY = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/',
-	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g,
+	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*/g,
 	bs, doc, fn;
 if( doc = W['document'] ){//browser
 	W[N = N || 'bs'] = bs = function(f){
@@ -167,7 +167,7 @@ else throw new Error( 0, 'not supported platform' );
 	(function(){
 		var h = [], t0 = [];
 		fn( 'param', function(arg){
-			var h, i, j;
+			var i, j;
 			if( !arg || ( j = arg.length ) < 4 ) return '';
 			h.length = t0.length = 0, i = 2;
 			while( i < j )
@@ -224,23 +224,23 @@ if( !W['console'] ) (function(){
 	};
 })();
 //network
-(function(){
+(function(bs){
 	var h = bs.param.header,
 	rq = W['XMLHttpRequest'] ? function(){return new XMLHttpRequest;} : (function(){
 		var t0, i, j;
 		t0 = 'MSXML2.XMLHTTP', t0 = ['Microsoft.XMLHTTP',t0,t0+'.3.0',t0+'.4.0',t0+'.5.0'], i = t0.length;
 		while( i-- ){try{new ActiveXObject( j = t0[i] );}catch(e){continue;}break;}
-		return function(){return new ActiveXObject( j );};
+		return function(){return new ActiveXObject(j);};
 	})(),
 	http = function( type, end, url, arg ){
 		var t0, t1, i, j;
 		t0 = rq();
 		if( end ) t0.onreadystatechange = function(){
 			if( t0.readyState != 4 || t1 < 0 ) return;
-			t0.onreadystatechange = null, clearTimeout( t1 ), t1 = -1, end( t0.status == 200 || t0.status == 0 ? t0.responseText : '@'+t0.status, t0.getAllResponseHeaders() );
+			t0.onreadystatechange = null, clearTimeout(t1), t1 = -1, end( t0.status == 200 || t0.status == 0 ? t0.responseText : '@'+t0.status, t0.getAllResponseHeaders() );
 		}, t1 = setTimeout( function(){if( t1 > -1 ) t1 = -1, t0.onreadystatechange = null, end( '@timeout' );}, bs.timeout() );
 		t0.open( type, url, end ? true : false ),
-		t0.setRequestHeader( 'Content-Type', ( type == 'GET' ? 'text/plain' : 'application/x-www-form-urlencoded' ) + 'charset=UTF-8' ),
+		t0.setRequestHeader( 'Content-Type', ( type == 'GET' ? 'text/plain' : 'application/x-www-form-urlencoded' ) + '; charset=UTF-8' ),
 		t0.setRequestHeader( 'Cache-Control', 'no-cache' ),
 		i = 0, j = h.length;
 		while( i < j ) t0.setRequestHeader( h[i++], h[i++] );
@@ -250,7 +250,7 @@ if( !W['console'] ) (function(){
 	mk = function(m){return function( end, url ){return http( m, end, bs.url(url), arguments );};};
 	fn( 'get', function( end, url ){return http( 'GET', end, bs.url( url, arguments ) );} ),
 	fn( 'post', mk('POST') ), fn( 'put', mk('PUT') ), fn( 'delete', mk('DELETE') );
-})();
+})(bs);
 fn( 'js', (function(doc){
 	var h, e, id, c, js;
 	h = doc.getElementsByTagName('head')[0], e = W['addEventListener'], id = 0, c = bs.__callback = {},
@@ -262,7 +262,7 @@ fn( 'js', (function(doc){
 			else t0.onreadystatechange = function(){
 				if( t0.readyState == 'loaded' || t0.readyState == 'complete' ) t0.onreadystatechange=null, load();
 			};
-			if( data.charAt( data.length - 1 ) == '=' ) data += 'bs.__callback.' + ( i = 'c' + (id++) ), c[i] = function(){delete jc[i], end.apply( null, arguments );};
+			if( data.charAt( data.length - 1 ) == '=' ) data += 'bs.__callback.' + ( i = 'c' + (id++) ), c[i] = function(){delete c[i], end.apply( null, arguments );};
 			t0.src = data;
 		}else t0.text = data;
 	};
@@ -361,7 +361,7 @@ function DETECT(){
 			(function(){
 				var plug, t0, e;
 				plug = navigator.plugins;
-				if( browser == 'ie' ) try{t0 = new ActiveXObject( 'ShockwaveFlash.ShockwaveFlash' ).GetVariable( '$version' ).substr( 4 ).split( ',' ), flash = parseFloat( t0[0] + '.' + t0[1] );}catch( e ){}
+				if( browser == 'ie' ) try{t0 = new ActiveXObject( 'ShockwaveFlash.ShockwaveFlash' ).GetVariable( 'version' ).substr( 4 ).split( ',' ), flash = parseFloat( t0[0] + '.' + t0[1] );}catch( e ){}
 				else if( ( t0 = plug['Shockwave Flash 2.0'] ) || ( t0 = plug['Shockwave Flash'] ) ) t0 = t0.description.split( ' ' )[2].split( '.' ), flash = parseFloat( t0[0] + '.' + t0[1] );
 				else if( agent.indexOf( 'webtv' ) > -1 ) flash = agent.indexOf( 'webtv/2.6' ) > -1 ? 4 : agent.indexOf("webtv/2.5") > -1 ? 3 : 2;
 			})();
@@ -440,12 +440,12 @@ function DOM(){
 		var style = function(s){this.s = s, this.u = {};}, fn = style.prototype,
 			r = /-[a-z]/g, re = function(_0){return _0.charAt(1).toUpperCase();},
 			b = doc.body.style, pf = bs.DETECT.stylePrefix, nopx = {'opacity':1,'zIndex':1},
-			key = style.key = function( k, t0 ){
-				k = t0.replace( r, re );
-				if( k in b ) style[t0] = k;
+			key = style.key = function(v){
+				var k = v.replace( r, re );
+				if( k in b ) style[v] = k;
 				else{
 					k = pf+k.charAt(0).toUpperCase()+k.substr(1);
-					if( k in b ) style[t0] = k;
+					if( k in b ) style[v] = k;
 					else return 0;
 				}
 				return k;
@@ -456,7 +456,7 @@ function DOM(){
 			while( i < j ){
 				k = style[t0 = arg[i++]], v = arg[i++];
 				if( !k ){
-					if( !( k = key( k, t0 ) ) ) continue;
+					if( !( k = key(t0) ) ) continue;
 				}else if( typeof k == 'function' ){
 					v = k( this, v );
 					continue;
@@ -479,14 +479,14 @@ function DOM(){
 		fn.g = function( t0 ){
 			var k = style[t0];
 			if( !k ){
-				if( !( k = key( k, t0 ) ) ) return 0;
+				if( !( k = key(t0) ) ) return 0;
 			}else if( typeof k == 'function' ) return k( this );
 			return this[k];
 		},
 		fn.s = function( t0, v ){
 			var k = style[t0];
 			if( !k ){
-				if( !( k = key( k, t0 ) ) ) return 0;
+				if( !( k = key(t0) ) ) return 0;
 			}else if( typeof k == 'function' ) return k( this, v );
 			return this[k] = v;
 		},
@@ -552,11 +552,11 @@ function DOM(){
 			if( sel.indexOf('@') > -1 ){
 				t0 = sel.split('@');
 				if( t0[0] == 'font-face' ){
-					t0 = t0[1].split(' '), v = 'font-family:'+t0[0]+";src:url('"+t0[1]+".eot');src:"+
-						"url('"+t0[1]+".eot?#iefix') format('embedded-opentype'),url('"+t0[1]+".woff') format('woff'),"+
-						"url('"+t0[1]+".ttf') format('truetype'),url('"+t0[1]+".svg') format('svg');",
+					v = t0[1].split(' '), v = 'font-family:'+v[0]+";src:url('"+v[1]+".eot');src:"+
+						"url('"+v[1]+".eot?#iefix') format('embedded-opentype'),url('"+v[1]+".woff') format('woff'),"+
+						"url('"+v[1]+".ttf') format('truetype'),url('"+v[1]+".svg') format('svg');",
 					t0 = '@font-face', this.type = 5;
-					try{this.r = add( t0, v ); 
+					try{this.r = add( t0, v );
 					}catch(e){
 						doc.getElementsByTagName('head')[0].appendChild( t0 = doc.createElement('style') ),
 						( t0.styleSheet || t0.sheet ).cssText = t0 + '{' + v + '}';
@@ -585,7 +585,7 @@ function DOM(){
 			}
 			return this;
 		},
-		r = /^[0-9.-]+$/,
+		r = /^[0-9.-]+/,
 		parser = function(data){
 			var t0, t1, t2, c, i, j, k, v;
 			t2 = [], t0 = data.split('}');
@@ -1114,7 +1114,7 @@ function ANI(){
 					else if( k == 'id' ) this.id = v;
 				}else{
 					l = this.length;
-					while( l-- ) this[l].push( isDom ? style[k] : k, v0 = isDom ? this[l][0].g( k ) : this[l][0][k], v - v0 );
+					while( l-- ) this[l].push( isDom ? style[k] : k, v0 = isDom ? this[l][0].g(k) : this[l][0][k], v - v0 );
 				}
 			}
 			this.stime = Date.now() + this.delay, this.etime = this.stime + this.time,
@@ -1136,7 +1136,7 @@ function ANI(){
 						while( i < j ) k = t0[i++], v = t0[i++] + t0[i++],
 							typeof k == 'function' ? k( t1, v ) : s[k] = v + u[k], t1[k] = v;
 					}
-					if( this.end ) this.end( this.t );
+					if( this.end ) this.end(this.t);
 					tweenPool[tweenPool.length++] = this;
 					return 1;
 				}
