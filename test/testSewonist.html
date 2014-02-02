@@ -11,12 +11,23 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi" />
 <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
 </head>
 <body>
 <a href="https://github.com/projectBS/bsJS">
 	<img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
 </a>
-<div id="stage" data-id="stageId" data-id2="stageId2">
+    <div id="test-table">
+        <table class="table" id="list">
+            <thead>
+                <tr><th>head 1</th><th>head 2</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button class="btn" id="btn-add-row">Add Row</button>
+        <button class="btn" id="btn-add-div">Add Div</button>
+    </div>
+<div id="stage-container" data-id="stageId" data-id2="stageId2">
     testbs.ANI.tweenStop 
     <ul>
         <li><div class="off">1 OFF</div><div class="on">1 ON</div></li>
@@ -26,11 +37,36 @@
 </div>
 <div id="result"></div>
 <div id="test"></div>
-<script src="../bs/bsjs.js"></script>
+<script src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
 <script src="./printer.js"></script>
 <script>
 bs( function(){
+<<<<<<< HEAD
+    // test table
+    bs.Css('#test-table').S('padding', 30);
+    bs.Dom('#btn-add-row').S('click', function(e){
+        bs.Dom('#list tbody').S('>', '<tr><th>body 1</th></tr>');
+    } );
+    bs.Dom('#btn-add-div').S('click', function(e){
+        bs.Dom('#list tbody').S('>', '<tr><div>div</div></tr>');
+    } );
+    // test animation
+    bs.Css( '#stage-container' ).S( 'border', '1px solid #f00', 'margin-top', 30, 'width', '90%', 'padding', 10, 'background-color', '#eee' );
+    bs.Css( 'ol, ul' ).S( 'list-style', 'none' );
+    bs.Css( 'li' ).S( 'position', 'relative', 'margin', '15px' );
+    bs.Css( '.off' ).S( 
+            'display', 'block', 'background-color', '#34AADC', 
+            'color', '#FFF', 'font-weight', 'bold', 'text-align', 'center', 'line-height', '80px',
+            'width', '200px', 'height', '80px'
+    );
+    bs.Css( '.on' ).S(
+            'display', 'block', 'background-color', '#4CD964', 
+            'color', '#FFF', 'font-weight', 'bold', 'text-align', 'center', 'line-height', '80px',
+            'width', '200px', 'height', '80px', 
+            'position', 'absolute', 'top', '0px', 'left', '0px'
+    );
+=======
 	
 bs.Css( '#stage' ).S( 'border', '1px solid #f00', 'margin-top', 30, 'width', '90:%', 'padding', 10, 'background-color', '#eee' );
 bs.Css( 'ol, ul' ).S( 'list-style', 'none' );
@@ -58,7 +94,19 @@ bs.Dom( '.on' ).S(
 	},
 	"opacity", 0
 );
+>>>>>>> 352fa2e9dde5e455bb8425580ea305c749b518c6
 
+    bs.Dom( '.on' ).S(
+            "mouseover", function(e){
+                    bs.ANI.tweenStop(this);
+                    bs.ANI.tween( this, "opacity", 1, "time", .3, "ease", "sineOut" );
+            },
+            "mouseout", function(e){
+                    bs.ANI.tweenStop(this);
+                    bs.ANI.tween( this, "opacity", 0, "time", .3, "ease", "sineOut" );
+            },
+            "opacity", 0
+    );
 } );
 </script>
 </body>
