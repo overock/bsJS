@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<title>한글</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta charset="utf-8"/>
+</head>
+<body>
+<article>
+	<div>ar-div1
+		<a>ar-div1-a</a>
+	</div>
+	<div>ar-div2
+		<ul>
+			<li>ar-div2-ul-li
+				<a>ar-div2-ul-li-a</a>
+			</li>
+		</ul>
+	</div>
+</article>
+<section>
+	<div>sec-div1
+		<a>sec-div1-a</a>
+	</div>
+	<div>sec-div2
+		<ul>
+			<li>sec-div2-ul-li
+				<div>sec-div2-ul-li-div
+					<ul>
+						<li disabled data-id='aaa'>sec-div2-ul-li-div-ul-li</li>
+					</ul>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div>sec-div3
+		<ul class='testid'>
+			<li>sec-div3-ul-li
+				<div id='testid' data-id='aaa'>sec-div3-ul-li-div
+					<ul>
+						<li class='testid testid2' data-id='aaa' href='#'><a href='http://www.naver.com'>sec-div3-ul-li-div-ul-li1</a></li>
+						<li class='testid'><a href='#'>sec-div3-ul-li-div-ul-li2</a></li>
+					</ul>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+</section>
+<form>
+<input type='text' name='aaa' alt='' readonly disabled>
+<input type='text' name='aaa1' alt='' readonly disabled>
+<input type='checkbox' name='bbb' alt='fff' readonly>
+<input type='checkbox' name='bbb1' alt='fff' checked>
+<input type='checkbox' name='bbb2' alt='fff' checked disabled>
+<input type='radio' name='ccc' alt='fff' disabled readonly>
+
+</form>
+<script src="./selector.js" type></script>
+<script>
+//bssel('li[disabled], input[type], :checked[type][type]');
+//bssel('.testid>[data-id]');
+bssel('.testid>[data-id], .testid [data-id]');
+//bssel('[data-id] form[data-id]:checked');
+bssel('div ul li');
+bssel('.testid.testid2');
+bssel('#testid:first-child');
+</script>
+
+</body>
+</html>
