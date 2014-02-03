@@ -130,18 +130,20 @@ var DETECT;
 var finder = (function(){
 	var bsel, parseQuery, compareEl, r0;
 
-	r0 = /  +/g;
 	parseQuery = function(s){
-		var tokens, token, step, key, i, j;
+		var tokens, token, key, i, t0;
 		tokens = [];
 		token = '';
 		i = s.length;
 		while( i-- ){
 			key = s.charAt(i);
-			if( key != ']' && key != '>' && key != '+' ) token = key + token;
-			if( key == ' ' || key == '>' || key == '+' ){
+			if( key == '[' ) t0 = 0; else if( key == ']' ) t0 = 1;
+			if( key != ' ' && key != ']' && key != '>' && key != '+' ) token = key + token;
+
+			if( key == ' ' && t0 ) token = key + token;
+			else if( key == ' ' || key == '>' || key == '+' ){
 				if( ( token = trim(token) ) != '' ) tokens.push(token);
-				tokens.push(key);
+				if( tokens[tokens.length-1] != ' ' )tokens.push(key);
 				token = '';
 			}else if( key == '.' || key == ':' || key == '[' || !i ){
 				tokens.push(token);
@@ -234,9 +236,10 @@ var finder = (function(){
 			key, hit, pIdx, aIdx, attrs, token, tokens, ntoken;
 		console.log('@@@', $s);
 		document.getElementById('selector').value = $s;
-		if(isQS) console.log( document.querySelectorAll($s) );
+		if(isQS) console.log( 'native:', document.querySelectorAll($s) );
 		oSel = [],
-		sels = trim( $s.replace( r0, ' ' ).split(',') );
+		//sels = trim( $s.replace( r0, ' ' ).split(',') );
+		sels = trim( $s.split(',') );
 		for( i = sels.length; i--; ){
 			oSel.push( parseQuery( sels[i] ) );
 		}
@@ -279,7 +282,7 @@ var finder = (function(){
 			}
 		}
 		//echo(ret[0]);
-		console.log(ret);
+		console.log('bssel:',ret);
 		for(var i=0; i<ret.length; i++){
 			ret[i].className = ret[i].className ? ret[i].className + ' selected': 'selected';
 		}
