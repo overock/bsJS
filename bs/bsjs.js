@@ -6,7 +6,7 @@
 ( function( W, N ){
 'use strict';
 var VERSION = 0.3, REPOSITORY = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/',
-	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*/g,
+	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g,
 	bs, doc, fn;
 if( doc = W['document'] ){//browser
 	W[N = N || 'bs'] = bs = function(f){
@@ -21,7 +21,7 @@ if( doc = W['document'] ){//browser
 	bs.err = function( num, msg ){console.log( num, msg );},
 	root = require.main.filename.lastIndexOf( '\\' ) > -1 ? '\\' : '/',
 	root = require.main.filename.substring( 0, require.main.filename.lastIndexOf( root ) ),
-	bs.root = function(){return root;};
+	bs.root = function(){return root;}, bs.DB = {};
 })();
 else throw new Error( 0, 'not supported platform' );
 (function(){//core
@@ -38,7 +38,7 @@ else throw new Error( 0, 'not supported platform' );
 		bs[t0] = pr.instanceOf = function(sel){
 			var t0;
 			if( typeof sel == 'string' ){
-				if( ( t0 = sel.charAt(0) ) == '@' ) sel = sel.substr(1);
+				if( ( t0 = sel.charAt(0) ) == '@' ) return sel = sel.substr(1), cls[sel] = new cls(sel);
 				else if( t0 != '<' ) return cls[sel] || ( cls[sel] = new cls(sel) );
 			}
 			return new cls(sel);
@@ -135,11 +135,12 @@ else throw new Error( 0, 'not supported platform' );
 		};
 	})() ),
 	fn( 'trim', (function(trim){
-		var f = function(v){
+		var t = String.prototype.trim ? 1 : 0,
+		f = function(v){
 			var t0, i;
 			if( !v ) return v;
 			t0 = typeof v;
-			if( t0 == 'string' ) return v.replace( trim, '' );
+			if( t0 == 'string' ) return t ? v.trim() : v.replace( trim, '' );
 			if( t0 == 'object' ){
 				if( v.splice ){t0 = [], i = v.length; while( i-- ) t0[i] = f(v[i]);}
 				else{t0 = {}; for( i in v ) if( v.hasOwnProperty(i) ) t0[i] = f(v[i]);}
@@ -182,7 +183,7 @@ else throw new Error( 0, 'not supported platform' );
 		return t0[0] + ( t0[0].indexOf('?') > -1 ? '&' : '?' ) + 'bsNC=' + bs.rand( 1000, 9999 ) + '&' + bs.param(arg) + ( t0[1] ? '#' + t0[1] : '' );
 	} );
 })();
-if( !doc ) return require('./bsnode')(bs);//branch node
+if( !doc ) return require('./node/core.js')(bs);//branch node
 //es5
 if( !Date.now ) Date.now = function(){return +new Date;};
 if( !Array.prototype.indexOf ) Array.prototype.indexOf = function( v, I ){
@@ -252,9 +253,7 @@ if( !W['console'] ) (function(){
 	fn( 'post', mk('POST') ), fn( 'put', mk('PUT') ), fn( 'delete', mk('DELETE') );
 })(bs);
 fn( 'js', (function(doc){
-	var h, e, id, c, js;
-	h = doc.getElementsByTagName('head')[0], e = W['addEventListener'], id = 0, c = bs.__callback = {},
-	js = function( data, load, end ){
+	var h = doc.getElementsByTagName('head')[0], e = W['addEventListener'], id = 0, c = bs.__callback = {},	js = function( data, load, end ){
 		var t0, i;
 		t0 = doc.createElement('script'), t0.type = 'text/javascript', t0.charset = 'utf-8', h.appendChild(t0);
 		if( load ){
@@ -627,18 +626,19 @@ function DOM(){
 			return html = function(sel){return div.innerHTML = sel, bs.reverse( div.childNodes );};
 		})(doc),
 		dom = (function( query, html ){
-			var nodes = {}, dom = function( sel, node ){
+			var nodes = {}, dom = function( sel, isSub ){
 				var r, t0, i, j, k;
 				t0 = typeof sel;
 				if( t0 == 'function' ) return sel();
 				if( t0 == 'string' ) return sel.charAt(0) == '<' ? html(sel) : query(sel);
 				if( sel.instanceOf == bs.Dom ) return sel;
-				r = node ? {} : nodes;
-				if( sel.nodeType == 1 ) return r[0] = sel, r.length = 1, r;
+				if( sel.nodeType == 1 ) return isSub ? sel : ( nodes[0] = sel, nodes.length = 1, nodes );
 				if( j = sel.length ){
-					for( r.length = i = 0 ; i < j ; i++ ){
-						t0 = dom( sel[i], 1 ), r.length = k = t0.length;
-						while( k-- ) r[k] = t0[k];
+					r = isSub ? {} : nodes, r.length = 0;
+					for( i = 0 ; i < j ; i++ ){
+						t0 = dom( sel[i], 1 );
+						if( t0.nodeType == 1 ) r[r.length++] = t0;
+						else if( k = t0.length ) while( k-- ) r[r.length++] = t0[k];
 					}
 					return r;
 				}
@@ -717,8 +717,8 @@ function DOM(){
 		fn['class'] = function( d, v ){return v === undefined ? d.className : ( d.className = v );},
 		fn['class+'] = function( d, v ){
 			var t0;
-			return !( t0 = d.className.replace( t, '' ) ) ? ( d.className = v ) :
-				t0.split(' ').indexOf(v) == -1 ? ( d.className = v + ' ' + t0 ) : t0;
+			return !( t0 = d.className.replace( t, '' ) ) ? ( console.log(1),d.className = v ) :
+				t0.split(' ').indexOf(v) == -1 ? ( console.log(t, t0, v),d.className = v + ' ' + t0 ) : t0;
 		},
 		fn['class-'] = function( d, v ){
 			var t0, i;
