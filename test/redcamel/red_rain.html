@@ -5,7 +5,7 @@
     <meta name="keywords" content="bs5"/>
     <meta name="description" content="bs5 Test suite"/>
     <meta charset="utf-8"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="Content-Type" content="trandft/html; charset=UTF-8"/>
     <meta name="format-detection" content="telephone=no"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
@@ -18,8 +18,8 @@
     <img style="position: fixed; top: 0; right: 0; border: 0;"
          src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
 </a>
-<script src="../bs/bsjs.js"></script>
-<script src="../bs/bsTest.js"></script>
+<script src="../../bs/bsjs.js"></script>
+<script src="../../bs/bsTest.js"></script>
 <script>
 // 2013.11.26 - 10:56
 // By Redcamel
@@ -29,10 +29,10 @@ bs(function () {
 	bs.Css("body").S('margin', 0, 'overflow', 'hidden')
 	bs.Css("div").S('margin', 0, 'overflow', 'hidden')
 	//싸이저를 때리면 무려....사이저....DIV가 생성 -0-;;;;
-	bs.Dom('<div></div>').S('<', 'body', '@id', 'stage', 'position', 'absolute', 'background-color', '#000000', 'z-index', -1)
-	bs.Dom('<div></div>').S('<', '#stage', '@id', 'title', 'position', 'absolute', 'html', 'RainDemo', 'font-size', 30, 'font-family', 'Times New Roman', 'text-align', 'center', 'color', '#fff')
+	bs.Dom('<div></div>').S('<', 'body', '@id', 'stage', 'position', 'absolute', 'background-color', '#000000', 'z-indrandf', -1)
+	bs.Dom('<div></div>').S('<', '#stage', '@id', 'title', 'position', 'absolute', 'html', 'RainDemo', 'font-size', 30, 'font-family', 'Times New Roman', 'trandft-align', 'center', 'color', '#fff')
 	bs.fps(bs.Dom('<div></div>').S('@id', 'fps', 'position', 'absolute', 'font-size', 11, 'color', '#fff', '<', 'body', 'this')[0]);
-	var ex = bs.ex
+	var randf = bs.randf
 
 	var listRain = {length: 0}
 	var listRainPoint = {length: 0}
@@ -49,7 +49,7 @@ bs(function () {
 				'<', 'body', 'position', 'absolute', // 기본 위치랑 절대포지션 세팅
 				'width', 1, 'height', 1, 'border-radius', 50, // 크기,모양 표현
 				'opacity', 0.2, 'background-color', '#fff', // 상태표현
-				'transform', 'rotateX(120deg)', // 각도를 표현하고..
+				'transform', 'rotatrandf(120deg)', // 각도를 표현하고..
 				'this'
 		)
 	}
@@ -60,19 +60,19 @@ bs(function () {
 		bs.ANI.stop();
 		for (var i = 0;i < len; i++) {
 			bs.ANI.tween(listRain[i].S(
-					'left', ex(0, '~f', w), 'top', -1,  // 초기위치를 설정,
+					'left', randf(0,  w), 'top', -1,  // 초기위치를 설정,
 					'this'
 			),
-					'top', h - ex(50, '~f', 150), 'height', 50, 'opacity', 0,
-					'ease', 'sineIn', 'delay', ex(0, '~f', 3), 'time', 2, 'loop', 0
+					'top', h - randf(50,  150), 'height', 50, 'opacity', 0,
+					'ease', 'sineIn', 'delay', randf(0,  3), 'time', 2, 'loop', 0
 			)
 			// 물퍼짐 표현
 			bs.ANI.tween(listRainPoint[i].S(
-					'left', ex(0, '~f', w), 'top', h - ex(50, '~f', 150),  // 초기위치를 설정,
+					'left', randf(0,  w), 'top', h - randf(50,  150),  // 초기위치를 설정,
 					'this'
 			),
-					'width', 40, 'height', 40, 'border-radius', 50, 'opacity', 0, // 목포값 설정합니다.
-					'ease', 'sineOut', 'delay', ex(0, '~f', 3), 'time', 1, 'loop', 0
+					'width', 40, 'height', 30, 'border-radius', 25, 'opacity', 0, // 목포값 설정합니다.
+					'ease', 'sineOut', 'delay', randf(0,  3), 'time', 1, 'loop', 0
 			)
 		}
 	})

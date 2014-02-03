@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title></title>
+    <meta name="keywords" content="bs5"/>
+    <meta name="description" content="bs5 Test suite"/>
+    <meta charset="utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta name="viewport"
+          content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi"/>
+    <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<a href="https://github.com/projectBS/bsJS">
+    <img style="position: fixed; top: 0; right: 0; border: 0;"
+         src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+</a>
+<div>IE8이하 vmware를 이용할때 개발자도구를 열면 체크불가능할 정도로 성능이 떨어짐</div>
+<div>그냥 -_- IE8이하에서 console확인좀 편하게 좀 확인만 하자고 만듬...</div>
+<div>사용법</div>
+<div>1. bs.plugin('debuger', 'last');</div>
+<div>2. console.log 찍고싶은대로 찍는다.</div>
+<div>3. bs.DEBUGER.show() /bs.DEBUGER.hide()를 이용하여 디버그창을 열고 닫는다. </div>
+<div>4. show()/hide() 기본 단축키는 pause키~ </div>
+<script src="../../bs/bsjs.js"></script>
+<script>
+    bs.plugin('debuger', 'last');
+
+    bs(function () {
+        bs.Css('div').S('font-size','11px')
+        var i = 100
+        while(i--)  console.log('test'+i, 'arg2_'+i)
+
+        setInterval(test,1000)
+        function test(){
+            console.log('console.log 테스트 - '+bs.rand(0,100))
+        }
+
+        bs.Dom("<input type='button'>").S('<', 'body',
+                '@value', 'bs.DEBUGER.show()',
+                'down', function ($e) {
+                    bs.DEBUGER.show()
+                }
+        )
+        bs.Dom("<input type='button'>").S('<', 'body',
+                '@value', 'bs.DEBUGER.hide()',
+                'down', function ($e) {
+                    bs.DEBUGER.hide()
+                }
+        );
+    })
+</script>
+</body>
+</html>
