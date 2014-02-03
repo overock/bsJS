@@ -110,6 +110,11 @@ bs( function(){
 			console.log('resize');
 		} );
 	} );
+	bsTest( '리스트로부터 Dom생성시 카운트',
+		function(){
+			return bs.Dom( document.getElementsByTagName('div') ).length;
+		}, document.getElementsByTagName('div').length
+	);
 } );
 </script>
 </body>
