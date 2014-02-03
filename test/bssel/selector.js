@@ -138,8 +138,8 @@ var finder = (function(){
 		i = s.length;
 		while( i-- ){
 			key = s.charAt(i);
-			if( key != ']' && key != '>' ) token = key + token;
-			if( key == ' ' || key == '>' ){
+			if( key != ']' && key != '>' && key != '+' ) token = key + token;
+			if( key == ' ' || key == '>' || key == '+' ){
 				if( ( token = trim(token) ) != '' ) tokens.push(token);
 				tokens.push(key);
 				token = '';
@@ -152,6 +152,8 @@ var finder = (function(){
 		return tokens;
 	},
 	compareEl = (function(){
+		var r0;
+		r0 = /"|'/g, //"
 		function _hasCls(key, clsNm){
 			var i;
 			if( !clsNm ) return 0;
@@ -160,7 +162,7 @@ var finder = (function(){
 			return 0;
 		};
 		return function(el, token){
-			var key;
+			var key, val, opIdx, op, i;
 			if( ( key = token.charAt(0) ) == '#' ){
 				//console.log("ID");
 				key = token.substr(1);
@@ -173,7 +175,33 @@ var finder = (function(){
 				//console.log('#attr');
 				// TODO:IE7 에서 A, SCRIPT, UL, LI 등의 요소에 기본 type 속성이 생성되어있는 문제 처리
 				key = token.substr(1);
-				if( el.getAttribute(key) !== null ) return 1;
+				opIdx = key.indexOf('=');
+				op = opIdx > -1 ? key.charAt(opIdx-1) : null;
+				val = key.split('=');
+				key = opIdx > -1 ? op == '~' || op == '|' || op == '^' || op == '$' || op == '*' ? val[0].substring(0, opIdx-1) : val[0] : key;
+				val = opIdx > -1 ? val[1].replace(r0, ''):null;
+				if( key = el.getAttribute(key) ){
+					//console.log(op, key,val)
+					if( opIdx == -1 ){
+						if( key !== null ) return 1;
+					}else{
+						if( op == '~' ){
+							key = key.split(' ');
+							for( i = key.length; i--; ){
+								//console.log(key[i])
+								if( key[i] == val ) return 1;
+							}
+						}else if( op == '|' ){
+							key = key.split('-');
+							for( i = key.length; i--; ){
+								//console.log(key[i])
+								if( key[i] == val ) return 1;
+							}
+						}else{
+							if( key == val ) return 1;
+						}
+					}
+				}
 			}else if( key == ':' ){
 				// TODO:pseudo 처리
 				key = token.substr(1);
@@ -233,6 +261,9 @@ var finder = (function(){
 						}else if( key == '>' ){ // immediate parent
 							m++;
 							hit = compareEl(el = el.parentNode, tokens[m]);
+						}else if( key == '+' ){ // has nextsibling
+							m++;
+							hit = ( el = el.previousSibling );
 						}else{
 							hit = compareEl(el, token);
 						}

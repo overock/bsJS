@@ -7,6 +7,8 @@
 <meta charset="utf-8"/>
 </head>
 <body>
+<section>
+</section>>
 <article>
 	<div>ar-div1
 		<a>ar-div1-a</a>
@@ -28,7 +30,7 @@
 			<li>sec-div2-ul-li
 				<div>sec-div2-ul-li-div
 					<ul>
-						<li disabled data-id='aaa'>sec-div2-ul-li-div-ul-li</li>
+						<li disabled data-id='abc-def'>sec-div2-ul-li-div-ul-li</li>
 					</ul>
 				</div>
 			</li>
@@ -37,10 +39,11 @@
 	<div>sec-div3
 		<ul class='testid'>
 			<li>sec-div3-ul-li
-				<div id='testid' data-id='aaa'>sec-div3-ul-li-div
+				<div id='testid' data-id='abc'>sec-div3-ul-li-div
 					<ul>
-						<li class='testid testid2' data-id='aaa' href='#'><a href='http://www.naver.com'>sec-div3-ul-li-div-ul-li1</a></li>
+						<li class='testid testid2' data-id='abc def' href='#'><a href='http://www.naver.com'>sec-div3-ul-li-div-ul-li1</a></li>
 						<li class='testid'><a href='#'>sec-div3-ul-li-div-ul-li2</a></li>
+						<li class='testid'><a href='#'>sec-div3-ul-li-div-ul-li3</a></li>
 					</ul>
 				</div>
 			</li>
@@ -61,11 +64,13 @@
 <script>
 //bssel('li[disabled], input[type], :checked[type][type]');
 //bssel('.testid>[data-id]');
-bssel('.testid>[data-id], .testid [data-id]');
+//bssel('.testid>[data-id], .testid [data-id]');
 //bssel('[data-id] form[data-id]:checked');
-bssel('div ul li');
-bssel('.testid.testid2');
-bssel('#testid:first-child');
+//bssel('div ul li');
+//bssel('.testid.testid2');
+//bssel('#testid:first-child');
+//bssel('section+article+section');
+bssel('li[data-id~=\'def\']');
 </script>
 
 </body>
