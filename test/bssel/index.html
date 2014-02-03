@@ -5,10 +5,19 @@
 <meta name="keywords" content="" />
 <meta name="description" content="" />
 <meta charset="utf-8"/>
+<style>
+	.selected{
+		font-weight:bold;
+		color:red;
+		border:2px solid red;
+	}
+</style>
 </head>
 <body>
 <section>
 </section>>
+<input onkeyup='if(event.keyCode == 13)bssel(this.value);'id='selector' style='padding:5px;border:2px solid green;font-size:20px;'>
+<button onclick='bssel(document.getElementById("selector").value);'>go</button>
 <article>
 	<div>ar-div1
 		<a>ar-div1-a</a>

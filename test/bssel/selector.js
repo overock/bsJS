@@ -232,7 +232,8 @@ var finder = (function(){
 	return function($s){
 		var ret, el, els, pel, sel, sels, oSel, t0, i, j, k, m, n,
 			key, hit, pIdx, aIdx, attrs, token, tokens, ntoken;
-		console.log('@@@', $s)
+		console.log('@@@', $s);
+		document.getElementById('selector').value = $s;
 		if(isQS) console.log( document.querySelectorAll($s) );
 		oSel = [],
 		sels = trim( $s.replace( r0, ' ' ).split(',') );
@@ -245,6 +246,7 @@ var finder = (function(){
 		if( els = document.getElementsByTagName('*') ){
 			//console.log(els);
 			for( i = 0, j = els.length; i < j; i++ ){
+				els[i].className = els[i].className.replace('selected','');
 				hit = 0;
 				pel = null;
 				for( k = oSel.length; k--; ){
@@ -277,7 +279,10 @@ var finder = (function(){
 			}
 		}
 		//echo(ret[0]);
-		console.dir(ret);
+		console.log(ret);
+		for(var i=0; i<ret.length; i++){
+			ret[i].className = ret[i].className ? ret[i].className + ' selected': 'selected';
+		}
 	}
 })();
 	return finder;
