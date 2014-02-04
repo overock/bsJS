@@ -1,5 +1,5 @@
 var bs = require( './bs/bsjs' );
-bs.site( 'bsplugin' ).$(
+bs.Site( 'bsplugin' ).S(
 	'url', 'js.bsplugin.com:8001',
 	'url', '127.0.0.1:8001',
 	'root', './noderoot/pluginjs/',
@@ -14,7 +14,7 @@ bs.site( 'bsplugin' ).$(
 	}
 	*/
 );
-bs.site( 'bsplugin' ).router(
+bs.Site( 'bsplugin' ).router(
 	'member', [
 		'function', function(){
 			if( !bs.WEB.session('id') ) bs.WEB.redirect('/'), bs.WEB.pause();
@@ -22,4 +22,4 @@ bs.site( 'bsplugin' ).router(
 		'template', '@.html'
 	]
 );
-bs.site('bsplugin').start();
+bs.Site('bsplugin').start();

@@ -18,7 +18,8 @@ if( doc = W['document'] ){//browser
 }else if( process && process.version )(function(){//node.js
 	var root;
 	module.exports = bs = function(f){f();},
-	bs.err = function( num, msg ){console.log( num, msg );},
+	bs.err = function( num, msg ){console.log( num, msg );throw new Error( num, msg );},
+	//bs.err = function( num, msg ){console.log( num, msg );},
 	root = require.main.filename.lastIndexOf( '\\' ) > -1 ? '\\' : '/',
 	root = require.main.filename.substring( 0, require.main.filename.lastIndexOf( root ) ),
 	bs.root = function(){return root;}, bs.DB = {};
@@ -30,7 +31,7 @@ else throw new Error( 0, 'not supported platform' );
 	fn( 'obj', function( name, o ){bs[name.replace( trim, '' ).toUpperCase()] = o;} ),
 	fn( 'cls', function( name, f ){
 		var cls, pr, t0, k;
-		pr = ( cls = function( sel ){this.__k = sel, this.NEW.apply( this, arguments );} ).prototype,
+		pr = ( cls = function( sel, arg ){this.__k = sel, this.NEW.apply( this, arg );} ).prototype,
 		pr.NEW = none, pr.END = function(){delete cls[this.__k];}, f( t0 = {}, bs );
 		for( k in t0 ) if( t0.hasOwnProperty(k) ) pr[k] = t0[k];
 		t0 = name.replace( trim, '' ).toLowerCase(),
@@ -38,10 +39,10 @@ else throw new Error( 0, 'not supported platform' );
 		bs[t0] = pr.instanceOf = function(sel){
 			var t0;
 			if( typeof sel == 'string' ){
-				if( ( t0 = sel.charAt(0) ) == '@' ) return sel = sel.substr(1), cls[sel] = new cls(sel);
-				else if( t0 != '<' ) return cls[sel] || ( cls[sel] = new cls(sel) );
+				if( ( t0 = sel.charAt(0) ) == '@' ) return sel = sel.substr(1), cls[sel] = new cls( sel, arguments );
+				else if( t0 != '<' ) return cls[sel] || ( cls[sel] = new cls( sel, arguments ) );
 			}
-			return new cls(sel);
+			return new cls( sel, arguments );
 		};
 	} ),
 	fn( 'timeout', function(){return arguments.length ? ( timeout = parseInt( arguments[0] * 1000 ) ) : timeout;} ),
@@ -72,10 +73,12 @@ else throw new Error( 0, 'not supported platform' );
 							for( k in t1 ) if( t1.hasOwnProperty(k) ) switch(k){
 							case'execute':case'recordset':case'stream':case'transation':case'open':case'close':case'S':
 								i++, t0.prototype[k] = t1[k]; break;
+							case'require': t1[k] = require(t1[k]); break;
 							default:return bs.err(7);
 							}
 							if( i != 7 ) return bs.err(8);
-							bs.DB[k] = t0;
+							bs.DB[name] = t0;
+							console.log( name, bs.DB[name] );
 							break;
 						case'style':
 							if( bs.STYLE ){

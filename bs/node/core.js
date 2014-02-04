@@ -54,7 +54,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 				bs.get( function(v){
 					var t0;
 					if( v.indexOf('module.exports') > -1 || v.indexOf('exports') > -1 ) end( ( t0 = new module.constructor, t0.paths = module.paths, t0._compile(v), t0.exports ) );
-					else try{new Function( 'bs', v )(bs);}catch(e){bs.err( 0, e );}
+					else try{new Function( 'bs', v )(bs);}catch(e){ bs.err( 0, e.toString() );}
 					load();
 				}, data );
 			}else if( data.indexOf('module.exports') > -1 || data.indexOf('exports') > -1 ) end( ( t0 = new module.constructor, t0.paths = module.paths, t0._compile(data), t0.exports ) );
@@ -97,29 +97,28 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		};
 	})(),
 	mk = function(m){return function( end, url ){return http( m, end, bs.url(url), arguments );};},
-	fn( 'get', function( $end, $path ){return http( 'GET', $end, bs.$url( $path, arguments ) );} ),
+	fn( 'get', function( end, path ){return http( 'GET', end, bs.url( path, arguments ) );} ),
 	fn( 'post', mk('POST') ), fn( 'put', mk('PUT') ), fn( 'delete', mk('DELETE') ),
 	fn( 'ck', (function(){
-		return function( k, v, expire, path, domain ){
+		return function( k, v, expire, path ){
 			var t0, t1;
-			if( $v === undefined ) return bs.$unescape(clientCookie[$k]||'');
-			if( $k.charAt(0) == '@' ) t0 = 1, $k = $k.substr(1);
-			t0 = $k + '=' + ( bs.$escape($v) || '' ) + 
-				';Path=' + ( $path || '/' ) + 
-				( t0 ? ';HttpOnly' : '' ) + 
-				( domain ? ';Domain=' + domain : '' );
-			if( $v === null ) (t1 = new Date).setTime( t1.getTime() - 86400000 ),
+			if( v === undefined ) return bs.unescape(clientCookie[k]||'');
+			if( k.charAt(0) == '@' ) t0 = 1, k = k.substr(1);
+			t0 = k + '=' + ( bs.escape(v) || '' ) + 
+				';Path=' + ( path || '/' ) + 
+				( t0 ? ';HttpOnly' : '' ); 
+			if( v === null ) (t1 = new Date).setTime( t1.getTime() - 86400000 ),
 				t0 += ';expires=' + t0.toUTCString() + ';Max-Age=0';
-			else if( $expire ) (t1 = new Date).setTime( t1.getTime() + $expire * 86400000 ),
-				t0 += ';expires=' + t1.toUTCString() + ';Max-Age=' + ( $expire * 86400 );
-			cookie[$k] = t0;
+			else if( expire ) (t1 = new Date).setTime( t1.getTime() + expire * 86400000 ),
+				t0 += ';expires=' + t1.toUTCString() + ';Max-Age=' + ( expire * 86400 );
+			cookie[k] = t0;
 		};
 	})() );
 })( HTTP, URL, FS_ROOTS ),
 (function(){ //db
 	var type, i;
 	type = 'execute,recordset,stream,transation'.split(','); for( i in type ) type[type[i]] = 1;
-	bs.cls( 'db', function( fn, bs ){
+	bs.cls( 'Db', function( fn, bs ){
 		fn.NEW = function( sel, type ){
 			if( !bs.DB[type] ) return bs.err( 0, 'no db connector for ' + type );
 			this.__db = new bs.DB[type]();
@@ -159,13 +158,13 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 				t0 = t1;
 			}else t0 = bs.tmpl( this.query, t0 );
 			//console.log( t0 );
-			return bs.db(this.db)[this.type]( t0, end );
+			return bs.Db(this.db)[this.type]( t0, end );
 		};
 	} );
 })(),
 (function( HTTP, HTTPS, URL ){
 	var countryCode = require('./i18n'), mime = require('./mime'), staticHeader = {'Content-Type':0}, curr,
-	err = function( $code, $v ){rp.writeHead( $code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( $v || '' );},
+	err = function( code, v ){rp.writeHead( code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( v || '' );},
 	ckParser = function(){
 		var t0, t1, i;
 		curr.clientCookie = {};
@@ -266,7 +265,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 					if( !( i in data ) ) return bs.err( 0, 'no key: data[' + i +']' );
 					t1 = t0[i], d1 = data[i];
 					for( j in t1 ) if( t1.hasOwnProperty(j) ){
-						if( !( j in d1 )  ) return bs.err( 0, 'no key: $data[' + i +'][' + j + ']' );
+						if( !( j in d1 )  ) return bs.err( 0, 'no key: data[' + i +'][' + j + ']' );
 					}
 				}
 				curr.i18nTxt[locale] = data;
@@ -299,7 +298,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		runRule = function( v, isPass ){
 			if( isPass ) curr.pause = 0;
 			switch( typeof v ){
-			case'string':return new Function( 'bs', f(bs.path(v)) )(bs);
+			case'string':return new Function( 'bs', fs(bs.path(v)) )(bs);
 			case'function':return v();
 			case'object':if( v.splice ) return v[0][v[1]]();
 			}
@@ -316,7 +315,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			this.rulesArr = [];
 			for( i in this.rules ) if( this.rules.hasOwnProperty(i) ) this.rulesArr[this.rulesArr.length] = i;
 			this.rulesArr.sort( function( a, b ){return a.length - b.length;} );
-			FS_ROOT[self.__k] = self.root;
+			FS_ROOTS[FS_ROOT = self.__k] = self.root, curr = this;
 			if( i = this.i18n.length ) while(i--) runRule( this.i18n[i] );
 			if( this.https ) https = {
 				key:fs(bs.path( this.https.key, this.root )),
@@ -335,7 +334,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 						if( port[t0].indexOf( domain ) == -1 ) port[t0].push( domain, self );
 					}
 				},
-				curr = self, runRule( self.siteStart, 1 );
+				curr = self, FS_ROOT = self.__k, runRule( self.siteStart, 1 );
 			};
 			if( this.db.length ){
 				for( i = 0, j = this.db.length, t0 = [start] ; i < j ; i++ ) t0[t0.length] = this.db[i], t0[t0.length] = 'last';
@@ -348,7 +347,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			this.url = [], this.i18n = [], this.i18nTxt = {}, this.i18nD = '', this.isStarted = 0,
 			this.rules = {'':defaultRouter}, this.application = {}, this.session = {}, this.db = [],
 			this.head = [], this.response = [], this.mime = {};
-			for( k in mime )if( mime.hasOwnProperty( k ) ) t0[k] = mime[k];
+			for( k in mime )if( mime.hasOwnProperty( k ) ) this.mime[k] = mime[k];
 			this.request = function( url, rq, rp ){
 				var t0, t1, i, j, k;
 				curr = this, t0 = this.path = url.pathname.substr(1);
@@ -375,10 +374,10 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 					if( ( i = this.file.lastIndexOf( '.' ) ) > -1 && this.file.charAt(0) != '@' ) return ( t0 = this.mime[this.file.substr( i + 1 )] ) ? 
 						bs.stream( bs.path( this.path + this.file ),
 							function(){rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe(rp);},
-                            function( $e ){err( 404, 'no file<br>' + self.path + self.file );}
+                            function(e){err( 404, 'no file<br>' + self.path + self.file );}
 						) : err( 404, 'no file<br>' + self.path + self.file );
 				}
-				this.rq = rq, this.rp = rp,
+				this.rq = rq, this.rp = rp, FS_ROOT = this.__k,
 				this.head.length = this.response.length = flushed = 0, this.retry = 1,
 				this.getData = bs.cgiparse( url.query ), ckParser(), this.data = {}, this.cookie = {};
 				if( this.currSession = this.session[t0 = bs.ck(sessionName)] ){
@@ -396,7 +395,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 							if( idx < currRule.length ){
 								try{
 									i = currRule[idx++], j = currRule[idx++];
-									if( typeof j == 'string' ) j = j.replace( '@', '@'+file ), j = j.charAt(0) == '/' ? j.substr(1) : ( this.path + j ), t0 = bs.path(j);
+									if( typeof j == 'string' ) j = j.replace( '@', '@'+this.file ), j = j.charAt(0) == '/' ? j.substr(1) : ( this.path + j ), t0 = bs.path(j);
 									self.pause = 0;
 									switch(i){
 									case'template':self.template( t0, fs(t0), null, tmplEnd ); break;
@@ -517,7 +516,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 								bbuf = new Buffer(rawEd - rawSt),
 								buf.copy( bbuf, 0, rawSt, rawEd ),
 								ret.file[mkey] = new Upfile( mfn, bbuf );
-							else ret.data[mkey] = bs.$unescape( $buf.slice( rawSt, rawEd ).toString() );
+							else ret.data[mkey] = bs.unescape( buf.slice( rawSt, rawEd ).toString() );
 							rawSt = 0, mkey = null, mfn = null;
 						}
 						bline = 0, k = i;
