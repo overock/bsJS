@@ -19,10 +19,9 @@ if( doc = W['document'] ){//browser
 	var root;
 	module.exports = bs = function(f){f();},
 	bs.err = function( num, msg ){console.log( num, msg );throw new Error( num, msg );},
-	//bs.err = function( num, msg ){console.log( num, msg );},
 	root = require.main.filename.lastIndexOf( '\\' ) > -1 ? '\\' : '/',
 	root = require.main.filename.substring( 0, require.main.filename.lastIndexOf( root ) ),
-	bs.root = function(){return root;}, bs.DB = {};
+	bs.root = function(){return root;};
 })();
 else throw new Error( 0, 'not supported platform' );
 (function(){//core
@@ -63,22 +62,10 @@ else throw new Error( 0, 'not supported platform' );
 					clearTimeout( isLoaded ), isLoaded = -1,
 					add = function(){
 						var t0, t1, i, k;
+						if( ( v != 'last' && typeof v != 'number' ) || v <= 0 ) return bs.err(4);
 						switch( type ){
 						case'class':case'method':case'static':
-							if( ( v != 'last' && typeof v != 'number' ) || v <= 0 ) return bs.err(4);
 							bs[type == 'method' ? 'fn' : type == 'class' ? 'cls' : 'obj']( name, obj );
-							break;
-						case'db':
-							t0 = function(){}, obj( t1 = {} ), i = 0;
-							for( k in t1 ) if( t1.hasOwnProperty(k) ) switch(k){
-							case'execute':case'recordset':case'stream':case'transation':case'open':case'close':case'S':
-								i++, t0.prototype[k] = t1[k]; break;
-							case'require': t1[k] = require(t1[k]); break;
-							default:return bs.err(7);
-							}
-							if( i != 7 ) return bs.err(8);
-							bs.DB[name] = t0;
-							console.log( name, bs.DB[name] );
 							break;
 						case'style':
 							if( bs.STYLE ){
@@ -86,6 +73,8 @@ else throw new Error( 0, 'not supported platform' );
 								for( k in t0 ) if( t0.hasOwnProperty(k) ) bs.STYLE[k] = t0[k];
 							}
 							break;
+						case'site': bs.site( name, obj ); break;
+						case'db':  bs.db( name, obj ); break;
 						default:return bs.err(9);
 						}
 						loader();

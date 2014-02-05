@@ -1,11 +1,49 @@
 module.exports = function(bs){
-var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn = bs.fn, FS_ROOT, FS_ROOTS = {root:bs.root()};
+var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn = bs.fn, FS_ROOTS = {root:bs.root()}, none = function(){};
 (function( HTTP, URL, FS_ROOTS ){ //core
 	var os = require('os'), query = require('querystring'), crypto = require('crypto'), fs = require('fs'), p = require('path'),
 		http, mk;
+	fn( 'site', (function(){
+		var I, fn;
+		bs.__SITE = {},
+		fn = ( I = function(){} ).prototype,
+		fn.NEW = fn.init = fn.S = fn.start = fn.request = fn.route = fn.flush = none;
+		return function( name, f ){
+			var cls, fn, t0, k;
+			f( t0 = {}, bs ), 
+			cls = function(site){
+				this.site = site,
+				this.NEW();
+			}, 
+			fn = cls.prototype = new I;
+			for( k in t0 ) if( t0.hasOweProperty(k) ) fn[k] = t0[k];
+			bs.__SITE[name] = cls;
+		};
+	})() ),
+	fn( 'db', (function(){
+		var I, fn;
+		bs.__DB = {},
+		fn = ( I = function(){} ).prototype,
+		fn.S = fn.execute = fn.recordset = fn.stream = fn.transation = fn.open = fn.close = none;
+		return function( name, f ){
+			var cls, fn, t0, k;
+			f( t0 = {}, bs ),
+			cls = function(){},
+			fn = cls.prototype = new I;
+			for( k in t0 ) if( t0.hasOweProperty(k) ){
+				if( k == 'require' ) fn[k] = require(t0[k]);
+				else fn[k] = t0[k];
+			}
+			bs.__DB[name] = cls;
+		};
+	})() ),
 	fn( 'os', function(k){return os[k]();} ),
 	fn( 'escape', function(v){return query.escape(v);} ),
 	fn( 'unescape', function(v){return query.unescape(v);} ),
+	fn( 'db2html', (function(){
+		var r0 = /[<]/g, r1 = /\n|\r\n|\r/g;
+		return function(str){return str.replace( r0, '&lt;' ).replace( r1, '<br/>' );};
+	})() ),
 	fn( 'cgiparse', function(v){return query.parse(v);} ),
 	fn( 'cgistringify', function(v){return query.stringify(v);} ),
 	fn( 'crypt', function( type, v ){
@@ -16,7 +54,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	} ),
 	fn( 'path', function( path, context ){
 		if( path.substr(0,5) == 'http:' || path.substr(0,5) == 'https:' ) return path;
-		return p.resolve( context ? FS_ROOTS[context] || context : FS_ROOTS[FS_ROOT], path );
+		return p.resolve( context || FS_ROOTS[bs.SITE.__k], path );
 	} ),
 	fn( 'file', function( end, path, v ){
 		var t0, t1, dir, i, j, k;
@@ -98,30 +136,15 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	})(),
 	mk = function(m){return function( end, url ){return http( m, end, bs.url(url), arguments );};},
 	fn( 'get', function( end, path ){return http( 'GET', end, bs.url( path, arguments ) );} ),
-	fn( 'post', mk('POST') ), fn( 'put', mk('PUT') ), fn( 'delete', mk('DELETE') ),
-	fn( 'ck', (function(){
-		return function( k, v, expire, path ){
-			var t0, t1;
-			if( v === undefined ) return bs.unescape(clientCookie[k]||'');
-			if( k.charAt(0) == '@' ) t0 = 1, k = k.substr(1);
-			t0 = k + '=' + ( bs.escape(v) || '' ) + 
-				';Path=' + ( path || '/' ) + 
-				( t0 ? ';HttpOnly' : '' ); 
-			if( v === null ) (t1 = new Date).setTime( t1.getTime() - 86400000 ),
-				t0 += ';expires=' + t0.toUTCString() + ';Max-Age=0';
-			else if( expire ) (t1 = new Date).setTime( t1.getTime() + expire * 86400000 ),
-				t0 += ';expires=' + t1.toUTCString() + ';Max-Age=' + ( expire * 86400 );
-			cookie[k] = t0;
-		};
-	})() );
+	fn( 'post', mk('POST') ), fn( 'put', mk('PUT') ), fn( 'delete', mk('DELETE') );
 })( HTTP, URL, FS_ROOTS ),
 (function(){ //db
 	var type, i;
 	type = 'execute,recordset,stream,transation'.split(','); for( i in type ) type[type[i]] = 1;
 	bs.cls( 'Db', function( fn, bs ){
 		fn.NEW = function( sel, type ){
-			if( !bs.DB[type] ) return bs.err( 0, 'no db connector for ' + type );
-			this.__db = new bs.DB[type]();
+			if( !bs.__DB[type] ) return bs.err( 0, 'no db connector for ' + type );
+			this.__db = new bs.__DB[type]();
 		},
 		fn.S = function(){return this.__db.S( arguments );},
 		fn.open = function(){return this.__db.open();},
@@ -131,7 +154,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		fn.stream = function( q, end ){this.__db.stream( q, end );};
 		fn.transation = function( q, end ){this.__db.transation( q, end );};
 	} ),
-	bs.cls( 'sql', function( fn, bs ){
+	bs.cls( 'Sql', function( fn, bs ){
 		var key, i, r0 = /[']/g, r1 = /--/g, toDB = function(v){return typeof v == 'string' ? v.replace( r0, "''" ).replace( r1, '' ) : v;};
 		key = 'db,type,query'.split(','); for( i in key ) key[key[i]] = 1;
 		fn.NEW = function(){this.type = 'recordset';},
@@ -163,119 +186,24 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	} );
 })(),
 (function( HTTP, HTTPS, URL ){
-	var countryCode = require('./i18n'), mime = require('./mime'), staticHeader = {'Content-Type':0}, curr,
+	var mime = require('./mime'), staticHeader = {'Content-Type':0},
 	err = function( code, v ){rp.writeHead( code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( v || '' );},
-	ckParser = function(){
-		var t0, t1, i;
-		curr.clientCookie = {};
-		if( t0 = rq.headers.cookie ){
-			t0 = t0.split(';'), i = t0.length;
-			while( i-- ) t0[i] = bs.trim( t0[i].split('=') ), curr.clientCookie[t0[i][0]] = t0[i][1];
+	fs = function(path){
+		if( curr.cache ) return fs[path] || ( fs[path] = bs.file( null, path ).toString() );
+		return bs.file( null, path ).toString();
+	},
+	runRule = function( v, site ){
+		if( site ) site.pause();
+		switch( typeof v ){
+		case'string':return new Function( 'bs', fs(bs.path(v)) )(bs);
+		case'function':return v();
+		case'object':if( v.splice ) return v[0][v[1]]();
 		}
+		if( site ) site.go();
 	};
-	bs.obj( 'WEB', (function(){
-		var flush, r0, r1;
-		r0 = /[<]/g, r1 = /\n|\r\n|\r/g,
-		sessionName = '__bsNode', id = 0,
-		flush = {
-			0:['Server', 'projectBS on node.js'],
-			1:['Content-Type', 'text/html; charset=utf-8'],
-			2:['Content-Length', 0]
-		};
-		return {
-			pause:function(){curr.pause = 1;},
-			pass:function(){curr.next();},
-			site:function(){return curr;},
-			exit:function(html){curr.pause = 1, err( 200, html );},
-			flush:function(){
-				var t0, k;
-				if( curr.flushed ) return;
-				curr.flushed = 1;
-				for(k in cookie) curr.head[head.length] = ['Set-Cookie', curr.cookie[k]];
-				curr.head.push( flush[0], flush[1], ( t0 = curr.response.join(''), flush[2][1] = Buffer.byteLength( t0, 'utf8' ), flush[2] ) ),
-				curr.rp.writeHead( 200, curr.head ), curr.rp.end( t0 );
-			},
-			application:function(){
-				var i, j, k, v;
-				i = 0, j = arguments.length;
-				while( i < j ){
-					k = arguments[i++], v = arguments[i++];
-					if( v === undefined ) return curr.application[k];
-					else if( v === null ) delete curr.application[k];
-					else curr.application[k] = v;
-				}
-				return v;
-			},
-			session:function(){
-				var t0, t1, i, j, k, v;
-				i = 0, j = arguments.length;
-				while( i < j ){
-					k = arguments[i++], v = arguments[i++];
-					if( v === undefined ) return curr.currSession ? curr.currSession[k] : null;
-					else if( v === null && curr.currSession ) delete curr.currSession[k];
-					else{
-						if( !curr.currSession ){
-							t0 = curr.session;
-							while( t0[t1 = bs.crypt( 'sha256', ''+bs.rand( 1000, 9999 ) + (id++) + bs.rand( 1000, 9999 ) )] );
-							bs.ck( sessionName, t1 );
-							curr.currSession = t0[t1] = {__t:Date.now()};
-						}
-						curr.currSession[k] = v;
-					}
-				}
-				return v;
-			},
-			head:function( k, v ){curr.head[curr.head.length] = [k, v];},
-			method:function(){return curr.method;},
-			request:function(k){return curr.rq[k]},
-			requestHeader:function(k){return curr.rq.headers[k];},
-			response:function(){
-				var i = 0, j = arguments.length;
-				while( i < j ) curr.response[curr.response.length] = arguments[i++];
-			},
-			url:function(){return curr.url;},
-			urlPath:function(){return curr.path;},
-			urlFile:function(){return curr.file;},
-			get:function(k){return curr.getData[k];},
-			post:function(k){return curr.postData[k];},
-			file:function(k){return curr.postFile[k];},
-			data:function( k, v ){return v === undefined ? curr.data[k] : ( curr.data[k] = v );},
-			redirect:function( url, isClient ){
-				curr.pause = 1;
-				if( isClient ) curr.rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), rp.end( '<script>location.href="' + url + '";</script>');
-				else curr.rp.writeHead( 301, {Location:url} ), curr.rp.end();
-			},
-			i18n:function( group, key ){
-				var t0 = curr.i18n||curr.i18nD, t1;
-				if( !t0 ) return err( 200, 'no locale:' + curr.i18n + ',' + curr.i18nD );
-				if( !( t1 = curr.i18nTxt[t0] ) ) return err( 200, 'undefined locale:' + t0 );
-				if( !( t1 = t1[group] ) ) return err( 200, 'undefined group:' + group );
-				return t1[key];
-			},
-			i18nAddDefault:function( locale, data ){
-				if( curr.i18nD ) return bs.err( 0, 'default already exist:' + curr.i18nD );
-				if( !countryCode[locale] ) return bs.err( 0, 'invaild locale:' + locale );
-				curr.i18nD = locale, curr.i18nTxt[locale] = data;
-			},
-			i18nAdd:function( locale, data ){
-				var t0, t1, d1, i, j;
-				if( !countryCode[locale] ) return bs.err( 0,  'invaild locale:' + locale );
-				t0 = curr.i18nTxt[curr.i18nD];
-				for( i in t0 ) if( t0.hasOwnProperty(i) ){
-					if( !( i in data ) ) return bs.err( 0, 'no key: data[' + i +']' );
-					t1 = t0[i], d1 = data[i];
-					for( j in t1 ) if( t1.hasOwnProperty(j) ){
-						if( !( j in d1 )  ) return bs.err( 0, 'no key: data[' + i +'][' + j + ']' );
-					}
-				}
-				curr.i18nTxt[locale] = data;
-			},
-			db2html:function(str){return str.replace( r0, '&lt;' ).replace( r1, '<br/>' );}
-		};
-	})() ),
 	bs.cls( 'Site', function( fn, bs ){
-		var port, fs, runRule, defaultRouter, tmplEnd;
-		port = function( https, sites, port ){
+		var slice = Array.prototype.slice, 
+		listen = function( https, sites, port ){
 			var f = function( rq, rp ){
 				var t0, t1, t2, i, j, k, v;
 				t0 = URL.parse( 'http://' + rq.headers.host + rq.url ), t1 = t0.hostname, i = 0, j = sites.length;
@@ -284,151 +212,32 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 					if( k == t1 ) v.request( t0, rq, rp );
 				}
 			};
-			HTTP.createServer( f ).on('error', function(e){bs.err( 0, e );}).listen(port);
+			HTTP.createServer(f).on('error', function(e){bs.err( 0, e );}).listen(port);
 			console.log( 'http:' + port + ' started' );
 			if( https ){
 				HTTPS.createServer( https, f ).on('error', function(e){bs.err(e);}).listen(https.port);
 				console.log( 'https:' + https.port + ' started' );
 			}
 		},
-		fs = function(path){
-			if( curr.cache ) return fs[path] || ( fs[path] = bs.file( null, path ).toString() );
-			return bs.file( null, path ).toString();
+		flush = {
+			0:['Server', 'projectBS on node.js'],
+			1:['Content-Type', 'text/html; charset=utf-8'],
+			2:['Content-Length', 0]
 		},
-		runRule = function( v, isPass ){
-			if( isPass ) curr.pause = 0;
-			switch( typeof v ){
-			case'string':return new Function( 'bs', fs(bs.path(v)) )(bs);
-			case'function':return v();
-			case'object':if( v.splice ) return v[0][v[1]]();
-			}
-			if( isPass && !curr.pause ) curr.pass();
-		},
-		defaultRouter = ['template', '@.html'],
-		tmplEnd = function(v){bs.WEB.response(v), bs.WEB.next();},
-		
-		fn.index = 'index', fn.cache = 1, fn.sessionTime = 1000 * 60 * 20, 
-		fn.template = function( url, template, data, end ){bs.jpage.cache = this.cache, end(bs.jpage( template, data, null, url ));},
-		fn.pass = function(){this.pause = 0, process.nextTick(this.next);},
-		fn.start = function(){
-			var self = this, start, https, t0, i, j;
-			this.rulesArr = [];
-			for( i in this.rules ) if( this.rules.hasOwnProperty(i) ) this.rulesArr[this.rulesArr.length] = i;
-			this.rulesArr.sort( function( a, b ){return a.length - b.length;} );
-			FS_ROOTS[FS_ROOT = self.__k] = self.root, curr = this;
-			if( i = this.i18n.length ) while(i--) runRule( this.i18n[i] );
-			if( this.https ) https = {
-				key:fs(bs.path( this.https.key, this.root )),
-				cert:fs(bs.path( this.https.cert, this.root )),
-				port:self.https.port || 443
-			};
-			start = function(){
-				var i, j;
-				i = 0, j = self.url.length;
-				self.next = function(){
-					var domain, t0;
-					self.next = null, self.isStarted = 1;
-					while( i < j ){
-						domain = self.url[i++], t0 = self.url[i++];
-						if( !port[t0] ) port( https, port[t0] = [], t0 );
-						if( port[t0].indexOf( domain ) == -1 ) port[t0].push( domain, self );
-					}
-				},
-				curr = self, FS_ROOT = self.__k, runRule( self.siteStart, 1 );
-			};
-			if( this.db.length ){
-				for( i = 0, j = this.db.length, t0 = [start] ; i < j ; i++ ) t0[t0.length] = this.db[i], t0[t0.length] = 'last';
-				bs.plugin.apply( null, t0 );
-			}else start();
-		},
+		defaultModules = [
+			['static'],
+			['cookie'],
+			['session'],
+			['i18n'],
+			['form'],
+			['router']
+		];
+		fn.isStarted = 0, fn.index = 'index', fn.cache = 1,
 		fn.NEW = function(sel){
-			var self = this, router, onData, k;
-			this.form = bs.Form(sel),
-			this.url = [], this.i18n = [], this.i18nTxt = {}, this.i18nD = '', this.isStarted = 0,
-			this.rules = {'':defaultRouter}, this.application = {}, this.session = {}, this.db = [],
-			this.head = [], this.response = [], this.mime = {};
-			for( k in mime )if( mime.hasOwnProperty( k ) ) this.mime[k] = mime[k];
-			this.request = function( url, rq, rp ){
-				var t0, t1, i, j, k;
-				curr = this, t0 = this.path = url.pathname.substr(1);
-				//language detect
-				this.i18n = 0;
-				if( countryCode[t0 = rq.headers.lang] ) this.i18n = t0;
-				else if( t0 = rq.headers['accept-language'] ){
-					t0 = t0.split(';');
-					for( i = 0, j = t0.length ; i < j ; i++ ){
-						t1 = t0[i].split(','), k = t1.length;
-						while( k-- ){
-							if( countryCode[t1[k]] ){
-								this.i18n = t1[k];
-								break;
-							}
-						}
-						if( this.i18n ) break;
-					}
-				}
-				if( t0.indexOf( '..' ) > -1 || t0.indexOf( './' ) > -1 ) return err( 404, 'no file<br>'+ t0 );
-				if( !t0 || t0.substr( t0.length - 1 ) == '/' ) this.file = this.index;
-				else{
-					( i = t0.lastIndexOf( '/' ) + 1 ) ? ( this.file = t0.substr(i), this.path = t0.substring(0,i) ) : ( this.file = t0, this.path = '' );
-					if( ( i = this.file.lastIndexOf( '.' ) ) > -1 && this.file.charAt(0) != '@' ) return ( t0 = this.mime[this.file.substr( i + 1 )] ) ? 
-						bs.stream( bs.path( this.path + this.file ),
-							function(){rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe(rp);},
-                            function(e){err( 404, 'no file<br>' + self.path + self.file );}
-						) : err( 404, 'no file<br>' + self.path + self.file );
-				}
-				this.rq = rq, this.rp = rp, FS_ROOT = this.__k,
-				this.head.length = this.response.length = flushed = 0, this.retry = 1,
-				this.getData = bs.cgiparse( url.query ), ckParser(), this.data = {}, this.cookie = {};
-				if( this.currSession = this.session[t0 = bs.ck(sessionName)] ){
-					Date.now() - this.currSession.__t > this.sessionTime ? ( delete this.session[t0], this.currSession = null ) : ( this.currSession.__t = Date.now() );
-				}
-				( this.method = rq.method ) == 'GET' ? ( this.postData = this.postFile = null, process.nextTick(router) ) : this.form.parse(router);
-			},
-			router = function(){
-				try{
-					self.next = function(){
-						var currRule, idx, t0, i;
-						t0 = self.rulesArr, i = t0.length, 
-						self.next = function(){
-							var t0, t1, i, j, r0, k, l;
-							if( idx < currRule.length ){
-								try{
-									i = currRule[idx++], j = currRule[idx++];
-									if( typeof j == 'string' ) j = j.replace( '@', '@'+this.file ), j = j.charAt(0) == '/' ? j.substr(1) : ( this.path + j ), t0 = bs.path(j);
-									self.pause = 0;
-									switch(i){
-									case'template':self.template( t0, fs(t0), null, tmplEnd ); break;
-									case'static':bs.WEB.response( fs(t0) ); break;
-									case'script':new Function( 'bs', fs(t0) )(bs); break;
-									case'require':require(t0)(bs); break;
-									case'function':runRule(j); break;
-									default: self.pass();
-									}
-									if( !self.pause ) self.pass();
-								}catch(e){
-									if( self.retry-- ) self.head.length = self.response.length = 0, self.data = {}, self.cookie = {}, self.path = self.path + self.file + '/', self.file = self.index, router();
-									else{
-										r0 = /at /g,
-										t0 = '<h1>Server error</h1>'+
-											'<hr><b>path, file:</b><br>['+self.path+'], [' + self.file +']'+
-											'<hr><b>rule: </b>'+i+'(idx:'+idx+') <b>target: </b>'+j+
-											'<hr><b>error:</b><br>',
-										t1 = Object.getOwnPropertyNames(e), k = t1.length;
-										while( k-- ) t0 += '<b>' + t1[k] +'</b>: '+( e[t1[k]].replace ? e[t1[k]].replace( r0, '<br>at ' ) : e[t1[k]] )+'<br>';
-										err( 500, t0 );
-									}
-								}
-							}else self.next = bs.WEB.flush, runRule( self.pageEnd, 1 );
-						};
-						while( i-- )if( self.path.indexOf( t0[i] ) > -1 ) return currRule = self.rules[t0[i]], idx = 0, self.next();
-						err( 500, '<h1>server error</h1><div>Error: no matched rules ' + self.path + self.file );
-					};
-					runRule( self.pageStart, 1 );
-				}catch(e){
-					err( 500, '<h1>server error</h1><div>Error: ' + e + '</div>router' );
-				}
-			}
+			var k;
+			this._urls = [], this._module = [], this.startModule = [], this.requestModule = [], this.methodModule = [], this.routerModule = [], this.flushModule = [];
+			this._application = {}, this._head = [], this._response = [], this.mime = {};
+			for( k in mime ) if( mime.hasOwnProperty(k) ) this.mime[k] = mime[k];
 		},
 		fn.S = function(){
 			var t0, i, j, k, v;
@@ -441,65 +250,391 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 					return null;
 				}else if( v !== undefined ){
 					switch( k ){
-					case'https':this.https = v; break;
-					case'i18n':case'db': this[k][this[k].length] = v; break;
-					case'url':
-						v = bs.trim( v.split(':') );
-						if( this.url.indexOf( v[0] ) == -1 ) this.url.push( v[0], parseInt( v[1] || '8001' ) );
-						break;
-					case'cache':this.cache = v; break;
-					case'root':this.root = bs.path( v, 'root' ); break;
-					case'sessionTime':case'template':case'index':this[k] = v; break;
-					case'siteStart':case'pageStart':case'pageEnd':this[k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
-					case'upload':this.form.S( k, v ); break;
-					case'postMax':case'fileMax':this.form.S( k, v * 1024 * 1024 ); break;
-					default:if( k.charAt(0) == '.' ) this.mime[k.substr(1)] = v;
+					case'url':v.indexOf(':') == -1 ? this._urls.push( bs.trim(v), 8001 ) : ( v = bs.trim(v.split(':')), this._urls.push( v[0], parseInt(v[1]) ) ); break;
+					case'siteStart':case'pageStart':case'pageEnd':this['_' + k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
+					case'root':FS_ROOTS[this.__k] = this._root = bs.path( v, 'root' ); break;
+					case'https':case'cache':this['_' + k] = v; break;
+					case'default':this._module = defaultModules.slice(0); break;
+					default:if( k.charAt(0) == '@' ) this.mime[k.substr(1)] = v;
 					}
 				}
 			}
-			return this[k];
 		},
-		fn.router = (function(){
-			var key, i;
-			key = 'template,static,script,require,function'.split(','), i = key.length;
-			while( i--) key[key[i]] = 1;
-			return function(){
-				var i, j, k, v, m, n;
-				i = 0, j = arguments.length;
-				while( i < j ){
-					k = arguments[i++], v = arguments[i++];
-					if( v === null ) delete this.rules[k];
-					else if( v !== undefined ){
-						if( v.splice ){
-							for( m = 0, n = v.length ; m < n ; m += 2 ) if( !key[v[m]] ) return bs.err( 0, 'invalid router type:' + v[m] );
-							this.rules[k] = v;
-						}else bs.err( 0, 'invalid router:'+v );
-					}
+		fn.start = function(){
+			var self = this, start, t0, t1, i, j;
+			start = function(){
+				var t0 = self._module, t1, i, j;
+				bs.SITE = self;
+				for( i = 0, j = t0.length ; i < j ; i++ ){
+					t1 = t0[i];
+					t1[t1[0]] = new bs.__SITE[t1[0]](this);
+					if( t1.length > 2 ) t1.init( slice.call( t1, 2 ) );
+					if( t1.start !== none ) this.startModule[this.startModule.length] = t1;
+					if( t1.request !== none ) this.requestModule[this.requestModule.length] = t1;
+					if( t1.route !== none ) this.routerModule[this.routerModule.length] = t1;
+					if( t1.flush !== none ) this.flushModule[this.flushModule.length] = t1;
 				}
-				return v;
+				for( t0 = this.startModule, i = 0, j = t0.length ; i < j ; i++ ) t0[i].start();
+				self.next( function(){
+					var https, domain, port, i, j;
+					if( self._https ) https = {
+						key:fs(bs.path( self._https.key)),
+						cert:fs(bs.path( self._https.cert)),
+						port:self._https.port || 443
+					};
+					self.isStarted = 1, i = 0, j = self._url.length;
+					while( i < j ){
+						domain = self._urls[i++], port = self._urls[i++];
+						if( !listen[port] ) listen( https, listen[port] = [], port );
+						if( listen[port].indexOf(domain) == -1 ) listen[port].push( domain, self );
+					}
+				} ),
+				runRule( self._siteStart, self );
 			};
-		})(),
+			t0 = this._module;
+			if( t0 && ( j = t0.length ) ){
+				for( i = 0, t1 = [start] ; i < j ; i++ ) if( !bs.__SITE[t0[i][0]] ) t1.push( t0[i][0], t0[i][1] );
+				if( t1.length > 1 ) return bs.plugin.apply( null, t1 );
+			}
+			start();
+		},
+		fn.request = function( url, rq, rp ){
+			var t0, t1, i, j, k;
+			//path
+			t0 = this._path = url.pathname.substr(1);
+			if( t0.indexOf( '..' ) > -1 || t0.indexOf( './' ) > -1 ) return err( 404, 'no file<br>'+ t0 );
+			if( !t0 || t0.substr( t0.length - 1 ) == '/' ) this._file = this.index;
+			else if( i = t0.lastIndexOf( '/' ) + 1 ) this._file = t0.substr(i), this._path = t0.substring( 0, i );
+			else this._file = t0, this._path = '';
+			//init
+			this._url = url, this._rq = rq, this._rp = rp, this._method = rq.method,
+			this._get = bs.cgiparse(url.query), this._post = this._file = null, this._data = {},
+			this._head.length = this._response.length = this._flushed = this._pause = 0,
+			this.next( function(){
+				for( var t0 = self.routerModule, i = 0, j = t0.length ; i < j ; i++ ) t0[i].route( url, rq, rp, path, file, this.mime );
+			} );
+			//request module
+			for( t0 = this.requestModule, i = 0, j = t0.length ; i < j ; i++ ) t0[i].request( url, rq, rp, path, file, this.mime );
+			this.go();
+		};
+		fn.flush = function(){
+			var self = bs.SITE, t0, i, j, k;
+			if( self._flushed ) return;
+			self._flushed = 1;
+			for( t0 = self.flushModule, i = 0, j = t0.length ; i < j ; i++ ) t0[i].flush( self._head, self._response );
+			self._head.push( flush[0], flush[1], ( t0 = self._response.join(''), flush[2][1] = Buffer.byteLength( t0, 'utf8' ), flush[2] ) ),
+			self.rp.writeHead( 200, self._head ), self.rp.end(t0);
+		},
 		fn.stop = function(){
 			var domain, port, i, j;
 			i = 0, j = this.url.length;
 			while( i < j ){
 				domain = this.url[i++], port = this.url[i++];
-				if( port[port] && ( k = port[port].indexOf(domain) ) > -1 ) port[port].splice( k, 2 );
+				if( listen[port] && ( k = listen[port].indexOf(domain) ) > -1 ) listen[port].splice( k, 2 );
+			}
+		},
+		fn.add = function( name, ver/*,init args*/ ){
+			if( this._module[name] ) bs.err( 0 );
+			this._module.push( arguments ), this._module[name] = 1;
+		},
+		//bs.SITE method
+		fn.next = function(f){this._next = f;},
+		fn.pause = function(){this._pause = 1;},
+		fn.pass = function(){this.pause = 0, process.nextTick(this._next);},
+		fn.go = function(){if( !this._pause ) this.pass();},
+		fn.exit = function(html){this.pause = 1, err( 200, html );},
+		fn.application = function(){
+			var i, j, k, v;
+			i = 0, j = arguments.length;
+			while( i < j ){
+				k = arguments[i++], v = arguments[i++];
+				if( v === undefined ) return this._application[k];
+				else if( v === null ) delete this._application[k];
+				else this._application[k] = v;
+			}
+			return v;
+		},
+		fn.head = function( k, v ){this._head[this._head.length] = [k, v];},
+		fn.method = function(){return this._method;},
+		fn.request = function(k){return this._rq[k]},
+		fn.requestHeader = function(k){return this._rq.headers[k];},
+		fn.response = function(){
+			var i = 0, j = arguments.length;
+			while( i < j ) this._response[this._response.length] = arguments[i++];
+		},
+		fn.url = function(){return this._url;},
+		fn.path = function(){return this._path;},
+		fn.file = function(){return this._file;},
+		fn.get = function(k){return this._get[k];},
+		fn.post = function(k){return this._post[k];},
+		fn.file = function(k){return this._file[k];},
+		fn.data = function( k, v ){return v === undefined ? this._data[k] : ( this._data[k] = v );},
+		fn.redirect = function( url, isClient ){
+			this.pause();
+			if( isClient ) this._rp.writeHead( 200, {'Content-Type':'text/html; charset=utf-8'} ), this._rp.end( '<script>location.href="' + url + '";</script>');
+			else this._rp.writeHead( 301, {Location:url} ), this._rp.end();
+		},
+		fn._ = function( name ){
+			var t0;
+			if( !( t0 = this._module[name] ) ) return bs.err( 0 );
+			return t0.S( slice.call( arguments, 1 ) ); 
+		};
+	} ),
+	bs.site( 'static', function( fn, bs ){
+		fn.NEW = function(){
+			this.cache = [];
+		},
+		fn.init = function(arg){
+			for( var i = 0, j = arg.length ; i < j ; i++ ) this.cache[this.cache.length] = arg[i];
+		},
+		fn.request = function( url, rq, rp, file, path, mime ){
+			var i;
+			if( ( i = file.lastIndexOf( '.' ) ) > -1 && file.charAt(0) != '@' ){
+				this.site.pause();
+				return ( t0 = mime[file.substr( i + 1 )] ) ? 
+					bs.stream( bs.path( this.path + this.file ),
+						function(){rp.writeHead( 200, ( staticHeader['Content-Type'] = t0, staticHeader ) ), this.pipe(rp);},
+						function(e){err( 404, 'no file<br>' + path + file );}
+					) : err( 404, 'no file<br>' + path + file );
 			}
 		};
 	} ),
-	bs.cls( 'Form', function( fn, bs ){
+	bs.site( 'cookie', function( fn, bs ){
+		fn.request = function( url, rq, rp ){
+			var t0, i;
+			this.server = {}, this.client = {};
+			if( t0 = rq.headers.cookie ){
+				t0 = t0.split(';'), i = t0.length;
+				while( i-- ) t0[i] = bs.trim(t0[i].split('=')), this.client[t0[i][0]] = t0[i][1];
+			}
+		},
+		fn.flush = function( head, response ){
+			var k;
+			for( k in this.server ) head[head.length] = ['Set-Cookie', this.server[k]];
+		},
+		fn.S = function(arg){
+			var k = arg[0], v = arg[1], expire = arg[2], path = arg[3], t0, t1;
+			if( v === undefined ) return bs.unescape( this.client[k] || '' );
+			if( k.charAt(0) == '@' ) t0 = 1, k = k.substr(1);
+			t0 = k + '=' + ( bs.escape(v) || '' ) + 
+				';Path=' + ( path || '/' ) + 
+				( t0 ? ';HttpOnly' : '' ); 
+			if( v === null ) ( t1 = new Date ).setTime( t1.getTime() - 86400000 ),
+				t0 += ';expires=' + t0.toUTCString() + ';Max-Age=0';
+			else if( expire ) (t1 = new Date).setTime( t1.getTime() + expire * 86400000 ),
+				t0 += ';expires=' + t1.toUTCString() + ';Max-Age=' + ( expire * 86400 );
+			return this.server[k] = t0;
+		};
+	} ),
+	bs.site( 'session', function( fn, bs ){
+		var KEY = '__bsNode', id = 0;
+		fn.time = 60000 * 20;
+		fn.init = function(arg){
+			var i, j;
+			while( i < j ){
+				k = arg[i++], v = arg[i++];
+				if( k == 'time' ) this.time = v * 60000;
+			}
+		},
+		fn.request = function( url, rq, rp ){
+			var t0;
+			if( this.curr = this[t0 = bs.ck(KEY)] ) Date.now() - this.curr.__t > this.time ? ( delete this[t0], this.curr = null ) : ( this.curr.__t = Date.now() );
+		},
+		fn.S = function(arg){
+			var i, j, k, v;
+			while( i < j ){
+				k = arg[i++], v = arg[i++];
+				if( k == 'time' ) this.time = v * 60000;
+				else if( v === undefined ) return this.curr ? curr[k] : null;
+				else if( v === null && this.curr ) delete this.curr[k];
+				else{
+					if( !this.curr ){
+						while( this[t1 = bs.crypt( 'sha256', '' + bs.rand( 1000, 9999 ) + (id++) + bs.rand( 1000, 9999 ) )] );
+						bs.ck( KEY, t1 );
+						this.curr = this[t1] = {__t:Date.now()};
+					}
+					this.curr[k] = v;
+				}
+			}
+		};
+	} ),
+	bs.site( 'router', function( fn, bs ){
+		var defaultRule, key, i;
+		key = 'template,static,script,require,function'.split(','), i = key.length;
+		while( i--) key[key[i]] = 1;
+		defaultRule = ['template', '@.html'],
+		fn.NEW = function(){
+			this.rules = {'':defaultRule};
+		},
+		fn.init = function(arg){
+			var i, j, k, v, m, n;
+			i = 0, j = arg.length;
+			while( i < j ){
+				k = arg[i++], v = arg[i++];
+				if( k == 'template' ) this.template = v;
+				else if( v.splice ){
+					for( m = 0, n = v.length ; m < n ; m += 2 ) if( !key[v[m]] ) return bs.err( 0, 'invalid router type:' + v[m] );
+					this.rules[k] = v;
+				}else bs.err( 0, 'invalid router:' + v );
+			}
+			return v;
+		},
+		fn.start = function(){
+			this.rulesArr = [];
+			for( i in this.rules ) if( this.rules.hasOwnProperty(i) ) this.rulesArr[this.rulesArr.length] = i;
+			this.rulesArr.sort( function( a, b ){return a.length - b.length;} );
+		},
+		fn.route = function( url, rq, rp, path, file, mime ){
+			var self = this, site = this.site;
+			site.next( function(){
+				var currRule, idx, t0, i;
+				t0 = self.rulesArr, i = t0.length, 
+				site.next( function(){
+					var t0, t1, i, j, r0, k, l;
+					if( idx < currRule.length ){
+						try{
+							i = currRule[idx++], j = currRule[idx++];
+							if( typeof j == 'string' ) j = j.replace( '@', '@' + file ), j = j.charAt(0) == '/' ? j.substr(1) : ( path + j ), t0 = bs.path(j);
+							site.pause();
+							switch(i){
+							case'template':self.template( site, t0, fs(t0) ); break;
+							case'static':site.response(fs(t0)); break;
+							case'script':new Function( 'bs', fs(t0) )(bs); break;
+							case'require':require(t0)(bs); break;
+							case'function':runRule(j); break;
+							default: self.pass();
+							}
+							site.go();
+						}catch(e){
+							if( file != site.index ) site.path = site.path + site.file + '/', site.file = site.index, self.router();
+							else{
+								r0 = /at /g,
+								t0 = '<h1>Server error</h1>'+
+									'<hr><b>path, file:</b><br>[' + path + '], [' + file +']'+
+									'<hr><b>rule: </b>'+i+'(idx:'+idx+') <b>target: </b>'+j+
+									'<hr><b>error:</b><br>',
+								t1 = Object.getOwnPropertyNames(e), k = t1.length;
+								while( k-- ) t0 += '<b>' + t1[k] +'</b>: '+( e[t1[k]].replace ? e[t1[k]].replace( r0, '<br>at ' ) : e[t1[k]] )+'<br>';
+								err( 500, t0 );
+							}
+						}
+					}else site.next(site.flush), runRule( site.pageEnd, site );
+				} )
+				while( i-- )if( path.indexOf(t0[i]) > -1 ) return currRule = self.rules[t0[i]], idx = 0, next();
+				err( 500, '<h1>server error</h1><div>Error: no matched rules ' + path + file );
+			} );
+			try{
+				runRule( site._pageStart, site );
+			}catch(e){
+				err( 500, '<h1>server error</h1><div>Error: ' + e + '</div>router' );
+			}
+		},
+		fn.template = function( site, url, template ){
+			bs.jpage.cache = site.cache, 
+			site.response(bs.jpage( template, null, null, url ));
+		};
+	} ),
+	bs.site( 'i18n', function( fn, bs ){
+		var countryCode = require('./i18n');
+		fn.NEW = function(){
+			this.arg = [];
+		},
+		fn.init = function(arg){
+			for( var i = 0, j = arg.length ; i < j ; i++ ) this.arg[this.arg.length] = arg[i];
+		},
+		fn.start = function(){
+			if( i = this.arg.length ) while(i--) runRule( this.arg[i] );
+		},
+		fn.request = function( url, rq, rp ){
+			var lang, t0, i, j;
+			lang = 0;
+			if( countryCode[t0 = rq.headers.lang] ) lang = t0;
+			else if( t0 = rq.headers['accept-language'] ){
+				t0 = t0.split(';');
+				for( i = 0, j = t0.length ; i < j ; i++ ){
+					t1 = t0[i].split(','), k = t1.length;
+					while( k-- ){
+						if( countryCode[t1[k]] ){
+							lang = t1[k];
+							break;
+						}
+					}
+					if( lang ) break;
+				}
+			}
+			this.v = this[lang||this.lang];
+		},
+		fn.S = function(arg){
+			var t0, t1, d1, i, j, k, v, m, n;
+			i = 0, j = arg.length;
+			while( i < j ){
+				k = arg[i++], v = arg[i++];
+				if( k.charAt(0) == '@' ){
+					if( this.lang ) return bs.err( 0, 'default already exist:' + this.lang );
+					if( !countryCode[k = k.substr(1)] ) return bs.err( 0, 'invaild locale:' + k );
+					this[this.lang = k] = v;
+				}else if( countryCode[k] ){
+					var t0, i, j;
+					if( !this.lang ) return bs.err( 0, 'default undefined' );
+					t0 = this[this.lang];
+					for( m in t0 ) if( t0.hasOwnProperty(m) ){
+						if( !( m in v ) ) return bs.err( 0, 'no key: data[' + m +']' );
+						t1 = t0[m], d1 = v[m];
+						for( n in t1 ) if( t1.hasOwnProperty(n) ){
+							if( !( n in d1 )  ) return bs.err( 0, 'no key: data[' + m +'][' + n + ']' );
+						}
+					}
+					this[k] = v;
+				}else return this.v[k][v];
+			}
+		};
+	} );
+	bs.site( 'form', function( fn, bs ){
 		var key, i, parser, Upfile;
 		key = 'encoding,keepExtensions,postMax,fileMax,upload'.split(',');
 		for( i in key ) key[key[i]] = 1;
+		fn.encoding = 'utf-8', fn.keepExtensions = 1, fn.fileMax = 2 * 1024 * 1024, fn.postMax = 5 * 1024 * 1024,
+		fn.init = function(arg){
+			var i, j, k, v;
+			i = 0, j = arg.length;
+			while( i < j ){
+				k = arg[i++], v = arg[i++];
+				if( key[k] ){
+					if( v === undefined ) return this[k];
+					else if( v === null ) delete this[k];
+					else this[k] = v;
+				}
+			}
+		},
+		fn.request = function( url, rq, rp ){
+			var site, t0;
+			if( rq.method == 'GET' ) return;
+			site = this.site, t0 = new Buffer(''), site.pause();
+			rq.on( 'data', function(v){
+				t0 = Buffer.concat([t0, v]);
+				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
+			} ).on( 'end', function(){
+				var type;
+				if( t0 === null ) return rp.end();
+				type = rq.headers['content-type'];
+				if( type.indexOf('x-www-form-urlencoded') > -1 ){
+					site._post = bs.cgiparse(t0.toString());
+					site._file = null;
+				}else if( type.indexOf('multipart') > -1 ){
+					t0 = parser( rq, t0 ),
+					site._post = t0.data, site._file = t0.file;
+				}
+				site.pass();
+			} );
+		},
 		Upfile = function( name, file ){
 			this.name = name,
 			this.file = file;
 		},
 		Upfile.prototype.save = function(path){
-			bs.file( null, path, this.file );
+			bs.file( null, bs.path(path), this.file );
 		},
-		parser = function bodyParser( rq, buf ){
+		parser = function( rq, buf ){
 			var i, j, k, t0, bboundary, blen, bline, bbuf, mkey, mfi, mfn, rawSt, rawEd, ret;
 			ret = {data:{}, file:{}},
 			t0 = rq.headers['content-type'],
@@ -546,38 +681,6 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 				}else i++;
 			}
 			return ret;
-		},
-		fn.encoding = 'utf-8', fn.keepExtensions = 1, fn.fileMax = 2 * 1024 * 1024, fn.postMax = 5 * 1024 * 1024,
-		fn.S = function(){
-			var i, j, k, v;
-			i = 0, j = arguments.length;
-			while( i < j ){
-				k = arguments[i++], v = arguments[i++];
-				if( key[k] ){
-					if( v === undefined ) return this[k];
-					else if( v === null ) delete this[k];
-					else this[k] = v;
-				}
-			}
-		},
-		fn.parse = function(end){
-			var t0 = new Buffer(''), self = this;
-			rq.on( 'data', function(v){
-				t0 = Buffer.concat([t0, v]);
-				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
-			} ).on( 'end', function(){
-				var type;
-				if( t0 === null ) return rp.end();
-				type = rq.headers['content-type'];
-				if( type.indexOf('x-www-form-urlencoded') > -1 ){
-					curr.postData = bs.cgiparse( t0.toString() );
-					curr.postFile = null, end();
-				}else if( type.indexOf('multipart') > -1 ){
-					t0 = parser( rq, t0 ),
-					curr.postData = t0.data, curr.postFile = t0.file,
-					end();
-				}
-			} );
 		};
 	} );
 })( HTTP, HTTPS, URL );
