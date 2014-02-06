@@ -52,12 +52,16 @@ function view1 () {
 
 	var div_content = bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', 'background-color', 'skyblue', 'overflow', 'hidden', 'this');
 	div_content.S('down', function(e) {
-		var div_t_0 = bs.Dom('<div></div>').S('<', div_content, 'position', 'relative', 'top', e.y - 100, 'left', e.x - 350, 'width', '100px', 'height', '100px', 'border-radius', '100px', 'background-color', 'red', 'this');
-		div_t_0.S('opacity', 0);
-		bs.ANI.tween(div_t_0, 'opacity', 1, 'time', 0.5, 'end', function () {
-			bs.ANI.tween(div_t_0, 'opacity', 0, 'time', 0.5, 'end', function () {
+		
+		//var tx = e.x - 350, ty = e.y - 100;
+		
+	
+		var div_t_0 = bs.Dom('<div></div>').S('<', div_content, 'position', 'absolute', 'top', e.y - 100, 'left', e.x - 350, 'width', '100px', 'height', '100px', 'border-radius', '100px', 'background-color', 'red', 'this');
+		div_t_0.S('opacity', 1);
+		bs.ANI.tween(div_t_0, 'opacity', 0, 'time', 0.5, 'end', function () {
+			//bs.ANI.tween(div_t_0, 'opacity', 0, 'time', 0.5, 'end', function () {
 				div_t_0.S(null);
-			});
+			//});
 		});
 		//alert('e');
 	});
