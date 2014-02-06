@@ -16,7 +16,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 				this.NEW();
 			}, 
 			fn = cls.prototype = new I;
-			for( k in t0 ) if( t0.hasOweProperty(k) ) fn[k] = t0[k];
+			for( k in t0 ) if( t0.hasOwnProperty(k) ) fn[k] = t0[k];
 			bs.__SITE[name] = cls;
 		};
 	})() ),
