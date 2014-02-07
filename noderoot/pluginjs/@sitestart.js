@@ -72,7 +72,6 @@ bs.SITE.application(
 		return bs.os( 'hostname' ) == 'hika' ? '' : 'http://projectbs.github.io/bsJS/noderoot/pluginjs';
 	})()
 );
-
 bs.Sql('cat').run( function(rs){
 	bs.SITE.application( 'cat', rs );
 	bs.Sql('type').run( function(rs){

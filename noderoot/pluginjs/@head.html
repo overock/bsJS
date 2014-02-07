@@ -1,4 +1,4 @@
-<%var R = bs.WEB.application('root'), i18n = bs.WEB.i18n;%>
+<%var R = bs.SITE.application('root'), i18n = function( g, k ){return bs.SITE._('i18n', g, k );};%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -23,7 +23,7 @@
 	<script type="text/javascript" src="http://www.bsidesoft.com/bs/bs5/bs/bsjs.js"></script>
 	<script type="text/javascript" src="<%=R%>/res/main.js"></script>
 	<script>
-	bs.$import('md5', 'last', 'test', 'last', 'rgbback', 'last');
+	bs.plugin('md5', 'last', 'test', 'last', 'rgbback', 'last');
 	site.R = '<%=R%>';
 	</script>
 <body>
@@ -41,9 +41,9 @@
 			<span id="topSearchBtn" class="O5 batch">&#xF097;</span>
 		</div>
 		<div id="topMember" class="FR">
-<%if( !bs.WEB.session('id') ){%>
+<%if( !bs.SITE._( 'session', 'id' ) ){%>
 			<div class="FL">
-				<span class="batch">&#xf152;</span> <input type="text" id="Lemail" class="BR7 O5 BS85" value="<%=bs.$ck('savedid')||''%>"/>
+				<span class="batch">&#xf152;</span> <input type="text" id="Lemail" class="BR7 O5 BS85" value="<%=bs.SITE._( 'cookie', 'savedid' ) || ''%>"/>
 				<span class="batch">&#xF0C0;</span> <input type="password" id="Lpw" class="BR7 O5 BS85"/>
 			</div>
 			<div class="FR">
@@ -53,7 +53,7 @@
 			<div id="Lalert"></div>
 			<script>bs( site.header );</script>
 <%}else{%>
-			<script>bs( function(){bs.dom('#topMember').$( 'html', site.logined( '<%=bs.WEB.session('nick')%>' ) )} );</script>
+			<script>bs( function(){bs.dom('#topMember').$( 'html', site.logined( '<%=bs.SITE._( 'session' ,'nick')%>' ) )} );</script>
 <%}%>
 		</div>
 	</div>
