@@ -11,10 +11,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		return function( name, f ){
 			var cls, fn, t0, k;
 			f( t0 = {}, bs ), 
-			cls = function(site){
-				this.site = site,
-				this.NEW();
-			}, 
+			cls = function(){this.NEW();},
 			fn = cls.prototype = new I;
 			for( k in t0 ) if( t0.hasOwnProperty(k) ) fn[k] = t0[k];
 			bs.__SITE[name] = cls;
@@ -30,7 +27,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			f( t0 = {}, bs ),
 			cls = function(){},
 			fn = cls.prototype = new I;
-			for( k in t0 ) if( t0.hasOweProperty(k) ){
+			for( k in t0 ) if( t0.hasOwnProperty(k) ){
 				if( k == 'require' ) fn[k] = require(t0[k]);
 				else fn[k] = t0[k];
 			}
@@ -54,7 +51,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	} ),
 	fn( 'path', function( path, context ){
 		if( path.substr(0,5) == 'http:' || path.substr(0,5) == 'https:' ) return path;
-		return p.resolve( context || FS_ROOTS[bs.SITE.__k], path );
+		return p.resolve( FS_ROOTS[context || bs.SITE.__k], path );
 	} ),
 	fn( 'file', function( end, path, v ){
 		var t0, t1, dir, i, j, k;
@@ -92,11 +89,11 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 				bs.get( function(v){
 					var t0;
 					if( v.indexOf('module.exports') > -1 || v.indexOf('exports') > -1 ) end( ( t0 = new module.constructor, t0.paths = module.paths, t0._compile(v), t0.exports ) );
-					else try{new Function( 'bs', v )(bs);}catch(e){ bs.err( 0, e.toString() );}
+					else try{new Function( 'bs', v )( bs );}catch(e){bs.err( 0, e.toString() );}
 					load();
 				}, data );
 			}else if( data.indexOf('module.exports') > -1 || data.indexOf('exports') > -1 ) end( ( t0 = new module.constructor, t0.paths = module.paths, t0._compile(data), t0.exports ) );
-			else try{new Function( 'bs', data )(bs);}catch(e){bs.err( 0, e );}
+			else try{new Function( 'bs', data )( bs );}catch(e){bs.err( 0, e );}
 		};
 		return function(end){
 			var i, j, arg, load;
@@ -180,7 +177,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 				while( i-- ) t1[i] = bs.tmpl( t1[i], t0 );
 				t0 = t1;
 			}else t0 = bs.tmpl( this.query, t0 );
-			//console.log( t0 );
+			console.log( t0, this.type );
 			return bs.Db(this.db)[this.type]( t0, end );
 		};
 	} );
@@ -189,14 +186,14 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	var mime = require('./mime'), staticHeader = {'Content-Type':0},
 	err = function( code, v ){rp.writeHead( code, (staticHeader['Content-Type'] = 'text/html', staticHeader) ), rp.end( v || '' );},
 	fs = function(path){
-		if( curr.cache ) return fs[path] || ( fs[path] = bs.file( null, path ).toString() );
+		if( bs.SITE.cache ) return fs[path] || ( fs[path] = bs.file( null, path ).toString() );
 		return bs.file( null, path ).toString();
 	},
 	runRule = function( v, site ){
-		if( site ) site.pause();
+		if( site ) site._pause = 0;
 		switch( typeof v ){
-		case'string':return new Function( 'bs', fs(bs.path(v)) )(bs);
-		case'function':return v();
+		case'string':new Function( 'bs', fs(bs.path(v)) )(bs); break;
+		case'function':v(); break;
 		case'object':if( v.splice ) return v[0][v[1]]();
 		}
 		if( site ) site.go();
@@ -223,16 +220,8 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			0:['Server', 'projectBS on node.js'],
 			1:['Content-Type', 'text/html; charset=utf-8'],
 			2:['Content-Length', 0]
-		},
-		defaultModules = [
-			['static'],
-			['cookie'],
-			['session'],
-			['i18n'],
-			['form'],
-			['router']
-		];
-		fn.isStarted = 0, fn.index = 'index', fn.cache = 1,
+		};
+		fn.isStarted = 0, fn.index = 'index', fn._cache = 1,
 		fn.NEW = function(sel){
 			var k;
 			this._urls = [], this._module = [], this.startModule = [], this.requestModule = [], this.methodModule = [], this.routerModule = [], this.flushModule = [];
@@ -254,7 +243,6 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 					case'siteStart':case'pageStart':case'pageEnd':this['_' + k] = typeof v == 'string' ? v + ( v.indexOf('.js') == -1 ? '.js' : '' ) : v; break;
 					case'root':FS_ROOTS[this.__k] = this._root = bs.path( v, 'root' ); break;
 					case'https':case'cache':this['_' + k] = v; break;
-					case'default':this._module = defaultModules.slice(0); break;
 					default:if( k.charAt(0) == '@' ) this.mime[k.substr(1)] = v;
 					}
 				}
@@ -263,18 +251,20 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		fn.start = function(){
 			var self = this, start, t0, t1, i, j;
 			start = function(){
-				var t0 = self._module, t1, i, j;
+				var t0 = self._module, t1, t2, i, j;
 				bs.SITE = self;
 				for( i = 0, j = t0.length ; i < j ; i++ ){
 					t1 = t0[i];
-					t1[t1[0]] = new bs.__SITE[t1[0]](this);
-					if( t1.length > 2 ) t1.init( slice.call( t1, 2 ) );
-					if( t1.start !== none ) this.startModule[this.startModule.length] = t1;
-					if( t1.request !== none ) this.requestModule[this.requestModule.length] = t1;
-					if( t1.route !== none ) this.routerModule[this.routerModule.length] = t1;
-					if( t1.flush !== none ) this.flushModule[this.flushModule.length] = t1;
+					if( bs.__SITE[t1[0]] ){
+						t0[t1[0]] = t2 = new bs.__SITE[t1[0]], t2.site = self;
+						if( t1.length > 2 ) t2.init( slice.call( t1, 2 ) );
+						if( t2.start !== none ) self.startModule[self.startModule.length] = t2;
+						if( t2.request !== none ) self.requestModule[self.requestModule.length] = t2;
+						if( t2.route !== none ) self.routerModule[self.routerModule.length] = t2;
+						if( t2.flush !== none ) self.flushModule[self.flushModule.length] = t2;
+					}
 				}
-				for( t0 = this.startModule, i = 0, j = t0.length ; i < j ; i++ ) t0[i].start();
+				for( t0 = self.startModule, i = 0, j = t0.length ; i < j ; i++ ) t0[i].start();
 				self.next( function(){
 					var https, domain, port, i, j;
 					if( self._https ) https = {
@@ -282,13 +272,13 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 						cert:fs(bs.path( self._https.cert)),
 						port:self._https.port || 443
 					};
-					self.isStarted = 1, i = 0, j = self._url.length;
+					self.isStarted = 1, i = 0, j = self._urls.length;
 					while( i < j ){
 						domain = self._urls[i++], port = self._urls[i++];
 						if( !listen[port] ) listen( https, listen[port] = [], port );
 						if( listen[port].indexOf(domain) == -1 ) listen[port].push( domain, self );
 					}
-				} ),
+				} );
 				runRule( self._siteStart, self );
 			};
 			t0 = this._module;
@@ -438,7 +428,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		},
 		fn.request = function( url, rq, rp ){
 			var t0;
-			if( this.curr = this[t0 = bs.ck(KEY)] ) Date.now() - this.curr.__t > this.time ? ( delete this[t0], this.curr = null ) : ( this.curr.__t = Date.now() );
+			if( this.curr = this[t0 = this.site._( 'cookie', KEY )] ) Date.now() - this.curr.__t > this.time ? ( delete this[t0], this.curr = null ) : ( this.curr.__t = Date.now() );
 		},
 		fn.S = function(arg){
 			var i, j, k, v;
@@ -543,7 +533,8 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			for( var i = 0, j = arg.length ; i < j ; i++ ) this.arg[this.arg.length] = arg[i];
 		},
 		fn.start = function(){
-			if( i = this.arg.length ) while(i--) runRule( this.arg[i] );
+			var i, j;
+			if( j = this.arg.length ) for( i = 0 ; i < j ; i++ ) runRule( this.arg[i] );
 		},
 		fn.request = function( url, rq, rp ){
 			var lang, t0, i, j;

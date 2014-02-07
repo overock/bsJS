@@ -1,4 +1,3 @@
-(function(){
 var ko, en;
 ko = {
 	common:{back:'이전으로'},
@@ -29,7 +28,6 @@ ko = {
 		dependAdd:'의존성추가'
 	}
 },
-
 en = {
 	common:{back:'Back'},
 	top:{
@@ -59,6 +57,4 @@ en = {
 		dependAdd:'Add Dependency'
 	}
 },
-bs.WEB.i18nAddDefault( 'en', en ),
-bs.WEB.i18nAdd( 'ko', ko );
-})();
+bs.SITE._( 'i18n', '@en', en, 'ko', ko );

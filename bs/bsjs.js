@@ -73,8 +73,8 @@ else throw new Error( 0, 'not supported platform' );
 								for( k in t0 ) if( t0.hasOwnProperty(k) ) bs.STYLE[k] = t0[k];
 							}
 							break;
-						case'site': bs.site( name, obj ); break;
-						case'db':  bs.db( name, obj ); break;
+						case'site':bs.site( name, obj ); break;
+						case'db':bs.db( name, obj ); break;
 						default:return bs.err(9);
 						}
 						loader();
