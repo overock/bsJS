@@ -1,26 +1,29 @@
 <%
-if( !bs.WEB.session('id') ){
-	var post = bs.WEB.application('post')( false, 'email', 's', 'pw', 's' );
-	if( post ) bs.WEB.application('db')( 'login', post, function( $data, $rs, $e ){
-		if( $rs && $rs.length ){
-			$rs = $rs[0];
-			bs.$ck( 'savedid', $rs.email, '/', 100 ),
-			$data.contents = {
-				email:$rs.email,
-				nick:$rs.nick,
-				thumb:$rs.thumb
+if( !bs.SITE._( 'session', 'id' ) ){
+	var post = bs.SITE.application('post')( false, 'email', 's', 'pw', 's' );
+	if( post ) bs.SITE.application('db')( 'login', post, function( data, rs, e ){
+	console.log('a');
+		if( rs && rs.length ){
+			rs = rs[0];
+			bs.ck( 'savedid', rs.email, '/', 100 ),
+			data.contents = {
+				email:rs.email,
+				nick:rs.nick,
+				thumb:rs.thumb
 			},
-			bs.WEB.session( 'id', $rs.member_rowid, 'email', $rs.email, 'nick', $rs.nick, 'thumb', $rs.thumb );
-		}else $data.result = 'fail', $data.contents = 'no data';
+			console.log( data.contents );
+			bs.SITE._( 'session', 'id', rs.member_rowid, 'email', rs.email, 'nick', rs.nick, 'thumb', rs.thumb );
+		}else data.result = 'fail', data.contents = 'no data';
 	} );
-	else bs.WEB.response( JSON.stringify( {result:'fail', contents:'no post'} ) );
+	else bs.SITE.response( JSON.stringify( {result:'fail', contents:'no post'} ) );
 }else{
-	bs.WEB.response( JSON.stringify( {
+console.log('b');
+	bs.SITE.response( JSON.stringify( {
 		result:'ok',
 		contents:{
-			email:bs.WEB.session('email'),
-			nick:bs.WEB.session('nick'),
-			thumb:bs.WEB.session('thumb')
+			email:bs.SITE._( 'session', 'email'),
+			nick:bs.SITE._( 'session', 'nick'),
+			thumb:bs.SITE._( 'session', 'thumb')
 		}
 	} ) );
 }

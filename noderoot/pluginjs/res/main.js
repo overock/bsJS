@@ -5,7 +5,7 @@ bs( function(){
 } );
 var site = {
 logined:function(nick){
-	bs.WIN.on( 'keydown', 'plugin', function(e){
+	bs.WIN.on( 'keydown', function(e){
 		var t0 = document.activeElement;
 		if( t0 && ( t0 = t0.tagName.toLowerCase() ) == 'input' || t0 == 'textarea' ) return;
 		if( e.key('1') ) bs.go( '/member/' );
@@ -28,6 +28,7 @@ header:function(){
 		bs.post( function(t0){
 			if( t0 ){
 				t0 = JSON.parse(t0);
+				console.log( 'login', t0 );
 				if( t0.result == 'ok' ) bs.Dom('#topMember').S( 'html', site.logined(t0.contents.nick) );
 				else bs.Dom('#Lalert').S( 'html', 'loginFailed:' + t0.contents );
 			}else bs.Dom('#Lalert').S( 'html', 'loginFailed: no response' );

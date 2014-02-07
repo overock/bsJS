@@ -37,18 +37,18 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	fn( 'os', function(k){return os[k]();} ),
 	fn( 'escape', function(v){return query.escape(v);} ),
 	fn( 'unescape', function(v){return query.unescape(v);} ),
-	fn( 'db2html', (function(){
-		var r0 = /[<]/g, r1 = /\n|\r\n|\r/g;
-		return function(str){return str.replace( r0, '&lt;' ).replace( r1, '<br/>' );};
-	})() ),
-	fn( 'cgiparse', function(v){return query.parse(v);} ),
-	fn( 'cgistringify', function(v){return query.stringify(v);} ),
+	fn( 'qparse', function(v){return query.parse(v);} ),
+	fn( 'qstringify', function(v){return query.stringify(v);} ),
 	fn( 'crypt', function( type, v ){
 		var t0;
 		switch(type){
 		case'sha256': return t0 = crypto.createHash('sha256'), t0.update(v), t0.digest('hex');
 		}
 	} ),
+	fn( 'db2html', (function(){
+		var r0 = /[<]/g, r1 = /\n|\r\n|\r/g;
+		return function(str){return str.replace( r0, '&lt;' ).replace( r1, '<br/>' );};
+	})() ),
 	fn( 'path', function( path, context ){
 		if( path.substr(0,5) == 'http:' || path.substr(0,5) == 'https:' ) return path;
 		return p.resolve( FS_ROOTS[context || bs.SITE.__k], path );
@@ -134,7 +134,17 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	mk = function(m){return function( end, url ){return http( m, end, bs.url(url), arguments );};},
 	fn( 'get', function( end, path ){return http( 'GET', end, bs.url( path, arguments ) );} ),
 	fn( 'post', mk('POST') ), fn( 'put', mk('PUT') ), fn( 'delete', mk('DELETE') ),
-	fn( 'ck', function( k, v, expire, path ){return bs.SITE._( 'cookie', k, v, expire, path );} );
+	fn( 'ck', function( k, v, expire, path ){return bs.SITE._( 'cookie', k, v, expire, path );} ),
+	fn( 'session', (function(){
+		var arg = arguments;
+		arg[0] = 'session';
+		return function(){
+			var i, j;
+			i = 0, j = arguments.length, arg.length = j + 1;
+			while( i < j ) arg[i+1] = arguments[i];
+			return bs.SITE._.apply( bs.SITE, arg );
+		}
+	})() );
 })( HTTP, URL, FS_ROOTS ),
 (function(){ //db
 	var type, i;
@@ -180,6 +190,15 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			}else t0 = bs.tmpl( this.query, t0 );
 			console.log( t0, this.type );
 			return bs.Db(this.db)[this.type]( t0, end );
+		},
+		fn['@load'] = function(path){
+			var t0, t1, db, k;
+			try{
+				t0 = JSON.parse(bs.file( null, bs.path(path)).toString());
+				for( db in t0 ) for( k in t0[db] ) bs.Sql(k).S( 'db', db, 'query', t0[db][k].splice ? t0[db][k].join('') : t0[db][k] );
+			}catch(e){
+				bs.err( 0, e.toString() );
+			}
 		};
 	} );
 })(),
@@ -308,7 +327,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			else this._file = t0, this._path = '';
 			//init
 			this._url = url, this._rq = rq, this._rp = rp, this._method = rq.method,
-			this._get = bs.cgiparse(url.query), this._post = this._upload = null, this._data = {},
+			this._get = bs.qparse(url.query), this._post = this._upload = null, this._data = {},
 			this._head.length = this._response.length = this._flushed = this._pause = 0,
 			//request module
 			this.rqIdx = 0, this.rqLen = this.requestModule.length, this.next(this.onRequestModule), this.go();
@@ -373,7 +392,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		fn._ = function(name){
 			var t0;
 			if( !( t0 = this._module[name] ) ) return bs.err(0);
-			return t0.S( slice.call( arguments, 1 ) ); 
+			return t0.S(arguments); 
 		};
 	} ),
 	bs.site( 'static', function( fn, bs ){
@@ -409,7 +428,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			for( k in this.server ) head[head.length] = ['Set-Cookie', this.server[k]];
 		},
 		fn.S = function(arg){
-			var k = arg[0], v = arg[1], expire = arg[2], path = arg[3], t0, t1;
+			var k = arg[1], v = arg[2], expire = arg[3], path = arg[4], t0, t1;
 			if( v === undefined ) return bs.unescape( this.client[k] || '' );
 			if( k.charAt(0) == '@' ) t0 = 1, k = k.substr(1);
 			t0 = k + '=' + ( bs.escape(v) || '' ) + 
@@ -438,10 +457,11 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		},
 		fn.S = function(arg){
 			var i, j, k, v;
+			i = 1, j = arg.length;
 			while( i < j ){
 				k = arg[i++], v = arg[i++];
 				if( k == 'time' ) this.time = v * 60000;
-				else if( v === undefined ) return this.curr ? curr[k] : null;
+				else if( v === undefined ) return this.curr ? this.curr[k] : null;
 				else if( v === null && this.curr ) delete this.curr[k];
 				else{
 					if( !this.curr ){
@@ -566,7 +586,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		},
 		fn.S = function(arg){
 			var t0, t1, d1, i, j, k, v, m, n;
-			i = 0, j = arg.length;
+			i = 1, j = arg.length;
 			while( i < j ){
 				k = arg[i++], v = arg[i++];
 				if( k.charAt(0) == '@' ){
@@ -607,9 +627,9 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			}
 		},
 		fn.request = function( url, rq, rp ){
-			var site, t0;
+			var self = this, site = this.site, t0;
 			if( rq.method == 'GET' ) return;
-			site = this.site, t0 = new Buffer(''), site.pause();
+			t0 = new Buffer(''), site.pause();
 			rq.on( 'data', function(v){
 				t0 = Buffer.concat([t0, v]);
 				if( t0.length > self.postMax ) t0 = null, this.pause(), err( 413, 'too large post' );
@@ -618,7 +638,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 				if( t0 === null ) return rp.end();
 				type = rq.headers['content-type'];
 				if( type.indexOf('x-www-form-urlencoded') > -1 ){
-					site._post = bs.cgiparse(t0.toString());
+					site._post = bs.qparse(t0.toString());
 					site._upload = null;
 				}else if( type.indexOf('multipart') > -1 ){
 					t0 = parser( rq, t0 ),

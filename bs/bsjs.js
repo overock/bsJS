@@ -32,7 +32,7 @@ else throw new Error( 0, 'not supported platform' );
 		var cls, pr, t0, k;
 		pr = ( cls = function( sel, arg ){this.__k = sel, this.NEW.apply( this, arg );} ).prototype,
 		pr.NEW = none, pr.END = function(){delete cls[this.__k];}, f( t0 = {}, bs );
-		for( k in t0 ) if( t0.hasOwnProperty(k) ) pr[k] = t0[k];
+		for( k in t0 ) if( t0.hasOwnProperty(k) ) cls[k.substr(1)] = k.charAt(0) == '@' ? t0[k] : pr[k] = t0[k];
 		t0 = name.replace( trim, '' ).toLowerCase(),
 		t0 = t0.charAt(0).toUpperCase() + t0.substr(1);
 		bs[t0] = pr.instanceOf = function(sel){
@@ -646,11 +646,11 @@ function DOM(){
 			var t0, i, j, k;
 			i = this.length;
 			while( i-- ){
-				t0 = this[i];
+				t0 = this[i],
+				t0.parentNode.removeChild(t0);
 				if( t0.nodeType == 3 ) continue;
 				if( t0.bsE ) t0.bsE = t0.bsE._();
 				if( t0.bsS ) t0.bsS = null;
-				t0.parentNode.removeChild(t0),
 				j = t0.attributes.length;
 				while( j-- )
 					switch( typeof t0.getAttribute( k = t0.attributes[j].nodeName ) ){
