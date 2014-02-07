@@ -1,29 +1,77 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <title>bs5 Test suite</title>
-    <meta name="keywords" content="bs5"/>
-    <meta name="description" content="bs5 Test suite"/>
-    <meta charset="utf-8"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="format-detection" content="telephone=no"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-    <meta name="viewport"
-          content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi"/>
-    <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+<title>bs5 Test suite</title>
+<meta name="keywords" content="bs5" />
+<meta name="description" content="bs5 Test suite" />
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi" />
+<link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+<style>
+	td {padding: 10px 0;border: 1px solid #999;}
+</style>
 </head>
 <body>
-<div id="target"></div>
+<div id="result"></div>
+<div id="test"></div>
+<button type="button" id="btnAddRow">AddRow</button>
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
+<script src="./printer.js"></script>
 <script>
-bs.plugin( 'innerhtml', 'last' );
-bs(function() {
-  var target = document.getElementById('target');
-  bs.innerhtml( '<td>태그문자열1</td><td>태그문자열2</td><td>태그문자열3</td><td>태그문자열4</td>', target);
-  var result = bs.innerhtml( '<td>태그문자열1</td><td>태그문자열2</td><td>태그문자열3</td><td>태그문자열4</td>');
-});
+bs( function(){	
+	var count = 0;
+	bs.Dom('body').S('padding', 0, 'margin', '0');
+	bs.Dom('<table id="twoshTable"></table>').S(
+		'<', 'body',
+		//'html', '<tr><td>Cell' + count + '</td></tr>',
+		'width', '200px',
+		'margin', '0 30px',
+		'text-align', 'center',
+		'border-spacing', '0',
+		'border-collapse', 'collapse'
+	);
+	bs.Dom('#btnAddRow').S(
+		'cursor', 'pointer',
+		'width', '200px',
+		'padding', '10px 0',
+		'margin', '30px 30px 15px',
+		'border', '1px solid #999',
+		'click', function(){
+		count++;
+		bs.Dom('#twoshTable').S(
+			'html+', '<tr><td>Cell' + count + '</td></tr>',
+			'width', '600px'
+		);
+	} );
+
+	//bs.Dom('<table id="twoshTable"></table>').S('>', '<tr><td>Cell' + count + '</td></tr>');
+	// 'html', '+html', 'html+'가 아닌 '<', '>' 의 경우도 있구나.. 허허..
+	//이러면 ie6, ie7은 동작 안됨 table이 아닌 tbody로 명시 해줘야 됨.
+
+	/*
+	<table id="twoshTable">
+		<tbody>
+			<tr>
+				<td>Cell0</td>
+			</tr>
+		</tbody>
+		<tr>
+			<td>Cell1</td>
+		</tr>
+		<tr>
+			<td>Cell2</td>
+		</tr>
+	</table>
+	이런 구조가 되서, tbody안에 있지 않은 Cell1과 Cell2는 ie6, ie7에서 랜더링 되지 않음.
+	target이 table이고 '>'을 통해서 하위 계층을 추가 할 때 tbody의 유무를 살펴서 있으면 tbody안으로, 없으면 tbody생성 후 안으로 추가 해야 하는건가.
+	*/
+	
+} );
 </script>
 </body>
 </html>
