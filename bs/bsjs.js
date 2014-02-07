@@ -506,11 +506,11 @@ function DOM(){
 			style.gradientDirection = function( self, v ){return v === undefined ? self.grD:(gra( self.s, self.grD = v, self.grB || b, self.grE || b ), v);};
 		} )();
 		if( !( 'opacity' in b ) ){
-			style.opacity = function( self, v ){
+			style.opacity = function( s, v ){
 				var v = arguments[1];
 				if( v === undefined ) return s.opacity;
 				else if( v === null ) return delete s.opacity, s.s.filter = '', v;
-				else return s.opacity = v, s.s.filter = 'alpha(opacity=' + parseInt( v * 100 ) + ')', v;
+				else return s.s.filter = 'alpha(opacity=' + parseInt( v * 100 ) + ')', s.opacity = v;
 			},
 			style.rgba = function(v){
 				var t0 = v.substring( 5, v.length - 1 ).split(',');
@@ -675,12 +675,11 @@ function DOM(){
 							fn[k] ? fn[k](d) :
 							d.bsS ? d.bsS.g(k) : d.style[style[k]];
 					}else{
-						v = ev[k] ? ev( d, k, v ) : ( t0 = ds[k.charAt(0)] ) ? ( v = t0( d, k.substr(1), v, arguments, i ), i = t0.i || i, v ) :
+						v = ev[k] ? ev( d, k, v ) : ( t0 = ds[k.charAt(0)] ) ? ( v = t0( d, k.substr(1), v ) ) :
 							fn[k] ? fn[k]( d, v ) : ( ds[ds.length++] = k, ds[ds.length++] = v );
 					}
 				}
 				if( ds.length ) ( d.bsS || ( d.bsS = new style(d.style) ) ).S(ds);
-				if( target ) break;
 			}
 			return v;
 		},

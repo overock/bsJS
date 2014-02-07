@@ -135,6 +135,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	fn( 'get', function( end, path ){return http( 'GET', end, bs.url( path, arguments ) );} ),
 	fn( 'post', mk('POST') ), fn( 'put', mk('PUT') ), fn( 'delete', mk('DELETE') ),
 	fn( 'ck', function( k, v, expire, path ){return bs.SITE._( 'cookie', k, v, expire, path );} ),
+	fn( 'application', function( k, v ){return bs.SITE.application( k, v );} ),
 	fn( 'session', (function(){
 		var arg = arguments;
 		arg[0] = 'session';
@@ -145,6 +146,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			return bs.SITE._.apply( bs.SITE, arg );
 		}
 	})() );
+	fn( 'i18n', function( g, k ){return bs.SITE._('i18n', g, k );} );
 })( HTTP, URL, FS_ROOTS ),
 (function(){ //db
 	var type, i;
