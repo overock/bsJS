@@ -143,7 +143,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		return function(){
 			var i, j;
 			i = 0, j = arguments.length, arg.length = j + 1;
-			while( i < j ) arg[i+1] = arguments[i];
+			while( i < j ) arg[i+1] = arguments[i++];
 			return bs.SITE._.apply( bs.SITE, arg );
 		}
 	})() ),
@@ -324,11 +324,12 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		fn.onRequest = function( url, rq, rp ){
 			var self = this, t0, t1, i, j, k;
 			//path
-			t0 = this._path = url.pathname.substr(1), this._file = '';
+			t0 = this._path = url.pathname.substr(1);
 			if( t0.indexOf( '..' ) > -1 || t0.indexOf( './' ) > -1 ) return err( 404, 'no file<br>'+ t0 );
 			if( !t0 || t0.substr( t0.length - 1 ) == '/' ) this._file = this.index;
 			else if( i = t0.lastIndexOf( '/' ) + 1 ) this._file = t0.substr(i), this._path = t0.substring( 0, i );
 			else this._file = t0, this._path = '';
+			this._file = this._file || '';
 			//init
 			this._url = url, this._rq = rq, this._rp = rp, this._method = rq.method,
 			this._get = bs.qparse(url.query), this._post = this._upload = null, this._data = {},
@@ -506,7 +507,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			this.onRouteNext = function(){
 				var t0, t1, i, j, r0, k, l;
 				if( self.idx < self.currRule.length ){
-					//try{
+					try{
 						i = self.currRule[self.idx++], j = self.currRule[self.idx++];
 						if( typeof j == 'string' ) j = j.replace( '@', '@' + site._file ), j = j.charAt(0) == '/' ? j.substr(1) : ( site._path + j ), t0 = bs.path(j);
 						site._pause = 0;
@@ -519,7 +520,6 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 						default: self.pass();
 						}
 						site.go();
-						/*
 					}catch(e){
 						if( site._file != site.index ) site._path = site._path + ( site._file || '' ) + '/', site._file = site.index, self.onRoute();
 						else{
@@ -533,7 +533,6 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 							err( 500, t0 );
 						}
 					}
-					*/
 				}else site.next(site.flush), runRule( site.pageEnd, site );
 			};
 			return v;

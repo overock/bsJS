@@ -5,8 +5,8 @@ font-face@batch{/res/batch}
 .THB0{width:105;height:105;border-radius:5}
 
 .TH{text-shadow:1px 1px 0 #000}
-.THL{text-shadow:1px 1px 0 #000;border-radius:15px 0 0 15px}
-.THR{text-shadow:1px 1px 0 #000;border-radius:0 15px 15px 0}
+.THL{text-shadow:1px 1px 0 #000;border-top-left-radius:15;border-bottom-left-radius:15}
+.THR{text-shadow:1px 1px 0 #000;border-top-right-radius:15;border-bottom-right-radius:15}
 
 .GR0{gradientBegin:#659CAD;gradientEnd:#FFFFFF}
 .GR1{gradientBegin:#C79FB4;gradientEnd:#AF7695}

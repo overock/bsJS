@@ -56,7 +56,7 @@ header:function(){
 		if( bs.Dom('#Jjoin').downed ) return;
 		bs.Dom('#Jjoin').downed = 1;
 		bs.Dom('#Jalert').S( 'html', '' );
-		if( !bs.$test( '@email', '#Jemail|' ) ){
+		if( !bs.test( '@email', '#Jemail|' ) ){
 			return bs.Dom('#Jalert').S( 'html', 'invalid [email]' ), setTimeout( jend, 1 );
 		}else if( !bs.test( '@pass', '#Jpw|' ) || !bs.test( '@range|6|16', '#Jpw|' ) ){
 			return bs.Dom('#Jalert').S( 'html', 'invalid [pw]' ), setTimeout( function(){bs.Dom('#Jpw').S( '@value', '', 'f' );}, 1 );
@@ -102,12 +102,12 @@ mi:function(){
 	bs.Dom('#Acancel').S( 'down', function(){
 		bs.ANI.tween( bs.Dom('#miAdd' ), 'height', 0, 'time', .2, 'end', acancel );
 	} ),
-	bs.Dom('#Aadd').S( 'down', function( $e ){
+	bs.Dom('#Aadd').S( 'down', function(){
 		var t0;
 		if( bs.Dom('#Aadd').downed ) return;
 		bs.Dom('#Aadd').downed = 1;
 		bs.Dom('#Aalert').S( 'html', '' );
-		if( !bs.$test( '@range|5|100', '#Atitle|' ) ){
+		if( !bs.test( '@range|5|100', '#Atitle|' ) ){
 			return bs.Dom('#Aalert').S( 'html', 'invalid [title]' ), setTimeout( function(){bs.Dom('#Atitle').S('f');}, 1 );
 		}else if( !bs.test( '@range|3|100', '#Auname|' ) ){
 			return bs.Dom('#Aalert').S( 'html', 'invalid [uname]' ), setTimeout( function(){bs.Dom('#Auname').S('f');}, 1 );
@@ -214,7 +214,7 @@ view:function(){
 		depend();
 	},
 	depend = function(){
-		bs.$post( function(t0){
+		bs.post( function(t0){
 			var t1, t2, i, j, drs;
 			t1 = 'no dependency';
 			if( t0 ){

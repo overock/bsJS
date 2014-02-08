@@ -1,8 +1,7 @@
 <%
-if( !bs.SITE._( 'session', 'id' ) ){
-	var post = bs.SITE.application('post')( false, 'email', 's', 'pw', 's' );
-	if( post ) bs.SITE.application('db')( 'login', post, function( data, rs, e ){
-	console.log('a');
+if( !bs.session('id') ){
+	var post = bs.application('post')( false, 'email', 's', 'pw', 's' );
+	if( post ) bs.application('db')( 'login', post, function( data, rs, e ){
 		if( rs && rs.length ){
 			rs = rs[0];
 			bs.ck( 'savedid', rs.email, '/', 100 ),
@@ -11,20 +10,18 @@ if( !bs.SITE._( 'session', 'id' ) ){
 				nick:rs.nick,
 				thumb:rs.thumb
 			},
-			console.log( data.contents );
-			bs.SITE._( 'session', 'id', rs.member_rowid, 'email', rs.email, 'nick', rs.nick, 'thumb', rs.thumb );
+			bs.session( 'id', rs.member_rowid, 'email', rs.email, 'nick', rs.nick, 'thumb', rs.thumb );
 		}else data.result = 'fail', data.contents = 'no data';
 	} );
-	else bs.SITE.response( JSON.stringify( {result:'fail', contents:'no post'} ) );
+	else bs.response(JSON.stringify({result:'fail', contents:'no post'}));
 }else{
-console.log('b');
-	bs.SITE.response( JSON.stringify( {
+	bs.response(JSON.stringify({
 		result:'ok',
 		contents:{
-			email:bs.SITE._( 'session', 'email'),
-			nick:bs.SITE._( 'session', 'nick'),
-			thumb:bs.SITE._( 'session', 'thumb')
+			email:bs.session('email'),
+			nick:bs.session('nick'),
+			thumb:bs.session('thumb')
 		}
-	} ) );
+	}));
 }
 %>

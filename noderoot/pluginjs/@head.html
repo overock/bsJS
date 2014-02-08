@@ -1,4 +1,4 @@
-<%var R = bs.application('root')%>
+<%var R = bs.application('root');%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -53,7 +53,7 @@
 			<div id="Lalert"></div>
 			<script>bs(site.header);</script>
 <%}else{%>
-			<script>bs( function(){bs.dom('#topMember').$( 'html', site.logined( '<%=bs.session('nick')%>' ) )} );</script>
+			<script>bs( function(){bs.Dom('#topMember').S( 'html', site.logined( '<%=bs.session('nick')%>' ) )} );</script>
 <%}%>
 		</div>
 	</div>
@@ -62,7 +62,7 @@
     <div id="topJoin0" class="BR10 BS2">
 		<div><img src="<%=R%>/res/member/plugin_reg.png"><div class="batch FR" id="Jcancel">&#xf165;</div></div>
 		<div id="topJoin1" class="FL">
-			<div class="title TS1"><%=ibs.18n('join','email')%></div>
+			<div class="title TS1"><%=bs.i18n('join','email')%></div>
 			<div><input type="text" id="Jemail" placeholder="email" class="value BS5 BR5"/></div>
 			<div class="title TS1"><%=bs.i18n('join','pw')%></div>
 			<div><input type="password" id="Jpw"  class="value BS5 BR5"/></div>

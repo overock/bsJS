@@ -1,5 +1,4 @@
 {
-	
 "d":{
 	"cat":	"select*from cat",
 	"type":	"select*from plugintype",
@@ -24,5 +23,4 @@
 					 "from ver v,plugin p,plugintype t ",
 					 "where v.plugin_rowid=p.plugin_rowid and p.plugintype_rowid=t.plugintype_rowid and ver_rowid=@vr@"]
 }
-
 }

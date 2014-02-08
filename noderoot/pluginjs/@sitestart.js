@@ -1,7 +1,7 @@
 if( bs.os( 'hostname' ) == 'hika' ) bs.Db( 'd', 'mysql' ).S( 'url', 'localhost:3306', 'id', 'root', 'pw', '1234', 'db', 'hika01' );
 else bs.Db( 'd', 'mysql' ).S( 'url', '10.0.0.1:3306', 'id', 'hika01', 'pw', 'projectbs00', 'db', 'hika01' );
 bs.Sql.load('@sql.js');
-bs.application( 
+bs.SITE.application( 
 	'post', function(isSession){
 		var t0, i, j, k, v;
 		if( isSession && !bs.session('id') ) return bs.response(JSON.stringify({result:'fail', contents:'no session'})), 0;

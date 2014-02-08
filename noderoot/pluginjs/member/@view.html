@@ -1,32 +1,32 @@
-<%var R = bs.WEB.application('root'), i18n = bs.WEB.i18n, r;%>
+<%var R = bs.application('root'), r;%>
 <%
-if( bs.WEB.method() == 'POST' ){
-	var post = bs.WEB.application('post')( true, 'r', 'i' );
-	if( post ) bs.WEB.application('db')( 'Pview', post, function( $data, $rs, $e ){
+if( bs.SITE.method() == 'POST' ){
+	var post = bs.application('post')( true, 'r', 'i' );
+	if( post ) bs.application('db')( 'Pview', post, function( data, rs, e ){
 		var t0;
-		if( $data.result == 'ok' ){
-			if( $rs.length ){
-				$data.contents = $rs[0];
-				$data.contents.contents = bs.WEB.db2html( $data.contents.contents );
-			}else $data.result = 'no';
+		if( data.result == 'ok' ){
+			if( rs.length ){
+				data.contents = rs[0];
+				data.contents.contents = bs.db2html( data.contents.contents );
+			}else data.result = 'no';
 		}
 	} );
 	return;
-}else if( !(r = parseInt( bs.WEB.get('r') ) ) ) return bs.WEB.redirect('/'), bs.WEB.pause();
+}else if( !(r = parseInt( bs.SITE.get('r') ) ) ) return bs.SITE.redirect('/'), bs.SITE.pause();
 %>
 
 <%IMPORT( '@head.html' );%>
 
 <div class="contents">
-	<div id="back" class="ADD"><span class="batch">&#xf158;</span> <%=i18n('common','back')%></div>
+	<div id="back" class="ADD"><span class="batch">&#xf158;</span> <%=bs.i18n('common','back')%></div>
 	<table id="miTop" cellspacing="0" border="0" cellpadding="0">
 	<tr><td id="miTop0"><img id="mvTop0" onerror="this.src=\'<%=R%>/res/thumb/default.png\'" src="<%=R%>/res/thumb/default.png" class="THB0"></td>
 		<td id="miTop1">
 		<div id="mvTop1" class="BR15 FL"></div>
 		<div id="mvTop2"></div>
 		<div class="CLEAR">
-			<%=i18n('miAdd','category')%>: <span id="mvTop3"></span> &nbsp; 
-			<%=i18n('miAdd','type')%>: <span id="mvTop4"></span>
+			<%=bs.i18n('miAdd','category')%>: <span id="mvTop3"></span> &nbsp; 
+			<%=bs.i18n('miAdd','type')%>: <span id="mvTop4"></span>
 		</div>
 		<div id="mvTop5"></div>
 		</td>
@@ -36,10 +36,10 @@ if( bs.WEB.method() == 'POST' ){
 	</table>
 	
 	<div id="mvAdd">
-		<div class="FL"><%=i18n('mv','caution')%></div>
+		<div class="FL"><%=bs.i18n('mv','caution')%></div>
 		<div class="FR">
-			<input type="text" id="Vversion" class="FL BR15 BS15" placeholder="<%=i18n('mv','version')%>"/>
-			<div id="Vadd" class="ADD FR"><span class="batch">&#xF14C;</span> <%=i18n('mv','addNewVersion')%></div>
+			<input type="text" id="Vversion" class="FL BR15 BS15" placeholder="<%=bs.i18n('mv','version')%>"/>
+			<div id="Vadd" class="ADD FR"><span class="batch">&#xF14C;</span> <%=bs.i18n('mv','addNewVersion')%></div>
 		</div>
 		<div id="Aalert" style="clear:both"></div>
 	</div>
@@ -64,11 +64,11 @@ if( bs.WEB.method() == 'POST' ){
 		<div class="mvDetail1 GR3">&nbsp;
 			<div class="mvDetail2">Dependency</div>
 			<div>
-				<input type="text" id="Dname" class="BR15 BS15 FL" placeholder="<%=i18n('mv','dependName')%>"/>
-				<div id="Dsearch" class="ADD FL"><span class="batch">&#xF14C;</span> <%=i18n('mv','dependSearch')%></div>
+				<input type="text" id="Dname" class="BR15 BS15 FL" placeholder="<%=bs.i18n('mv','dependName')%>"/>
+				<div id="Dsearch" class="ADD FL"><span class="batch">&#xF14C;</span> <%=bs.i18n('mv','dependSearch')%></div>
 				<div id="Ddetail" class="FL">
 					<div id="Dver" class="FL"></div> 
-					<div id="Dadd" class="ADD FL"><span class="batch">&#xF14C;</span> <%=i18n('mv','dependAdd')%></div>
+					<div id="Dadd" class="ADD FL"><span class="batch">&#xF14C;</span> <%=bs.i18n('mv','dependAdd')%></div>
 				</div>
 			</div>
 			<div id="Vdependency" class="CLEAR"></div>
@@ -76,4 +76,5 @@ if( bs.WEB.method() == 'POST' ){
 	</div>
 </div>
 <script>site.viewr = <%=r%>, bs( site.view );</script>
+
 <%IMPORT( '@foot.html' );%>
