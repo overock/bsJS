@@ -42,7 +42,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	fn( 'crypt', function( type, v ){
 		var t0;
 		switch(type){
-		case'sha256': return t0 = crypto.createHash('sha256'), t0.update(v), t0.digest('hex');
+		case'sha1':case'md5':case'sha256':case'sha512': return t0 = crypto.createHash('sha256'), t0.update(v), t0.digest('hex');
 		}
 	} ),
 	fn( 'db2html', (function(){
