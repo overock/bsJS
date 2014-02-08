@@ -89,7 +89,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 				bs.get( function(v){
 					var t0;
 					if( v.indexOf('module.exports') > -1 || v.indexOf('exports') > -1 ) end( ( t0 = new module.constructor, t0.paths = module.paths, t0._compile(v), t0.exports ) );
-					else try{new Function( 'bs', v )( bs );}catch(e){bs.err( 0, e.toString() );}
+					else try{new Function( 'bs', v )( bs );}catch(e){console.log(v),bs.err( 0, e.toString() );}
 					load();
 				}, data );
 			}else if( data.indexOf('module.exports') > -1 || data.indexOf('exports') > -1 ) end( ( t0 = new module.constructor, t0.paths = module.paths, t0._compile(data), t0.exports ) );
@@ -135,6 +135,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 	fn( 'get', function( end, path ){return http( 'GET', end, bs.url( path, arguments ) );} ),
 	fn( 'post', mk('POST') ), fn( 'put', mk('PUT') ), fn( 'delete', mk('DELETE') ),
 	fn( 'ck', function( k, v, expire, path ){return bs.SITE._( 'cookie', k, v, expire, path );} ),
+	//SITE단축함수
 	fn( 'application', function( k, v ){return bs.SITE.application( k, v );} ),
 	fn( 'session', (function(){
 		var arg = arguments;
@@ -145,8 +146,9 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			while( i < j ) arg[i+1] = arguments[i];
 			return bs.SITE._.apply( bs.SITE, arg );
 		}
-	})() );
-	fn( 'i18n', function( g, k ){return bs.SITE._('i18n', g, k );} );
+	})() ),
+	fn( 'response', function(){return bs.SITE.response.apply( bs.SITE, arguments );} ),
+	fn( 'i18n', function( g, k ){return bs.SITE._( 'i18n', g, k );} );
 })( HTTP, URL, FS_ROOTS ),
 (function(){ //db
 	var type, i;

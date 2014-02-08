@@ -29,20 +29,21 @@ else throw new Error( 0, 'not supported platform' );
 	bs.fn = fn = function( name, f ){bs[name.replace( trim, '' ).toLowerCase()] = f;},
 	fn( 'obj', function( name, o ){bs[name.replace( trim, '' ).toUpperCase()] = o;} ),
 	fn( 'cls', function( name, f ){
-		var cls, pr, t0, k;
+		var cls, pr, t0, t1, k;
 		pr = ( cls = function( sel, arg ){this.__k = sel, this.NEW.apply( this, arg );} ).prototype,
-		pr.NEW = none, pr.END = function(){delete cls[this.__k];}, f( t0 = {}, bs );
-		for( k in t0 ) if( t0.hasOwnProperty(k) ) cls[k.substr(1)] = k.charAt(0) == '@' ? t0[k] : pr[k] = t0[k];
+		pr.NEW = none, pr.END = function(){delete cls[this.__k];},
 		t0 = name.replace( trim, '' ).toLowerCase(),
-		t0 = t0.charAt(0).toUpperCase() + t0.substr(1);
-		bs[t0] = pr.instanceOf = function(sel){
+		t0 = t0.charAt(0).toUpperCase() + t0.substr(1),
+		t1 = bs[t0] = pr.instanceOf = function(sel){
 			var t0;
 			if( typeof sel == 'string' ){
 				if( ( t0 = sel.charAt(0) ) == '@' ) return sel = sel.substr(1), cls[sel] = new cls( sel, arguments );
 				else if( t0 != '<' ) return cls[sel] || ( cls[sel] = new cls( sel, arguments ) );
 			}
 			return new cls( sel, arguments );
-		};
+		},
+		f( t0 = {}, bs );
+		for( k in t0 ) if( t0.hasOwnProperty(k) ) k.charAt(0) == '@' ? t1[k.substr(1)] = t0[k] : pr[k] = t0[k];
 	} ),
 	fn( 'timeout', function(){return arguments.length ? ( timeout = parseInt( arguments[0] * 1000 ) ) : timeout;} ),
 	fn( 'repository', function(){return arguments.length ? ( REPOSITORY = arguments[0] ) : REPOSITORY;} ),
