@@ -569,14 +569,14 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 			if( j = this.arg.length ) for( i = 0 ; i < j ; i++ ) runRule( this.arg[i] );
 		},
 		fn.request = function( url, rq, rp ){
-			var lang, t0, i, j;
+			var lang, t0, i, j, k, l;
 			lang = 0;
 			if( countryCode[t0 = rq.headers.lang] ) lang = t0;
 			else if( t0 = rq.headers['accept-language'] ){
 				t0 = t0.split(';');
 				for( i = 0, j = t0.length ; i < j ; i++ ){
-					t1 = t0[i].split(','), k = t1.length;
-					while( k-- ){
+					t1 = t0[i].split(','), k = 0, l = t1.length;
+					while( k < l ){
 						if( countryCode[t1[k]] ){
 							lang = t1[k];
 							break;
