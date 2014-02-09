@@ -1,28 +1,27 @@
 <%
-if( !bs.WEB.session('email') ){
-	bs.sql( 'login' ).run( function( $rs ){
-		var t0 = {};
-		if( $rs && $rs.length ){
-			t0.result = 'ok',
-			t0.contents = {
-				email:$rs[0].email,
-				nick:$rs[0].nick,
-				thumb:$rs[0].thumb
+if( !bs.session('id') ){
+	var post = bs.application('post')( false, 'email', 's', 'pw', 's' );
+	if( post ) bs.application('db')( 'login', post, function( data, rs, e ){
+		if( rs && rs.length ){
+			rs = rs[0];
+			bs.ck( 'savedid', rs.email, '/', 100 ),
+			data.contents = {
+				email:rs.email,
+				nick:rs.nick,
+				thumb:rs.thumb
 			},
-			bs.WEB.session( 'id', $rs[0].member_rowid, 'email', $rs[0].email, 'nick', $rs[0].nick, 'thumb', $rs[0].nickthumb );
-		}else t0.result = 'fail';
-		bs.WEB.response( JSON.stringify( t0 ) );
-		bs.WEB.next();
-	}, 'email', bs.WEB.post( 'email' ), 'pw', bs.WEB.post( 'pw' ) );
-	bs.WEB.pause();
+			bs.session( 'id', rs.member_rowid, 'email', rs.email, 'nick', rs.nick, 'thumb', rs.thumb );
+		}else data.result = 'fail', data.contents = 'no data';
+	} );
+	else bs.response(JSON.stringify({result:'fail', contents:'no post'}));
 }else{
-	bs.WEB.response( JSON.stringify( {
+	bs.response(JSON.stringify({
 		result:'ok',
 		contents:{
-			email:bs.WEB.session('email'),
-			nick:bs.WEB.session('nick'),
-			thumb:bs.WEB.session('thumb')
+			email:bs.session('email'),
+			nick:bs.session('nick'),
+			thumb:bs.session('thumb')
 		}
-	} ) );
+	}));
 }
 %>

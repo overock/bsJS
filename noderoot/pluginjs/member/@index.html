@@ -1,87 +1,58 @@
-<%if( bs.WEB.method() == 'POST' ){
-	if( bs.WEB.session('id') ){
-		bs.sql( 'Plist' ).run( function( $rs ){
-			var t0 = {};
-			if( $rs ){
-				if( $rs.length ) t0.result = 'ok', t0.contents = $rs;
-				else t0.result = 'no';
-			}else t0.result = 'fail';
-			bs.WEB.response( JSON.stringify( t0 ) );
-			bs.WEB.next();
-		}, 'p', ( ( bs.WEB.post( 'p' ) || 1 ) - 1 )*10, 'rpp', 10, 'id', bs.WEB.session('id') );
-		return bs.WEB.pause();
-	}
-	bs.WEB.response( JSON.stringify( {result:'no'} ) );
-	return;
-}%>
+<%var R = bs.application('root'), t0, i, j;%>
+
+<%if( bs.SITE.method() == 'POST' ) return bs.application('db')( 'Plist', ['p', 0, 'rpp', 10, 'id', bs.session('id')] );%>
 
 <%IMPORT( '@head.html' );%>
-<div id="add" style="display:none">
-	<div>type <select id="Atype"><option value="1">method</option><option value="2">class</option><option value="3">static</option></select></div>
-	<div>uniquename <input type="text" id="Auname" /></div>
-	<div>title <input type="text" id="Atitle" /></div>
-	<div>description<br /><textarea id="Adescription"></textarea></div>
-	<div>category <select id="Acat">
-<%for( var t0 = bs.WEB.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>
-		<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
+
+<div id="miAdd" class="GR0">
+    <div id="miAdd0" class="BS2 BR10">
+		<div><img src="<%=R%>/res/member/plugin_reg.png"><div id="Acancel" class="batch FR">&#xf165;</div></div>
+		<div id="miAdd1" class="FL">
+			<div class="title"><%=bs.i18n( 'miAdd','category' )%></div>
+			<select id="Acat" class="value">
+<%for( t0 = bs.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>
+				<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
 <%}%>
-	</select></div>
-	<div>keyword <input type="text" id="Akeyword" /></div>
-	<div>thumb url <input type="text" id="Athumb" /></div>
-	<div id="Aalert"></div>
-	<input type="button" id="Aadd" value="add"/> <input type="button" id="Acancel" value="cancel"/>
+			</select>
+			<div class="title"><%=bs.i18n('miAdd','type')%></div>
+			<select id="Atype" class="value">
+<%for( t0 = bs.application( 'type' ), i = 0, j = t0.length; i < j ; i++ ){%>
+				<option value="<%=t0[i].plugintype_rowid%>"><%=t0[i].title%></option>
+<%}%>
+			</select>
+			<div class="title"><%=bs.i18n('miAdd','title')%></div><input type="text" id="Atitle" class="value"/>
+			<div class="title"><%=bs.i18n('miAdd','unique')%></div><input type="text" id="Auname" class="value"/>
+			<div class="title"><%=bs.i18n('miAdd','keyword')%></div><input type="text" id="Akeyword" class="value"/>
+		</div>
+		<div id="miAdd2" class="FR">
+			<div class="title"><%=bs.i18n('miAdd','description')%></div>
+			<div><textarea id="Adescription"></textarea></div>
+			<div id="miAdd3" class="FL">
+				<div class="title"><%=bs.i18n('miAdd','thumb')%></div>
+				<input type="text" id="Athumb" class="value" placeholder="<%=bs.i18n('miAdd','rthumb')%> : 200*200"/>
+				<div id="Aalert">&nbsp;</div>
+				<div id="Aadd" class="batch">&#xf164;</div>
+			</div>
+			<img id="Aimg" src="<%=R%>/res/draft/index_Bthumb_1.png" class="THB0 FR"/>
+		</div>
+    </div>
 </div>
-<div id="list">
-	<input type="button" id="Padd" value="add plugin"/>
-	<div id="Plist"></div>
-	<div id="Ppage"></div>
+
+<div class="contents">
+	<table id="miTop" cellspacing="0" border="0" cellpadding="0">
+	<tr><td rowspan="2" id="miTop0"><img src="<%=bs.session('thumb')||R+'/res/thumb/default.png'%>" class="THB0"></td>
+		<td id="miTop1"><span id="miTop2"><%=bs.session('nick')%></span><%=bs.i18n('mi','title')%></td>
+		<td rowspan="2" id="miTop3"><img src="<%=R%>/res/member/title.png"></td>
+	</tr>
+	<tr><td><div id="Padd" class="ADD"><span class="batch">&#xF14C;</span><%=bs.i18n('mi','add')%></div></td></tr>
+	</table>
+	<table id="miListTop" cellspacing="0" border="0" cellpadding="0">
+	<tr><td id="miListTop0" class="THL GR2"><%=bs.i18n('mi','title0')%></td>
+	<td class="miListTop1 TH GR2"><%=bs.i18n('miAdd','type')%></td><td class="miListTop1 TH GR2"><%=bs.i18n('miAdd','category')%></td>
+	<td class="THR GR2"><%=bs.i18n('miAdd','date')%></td></tr>
+	</table>
+	<div id="miList"><div id="miList0"><%=bs.i18n("mi","noplugin")%></div></div>
 </div>
-<script>
-bs( function(){
-	var page;
-	function list( $page ){
-		var t0, t1, i, j;
-		page = $page, t0 = JSON.parse( bs.$post( null, '/member/', 'p', page ) );
-		if( t0.result == 'ok' ){
-			t0 = t0.contents, i = 0, j = t0.length,
-			t1 = '<table><tr><td>title</td><td>type</td><td>category</td><td>date</td></tr>';
-			for( ; i < j ; i++ )
-				t1 += '<tr><td><a href="/member/view?r='+t0[i].plugin_rowid+'">'+t0[i].title+'('+t0[i].uname+')</a></td>'+
-					'<td>'+t0[i].type+'</td><td>'+t0[i].cat+'</td><td>'+t0[i].regdate+'</td></tr>';
-			t1 += '</table>';
-		}else t1 = 'no registered plugin';
-		bs.dom( '#Plist' ).$( 'html', t1 );
-	}
-	list(1);
-	bs.dom( '#Padd' ).$( 'down', function(){
-		bs.dom( '#list' ).$( 'display', 'none' );
-		bs.dom( '#add' ).$( 'display', 'block' );
-	} );
-	bs.dom( '#Aadd' ).$( 'down', function( $e ){
-		var t0;
-		t0 = bs.$post( null, '/member/add', 
-			'type', bs.dom( '#Atype' ).$('@value'), 'uname', bs.dom( '#Auname' ).$('@value'),
-			'title', bs.dom( '#Atitle' ).$('@value'), 'description', bs.dom( '#Adescription' ).$('@value'),
-			'cat', bs.dom( '#Acat' ).$('@value'), 'keyword', bs.dom( '#Akeyword' ).$('@value'),
-			'thumb', bs.dom( '#Athumb' ).$('@value')
-		);
-		if( t0 ){
-			t0 = JSON.parse( t0 );
-			if( t0.result == 'ok' ){
-				list(page);
-				bs.dom( '#add' ).$( 'display', 'none' );
-				bs.dom( '#list' ).$( 'display', 'block' );
-			}else{
-				bs.dom( '#Aalert' ).$( 'html', 'addFailed:'+ t0.contents );
-			}
-		}else{
-			bs.dom( '#Aalert' ).$( 'html', 'addFailed: no response' );
-		}
-	} );
-	bs.dom( '#Acancel' ).$( 'down', function( $e ){
-		bs.dom( '#add' ).$( 'display', 'none' );
-		bs.dom( '#list' ).$( 'display', 'block' );
-	} );
-} );
-</script>
+<script>bs( site.mi );</script>
+
 <%IMPORT( '@foot.html' );%>

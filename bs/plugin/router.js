@@ -1,4 +1,4 @@
-bs.$register( 'static', 'router', (function(){console.log( 'router' );
+bs['plugin+']( 'static', 'router', (function(){console.log( 'router' );
 	var s, e, t, h, count;
 	s = {'#':[]}, e = {'#':[]}, t = {}, h = [], count = 5;
 	function make( t ){
@@ -41,7 +41,7 @@ bs.$register( 'static', 'router', (function(){console.log( 'router' );
 			while( i < j ) t[arguments[i++]] = arguments[i++];
 		},
 		go:function( $str ){location.hash = $str;},
-		route:function(){arguments[0] === null ? bs.WIN.on( 'hash', '@ROUTER' ) : ( bs.WIN.on( 'hashchange', '@ROUTER', router ),router() );},
+		route:function(){arguments[0] === null ? bs.WIN.on( 'hash' ) : ( bs.WIN.on( 'hashchange', router ),router() );},
 		historyMax:function($len){count=$len;}, history:h
 	};
 })(), 1.0 );

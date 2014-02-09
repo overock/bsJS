@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<title>bs5 Test suite</title>
+<meta name="keywords" content="bs5" />
+<meta name="description" content="bs5 Test suite" />
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi" />
+<link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<div id="result"></div>
+<div id="test"></div>
+<script src="../bs/bsjs.js"></script>
+<script src="../bs/bsTest.js"></script>
+<script src="./printer.js"></script>
+<script>
+bs( function(){
+	bs.Dom('<div>text1<span>text2</span>text3</div>').S('<', 'body', 'html', '<span>add</span>');	
+} );
+</script>
+</body>
+</html>

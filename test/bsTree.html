@@ -37,22 +37,22 @@
 
 
     bs(function () {
-        bs.css('li').$('margin', 10, 'padding', 10, 'font-size', 11)
-        bs.css('ul').$('margin', 10, 'padding', 10)
-        bs.css('.method').$('margin', 10, 'background-color', '#eeeeee')
-        bs.css('.property').$('margin', 10)
+        bs.Css('li').S('margin', 10, 'padding', 10, 'font-size', 11)
+        bs.Css('ul').S('margin', 10, 'padding', 10)
+        bs.Css('.method').S('margin', 10, 'background-color', '#eeeeee')
+        bs.Css('.property').S('margin', 10)
 
         var key = 0
         for (var i in bs) {
             var str = 'bs.' + i
             key++
             if (typeof  bs[i] == "function") {
-                var p = bs.dom('<ul></ul>')
+                var p = bs.Dom('<ul></ul>')
                 console.log(str)
-                p.$('text', str, '<', 'body', '@className', 'method')
-                bs.dom('<li></li>').$('<', p, 'html', bs[i])
+                p.S('text', str, '<', 'body', '@className', 'method')
+                bs.Dom('<li></li>').S('<', p, 'html', bs[i])
             }
-            else bs.dom('<li></li>').$('text', str, '<', 'body', '@className', 'property')
+            else bs.Dom('<li></li>').S('text', str, '<', 'body', '@className', 'property')
         }
 
     });

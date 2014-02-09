@@ -1,128 +1,80 @@
-<% 
-if( bs.WEB.method() == 'POST' ){
-	var post = bs.WEB.application('post')( true, 'r', 'i' );
-	if( post ) bs.WEB.application('db')( 'Pview', post, function( $data, $rs, $e ){
-		if( $data.result == 'ok' ){
-			if( $rs.length ) $data.contents = $rs[0];
-			else $data.result = 'no';
+<%var R = bs.application('root'), r;%>
+<%
+if( bs.SITE.method() == 'POST' ){
+	var post = bs.application('post')( true, 'r', 'i' );
+	if( post ) bs.application('db')( 'Pview', post, function( data, rs, e ){
+		var t0;
+		if( data.result == 'ok' ){
+			if( rs.length ){
+				data.contents = rs[0];
+				data.contents.contents = bs.db2html( data.contents.contents );
+			}else data.result = 'no';
 		}
 	} );
 	return;
-}else{
-	var r = parseInt( bs.WEB.get('r') );
-	if( !r ) return bs.WEB.redirect('/'), bs.WEB.pause();
-}%>
+}else if( !(r = parseInt( bs.SITE.get('r') ) ) ) return bs.SITE.redirect('/'), bs.SITE.pause();
+%>
 
 <%IMPORT( '@head.html' );%>
-<div id="view">
-	<div id="Vinfo"></div>
-	<div>
-		version <input type="text" id="Vversion" /> <input type="button" id="Vadd" value="add"/>
-		<div id="Aalert"></div>
+
+<div class="contents">
+	<div id="back" class="ADD"><span class="batch">&#xf158;</span> <%=bs.i18n('common','back')%></div>
+	<table id="miTop" cellspacing="0" border="0" cellpadding="0">
+	<tr><td id="miTop0"><img id="mvTop0" onerror="this.src=\'<%=R%>/res/thumb/default.png\'" src="<%=R%>/res/thumb/default.png" class="THB0"></td>
+		<td id="miTop1">
+		<div id="mvTop1" class="BR15 FL"></div>
+		<div id="mvTop2"></div>
+		<div class="CLEAR">
+			<%=bs.i18n('miAdd','category')%>: <span id="mvTop3"></span> &nbsp; 
+			<%=bs.i18n('miAdd','type')%>: <span id="mvTop4"></span>
+		</div>
+		<div id="mvTop5"></div>
+		</td>
+		<td id="miTop3"><img src="<%=R%>/res/member/title.png"></td>
+	</tr>
+	<tr><td colspan="3"><div id="mvTop6" class="BR10"></div></td></tr>
+	</table>
+	
+	<div id="mvAdd">
+		<div class="FL"><%=bs.i18n('mv','caution')%></div>
+		<div class="FR">
+			<input type="text" id="Vversion" class="FL BR15 BS15" placeholder="<%=bs.i18n('mv','version')%>"/>
+			<div id="Vadd" class="ADD FR"><span class="batch">&#xF14C;</span> <%=bs.i18n('mv','addNewVersion')%></div>
+		</div>
+		<div id="Aalert" style="clear:both"></div>
 	</div>
-	<div id="Vversions">versions</div>
-	<div id="Vdetail" style="display:none">
+	
+	<div id="mvVersions"></div>
+	
+	<div id="mvDetail"><a name="detail"></a>
 		<input type="hidden" id="Vidx"/>
 		<input type="hidden" id="Vvr"/>
-		<div id="Vver"></div>
-		<div id="Vdependency"></div>
-		<div>code</div>
-		<textarea id="Vcode"></textarea>
-		<div>notice</div>
-		<textarea id="Vcontents"></textarea>
-		<input type="button" id="Vfreeze" value="freeze"/>
-		<input type="button" id="Vupdate" value="update"/>
-		<div id="Valert"></div>
+		<div id="mvDetail0" class="GR3 BRLR10">
+			<div id="Vver" class="FL mvDetail2"></div>
+			<div id="Vtab0" class="FL TS2 BR5 GR4 mvTab mvTabOn">code</div>
+			<div id="Vtab1" class="FL TS2 BR5 GR4 mvTab">notice</div>
+			<div id="Valert" class="FL"></div>
+			<div id="Vupdate" class="FR mvEdit GR1 BR5">update</div>
+			<div id="Vfreeze" class="FR mvEdit GR2 BR5">freeze</div>
+		</div>
+		<div class="mvDetail1 GR3">
+			<textarea id="Vcode" class="TS2 BR5 GR1"></textarea>
+			<textarea id="Vcontents" class="TS2 BR5 GR1"></textarea>
+		</div>
+		<div class="mvDetail1 GR3">&nbsp;
+			<div class="mvDetail2">Dependency</div>
+			<div>
+				<input type="text" id="Dname" class="BR15 BS15 FL" placeholder="<%=bs.i18n('mv','dependName')%>"/>
+				<div id="Dsearch" class="ADD FL"><span class="batch">&#xF14C;</span> <%=bs.i18n('mv','dependSearch')%></div>
+				<div id="Ddetail" class="FL">
+					<div id="Dver" class="FL"></div> 
+					<div id="Dadd" class="ADD FL"><span class="batch">&#xF14C;</span> <%=bs.i18n('mv','dependAdd')%></div>
+				</div>
+			</div>
+			<div id="Vdependency" class="CLEAR"></div>
+		</div>
 	</div>
-	
 </div>
-<script>
-bs( function(){
-	var version, r;
-	r = <%=r%>;
-	var t0 = JSON.parse( bs.$post( null, '/member/view', 'r', r ) );
-	if( t0.result == 'ok' ){
-		t0 = t0.contents;
-		bs.dom( '#Vinfo' ).$( 'html', 
-			'<div>'+t0.title+'('+t0.uname+')</div>'+
-			'<div>'+t0.contents+'</div>'+
-			'<div>type: '+t0.type+'</div>'+
-			'<div>category:'+t0.cat+'</div>'+
-			'<div>regdate:'+t0.regdate+'</div>'
-		);
-		ver();
-	}else return bs.$back();
-	function ver(){
-		var t0, t1, i, j;
-		t0 = JSON.parse( bs.$post( null, '/member/ver', 'r', r ) );
-		version = t0 = t0.contents, i = 0, j = t0.length;
-		bs.dom( '#Vversions' ).$( 'html', 'versions' );
-		for( ; i < j ; i++ ){
-			bs.dom( '<div id="v'+i+'">'+t0[i].version+'<br>freeze:'+t0[i].freezeData+'<br>update:'+t0[i].editdate+'</div>' ).$( '<', '#Vversions', 'down', function(){
-				versionDetail( this.id.substr(1) );
-			}, 'background', '#ff0', 'border', '1px solid #999' );
-		}
-	}	
-	function versionDetail( $v ){
-		var t0;
-		bs.dom( '#Vidx' ).$( '@value', $v );
-		$v = version[$v];
-		bs.dom( '#Vver' ).$( 'html', $v.version );
-		bs.dom( '#Vvr' ).$( '@value', $v.ver_rowid );
-		bs.dom( '#Vcode' ).$( 'width', 960, 'height', 300, 'display', 'block', '@value', $v.code || '' );
-		bs.dom( '#Vcontents' ).$( 'width', 960, 'height', 300, 'display', 'block', '@value', $v.contents || '' );
-		bs.dom( '#Vdetail' ).$( 'display', 'block' );
-	}
-	bs.dom( '#Vupdate' ).$( 'down', function( $e ){
-		var t0;
-		t0 = bs.$post( null, '/member/vUp',
-			'vr', bs.dom( '#Vvr' ).$('@value'), 'code', bs.dom( '#Vcode' ).$('@value'), 'contents', bs.dom( '#Vcontents' ).$('@value')
-		);
-		if( t0 ){
-			t0 = JSON.parse( t0 );
-			if( t0.result == 'ok' ){
-				bs.dom( '#Valert' ).$( 'html', 'updateOK' );
-			}else{
-				bs.dom( '#Valert' ).$( 'html', 'updateFailed:'+ t0.contents );
-			}
-			ver();
-			versionDetail(bs.dom( '#Vidx' ).$('@value'));
-		}else{
-			bs.dom( '#Valert' ).$( 'html', 'updateFailed: no response' );
-		}
-	} );
-	
-	bs.dom( '#Vfreeze' ).$( 'down', function(){
-		var t0;
-		t0 = bs.$post( null, '/member/vFrz', 'vr', bs.dom( '#Vvr' ).$('@value') );
-		if( t0 ){
-			t0 = JSON.parse( t0 );
-			if( t0.result == 'ok' ){
-				bs.dom( '#Valert' ).$( 'html', 'freezeOK' );
-			}else{
-				bs.dom( '#Valert' ).$( 'html', 'freezeFailed:'+ t0.contents );
-			}
-		}else{
-			bs.dom( '#Valert' ).$( 'html', 'freezeFailed: no response' );
-		}
-	} );
-	
-	bs.dom( '#Vadd' ).$( 'down', function( $e ){
-		var t0;
-		t0 = bs.$post( null, '/member/vAdd', 
-			'version', parseFloat( bs.dom( '#Vversion' ).$('@value') ), 'r', r
-		);
-		if( t0 ){
-			t0 = JSON.parse( t0 );
-			if( t0.result == 'ok' ){
-				ver();
-			}else{
-				bs.dom( '#Aalert' ).$( 'html', 'addFailed:'+ t0.contents );
-			}
-		}else{
-			bs.dom( '#Aalert' ).$( 'html', 'addFailed: no response' );
-		}
-	} );
-} );
-</script>
+<script>site.viewr = <%=r%>, bs( site.view );</script>
+
 <%IMPORT( '@foot.html' );%>

@@ -238,13 +238,13 @@ body {
 
 <script src="../bs/bsjs.js"></script>
 <script>
-bs.$import( 'scroll', 'last' );
+bs.plugin( 'scroll', 'last' );
 bs( function(){
 	var HOST = {
 		init:function(){
 			/* snap false 
 			
-			var main_slide = bs.scroll( '#wrapper' ).$( 
+			var main_slide = bs.scroll( '#wrapper' ).S( 
 				'scrollX', true,
 				'scrollY', true,
 				'momentum', true,
@@ -253,7 +253,7 @@ bs( function(){
 			
 			*/
 			
-			var main_slide = bs.scroll( '#wrapper' ).$( 
+			var main_slide = bs.Scroll( '#wrapper' ).S( 
 				'scrollX', true,
 				'scrollY', true,
 				'momentum', false,

@@ -1,28 +1,33 @@
 <%
-if( !bs.WEB.session('email') ){
-	var e, n, t;
-	bs.sql( 'join' ).run( function( $rs ){
-		var t0 = {};
-		if( $rs ){
-			t0.result = 'ok',
-			t0.contents = {email:e, nick:n, thumb:t},
-			bs.WEB.session( 'email', e, 'nick', n, 'thumb', t );
-		}else t0.result = 'fail', t0.contents = arguments[1] + '';
-		bs.WEB.response( JSON.stringify( t0 ) );
-		bs.WEB.next();
-	},
-	'email', e = bs.WEB.post( 'email' ), 'pw', bs.WEB.post( 'pw' ),
-	'nick', n = bs.WEB.post( 'nick' ), 'thumb', t = bs.WEB.post( 'thumb' )
-	);
-	bs.WEB.pause();
+if( !bs.session('id') ){
+	var post = bs.application('post')( false, 'email', 's', 'pw', 's', 'nick', 's', 'thumb', 's' );
+	if( post ) bs.application('db')( 'join', post, function( data, rs, e ){
+		if( rs ){
+			bs.application('db')( 'login', ['email', post.email, 'pw', post.pw], function( data, rs, e ){
+				if( rs && rs.length ){
+					rs = rs[0];
+					bs.ck( 'savedid', rs.email, '/', 100 ),
+					data.contents = {
+						email:rs.email,
+						nick:rs.nick,
+						thumb:rs.thumb
+					},
+					bs.session( 'id', rs.member_rowid, 'email', rs.email, 'nick', rs.nick, 'thumb', rs.thumb );
+				}else data.result = 'fail', data.contents = e.toString();
+				bs.response(JSON.stringify(data)), bs.WEB.pass();
+			} );
+			return 1;
+		}else data.result = 'fail', data.contents = e.toString();
+	} );
+	else bs.response(JSON.stringify({result:'fail', contents:'no post'}));
 }else{
-	bs.WEB.response( JSON.stringify( {
+	bs.response(JSON.stringify({
 		result:'ok',
 		contents:{
-			email:bs.WEB.session('email'),
-			nick:bs.WEB.session('nick'),
-			thumb:bs.WEB.session('thumb')
+			email:bs.session('email'),
+			nick:bs.session('nick'),
+			thumb:bs.session('thumb')
 		}
-	} ) );
+	}));
 }
 %>

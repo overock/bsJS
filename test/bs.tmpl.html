@@ -28,8 +28,8 @@ bs( function(){
 	var temp, obj0, obj1;
 	bsTest.tear( 'template init', function(){
 		//get template string
-		temp = bs.dom( '#tmpl_a' ).$( '@text' );
-		console.log(bs.dom( '#tmpl_a' ), temp);
+		temp = bs.Dom( '#tmpl_a' ).S( '@text' );
+		console.log(bs.Dom( '#tmpl_a' ), temp);
 		/*
 		<div id="label0">
 			<h1>@label.0@</h1>
@@ -51,26 +51,25 @@ bs( function(){
 			},
 			label:['info', 'data']
 		};
-		obj1 = [20, 'male', {address:['mapo','test'], group:'bs5'}];
-		obj1[2].address = bs.$deco( obj1[2].address, '<li>', '</li>' );
+		obj1 = [20, 'male', {address:['<li>mapo</li>','<li>test</li>'], group:'bs5'}];
 		//run template
-		temp = bs.$tmpl( temp, obj0, obj1 );
+		temp = bs.tmpl( temp, obj0, obj1 );
 		//into dom
-		bs.dom( temp ).$( '<', '#stage' );
+		bs.Dom( temp ).S( '<', '#stage' );
 	} );
 	bsTest( '템플릿테스트',
 		function(){
-			return bs.dom('#label0').$('>0', 'html' );
+			return bs.Dom('#label0').S('>0', 'html' );
 		},obj0.label[0],
 		function(){
-			return bs.dom('#'+obj0.user.id).$('html').substr(0,obj0.user.id.length);
+			return bs.Dom('#'+obj0.user.id).S('html').substr(0,obj0.user.id.length);
 		},obj0.user.id,
 		function(){
-			return bs.dom('#group').$('html');
+			return bs.Dom('#group').S('html');
 		},'group : '+obj1[2].group
 	);
 	bsTest.tear( 'template sync load', function(){
-		temp = bs.$tmpl( 'tmpl.html', obj0, obj1 );
+		temp = bs.tmpl( 'tmpl.html', obj0, obj1 );
 		/*
 		<div id="label2">
 			<h1>@label.1@</h1>
@@ -80,17 +79,17 @@ bs( function(){
 		</div>
 		*/
 		//into dom
-		bs.dom( temp ).$( '<', '#stage' );
+		bs.Dom( temp ).S( '<', '#stage' );
 	} );
 	bsTest( '템플릿테스트',
 		function(){
-			return bs.dom('#label2').$('>0', 'html' );
+			return bs.Dom('#label2').S('>0', 'html' );
 		},obj0.label[1],
 		function(){
-			return bs.dom('#'+obj0.user.id).$('html').substr(0,obj0.user.id.length);
+			return bs.Dom('#'+obj0.user.id).S('html').substr(0,obj0.user.id.length);
 		},obj0.user.id,
 		function(){
-			return bs.dom('#age').$('html');
+			return bs.Dom('#age').S('html');
 		},'age : '+obj1[0]
 	);
 } );

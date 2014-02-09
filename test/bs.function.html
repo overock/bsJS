@@ -13,9 +13,6 @@
 <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
 </head>
 <body>
-<a href="https://github.com/projectBS/bsJS">
-	<img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
-</a>
 <div id="result"></div>
 <div id="test"></div>
 <script src="../bs/bsjs.js"></script>
@@ -23,32 +20,31 @@
 <script src="./printer.js"></script>
 <script>
 bs( function(){
-	bsTest( 'bs.$ex',
+	bsTest( 'bs.rand',
 		function() {
-			return bs.$ex( 5, '~', 10 )
-		}, bsTest.RANGE(5, 10),
-		"bs.$ex( 5, '~', 10 )", bsTest.RANGE(5,10), bs.$ex( 5, '~', 10 ),
+			return bs.rand( 5, 10 );
+		}, bsTest.RANGE( 5, 10 ),
 		function() {
-			return bs.$ex( 5, '~f', 10 )
-		}, bsTest.RANGE(5, 10)
+			return bs.randf( 5, 10 );
+		}, bsTest.RANGE( 5, 10 )
 	);
 	
-	bsTest( 'bs.$trim',
+	bsTest( 'bs.trim',
 		function() {
-			return bs.$trim( "   test   " )
+			return bs.trim("   test   ");
 		}, 'test',
 		function() {
-			return bs.$trim( [" a ", " b "] )
-		}, bsTest.ITEM( ["a", "b"] )
+			return bs.trim([" a ", " b "]);
+		}, bsTest.ITEM(["a", "b"])
 	);
 	
 	bsTest.tear( "Cookie Set",
-	function(){
-		bs.$ck( 'bsName', "bs5" );
-	} );
-	bsTest( 'bs.$ck',
+		function(){
+			bs.ck( 'bsName', "bs5" );
+		} );
+	bsTest( 'bs.ck',
 		function() {
-			return bs.$ck( 'bsName' )
+			return bs.ck('bsName')
 		}, 'bs5'
 	);
 
