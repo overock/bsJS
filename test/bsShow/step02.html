@@ -16,7 +16,7 @@
 <script src="../../bs/bsjs.js"></script>
 <script>
     bs(function(){
-        bs.dom('<div></div>').$(
+        bs.Dom('<div></div>').S(
                 'html','Hello World',
                 'background','#aa2211',
                 'border-radius',20,
@@ -28,8 +28,11 @@
                 }
         )
 
-        bs.dom('#bsTest').$('mouseover',function(){
-            bs.dom('#bsTest').$('background','#aaa')
+        bs.Dom('#bsTest').S('mouseover',function(){
+            bs.Dom('#bsTest').S('background','#aaa')
+        })
+        bs.Dom('#bsTest').S('mouseout',function(){
+            bs.Dom('#bsTest').S('background','#aa2211')
         })
 
 
