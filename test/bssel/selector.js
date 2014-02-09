@@ -5,8 +5,30 @@
 */
 var bssel = (function(){
 'use strict';
-var isQS;
-isQS = ( typeof document.querySelector == 'function' ); // <= IE8
+var isQS = ( typeof document.querySelector == 'function' ), // <= IE8
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
+    DOCUMENT_NODE = 9,
+    ELEMENT_NODE = 1,
+    TEXT_NODE = 3;
+
+    // :hover
+    window.onmouseover = function(e) {
+        e = e || window.event;
+        var t = e.srcElement || e.target;
+        while(t) {
+            t.hovering = true;
+            t = t.parentNode;
+        }
+    };
+    window.onmouseout = function(e) {
+        e = e || window.event;
+        var t = e.srcElement || e.target;
+        while(t) {
+            t.hovering = false;
+            t = t.parentNode;
+        }
+    };
 
 var trim = (function(){
 	var dotrim = (function(){
@@ -219,7 +241,7 @@ var finder = (function(){
 					return el.childNodes[0];
 					break;
 				case'hover':
-					// TODO;
+                    return el.hovering;
 					break;
 				case'focus':
 					// TODO;
@@ -266,10 +288,16 @@ var finder = (function(){
 						}else if( key == '>' ){ // immediate parent
 							m++;
 							hit = compareEl(el = el.parentNode, tokens[m]);
-						}else if( key == '+' ){ // has nextsibling
-							m++;
-							hit = ( el = el.previousSibling );
-						}else{
+                        }else if( key == '+' ){ // has nextsibling element
+                            m++;
+                            // pass textnode
+                            while( el = el.previousSibling ) {
+                                if(el.nodeType === ELEMENT_NODE) {
+                                    break;
+                                }
+                            }
+                            if(hit = el && compareEl(el, tokens[m]) ) break;
+                        }else{
 							hit = compareEl(el, token);
 						}
 						if( !hit ) break; // 여긴 AND 연산
