@@ -146,8 +146,8 @@ else throw new Error( 0, 'not supported platform' );
 	(function(){
 		var rc = 0, rand = function(){return rc = ( rc + 1 ) % 1000, rand[rc] || ( rand[rc] = Math.random() );};
 		fn( 'rand', function( a, b ){return parseInt( rand() * ( b - a + 1 ) ) + a;} ),
-		fn( 'randf', function( a, b ){return rand() * ( b - a + 1 ) + a;} );
-	})(),		
+		fn( 'randf', function( a, b ){return rand() * ( b - a ) + a;} );
+	})(),
 	fn( 'reverse', function(o){
 		var t0, i;
 		i = o.length;
