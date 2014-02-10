@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-
+<meta charset='utf8' >
 <style type="text/css">
 	html, body { height:100%; padding: 0px; margin: 0px; }
 </style>
@@ -19,16 +19,16 @@ bs(function() {
 	wrap.S('opacity', 0);
 	bs.ANI.tween( wrap, 'opacity', 1, 'time', 1);
 
-	var div_title = bs.Dom('<div>Project BS</div>').S('<', '#body_wrap', '@id', 'div_title', 'position', 'relative', 'font-size', '50px', 'this');
-	div_title.S('left', -100, 'top', -100);
-	setTimeout(function(){ bs.ANI.tween(div_title, 'left', 10, 'top', 10, 'time', 0.3); }, 1000);
-
-	var div_menu = bs.Dom('<div style="float:left;"></div>').S('<', '#body_wrap', 'position', 'absolute', 'width', '100px', 'height', '400px', 'this');
+	var div_title = bs.Dom('<div></div>').S('<', '#body_wrap', '@id', 'div_title', 'html', 'Project BS', 'position', 'absolute', 'font-size', '50px', 'this');
+	
+	//div_title.S('left', -100, 'top', -100);
+	
+	var div_menu = bs.Dom('<div style="float:left;"></div>').S('<', '#body_wrap', 'position', 'absolute', 'top', '100px', /*'width', '150px', 'height', '400px',*/ 'z-index', '100', 'this');
 
 	var ul_menu = bs.Dom('<ul></ul>').S('<', div_menu, 'this');
-	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view1();">View 1</a></li>');
-	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view2();">View 2</a></li>');
-	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view3();">View 3</a></li>');
+	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view1();">클릭이벤트</a></li>');
+	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view2();">CSS Animation</a></li>');
+	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view3();">Key 이벤트</a></li>');
 	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view4();">View 4</a></li>');
 	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view5();">View 5</a></li>');
 
@@ -37,54 +37,97 @@ bs(function() {
 
 
 	setTimeout(function () {
-		bs.Dom('<div></div>').S('<', '#body_wrap', '@id', 'div_contents', 'position', 'absolute', 'left', '300px', 'border', '1px solid purple', 'width', '800px', 'height', '600px');
+		bs.Dom('<div></div>').S('<', '#body_wrap', '@id', 'div_contents', 'position', 'absolute', /*'left', '300px',*/ 'border', '1px solid purple', 'width', '100%', 'height', '100%');
 	}, 2000);
 
 
 	bs.Dom('#d_1234').S('>', '<div>abcd</div>');
 
+	bs.WIN.sizer(function (w, h) {
+        bs.Dom('#div_title').S('left', (w * 0.5) - 100, 'top', h / 2);
+		setTimeout(function(){ bs.ANI.tween(div_title, 'left', 10, 'top', 10, 'time', 0.3); }, 1000);
+	});
+
 	console.log('End');
 
 });
 
+/**
+ * 클릭 이벤트에 의한 처리
+ * 1. 물방울이 퍼지는 걸로 바꿔봅시다.
+ * 2. 기왕이면 이쁜 걸그룹 사진이 나오도록 해봅시다.
+ */
 function view1 () {
+
+	// 물방울 퍼지는걸로 바꿔봅시다.
 	bs.Dom( "#div_contents" ).S( '>', null );
 
-	var div_content = bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', 'background-color', 'skyblue', 'overflow', 'hidden', 'this');
+	var div_content = bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', /*'background-color', 'skyblue',*/ 'overflow', 'hidden', 'this');
 	div_content.S('down', function(e) {
 		
 		//var tx = e.x - 350, ty = e.y - 100;
 		
 	
-		var div_t_0 = bs.Dom('<div></div>').S('<', div_content, 'position', 'absolute', 'top', e.y - 100, 'left', e.x - 350, 'width', '100px', 'height', '100px', 'border-radius', '100px', 'background-color', 'red', 'this');
+		var div_t_0 = bs.Dom('<div></div>').S('<', div_content, 'position', 'absolute', 'top', e.y - 50, 'left', e.x - 50, 'width', '150px', 'height', '150px', 'border-radius', '100px', 'background', 'url(d2test/APINK_~2.jpg) no-repeat ' + (-e.x + 200) + 'px ' + (-e.y + 10) + 'px', 'this');
 		div_t_0.S('opacity', 1);
-		bs.ANI.tween(div_t_0, 'opacity', 0, 'time', 0.5, 'end', function () {
+		bs.ANI.tween(div_t_0, 'opacity', 0, 'time', 1, 'end', function () {
 			//bs.ANI.tween(div_t_0, 'opacity', 0, 'time', 0.5, 'end', function () {
 				div_t_0.S(null);
 			//});
 		});
-		//alert('e');
 	});
 
 }
 
+/**
+ * CSS Animation
+ */
 function view2 () {
+
+
 	bs.Dom( "#div_contents" ).S( '>', null );
 
+/*
 	bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', 'background-color', 'blue', 'down', function(e) {
 		alert('click 2');
 	});
+*/
+	//edit
+	//bs.Css( 'keyframes@test' ).S( '100%', 'width', 100, 'height', 150 );
+	//run
+	//bs.Dom( '<div></div>' ).S( '<', '#div_contents', 'background', '#f00', 'animation', 'test 1s linear 2 alternate forwards' );
+	//var t = bs.Dom( '<div></div>' ).S( '<', '#div_contents', 'position', 'relative', /*'top', '200px', 'left', '300px',*/  'animation', 'test 1s linear 0.5s infinite alternate forwards', 'this' );
+	//setTimeout(function() { t.S(null); }, 2000);
 
-}
+	var bt = bs.Dom('<button></button>').S('<', '#div_contents', 'html', 'click', 'position', 'absolute', 'top', '130px', 'left', '170px', 'down', function (e) {
 
-function view3 () {
-	bs.Dom( "#div_contents" ).S( '>', null );
+		var t = bs.rand(1, 6);
 
-	bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', 'background-color', 'grey', 'down', function(e) {
-		alert('click 3');
+		bs.Css( 'keyframes@test' ).
+			S( '0%', 'width', 100, 'height', 150, 'background-color', 'red', 'border-radius', '0px', 'left', '10%', 'top', '10%' ).
+			S( '25%', 'width', 100, 'height', 150, 'background-color', 'purple', 'border-radius', '25px', 'left', '90%', 'top', '10%').
+			S( '50%', 'width', 100, 'height', 150, 'background-color', 'blue', 'border-radius', '50px', 'left', '10%', 'top', '50%' ).
+			S( '75%', 'width', 100, 'height', 150, 'background-color', 'blue', 'border-radius', '75px', 'left', '90%', 'top', '50%' ).
+			S( '100%', 'width', 100, 'height', 150, 'background-color', 'blue', 'border-radius', '100px', 'left', '10%', 'top', '10%' );
+
+
+		//bs.Css( 'keyframes@test' ).S( '50%', 'width', 200, 'height', 200, 'background-color', 'purple', 'border-radius', '50px', 'left', '50%', 'top', '100%');
+		var t = bs.Dom( '<div></div>' ).S( '<', '#div_contents', 'position', 'absolute', 'background', 'url(d2test/apink' + t + '_100.jpg) no-repeat center center', /*'top', '200px', 'left', '300px',*/  'animation', 'test 15s linear 0.5s infinite alternate forwards', 'this' );
 	});
 }
 
+/**
+ * Key Event
+ */
+function view3 () {
+	bs.Dom( "#div_contents" ).S( '>', null );
+
+	var div_content = bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', /*'background-color', 'skyblue',*/ 'overflow', 'hidden', 'this');
+}
+
+/**
+ * Photo Wall ?
+ */
 function view4 () {
 	bs.Dom( "#div_contents" ).S( '>', null );
 
