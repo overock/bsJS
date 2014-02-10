@@ -1,46 +1,71 @@
 function bsTest( $printer,$title ){
-	var id, i, j, k, r, t, s, f, check, title, target, origin, t0, t1;
-	if( typeof $printer != 'function' ){
-		title = $printer;
-		$printer = bsTest.printer;
+	var isNode, id, i, j, k, r, t, s, f, check, title, target, origin, t0, t1, t2, nR;
+	if( typeof $printer != 'function' )
+		title = $printer,
+		$printer = bsTest.printer,
 		i = 1;
-	}else{
-		title = $title;
+	else
+		title = $title,
 		i = 2;
-	}
+	if( bsTest.isNode ) nR = [], isNode = 1;
 	id = bsTest.id++;
-	r = '<div style="border:1px dashed #999;padding:10px;margin:10px"><div id="bsTestOn'+id+'" style="display:none;cursor:pointer" onclick="bsTest.on(this)"><div style="float:left"><b>'+title+'</b><hr><ol>';
+	if(isNode) r = '[test#' + id + '] ' + title, r += '\n========================';
+	else r = '<div style="border:1px dashed #999;padding:10px;margin:10px"><div id="bsTestOn'+id+'" style="display:none;cursor:pointer" onclick="bsTest.on(this)"><div style="float:left"><b>'+title+'</b><hr><ol>';
 	t = s = f = 0;
 	for( k = 1, j = arguments.length ; i < j ; k++ ){
 		t++;
 		t0 = arguments[i++];
-		r += '<li>';
-		if( typeof t0 == 'function' ){
-			r += '<pre style="display:inline;">'+bsTest.f2s(t0)+'</pre>';
-			target = t0();
+		if(isNode){
+			if( typeof t0 == 'function' ) t2 = bsTest.f2s(t0), target = t0();
+			else t2 = t0, target = arguments[i++];
+			origin = arguments[i++];
+			if( target && target.bsTestType )	t1 = bsTest._bsCompare(target, origin, t2), t2 = t1[0], check = t1[1];
+			else if( origin && origin.bsTestType ) t1 = bsTest._bsCompare(origin, target, t2), t2 = t1[0], check = t1[1];
+			else{
+				t2 += ' == ' + target;
+				check = origin === target;
+			}
+			t2 += ' :: ' + (origin ? (origin.bsTestType ? target:origin) : origin);
+			if( check ) s++, t2 += " OK", nR.push( bsTest.nCon(t2, 'green') );
+			else f++, t2 += " NO", nR.push( bsTest.nCon(t2, 'red') );
 		}else{
-			r += t0;
-			target = arguments[i++];
+			r += '<li>';
+			if( typeof t0 == 'function' ){
+				r += '<pre style="display:inline;">'+bsTest.f2s(t0)+'</pre>';
+				target = t0();
+			}else{
+				r += t0;
+				target = arguments[i++];
+			}
+			r += ' <b>';
+			origin = arguments[i++];
+			if( target && target.bsTestType )	t1 = bsTest._bsCompare(target, origin, r), r = t1[0], check = t1[1];
+			else if( origin && origin.bsTestType ) t1 = bsTest._bsCompare(origin, target, r), r = t1[0], check = t1[1];
+			else{
+				r += '== ' + target;
+				check = origin === target;
+			}
+			r += '</b> :: <b>'+ (origin ? (origin.bsTestType ? target:origin) : origin) + '</b> <b style="color:#' + ( check ? ( s++,'0a0">OK') : (f++,'a00">NO') ) + '</b></li>';
 		}
-		r += ' <b>';
-		origin = arguments[i++];
-		if( target && target.bsTestType )	t1 = bsTest._bsCompare(target, origin, r), r = t1[0], check = t1[1];
-		else if( origin && origin.bsTestType ) t1 = bsTest._bsCompare(origin, target, r), r = t1[0], check = t1[1];
-		else{
-			r += '== ' + target;
-			check = origin === target;
-		}
-		r += '</b> :: <b>'+ (origin ? (origin.bsTestType ? target:origin) : origin) + '</b> <b style="color:#' + ( check ? ( s++,'0a0">OK') : (f++,'a00">NO') ) + '</b></li>';
 	}
 	if( f ) bsTest.isOK = 0;
-	r += '</ol></div><div style="padding:5px;float:right;border:1px dashed #999;text-align:center"><b style="font-size:30px;color:#' + ( f ? 'a00">FAIL' : '0a0">OK' ) + '</b><br>ok:<b style="color:#0a0">' + s + '</b> no:<b style="color:#a00">' + f + '</b></div><br clear="both"></div>'+
-		'<div id="bsTestOff'+id+'" style="display:block;cursor:pointer" onclick="bsTest.off(this)"><b>'+title+'</b> : <b style="color:#' + ( f ? 'a00">FAIL' : '0a0">OK' ) + '</b></div></div>';
-	$printer( r ), f = window.top;
-	if( f.bsTest && f.bsTest.suite.urls && !bsTest.isOK )
-		r = window.location.pathname.split("/").pop(),
-		f.document.getElementById(r).innerHTML = '<b style="font-size:20px;color:#a00">FAIL</b>',
-		f.bsTest.result( '<div style="font-weight:bold;font-size:30px;padding:10px;color:#a00">FAIL</div><hr>' );
-	if( bsTest.result ) bsTest.result( '<hr><div style="font-weight:bold;font-size:30px;padding:10px;color:#' + ( !bsTest.isOK ? 'a00">FAIL' : '0a0">OK' ) + '</div>' );
+	if(isNode){
+		console.log(r);
+		for(k = 0; k < nR.length; k++) console.log(nR[k]);
+		r = '[' + bsTest.nCon( "ok:" + s, 'green' ) + ' ' + bsTest.nCon( "no:" + f, 'red' ) + ']';
+		if(f) console.log( 'RESULT[#' + id + '] : ' + bsTest.nCon("FAIL", 'red'), r );
+		else console.log( 'RESULT[#' + id + '] : ' + bsTest.nCon("SUCCESS", 'green'), r );
+		console.log();
+	}else{
+		r += '</ol></div><div style="padding:5px;float:right;border:1px dashed #999;text-align:center"><b style="font-size:30px;color:#' + ( f ? 'a00">FAIL' : '0a0">OK' ) + '</b><br>ok:<b style="color:#0a0">' + s + '</b> no:<b style="color:#a00">' + f + '</b></div><br clear="both"></div>'+
+			'<div id="bsTestOff'+id+'" style="display:block;cursor:pointer" onclick="bsTest.off(this)"><b>'+title+'</b> : <b style="color:#' + ( f ? 'a00">FAIL' : '0a0">OK' ) + '</b></div></div>';
+		$printer( r ), f = window.top;
+		if( f.bsTest && f.bsTest.suite.urls && !bsTest.isOK )
+			r = window.location.pathname.split("/").pop(),
+			f.document.getElementById(r).innerHTML = '<b style="font-size:20px;color:#a00">FAIL</b>',
+			f.bsTest.result( '<div style="font-weight:bold;font-size:30px;padding:10px;color:#a00">FAIL</div><hr>' );
+		if( bsTest.result ) bsTest.result( '<hr><div style="font-weight:bold;font-size:30px;padding:10px;color:#' + ( !bsTest.isOK ? 'a00">FAIL' : '0a0">OK' ) + '</div>' );
+	}
 }
 bsTest.f2s = (function(){
 	var r0, r1;
@@ -124,10 +149,18 @@ bsTest.tear = function( $title, $func ){
 	var id;
 	$func();
 	id = bsTest.id++;
-	bsTest.printer( '<div style="border:1px solid #999;background:#eee;padding:10px;margin:10px">'+
-		'<div id="bsTestOn'+id+'" style="display:none;cursor:pointer" onclick="bsTest.on(this)"><b>'+$title+'</b><hr><pre>'+bsTest.f2s($func)+'</pre></div>'+
-		'<div id="bsTestOff'+id+'" style="display:block;cursor:pointer" onclick="bsTest.off(this)"><b>'+$title+'</b></div>'+
-	'</div>' );
+	if( bsTest.isNode ){
+		console.log('[tear#'+id + '] '+ $title + ''),
+		console.log('======================'),
+		console.log(bsTest.f2s($func)),
+		console.log();
+	}else{
+		bsTest.printer(
+		'<div style="border:1px solid #999;background:#eee;padding:10px;margin:10px">'+
+			'<div id="bsTestOn'+id+'" style="display:none;cursor:pointer" onclick="bsTest.on(this)"><b>'+$title+'</b><hr><pre>'+bsTest.f2s($func)+'</pre></div>'+
+			'<div id="bsTestOff'+id+'" style="display:block;cursor:pointer" onclick="bsTest.off(this)"><b>'+$title+'</b></div>'+
+		'</div>' );
+	}
 };
 bsTest.suite = function(){
 	var i = arguments.length, url;
@@ -160,3 +193,47 @@ bsTest.auto = (function(){
 		$func.apply( $context, arg )
 	};
 })();
+if( typeof process !== 'undefined' && process.version )
+	bsTest.isNode = 1,
+	bsTest.nCon = (function(){
+		// source from https://github.com/Marak/colors.js/blob/master/colors.js
+		var styles = {
+			//styles
+      'bold'      : ['\x1B[1m',  '\x1B[22m'],
+      'italic'    : ['\x1B[3m',  '\x1B[23m'],
+      'underline' : ['\x1B[4m',  '\x1B[24m'],
+      'inverse'   : ['\x1B[7m',  '\x1B[27m'],
+      'strikethrough' : ['\x1B[9m',  '\x1B[29m'],
+      //text colors
+      //grayscale
+      'white'     : ['\x1B[37m', '\x1B[39m'],
+      'grey'      : ['\x1B[90m', '\x1B[39m'],
+      'black'     : ['\x1B[30m', '\x1B[39m'],
+      //colors
+      'blue'      : ['\x1B[34m', '\x1B[39m'],
+      'cyan'      : ['\x1B[36m', '\x1B[39m'],
+      'green'     : ['\x1B[32m', '\x1B[39m'],
+      'magenta'   : ['\x1B[35m', '\x1B[39m'],
+      'red'       : ['\x1B[31m', '\x1B[39m'],
+      'yellow'    : ['\x1B[33m', '\x1B[39m'],
+      //background colors
+      //grayscale
+      'whiteBG'     : ['\x1B[47m', '\x1B[49m'],
+      'greyBG'      : ['\x1B[49;5;8m', '\x1B[49m'],
+      'blackBG'     : ['\x1B[40m', '\x1B[49m'],
+      //colors
+      'blueBG'      : ['\x1B[44m', '\x1B[49m'],
+      'cyanBG'      : ['\x1B[46m', '\x1B[49m'],
+      'greenBG'     : ['\x1B[42m', '\x1B[49m'],
+      'magentaBG'   : ['\x1B[45m', '\x1B[49m'],
+      'redBG'       : ['\x1B[41m', '\x1B[49m'],
+      'yellowBG'    : ['\x1B[43m', '\x1B[49m']
+		};
+		return function(str, $style){
+			var cstyle;
+			
+			//console.log( cstyle[0] + str + cstyle[1] );
+			return cstyle = styles[$style] || styles['white'], cstyle[0] + str + cstyle[1];
+		};
+	})(),
+	module.exports = bsTest;
