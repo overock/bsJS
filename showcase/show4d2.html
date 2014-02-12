@@ -310,9 +310,18 @@ function view5 () {
 			imgStage.S('>', images[i]);
 		}
 
+		// Ver 0.1
+		/*
 		imgStage.S('left', 0);
 		bs.ANI.tween(imgStage, 'left', -22680, 'time', total * 4, 'loop', -1);
-		//alert('2');
+		*/
+		
+		// Ver 0.2
+		bs.Css( 'keyframes@carousel' ).
+		S( '0%', 'left', '0px').
+		S( '100%', 'left', '-22680px');
+		bs.Dom(imgStage).S('animation', 'carousel ' + (total * 4) + 's linear 1s infinite alternate forwards');
+
 	}
 }
 </script>
