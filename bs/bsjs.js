@@ -30,7 +30,7 @@ else throw new Error( 0, 'not supported platform' );
 	fn( 'obj', function( name, o ){bs[name.replace( trim, '' ).toUpperCase()] = o;} ),
 	fn( 'cls', function( name, f ){
 		var cls, pr, t0, t1, k;
-		pr = ( cls = function( sel, arg ){this.__k = sel, this.NEW.apply( this, arg );} ).prototype,
+		pr = ( cls = function( sel, arg ){this.__k = arg[0] = sel, this.NEW.apply( this, arg );} ).prototype,
 		pr.NEW = none, pr.END = function(){delete cls[this.__k];},
 		t0 = name.replace( trim, '' ).toLowerCase(),
 		t0 = t0.charAt(0).toUpperCase() + t0.substr(1),
@@ -577,7 +577,7 @@ function DOM(){
 			}
 			return this;
 		},
-		r = /^[0-9.-]+/,
+		r = /^[0-9.-]+$/,
 		parser = function(data){
 			var t0, t1, t2, c, i, j, k, v;
 			t2 = [], t0 = data.split('}');
@@ -588,7 +588,7 @@ function DOM(){
 						c = bs.Css(t0[i][0]), t1 = bs.trim(t0[i][1].split(';')), k = t1.length, t2.length = 0;
 						while( k-- ) v = bs.trim(t1[k].split(':')), t2[t2.length] = v[0], t2[t2.length] = r.test(v[1]) ? parseFloat(v[1]) : v[1];
 						c.S.apply( c, t2 );
-					}else if( t0[i][0].substr( 0, 9 ) == 'font-face' ) bs.Css(t0[i].join(' '));
+					}else if( t0[i][0].substr( 0, 9 ) == 'font-face' ) console.log(t0[i].join(' ')),bs.Css(t0[i].join(' '));
 				}
 			}
 		}, 
@@ -643,6 +643,8 @@ function DOM(){
 		fn.NEW = function(sel){
 			var t0, i, j;
 			for( t0 = dom(sel), i = 0, this.length = j = t0.length ; i < j ; i++ ) this[i] = t0[i];
+			t0 = dom(sel), this.length = i = j = t0.length;
+			while(i--) this[j - i - 1] = t0[i];
 		},
 		fn._ = function(){
 			var t0, i, j, k;
@@ -710,8 +712,8 @@ function DOM(){
 		fn['class'] = function( d, v ){return v === undefined ? d.className : ( d.className = v );},
 		fn['class+'] = function( d, v ){
 			var t0;
-			return !( t0 = d.className.replace( t, '' ) ) ? ( console.log(1),d.className = v ) :
-				t0.split(' ').indexOf(v) == -1 ? ( console.log(t, t0, v),d.className = v + ' ' + t0 ) : t0;
+			return !( t0 = d.className.replace( t, '' ) ) ? ( d.className = v ) :
+				t0.split(' ').indexOf(v) == -1 ? ( d.className = v + ' ' + t0 ) : t0;
 		},
 		fn['class-'] = function( d, v ){
 			var t0, i;

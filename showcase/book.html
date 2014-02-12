@@ -60,7 +60,7 @@ bs( function(){
 			else V.detail( C._type, C._id, C._isbn, 'wait' ), bs.js( C.loaded, M.url(  C._type, C._id ) );
 		},
 		result:function( type, v ){
-			bs.ROUTER.go( '#result/' + type + '/' + ( val ? bs.trim(v) : '' ) );
+			bs.ROUTER.go( '#result/' + type + '/' + ( v ? bs.trim(v) : '' ) );
 		},
 		detail:function(v){
 			bs.ROUTER.go( '#detail/' + v );

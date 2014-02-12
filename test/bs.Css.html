@@ -36,6 +36,12 @@ bs( function(){
 			return bs.Dom('#test1').S( '_background-color' ).replace( /[ ]/g, '').toLowerCase();
 		}, 'rgb(255,0,0)'
 	);
+	
+	bs.Css('.ttt').S( 'float', 'left' );
+	bs.Dom('<div class="ttt"></div>').S( 'width', 200, 'height', 200, 'background', '#ff0', '<', 'body' ),
+	bs.Dom('<div class="ttt"></div>').S( 'width', 200, 'height', 200, 'background', '#0f0', '<', 'body' );
+	
+	
 } );
 </script>
 </body>
