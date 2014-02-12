@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset='utf8' >
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <style type="text/css">
 	html, body { height:100%; padding: 0px; margin: 0px; }
 </style>
@@ -10,6 +11,7 @@
 
 <script type="text/javascript">
 
+var cw, ch;
 bs(function() {
 
 	console.log('Start');
@@ -26,11 +28,11 @@ bs(function() {
 	var div_menu = bs.Dom('<div style="float:left;"></div>').S('<', '#body_wrap', 'position', 'absolute', 'top', '100px', /*'width', '150px', 'height', '400px',*/ 'z-index', '100', 'this');
 
 	var ul_menu = bs.Dom('<ul></ul>').S('<', div_menu, 'this');
-	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view1();">클릭이벤트</a></li>');
+	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view1();">마우스클릭</a></li>');
 	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view2();">CSS Animation</a></li>');
-	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view3();">Key 이벤트</a></li>');
-	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view4();">View 4</a></li>');
-	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view5();">View 5</a></li>');
+	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view3();">Key 이벤트(asdfg)</a></li>');
+	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view4();">Photo Wall</a></li>');
+	ul_menu.S('>', '<li class="ccc"><a href="#" onclick="view5();">Carousel</a></li>');
 
 	div_menu.S('left', -200);
 	setTimeout(function(){ bs.ANI.tween(div_menu, 'left', 10, 'time', 0.3); }, 1500);
@@ -44,6 +46,7 @@ bs(function() {
 	bs.Dom('#d_1234').S('>', '<div>abcd</div>');
 
 	bs.WIN.sizer(function (w, h) {
+		cw = w, ch = h;
         bs.Dom('#div_title').S('left', (w * 0.5) - 100, 'top', h / 2);
 		setTimeout(function(){ bs.ANI.tween(div_title, 'left', 10, 'top', 10, 'time', 0.3); }, 1000);
 	});
@@ -54,26 +57,18 @@ bs(function() {
 
 /**
  * 클릭 이벤트에 의한 처리
- * 1. 물방울이 퍼지는 걸로 바꿔봅시다.
- * 2. 기왕이면 이쁜 걸그룹 사진이 나오도록 해봅시다.
  */
 function view1 () {
 
-	// 물방울 퍼지는걸로 바꿔봅시다.
 	bs.Dom( "#div_contents" ).S( '>', null );
 
 	var div_content = bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', /*'background-color', 'skyblue',*/ 'overflow', 'hidden', 'this');
 	div_content.S('down', function(e) {
 		
-		//var tx = e.x - 350, ty = e.y - 100;
-		
-	
-		var div_t_0 = bs.Dom('<div></div>').S('<', div_content, 'position', 'absolute', 'top', e.y - 50, 'left', e.x - 50, 'width', '150px', 'height', '150px', 'border-radius', '100px', 'background', 'url(d2test/APINK_~2.jpg) no-repeat ' + (-e.x + 200) + 'px ' + (-e.y + 10) + 'px', 'this');
-		div_t_0.S('opacity', 1);
-		bs.ANI.tween(div_t_0, 'opacity', 0, 'time', 1, 'end', function () {
-			//bs.ANI.tween(div_t_0, 'opacity', 0, 'time', 0.5, 'end', function () {
-				div_t_0.S(null);
-			//});
+		var div_t_0 = bs.Dom('<div></div>').S('<', div_content, 'position', 'absolute', 'top', e.y - 100, 'left', e.x - 100, 'background', 'url(d2test/APINK_poster20130625.jpg) ' + (-e.x + 100) + 'px ' + (-e.y + 10) + 'px', 'this');
+		div_t_0.S('opacity', 1, 'width', 150, 'height', 150, 'border-radius', 150);
+		bs.ANI.tween(div_t_0, 'opacity', 0, 'width', 300, 'height', 300, 'border-radius', 300, 'time', 1, 'end', function () {
+			div_t_0.S(null);
 		});
 	});
 
@@ -103,13 +98,23 @@ function view2 () {
 
 		var t = bs.rand(1, 6);
 
+		var kf1 = bs.rand(1, 9) * 10;
+		var kf2 = bs.rand(1, 9) * 10;
+		var kf3 = bs.rand(1, 9) * 10;
+		var kf4 = bs.rand(1, 9) * 10;
+		var kf5 = bs.rand(1, 9) * 10;
+		var kf6 = bs.rand(1, 9) * 10;
+		var kf7 = bs.rand(1, 9) * 10;
+		var kf8 = bs.rand(1, 9) * 10;
+		var kf9 = bs.rand(1, 9) * 10;
+		
+		
 		bs.Css( 'keyframes@test' ).
-			S( '0%', 'width', 100, 'height', 150, 'background-color', 'red', 'border-radius', '0px', 'left', '10%', 'top', '10%' ).
-			S( '25%', 'width', 100, 'height', 150, 'background-color', 'purple', 'border-radius', '25px', 'left', '90%', 'top', '10%').
-			S( '50%', 'width', 100, 'height', 150, 'background-color', 'blue', 'border-radius', '50px', 'left', '10%', 'top', '50%' ).
-			S( '75%', 'width', 100, 'height', 150, 'background-color', 'blue', 'border-radius', '75px', 'left', '90%', 'top', '50%' ).
-			S( '100%', 'width', 100, 'height', 150, 'background-color', 'blue', 'border-radius', '100px', 'left', '10%', 'top', '10%' );
-
+		S( '0%', 'left', '10%', 'top', '10%', 'width', 100, 'height', 150/*, 'background-color', 'red', 'border-radius', '0px'*/).
+		S( kf1 + '%', 'left', kf4 + '%', 'top', kf7 + '%', 'width', 100, 'height', 150/*, 'background-color', 'red', 'border-radius', '0px'*/).
+		S( kf2 + '%', 'left', kf5 + '%', 'top', kf8 + '%', 'width', 100, 'height', 150/*, 'background-color', 'blue', 'border-radius', '75px'*/).
+		S( kf3 + '%', 'left', kf6 + '%', 'top', kf9 + '%', 'width', 100, 'height', 150/*, 'background-color', 'blue', 'border-radius', '75px'*/ ).
+		S( '100%', 'left', '10%', 'top', '10%', 'width', 100, 'height', 150/*, 'background-color', 'blue', 'border-radius', '100px'*/);
 
 		//bs.Css( 'keyframes@test' ).S( '50%', 'width', 200, 'height', 200, 'background-color', 'purple', 'border-radius', '50px', 'left', '50%', 'top', '100%');
 		var t = bs.Dom( '<div></div>' ).S( '<', '#div_contents', 'position', 'absolute', 'background', 'url(d2test/apink' + t + '_100.jpg) no-repeat center center', /*'top', '200px', 'left', '300px',*/  'animation', 'test 15s linear 0.5s infinite alternate forwards', 'this' );
@@ -122,7 +127,64 @@ function view2 () {
 function view3 () {
 	bs.Dom( "#div_contents" ).S( '>', null );
 
-	var div_content = bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', /*'background-color', 'skyblue',*/ 'overflow', 'hidden', 'this');
+	
+	var autoKeyTest = {
+		ANI: function ($time) {
+			if (bs.KEY["a"]) {
+				showImage('a');
+				bs.KEY["a"] = false;
+			}
+			if (bs.KEY["s"]) {
+				showImage('s');
+				bs.KEY["s"] = false;
+			}
+			if (bs.KEY["d"]) {
+				showImage('d');
+				bs.KEY["d"] = false;
+			}
+			if (bs.KEY["f"]) {
+				showImage('f');
+				bs.KEY["f"] = false;
+			}
+			if (bs.KEY["g"]) {
+				showImage('g');
+				bs.KEY["g"] = false;
+			}
+		}
+	};
+
+	bs.ANI.ani(autoKeyTest);
+	
+	function showImage(key) {
+		
+		var imgurl;
+		
+		switch (key) {
+			case "a":
+				imgurl = 'd2test/girlsday_01.jpg'
+				break;
+			case "s":
+				imgurl = 'd2test/girlsday_02.jpg'
+				break;
+			case "d":
+				imgurl = 'd2test/girlsday_03.jpg'
+				break;
+			case "f":
+				imgurl = 'd2test/girlsday_04.jpg'
+				break;
+			case "g":
+				imgurl = 'd2test/girlsday_05.jpg'
+				break;
+		}
+		
+		var div_img = bs.Dom('<div class="showImageWrap"></div').S('<', '#div_contents', 'position', 'absolute', 'left', (cw * 0.5) - 400, 'top', (ch / 2) - 400 , 'z-index', '100', 'html', '<img src="' + imgurl + '" width="800px" />', 'this');
+		
+		div_img.S('opacity', 1);
+		bs.ANI.tween(div_img, 'opacity', 0, 'time', 2, 'end', function () {
+			div_img.S(null);
+		});
+		
+	}
 }
 
 /**
@@ -131,17 +193,114 @@ function view3 () {
 function view4 () {
 	bs.Dom( "#div_contents" ).S( '>', null );
 
-	bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', 'background-color', 'lime', 'down', function(e) {
-		alert('click 4');
-	});
+	bs.Css('.img_wrap').S('width','200px', 'height', '231px', 'padding', '0', 'margin', '0' );
+	
+	var div_content = bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'overflow', 'hidden', 'padding', '0', 'this');
+/*	bs.Dom(div_content).S('>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_01_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_02_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_03_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_04_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_05_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_06_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_07_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_08_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_09_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_10_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_11_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_12_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_13_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_14_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_15_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_16_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_17_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_18_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_19_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_20_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_21_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_22_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_23_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_24_T.jpg" /></div>',
+		'>', '<div class="img_wrap" style="float:left;"><img src="d2test/SNSD_2014_C_25_T.jpg" /></div>');*/
+	
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_01_T.jpg" />', 'down', function() { showImage('01')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_02_T.jpg" />', 'down', function() { showImage('02')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_03_T.jpg" />', 'down', function() { showImage('03')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_04_T.jpg" />', 'down', function() { showImage('04')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_05_T.jpg" />', 'down', function() { showImage('05')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_06_T.jpg" />', 'down', function() { showImage('06')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_07_T.jpg" />', 'down', function() { showImage('07')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_08_T.jpg" />', 'down', function() { showImage('08')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_09_T.jpg" />', 'down', function() { showImage('09')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_10_T.jpg" />', 'down', function() { showImage('10')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_11_T.jpg" />', 'down', function() { showImage('11')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_12_T.jpg" />', 'down', function() { showImage('12')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_13_T.jpg" />', 'down', function() { showImage('13')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_14_T.jpg" />', 'down', function() { showImage('14')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_15_T.jpg" />', 'down', function() { showImage('15')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_16_T.jpg" />', 'down', function() { showImage('16')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_17_T.jpg" />', 'down', function() { showImage('17')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_18_T.jpg" />', 'down', function() { showImage('18')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_19_T.jpg" />', 'down', function() { showImage('19')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_20_T.jpg" />', 'down', function() { showImage('20')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_21_T.jpg" />', 'down', function() { showImage('21')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_22_T.jpg" />', 'down', function() { showImage('22')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_23_T.jpg" />', 'down', function() { showImage('23')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_24_T.jpg" />', 'down', function() { showImage('24')});
+	bs.Dom('<div class="img_wrap" style="float:left"></div>').S('<', div_content, 'html', '<img src="d2test/SNSD_2014_C_25_T.jpg" />', 'down', function() { showImage('25')});
+
+	function showImage(no) {
+		var div_img;
+		if (div_img) div_img.S(null);
+		
+		div_img = bs.Dom('<div class="showImageWrap"></div').S('<', '#div_contents', 'position', 'absolute', 'left', (cw * 0.5) - 400, 'top', (ch / 2) - 400 , 'z-index', '100', 'html', '<img src="d2test/SNSD_2014_C_' + no + '.jpg" width="800px" />', 'this');
+		div_img.S('down', function () {
+			div_img.S(null);
+		});
+	}
+	
 }
 
 function view5 () {
 	bs.Dom( "#div_contents" ).S( '>', null );
+	var div_content = bs.Dom('<div></div>').S('<', '#div_contents', 'position', 'absolute', 'left', (cw * 0.5) - 400, 'top', (ch / 2) - 490 ,  'width', '945px', 'height', '1090px', 'overflow', 'hidden', 'padding', '0', 'this');
+	
+	var images = bs.img(imagesLoaded, 'd2test/SNSD_2014_C_01.jpg',
+		'd2test/SNSD_2014_C_02.jpg',
+		'd2test/SNSD_2014_C_03.jpg',
+		'd2test/SNSD_2014_C_04.jpg',
+		'd2test/SNSD_2014_C_05.jpg',
+		'd2test/SNSD_2014_C_06.jpg',
+		'd2test/SNSD_2014_C_07.jpg',
+		'd2test/SNSD_2014_C_08.jpg',
+		'd2test/SNSD_2014_C_09.jpg',
+		'd2test/SNSD_2014_C_10.jpg',
+		'd2test/SNSD_2014_C_11.jpg',
+		'd2test/SNSD_2014_C_12.jpg',
+		'd2test/SNSD_2014_C_13.jpg',
+		'd2test/SNSD_2014_C_14.jpg',
+		'd2test/SNSD_2014_C_15.jpg',
+		'd2test/SNSD_2014_C_16.jpg',
+		'd2test/SNSD_2014_C_17.jpg',
+		'd2test/SNSD_2014_C_18.jpg',
+		'd2test/SNSD_2014_C_19.jpg',
+		'd2test/SNSD_2014_C_20.jpg',
+		'd2test/SNSD_2014_C_21.jpg',
+		'd2test/SNSD_2014_C_22.jpg',
+		'd2test/SNSD_2014_C_23.jpg',
+		'd2test/SNSD_2014_C_24.jpg',
+		'd2test/SNSD_2014_C_25.jpg');
+	
+	function imagesLoaded(images) {
+		var total = images.length, i;
+		var imgStage = bs.Dom('<div></div>').S('<', div_content, '@id', 'img_stage', 'position', 'absolute', 'width', (945 * total) + 'px', 'this' );
+		for	(i = 0; i < total; i++) {
+			imgStage.S('>', images[i]);
+		}
 
-	bs.Dom('<div></div>').S('<', '#div_contents', 'width', '100%', 'height', '100%', 'background-color', 'green', 'down', function(e) {
-		alert('click 5');
-	});
+		imgStage.S('left', 0);
+		bs.ANI.tween(imgStage, 'left', -22680, 'time', total * 4, 'loop', -1);
+		//alert('2');
+	}
 }
 </script>
 
