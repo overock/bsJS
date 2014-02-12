@@ -1,4 +1,4 @@
-bs.$register( 'method', 'fps', (function(){console.log( 'fps' );
+bs['plugin+']( 'method', 'fps', (function(){console.log( 'fps' );
 	var printer, prev, sum, cnt, isStop;
 	prev = sum = cnt = 0;
 	function fps(){

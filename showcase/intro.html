@@ -31,7 +31,7 @@ bs( function(){
 	}
 	digit.div = {length:0};
 	digit.end = function( $target ){
-		digit.div[digit.div.length++] = $target.$('visibility', 'hidden', 'this');
+		digit.div[digit.div.length++] = $target.S('visibility', 'hidden', 'this');
 	};
 	
 	digit.prototype[1] = function(){
@@ -165,27 +165,27 @@ bs( function(){
 	digit.prototype.ani = function( $num ){
 		if( this.stat === $num ){
 			this[$num](),
-			this.dom.$( 'left', this.px, 'top', this.py );
+			this.dom.S( 'left', this.px, 'top', this.py );
 			if( this.pcount++ % 2 ){
-				var s = bs.$ex( 30, '~', 50 );
-				var d = digit.div.length ? digit.div[--digit.div.length] : bs.dom('<div></div>' ).$( 'position','absolute', '<', '#stage', 'this' );
-				d.$( 'visibility', 'visible', 'background', this.c, 
+				var s = bs.rand( 30, 50 );
+				var d = digit.div.length ? digit.div[--digit.div.length] : bs.Dom('<div></div>' ).S( 'position','absolute', '<', '#stage', 'this' );
+				d.S( 'visibility', 'visible', 'background', this.c, 
 					'width',10, 'height',10, 'border-radius', 10, 'left',this.px,'top',this.py, 'opacity', 1 
 				);
 				bs.ANI.tween( d,
-					'left', bs.$ex( -this.a, '~', this.a ) + this.px, 'top', bs.$ex( -this.a, '~', this.a ) + this.py,
+					'left', bs.rand( -this.a, this.a ) + this.px, 'top', bs.rand( -this.a, this.a ) + this.py,
 					'border-radius', s, 'width', s, 'height',s, 'opacity', 0, 
-					'time', bs.$ex( 1.5, '~f', 2.5 ), 'end', digit.end
+					'time', bs.randf( 1.5, 2.5 ), 'end', digit.end
 				);
 			}
 		}else this.stat = $num, this.step = 0, this.px = this.x, this.py = this.y;
 	};
-	bs.css('.time').$('position','absolute','width',10,'height',10,'background','#f00','border-radius',5);
+	bs.Css('.time').S('position','absolute','width',10,'height',10,'background','#f00','border-radius',5);
 	var time = [
-		new digit( bs.dom('<div class="time"></div>').$('<','#stage','this'), 50, 50, 100, 150, 15, '#a66', 20 ),
-		new digit( bs.dom('<div class="time"></div>').$('<','#stage','this'), 200, 50, 100, 150, 15, '#a66', 20 ),
-		new digit( bs.dom('<div class="time"></div>').$('<','#stage','this'), 50, 250, 80, 120, 12, '#66a', 15 ),
-		new digit( bs.dom('<div class="time"></div>').$('<','#stage','this'), 200, 250, 80, 120, 10, '#66a', 15 )
+		new digit( bs.Dom('<div class="time"></div>').S('<','#stage','this'), 50, 50, 100, 150, 15, '#a66', 20 ),
+		new digit( bs.Dom('<div class="time"></div>').S('<','#stage','this'), 200, 50, 100, 150, 15, '#a66', 20 ),
+		new digit( bs.Dom('<div class="time"></div>').S('<','#stage','this'), 50, 250, 80, 120, 12, '#66a', 15 ),
+		new digit( bs.Dom('<div class="time"></div>').S('<','#stage','this'), 200, 250, 80, 120, 10, '#66a', 15 )
 	];
 	bs.ANI.ani( {ANI:function($time){
 		var h, m, s;

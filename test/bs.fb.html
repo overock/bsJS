@@ -14,9 +14,6 @@
 <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
 </head>
 <body>
-<a href="https://github.com/projectBS/bsJS">
-	<img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
-</a>
 <div id="stage"></div>
 <div id="result"></div>
 <div id="test"></div>
@@ -24,30 +21,30 @@
 <script src="../bs/bsTest.js"></script>
 <script src="./printer.js"></script>
 <script>
-bs.$import( 'fb', 'last' ),
+bs.plugin( 'fb', 'last' ),
 bs( function(){
-	bs.css( 'body' ).$( 'margin', 0, 'padding', 0 );
-	bs.css( '.box' ).$( 'width', 100, 'cursor', 'pointer', 'padding', 5, 'margin', 5, 'border-radius', 5, 'border', '1px solid #999', 'background', '#ff9' );
-	bs.css( '.item' ).$( 'float', 'left', 'width', 100, 'text-align', 'center', 'padding', 5, 'margin', 2, 'border-radius', 5, 'border', '1px dashed #99f' );
-	bs.css( '.data' ).$( 'width', 500, 'padding', 5, 'margin', '2px 0 2px 130px', 'border-radius', 5, 'border', '1px dashed #eee' );
-	bs.css( '.thumb' ).$( 'display', 'block', 'width', 100, 'text-align', 'center', 'padding', 5, 'margin', 2, 'border-radius', 5, 'border', '1px dashed #99f' );
+	bs.Css( 'body' ).S( 'margin', 0, 'padding', 0 );
+	bs.Css( '.box' ).S( 'width', 100, 'cursor', 'pointer', 'padding', 5, 'margin', 5, 'border-radius', 5, 'border', '1px solid #999', 'background', '#ff9' );
+	bs.Css( '.item' ).S( 'float', 'left', 'width', 100, 'text-align', 'center', 'padding', 5, 'margin', 2, 'border-radius', 5, 'border', '1px dashed #99f' );
+	bs.Css( '.data' ).S( 'width', 500, 'padding', 5, 'margin', '2px 0 2px 130px', 'border-radius', 5, 'border', '1px dashed #eee' );
+	bs.Css( '.thumb' ).S( 'display', 'block', 'width', 100, 'text-align', 'center', 'padding', 5, 'margin', 2, 'border-radius', 5, 'border', '1px dashed #99f' );
 	bs.FB.start( '617106348337323', function( $data, $conn, $disconn ){
-		bs.dom( '<div></div>' ).$( '<', '#stage', 'html', [
+		bs.Dom( '<div></div>' ).S( '<', '#stage', 'html', [
 			'<div class="item">id</div><div class="data">' + $data.username +'</div>',
 			'<div class="item">name</div><div class="data">' + $data.name +'</div>',
 			'<div class="item">link</div><div class="data"><a href="' + $data.link + '" target="_blank">' + $data.link +'</a></div>',
 			'<img class="thumb" src="' + $data.url +'">'
 		].join('<br clear="both">') );
-		bs.dom( '<div class="box"></div>' ).$( '<', '#stage', 'html', 'logout', 'down', function( $e ){
+		bs.Dom( '<div class="box"></div>' ).S( '<', '#stage', 'html', 'logout', 'down', function( $e ){
 			bs.FB.logout();
 		} );
 	}, function( $status, $conn, $disconn ){
-		bs.dom( '<div class="box"></div>' ).$( '<', '#stage', 'html', 'login', 'down', function( $e ){
-			bs.dom( '#stage' ).$( 'html', '' );
+		bs.Dom( '<div class="box"></div>' ).S( '<', '#stage', 'html', 'login', 'down', function( $e ){
+			bs.Dom( '#stage' ).S( 'html', '' );
 			bs.FB.login();
 		} );
 	}, function( $status, $conn, $disconn ){
-		bs.dom( '#stage' ).$( 'html', '' );
+		bs.Dom( '#stage' ).S( 'html', '' );
 	} );
 } );
 </script>

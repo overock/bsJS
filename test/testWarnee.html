@@ -34,26 +34,26 @@ bs( function(){
 
 	var t0, t1, t2;
 
-	//bs.$XXX
+	//bs.XXX
 	bsTest.tear( "bs$XXX test",  function(){
 	
 	});
 
-	// bs.$ex
-	bsTest('bs.$ex',
-		'3~5 사이의 정수', bsTest.IN(3,4,5), bs.$ex(3, "~", 5),
-		"3~5 사이의 실수", bsTest.RANGE( 3, 5 ), bs.$ex(3, "~f", 5));
+	// bs.ex
+	bsTest('bs.ex',
+		'3~5 사이의 정수', bsTest.IN(3,4,5), bs.ex(3, "~", 5),
+		"3~5 사이의 실수", bsTest.RANGE( 3, 5 ), bs.ex(3, "~f", 5));
 
 
 	// trim
-    bsTest('bs.$trim', 
-		'"abc"', bs.$trim("abc"), 'abc',
-		'"abc "', bs.$trim("abc "), 'abc',
-		'" abc"', bs.$trim(" abc"), 'abc',
-		'" abc "', bs.$trim(" abc "), 'abc',
-		'" a b c "', bs.$trim(" a b c "), 'a b c',
-		'"전각 스페이스[　a b c ]"', bs.$trim("　a b c　"), 'a b c',
-		'"Tab 대응[	a b c	]"', bs.$trim("	a b c	"), 'a b c');
+    bsTest('bs.trim', 
+		'"abc"', bs.trim("abc"), 'abc',
+		'"abc "', bs.trim("abc "), 'abc',
+		'" abc"', bs.trim(" abc"), 'abc',
+		'" abc "', bs.trim(" abc "), 'abc',
+		'" a b c "', bs.trim(" a b c "), 'a b c',
+		'"전각 스페이스[　a b c ]"', bs.trim("　a b c　"), 'a b c',
+		'"Tab 대응[	a b c	]"', bs.trim("	a b c	"), 'a b c');
 
 
 });

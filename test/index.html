@@ -12,50 +12,18 @@
 <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi" />
 <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
 </head>
-<body style="font-family:Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;">
-<a href="https://github.com/projectBS/bsJS">
-	<img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
-</a>
-<h3>test all</h3>
-<ul>
-	<li><a href="bs.suite.html">bs.suite.html</a></li>
-</ul>
-<h3>public test</h3>
-<ul>
-	<li><a href="bs.$js.html">bs.$js.html</a></li>
-	<li><a href="bs.$test.html">bs.$test.html</a></li>
-	<li><a href="bs.$xml.html">bs.$xml.html</a></li>
-	<li><a href="bs.ajax.html">bs.ajax.html</a></li>
-	<li><a href="bs.css.html">bs.css.html</a></li>
-	<li><a href="bs.data.html">bs.data.html</a></li>
-	<li><a href="bs.dom.html">bs.dom.html</a></li>
-	<li><a href="bs.event.html">bs.event.html</a></li>
-	<li><a href="bs.function.html">bs.function.html</a></li>
-	<li><a href="bs.json.html">bs.json.html</a></li>
-	<li><a href="bs.keyevent.html">bs.keyevent.html</a></li>
-	<li><a href="bs.keyframe.html">bs.keyframe.html</a></li>
-	<li><a href="bs.router.html">bs.router.html</a></li>
-	<li><a href="bs.tmpl.html">bs.tmpl.html</a></li>
-</ul>
-<h3>individual test</h3>
-<ul>
-	<li><a href="testHika.html">testHika.html</a></li>
-	<li><a href="testHuns.html">testHuns.html</a></li>
-	<li><a href="testRouka.html">testRouka.html</a></li>
-	<li><a href="testSato.html">testSato.html</a></li>
-	<li><a href="testWarnee.html">testWarnee.html</a></li>
-	<li><a href="testWarneeCarousel.html">testWarneeCarousel.html</a></li>
-</ul>
+<body>
+<a href="https://github.com/projectBS/bsJS"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+<div id="result"></div><div id="test"></div>
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
+<script src="./printer.js"></script>
 <script>
 bs( function(){
-	bs.css("li").$(
-		"font-weight", "bold",
-		"border", "1px dashed #999",
-		"padding", 10,
-		"margin",10
-	);
+	bs.get( function(data){
+		data = bs.trim(data);
+		bsTest.suite.apply( null, bs.reverse(bs.trim(data.split( data.indexOf('\n') > - 1 ? '\n' : '\r' ))) );
+	}, 'suite.txt' );
 } );
 </script>
 </body>

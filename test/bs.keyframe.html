@@ -23,14 +23,14 @@
 
 bs( function(){
 //init
-bs.css( 'keyframes@test' ).
-	$( '0%', 'width', 10, 'height', 10 ).
-	$( '50%', 'width', 200, 'height', 200 ).
-	$( '100%', 'width', 100, 'height', 100 );
+bs.Css( 'keyframes@test' ).
+	S( '0%', 'width', 10, 'height', 10 ).
+	S( '50%', 'width', 200, 'height', 200 ).
+	S( '100%', 'width', 100, 'height', 100 );
 //edit
-bs.css( 'keyframes@test' ).$( '100%', 'width', 100, 'height', 150 );
+bs.Css( 'keyframes@test' ).S( '100%', 'width', 100, 'height', 150 );
 //run
-bs.dom( '<div></div>' ).$( '<', '#stage', 'background', '#f00', 'animation', 'test 1s linear 2 alternate forwards' );
+bs.Dom( '<div></div>' ).S( '<', '#stage', 'background', '#f00', 'animation', 'test 1s linear 2 alternate forwards' );
 
 console.log( typeof eval( '{a:3}') );
 });

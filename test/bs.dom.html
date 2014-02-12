@@ -13,9 +13,6 @@
 <link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
 </head>
 <body>
-<a href="https://github.com/projectBS/bsJS">
-	<img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
-</a>
 <div id="stage" data-id="stageId" data-id2="stageId2">test stage</div>
 <div class="clsStage" style="display:none;">test stage</div>
 <div class="clsStage" style="display:none;">test stage</div>
@@ -27,97 +24,97 @@
 <script src="./printer.js"></script>
 <script>
 bs( function(){
-	bsTest( 'test',
-		'3', bsTest.NOT(2), 3,
-		'3', bsTest.IN(1,2,3,4,5), 3,
-		'3', bsTest.RANGE(1,5), 3,
-		function(){
-			return 'a';
-		},'a'
-	);
 	bsTest.tear( '스타일설정', function(){
-		bs.css( '#stage' ).$( 'border', '1px solid #f00', 'margin-top', 30, 'width', '50:%', 'padding', 10 );
-		bs.css( '#stage' ).$( 'width', 100 );
-		bs.dom( '#stage' ).$( 'background-color', '#eee' );
-		bs.dom( '#stage' ).$( 'class', 'cls1' );
+		bs.Css( '#stage' ).S( 'border', '1px solid #f00', 'margin-top', 30, 'width', '50:%', 'padding', 10 );
+		bs.Css( '#stage' ).S( 'width', 100 );
+		bs.Dom( '#stage' ).S( 'background-color', '#eee' );
+		bs.Dom( '#stage' ).S( 'class', 'cls1' );
 	} );
 	bsTest( 'dom selector',
-		"bs.dom( '#stage' ).$('_margin-top' )", 30, bs.dom( '#stage' ).$('_margin-top' ),
-		"bs.dom( document.getElementById('stage') ).$('_margin-top' )", 30, bs.dom( document.getElementById('stage') ).$('_margin-top' ),
-		"bs.dom( bs.dom('#stage') ).$('_margin-top' )", 30, bs.dom( bs.dom('#stage') ).$('_margin-top' ),
-		"bs.dom( '.clsStage' ).length", 2, bs.dom( '.clsStage' ).length,
+		"bs.Dom( '#stage' ).S('_margin-top' )", 30, bs.Dom( '#stage' ).S('_margin-top' ),
+		"bs.Dom( document.getElementById('stage') ).S('_margin-top' )", 30, bs.Dom( document.getElementById('stage') ).S('_margin-top' ),
+		"bs.Dom( bs.Dom('#stage') ).S('_margin-top' )", 30, bs.Dom( bs.Dom('#stage') ).S('_margin-top' ),
+		"bs.Dom( '.clsStage' ).length", 2, bs.Dom( '.clsStage' ).length,
 		//
-		"bs.dom( '#stage' ).$( 'background-color' )", '#eee', bs.dom( '#stage' ).$( 'background-color' ),
-		"bs.dom( document.getElementById('stage') ).$( 'background-color' )", '#eee', bs.dom( document.getElementById('stage') ).$( 'background-color' ),
-		"bs.dom( bs.dom('#stage') ).$( 'background-color' )", '#eee', bs.dom( bs.dom('#stage') ).$( 'background-color' ),
-		"bs.dom( '.clsStage' ).length", 2, bs.dom( '.clsStage' ).length
+		"bs.Dom( '#stage' ).S( 'background-color' )", '#eee', bs.Dom( '#stage' ).S( 'background-color' ),
+		"bs.Dom( document.getElementById('stage') ).S( 'background-color' )", '#eee', bs.Dom( document.getElementById('stage') ).S( 'background-color' ),
+		"bs.Dom( bs.Dom('#stage') ).S( 'background-color' )", '#eee', bs.Dom( bs.Dom('#stage') ).S( 'background-color' ),
+		"bs.Dom( '.clsStage' ).length", 2, bs.Dom( '.clsStage' ).length
 	);
 	bsTest( 'dom method',
-		"bs.dom( '&lt;div&gt;test&lt;/div&gt;' ).$( 'html' )", 'test', bs.dom( '<div>test</div>' ).$( 'html' ),
-		"bs.dom( '&lt;div&gt;test&lt;/div&gt;' ).$( 'text' )", 'test', bs.dom( '<div>test</div>' ).$( 'text' ),
-		"bs.dom( '&lt;tr&gt;&lt;td&gt;test&lt;/td&gt;&lt;/tr&gt;' ).$( 'html' )", undefined, bs.dom( '<tr><td>test</td></tr>' ).$( 'html' ),
-		"bs.dom( '#stage' ).$( 'class' )", 'cls1', bs.dom( '#stage' ).$( 'class' ),
-		"bs.dom( '#stage' ).$( 'class+', 'cls2' )", 'cls2 cls1', bs.dom( '#stage' ).$( 'class+', 'cls2' ),
-		"bs.dom( '#stage' ).$( 'class+', 'cls2' )", 'cls2 cls1', bs.dom( '#stage' ).$( 'class+', 'cls2' ),
-		"bs.dom( '#stage' ).$( 'class+', 'cls' )", 'cls cls2 cls1', bs.dom( '#stage' ).$( 'class+', 'cls' ),
-		"bs.dom( '#stage' ).$( 'class-', 'cls2' )", 'cls cls1', bs.dom( '#stage' ).$( 'class-', 'cls2' ),
-		"bs.dom( '#stage' ).$( 'class-', 'cls' )", 'cls1', bs.dom( '#stage' ).$( 'class-', 'cls' ),
-		"bs.dom( '#stage' ).$( 'class', null )", null, bs.dom( '#stage' ).$( 'class', null ),
+		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'html' )", 'test', bs.Dom( '<div>test</div>' ).S( 'html' ),
+		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'text' )", 'test', bs.Dom( '<div>test</div>' ).S( 'text' ),
+		"bs.Dom( '&lt;tr&gt;&lt;td&gt;test&lt;/td&gt;&lt;/tr&gt;' ).S( 'html' )", undefined, bs.Dom( '<tr><td>test</td></tr>' ).S( 'html' ),
+		"bs.Dom( '#stage' ).S( 'class' )", 'cls1', bs.Dom( '#stage' ).S( 'class' ),
+		"bs.Dom( '#stage' ).S( 'class+', 'cls2' )", 'cls2 cls1', bs.Dom( '#stage' ).S( 'class+', 'cls2' ),
+		"bs.Dom( '#stage' ).S( 'class+', 'cls2' )", 'cls2 cls1', bs.Dom( '#stage' ).S( 'class+', 'cls2' ),
+		"bs.Dom( '#stage' ).S( 'class+', 'cls' )", 'cls cls2 cls1', bs.Dom( '#stage' ).S( 'class+', 'cls' ),
+		"bs.Dom( '#stage' ).S( 'class-', 'cls2' )", 'cls cls1', bs.Dom( '#stage' ).S( 'class-', 'cls2' ),
+		"bs.Dom( '#stage' ).S( 'class-', 'cls' )", 'cls1', bs.Dom( '#stage' ).S( 'class-', 'cls' ),
+		"bs.Dom( '#stage' ).S( 'class', null )", null, bs.Dom( '#stage' ).S( 'class', null ),
 		//
-		"bs.dom( '&lt;div&gt;test&lt;/div&gt;' ).$( 'html' )", 'test', bs.dom( '<div>test</div>' ).$( 'html' ),
-		"bs.dom( '&lt;div&gt;test&lt;/div&gt;' ).$( 'text' )", 'test', bs.dom( '<div>test</div>' ).$( 'text' ),
-		"bs.dom( '&lt;tr&gt;&lt;td&gt;test&lt;/td&gt;&lt;/tr&gt;' ).$( 'html' )", undefined, bs.dom( '<tr><td>test</td></tr>' ).$( 'html' )
+		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'html' )", 'test', bs.Dom( '<div>test</div>' ).S( 'html' ),
+		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'text' )", 'test', bs.Dom( '<div>test</div>' ).S( 'text' ),
+		"bs.Dom( '&lt;tr&gt;&lt;td&gt;test&lt;/td&gt;&lt;/tr&gt;' ).S( 'html' )", undefined, bs.Dom( '<tr><td>test</td></tr>' ).S( 'html' )
 	);
 	bsTest( 'dom attribute',
-		"bs.dom( '#stage' ).$( '@data-id' )", "stageId", bs.dom( '#stage' ).$( '@data-id' ),
-		"bs.dom( '#stage' ).$( '@data-id', 'stageId2' )", "stageId2", bs.dom( '#stage' ).$( '@data-id', 'stageId2' ),
-		"bs.dom( '#stage' ).$( '@data-id' )", "stageId2", bs.dom( '#stage' ).$( '@data-id' ),
-		"bs.dom( '#stage' ).$( '@data-id', '' )", "", bs.dom( '#stage' ).$( '@data-id', '' ),
-		"bs.dom( '#stage' ).$( '@data-id', 0 )", 0, bs.dom( '#stage' ).$( '@data-id', 0 ),
-		"bs.dom( '#stage' ).$( '@data-id', null )", null, bs.dom( '#stage' ).$( '@data-id', null ),
+		"bs.Dom( '#stage' ).S( '@data-id' )", "stageId", bs.Dom( '#stage' ).S( '@data-id' ),
+		"bs.Dom( '#stage' ).S( '@data-id', 'stageId2' )", "stageId2", bs.Dom( '#stage' ).S( '@data-id', 'stageId2' ),
+		"bs.Dom( '#stage' ).S( '@data-id' )", "stageId2", bs.Dom( '#stage' ).S( '@data-id' ),
+		"bs.Dom( '#stage' ).S( '@data-id', '' )", "", bs.Dom( '#stage' ).S( '@data-id', '' ),
+		"bs.Dom( '#stage' ).S( '@data-id', 0 )", 0, bs.Dom( '#stage' ).S( '@data-id', 0 ),
+		"bs.Dom( '#stage' ).S( '@data-id', null )", null, bs.Dom( '#stage' ).S( '@data-id', null ),
 		//
-		"bs.dom( '#stage' ).$( '@data-id2' )", "stageId2", bs.dom( '#stage' ).$( '@data-id2' ),
-		"bs.dom( '#stage' ).$( '@data-id2', 'stageId3' )", "stageId3", bs.dom( '#stage' ).$( '@data-id2', 'stageId3' ),
-		"bs.dom( '#stage' ).$( '@data-id2' )", "stageId3", bs.dom( '#stage' ).$( '@data-id2' ),
-		"bs.dom( '#stage' ).$( '@data-id2', '' )", "", bs.dom( '#stage' ).$( '@data-id2', '' ),
-		"bs.dom( '#stage' ).$( '@data-id2', 0 )", 0, bs.dom( '#stage' ).$( '@data-id2', 0 ),
-		"bs.dom( '#stage' ).$( '@data-id2', null )", null, bs.dom( '#stage' ).$( '@data-id2', null )
+		"bs.Dom( '#stage' ).S( '@data-id2' )", "stageId2", bs.Dom( '#stage' ).S( '@data-id2' ),
+		"bs.Dom( '#stage' ).S( '@data-id2', 'stageId3' )", "stageId3", bs.Dom( '#stage' ).S( '@data-id2', 'stageId3' ),
+		"bs.Dom( '#stage' ).S( '@data-id2' )", "stageId3", bs.Dom( '#stage' ).S( '@data-id2' ),
+		"bs.Dom( '#stage' ).S( '@data-id2', '' )", "", bs.Dom( '#stage' ).S( '@data-id2', '' ),
+		"bs.Dom( '#stage' ).S( '@data-id2', 0 )", 0, bs.Dom( '#stage' ).S( '@data-id2', 0 ),
+		"bs.Dom( '#stage' ).S( '@data-id2', null )", null, bs.Dom( '#stage' ).S( '@data-id2', null )
 	);
 
 	bsTest.tear( '구조생성', function(){
-		//<stage>
+		//<stageHika>
 		//	<div><b><span>a</span></b></div>
 		//	<div>b</div>
-		//</stage>
-		bs.dom( "#stageHika" ).$( 
+		//</stageHika>
+		bs.Dom( "#stageHika" ).S( 
 			'>', '<div><b><span>a</span></b></div>',
 			'>', '<div>b</div>' 
 		);
 	} );
 	bsTest( 'DOM 직계 자손은 2개인가?',
-		"bs.dom( '#stageHika' ).$( '>' ).length", 2, bs.dom( '#stageHika' ).$( '>' ).length
+		"bs.Dom( '#stageHika' ).S( '>' ).length", 2, bs.Dom( '#stageHika' ).S( '>' ).length
 	);
 	bsTest( 'DOM 자식찾기, 자식의 속성얻기',
-		"bs.dom( '#stageHika' ).$( '>1' ).innerHTML", 'b', bs.dom( '#stageHika' ).$( '>1' ).innerHTML,
-		"bs.dom( '#stageHika' ).$( '>1', 'html' )", 'b', bs.dom( '#stageHika' ).$( '>1', 'html' ),
-		"bs.dom( bs.dom('#stageHika' ).$( '>1' ) ).$( 'html', 'c' )", 'c', bs.dom( bs.dom('#stageHika' ).$( '>1' ) ).$( 'html', 'c' )
+		"bs.Dom( '#stageHika' ).S( '>1' ).innerHTML", 'b', bs.Dom( '#stageHika' ).S( '>1' ).innerHTML,
+		function(){
+			return bs.Dom('#stageHika').S( '>1', 'html' );
+		}, 'b'
 	);
 	
 	bsTest( 'DOM 다중자손의 속성얻기',
-		"bs.dom( '#stageHika' ).$( '>0>0>0', 'html' )", 'a', bs.dom( '#stageHika' ).$( '>0>0>0', 'html' )
+		function(){
+		 return bs.Dom('#stageHika').S( '>0>0>0', 'html' );
+		}, 'a'
 	);
 	
 	bsTest.tear( '자식전체삭제', function(){
-		bs.dom( "#stageHika" ).$( '>', null );
+		bs.Dom( "#stageHika" ).S( '>', null );
 	} );
 	bsTest( 'DOM 자식을 전부 삭제',
-		"bs.dom( '#stageHika' ).$( '>' ).length", 0, bs.dom( '#stageHika' ).$( '>' ).length
+		"bs.Dom( '#stageHika' ).S( '>' ).length", 0, bs.Dom( '#stageHika' ).S( '>' ).length
 	);
 	bsTest.tear( '리사이즈', function(){
-		bs.dom( "#stageHika" ).$( 'resize', function( $e ){
+		bs.Dom( "#stageHika" ).S( 'resize', function( $e ){
 			console.log('resize');
 		} );
 	} );
+	bsTest( '리스트로부터 Dom생성시 카운트',
+		function(){
+			return bs.Dom( document.getElementsByTagName('div') ).length;
+		}, document.getElementsByTagName('div').length
+	);
 } );
 </script>
 </body>

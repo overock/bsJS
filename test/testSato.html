@@ -43,7 +43,7 @@ bs( function(){
       console.log( $dest );
       d = {r:0};
       SCROLL.xs = bs.WIN.scroll( 'left' );
-      SCROLL.xe = bs.dom( '#page' + $dest ).$( 'left' );
+      SCROLL.xe = bs.Dom( '#page' + $dest ).S( 'left' );
       console.log( 'SCROLL.xs ' + SCROLL.xs);
       console.log( 'SCROLL.xe ' + SCROLL.xe);
       bs.ANI.tween( d, 
@@ -64,58 +64,58 @@ bs( function(){
   var i, w, offset;
   i = 0, offset = 0;
   for (var i = 0; i < 5; i++) {
-    w = bs.$ex( 400, '~', 800);
-    bs.dom( '<div id="page' + i + '"></div>' ).$( '<', '#scroll', 
+    w = bs.ex( 400, '~', 800);
+    bs.Dom( '<div id="page' + i + '"></div>' ).S( '<', '#scroll', 
       'position','absolute', 
       'top', 50, 'left', offset, 'width', w, 'height', 200, 
       'html', 'page #' + i,
-      'background', 'rgb('+bs.$ex(210,'~',255)+','+bs.$ex(210,'~',255)+','+bs.$ex(150,'~',200)+')', 'line-height', 20, 'font-weight', 'bold', 'font-size', 11
+      'background', 'rgb('+bs.ex(210,'~',255)+','+bs.ex(210,'~',255)+','+bs.ex(150,'~',200)+')', 'line-height', 20, 'font-weight', 'bold', 'font-size', 11
     );
     offset += w;
   }
 
-  bs.dom( '<div></div>' ).$( '<', '#menu', 
+  bs.Dom( '<div></div>' ).S( '<', '#menu', 
     'position','fixed', 'bottom', 100, 'left', 10, 'width', 70, 'height', 20, 'border-radius', 15, 'html', 'toggle',
     'background', '#ddd', 'line-height', 20, 'text-align', 'center', 'font-weight', 'bold', 'cursor', 'pointer', 'font-size', 11,
     'down', function($e){bs.ANI.tweenToggle('c');}
   );
-  bs.dom( '<div></div>' ).$( '<', '#menu', 
+  bs.Dom( '<div></div>' ).S( '<', '#menu', 
     'position','fixed', 'bottom', 100, 'left', 110, 'width', 70, 'height', 20, 'border-radius', 15, 'html', 'pause',
     'background', '#ddd', 'line-height', 20, 'text-align', 'center', 'font-weight', 'bold', 'cursor', 'pointer', 'font-size', 11,
     'down', function($e){bs.ANI.tweenPause('c');}
   );
-  bs.dom( '<div></div>' ).$( '<', '#menu', 
+  bs.Dom( '<div></div>' ).S( '<', '#menu', 
     'position','fixed', 'bottom', 100, 'left', 210, 'width', 70, 'height', 20, 'border-radius', 15, 'html', 'resume',
     'background', '#ddd', 'line-height', 20, 'text-align', 'center', 'font-weight', 'bold', 'cursor', 'pointer', 'font-size', 11,
     'down', function($e){bs.ANI.tweenResume('c');}
   );
-  bs.dom( '<div></div>' ).$( '<', '#menu', 
+  bs.Dom( '<div></div>' ).S( '<', '#menu', 
     'position','fixed', 'bottom', 100, 'left', 310, 'width', 70, 'height', 20, 'border-radius', 15, 'html', 'stop',
     'background', '#ddd', 'line-height', 20, 'text-align', 'center', 'font-weight', 'bold', 'cursor', 'pointer', 'font-size', 11,
     'down', function($e){bs.ANI.tweenStop('c');}
   );
 
-  bs.dom( '<div></div>' ).$( '<', '#menu', 
+  bs.Dom( '<div></div>' ).S( '<', '#menu', 
     'position','fixed', 'bottom', 50, 'left', 10, 'width', 70, 'height', 20, 'border-radius', 15, 'html', 'page#0',
     'background', '#ddd', 'line-height', 20, 'text-align', 'center', 'font-weight', 'bold', 'cursor', 'pointer', 'font-size', 11,
     'down', function($e){SCROLL.start( 0 );}
   );
-  bs.dom( '<div></div>' ).$( '<', '#menu', 
+  bs.Dom( '<div></div>' ).S( '<', '#menu', 
     'position','fixed', 'bottom', 50, 'left', 110, 'width', 70, 'height', 20, 'border-radius', 15, 'html', 'page#1',
     'background', '#ddd', 'line-height', 20, 'text-align', 'center', 'font-weight', 'bold', 'cursor', 'pointer', 'font-size', 11,
     'down', function($e){SCROLL.start( 1 );}
   );
-  bs.dom( '<div></div>' ).$( '<', '#menu', 
+  bs.Dom( '<div></div>' ).S( '<', '#menu', 
     'position','fixed', 'bottom', 50, 'left', 210, 'width', 70, 'height', 20, 'border-radius', 15, 'html', 'page#2',
     'background', '#ddd', 'line-height', 20, 'text-align', 'center', 'font-weight', 'bold', 'cursor', 'pointer', 'font-size', 11,
     'down', function($e){SCROLL.start( 2 );}
   );
-  bs.dom( '<div></div>' ).$( '<', '#menu', 
+  bs.Dom( '<div></div>' ).S( '<', '#menu', 
     'position','fixed', 'bottom', 50, 'left', 310, 'width', 70, 'height', 20, 'border-radius', 15, 'html', 'page#3',
     'background', '#ddd', 'line-height', 20, 'text-align', 'center', 'font-weight', 'bold', 'cursor', 'pointer', 'font-size', 11,
     'down', function($e){SCROLL.start( 3 );}
   );
-  bs.dom( '<div></div>' ).$( '<', '#menu', 
+  bs.Dom( '<div></div>' ).S( '<', '#menu', 
     'position','fixed', 'bottom', 50, 'left', 410, 'width', 70, 'height', 20, 'border-radius', 15, 'html', 'page#4',
     'background', '#ddd', 'line-height', 20, 'text-align', 'center', 'font-weight', 'bold', 'cursor', 'pointer', 'font-size', 11,
     'down', function($e){SCROLL.start( 4 );}

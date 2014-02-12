@@ -1,6 +1,0 @@
-<%
-bs.sql( 'login' ).run( function( $rs ){
-	if( $rs && $rs.length ) ECHO( '{}' ); else ECHO( '{}' );
-	bs.WEB.next();
-}, 'email', bs.WEB.get( 'email' ), 'pw', bs.WEB.get( 'pw' ) );
-%>
