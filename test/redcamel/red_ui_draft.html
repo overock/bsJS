@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<title>space</title>
+<meta name="keywords" content="bs5"/>
+<meta name="description" content="bs5 Test suite"/>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="viewport"
+      content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi"/>
+<link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+
+</head>
+<body>
+<a href="https://github.com/projectBS/bsJS">
+    <img style="position: fixed; top: 0; right: 0; border: 0;z-index:10000000000000000000000"
+         src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+</a>
+
+<h1>H1</h1>
+
+<h2>H2</h2>
+
+<h3>H3</h3>
+<h4>H4</h4>
+<h5>H5</h5>
+<h6>H6</h6>
+<script src="../../bs/bsjs.js"></script>
+<script>
+    // 2014.01.28 - 10:00
+    // By Redcamel
+    // 개발목적 : 부트스크랩 테마를 활용한 UI시스템확장 가능성 검토
+    // 걍일단 되는대로 구현해봅세...
+    bs(function(){
+        bs.Dom("<h2>기본적 부트 스트랩 클래스는 뭐 당연히 다이용가능하것고..</h2>").S('<', 'body')
+        // 테스트 버튼
+        bs.Dom('<div>click 기본테마적용</div>').S('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10, 'cursor', 'pointer',
+                'click', function(){
+                    document.getElementById('theme').setAttribute('href', 'http://bootstrapk.com/BS3/dist/css/bootstrap-theme.min.css')
+                })
+        bs.Dom('<div>click 커스텀테마적용1</div>').S('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10, 'cursor', 'pointer',
+                'click', function(){
+                    document.getElementById('theme').setAttribute('href', 'http://bootswatch.com/amelia/bootstrap.css')
+                });
+        bs.Dom('<div>click 커스텀테마적용2</div>').S('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10, 'cursor', 'pointer',
+                'click', function(){
+                    document.getElementById('theme').setAttribute('href', 'http://bootswatch.com/slate/bootstrap.css')
+                });
+        bs.Dom('<div>click 커스텀테마적용3</div>').S('<', 'body', 'border', '1px solid #eee', 'display', 'inline-block', 'padding', 10, 'margin', 10, 'cursor', 'pointer',
+                'click', function(){
+                    document.getElementById('theme').setAttribute('href', 'http://infynitix.cyberscriptsolutions.com/esthetics_admin/css/style.css')
+                });
+        ////////////////////////////////////////////////////////////
+        // bs.ui 프로토타입 목업
+        bs.ui=(function(){
+            // ui가 정의될때 코어 css와 부트 스트랩 기본 테마가 로딩되어있어야함...
+            function cssLoad(){
+                var headID=document.getElementsByTagName("head")[0];
+                var css=document.createElement('link');
+                css.type='text/css';
+                css.rel='stylesheet';
+                css.href=arguments[0]
+                if(arguments[1]) css.id='theme'
+                headID.appendChild(css);
+            }
+
+            cssLoad('http://bootstrapk.com/BS3/dist/css/bootstrap.css') // 기본 코어 css를 부름
+            cssLoad('http://bootstrapk.com/BS3/dist/css/bootstrap-theme.min.css', 'theme');// 기본테마를 부름
+            // 필요한 기본 요소들을 싸그리등록
+            // 추가 확장 형 ui들은 별도의 키네임 혹은 플러그인을 이용해서 제공
+            return function(){
+                // TODO 타입을 체크하고 기본이 되는 스타일리스트를 제공해야할듯
+                var addStyle=arguments[1] ? arguments[1] : ''
+                if(arguments.length>2) for(var i=2; i=arguments.length; i++) addStyle+=" "+arguments[i]
+                switch(arguments[0]){
+                    ///////////////////// 기본 폼
+                    case "form" :
+                        return bs.Dom('<form></form>').S('@class', addStyle, 'this')
+                    case "formGroup" :
+                        return bs.Dom('<div></div>').S('@class', 'form-group', 'this')
+                    case "label" :
+                        return bs.Dom('<label></label>').S('@value', 'email', '@class', addStyle, 'this')
+                    case "submit" :
+                        return bs.Dom('<input type="submit"/>').S('@class', 'btn '+addStyle, 'this')
+                    case "reset" :
+                        return bs.Dom('<input type="reset"/>').S('@class', 'btn '+addStyle, 'this')
+                    case "button" :
+                        return bs.Dom('<input type="button"/>').S('@class', 'btn '+addStyle, 'this')
+                    case "text" :
+                        return bs.Dom('<input type="text"/>').S('@class', 'form-control', '@value', 'textField', 'this')
+                    case "email" :
+                        return bs.Dom('<input type="email"/>').S('@class', 'form-control', '@value', 'email', 'this')
+                    case "password" :
+                        return bs.Dom('<input type="password"/>').S('@class', 'form-control', '@value', 'email', 'this')
+
+                    ///////////////////// help
+                    case "close" :
+                        return bs.Dom('<button type="button" class="close" aria-hidden="true">&times;</button>').S('this')
+                    case "carets" :
+                        return bs.Dom('<span class="caret"></span>').S('this')
+                    case "alert" :
+                        return bs.Dom('<div></div>').S('@class', 'alert '+addStyle, 'this')
+                    ///////////////////// 축약
+                    case "abbr" :
+                        return bs.Dom('<abbr></abbr>')
+                    ///////////////////// img
+                    case 'img' :
+                        return bs.Dom('<img>').S('@class', 'img '+addStyle, 'this')
+                }
+            }
+        })();
+        // 폼 코드 테스트
+        bs.Dom("<h2>form 테스트</h2>").S('<', 'body')
+        bs.ui('form').S('<', 'body', '@id', 'formBox', 'margin', 5)
+        bs.ui('formGroup').S('<', '#formBox', '>', bs.ui("label").S('html', 'textField', 'this'), '>', bs.ui("text").S('html', 'test', 'this'))
+        bs.ui('formGroup').S('<', '#formBox', '>', bs.ui("label").S('html', 'email', 'this'), '>', bs.ui("email").S('html', 'test', 'this'))
+        bs.ui('formGroup').S('<', '#formBox', '>', bs.ui("label").S('html', 'password', 'this'), '>', bs.ui("password").S('html', 'test', 'this'))
+        bs.ui("submit", 'btn-default').S('<', '#formBox', 'margin', 5)
+        bs.ui("reset", 'btn-default').S('<', '#formBox', 'margin', 5)
+        bs.Dom("<h2>button 버튼 기본 들</h2>").S('<', '#formBox')
+        bs.ui("button", 'btn-default').S('<', '#formBox', 'margin', 5, '@value', 'default')
+        bs.ui("button", 'btn-primary').S('<', '#formBox', 'margin', 5, '@value', 'primary')
+        bs.ui("button", 'btn-success').S('<', '#formBox', 'margin', 5, '@value', 'success')
+        bs.ui("button", 'btn-info').S('<', '#formBox', 'margin', 5, '@value', 'info')
+        bs.ui("button", 'btn-warning').S('<', '#formBox', 'margin', 5, '@value', 'warning')
+        bs.ui("button", 'btn-danger').S('<', '#formBox', 'margin', 5, '@value', 'danger')
+        bs.ui("button", 'btn-link').S('<', '#formBox', 'margin', 5, '@value', 'link')
+        bs.Dom("<h2>button 텍스트 사이즈 적용</h2>").S('<', '#formBox')
+        bs.ui("button", 'btn-primary btn-lg').S('<', '#formBox', 'margin', 5, '@value', 'primary')
+        bs.ui("button", 'btn-success btn-lg').S('<', '#formBox', 'margin', 5, '@value', 'success')
+        bs.ui("button", 'btn-info btn-sm').S('<', '#formBox', 'margin', 5, '@value', 'info')
+        bs.ui("button", 'btn-warning btn-sm').S('<', '#formBox', 'margin', 5, '@value', 'warning')
+        bs.ui("button", 'btn-danger btn-xs').S('<', '#formBox', 'margin', 5, '@value', 'danger')
+        bs.ui("button", 'btn-link btn-xs').S('<', '#formBox', 'margin', 5, '@value', 'link')
+        bs.Dom("<h2>button disabled적용</h2>").S('<', '#formBox')
+        bs.ui("button", 'btn-primary disabled').S('<', '#formBox', 'margin', 5, '@value', 'primary')
+        bs.ui("button", 'btn-success disabled').S('<', '#formBox', 'margin', 5, '@value', 'success')
+        bs.ui("button", 'btn-info disabled').S('<', '#formBox', 'margin', 5, '@value', 'info')
+        bs.ui("button", 'btn-warning disabled').S('<', '#formBox', 'margin', 5, '@value', 'warning')
+        bs.ui("button", 'btn-danger disabled').S('<', '#formBox', 'margin', 5, '@value', 'danger')
+        bs.ui("button", 'btn-link disabled').S('<', '#formBox', 'margin', 5, '@value', 'link')
+        bs.Dom("<h2>button active적용</h2>").S('<', '#formBox')
+        bs.ui("button", 'btn-primary active').S('<', '#formBox', 'margin', 5, '@value', 'primary')
+        bs.ui("button", 'btn-success active').S('<', '#formBox', 'margin', 5, '@value', 'success')
+        bs.ui("button", 'btn-info active').S('<', '#formBox', 'margin', 5, '@value', 'info')
+        bs.ui("button", 'btn-warning active').S('<', '#formBox', 'margin', 5, '@value', 'warning')
+        bs.ui("button", 'btn-danger active').S('<', '#formBox', 'margin', 5, '@value', 'danger')
+        bs.ui("button", 'btn-link active').S('<', '#formBox', 'margin', 5, '@value', 'link')
+        ////////////////////////////////////////////////////////////
+        bs.Dom("<h2>텍스트 정렬 클래스</h2>").S('<', 'body')
+        bs.Dom("<div>left</div>").S('<', 'body', '@class', 'text-left', 'margin', 5, 'padding', 5, 'background', '#eee')
+        bs.Dom("<div>center</div>").S('<', 'body', '@class', 'text-center', 'margin', 5, 'padding', 5, 'background', '#eee')
+        bs.Dom("<div>right</div>").S('<', 'body', '@class', 'text-right', 'margin', 5, 'padding', 5, 'background', '#eee')
+        ////////////////////////////////////////////////////////////
+        // 텍스트 강조 클래스
+        bs.Dom("<h2>텍스트 강조 클래스</h2>").S('<', 'body')
+        bs.Dom("<div>text-muted</div>").S('<', 'body', '@class', 'text-muted', 'margin', 5, 'padding', 5)
+        bs.Dom("<div>text-warning</div>").S('<', 'body', '@class', 'text-warning', 'margin', 5, 'padding', 5)
+        bs.Dom("<div>text-error</div>").S('<', 'body', '@class', 'text-error', 'margin', 5, 'padding', 5)
+        bs.Dom("<div>text-info</div>").S('<', 'body', '@class', 'text-info', 'margin', 5, 'padding', 5)
+        bs.Dom("<div>text-success</div>").S('<', 'body', '@class', 'text-success', 'margin', 5, 'padding', 5)
+        ////////////////////////////////////////////////////////////
+        // form inline 테스트
+        bs.Dom("<h2>form inline 테스트</h2>").S('<', 'body')
+        bs.ui('form', 'form-inline').S('<', 'body', '@id', 'formBox2', 'margin', 5)
+        bs.ui('formGroup').S('<', '#formBox2', '>', bs.ui("label").S('html', 'textField', 'this'), '>', bs.ui("text").S('html', 'test', 'this'))
+        bs.ui('formGroup').S('<', '#formBox2', '>', bs.ui("label").S('html', 'email', 'this'), '>', bs.ui("email").S('html', 'test', 'this'))
+        bs.ui('formGroup').S('<', '#formBox2', '>', bs.ui("label").S('html', 'password', 'this'), '>', bs.ui("password").S('html', 'test', 'this'))
+        bs.ui("submit", 'btn-default').S('<', '#formBox2', 'margin', 5)
+        bs.ui("reset", 'btn-default').S('<', '#formBox2', 'margin', 5)
+        // label sr- 테스트
+        bs.Dom("<h2>label sr- 테스트</h2>").S('<', 'body')
+        bs.ui('form').S('<', 'body', '@id', 'formBox3', 'margin', 5)
+        bs.ui('formGroup').S('<', '#formBox3', '>', bs.ui("label", 'sr-only').S('html', 'textField', 'this'), '>', bs.ui("text").S('html', 'test', 'this'))
+        bs.ui('formGroup').S('<', '#formBox3', '>', bs.ui("label", 'sr-only').S('html', 'email', 'this'), '>', bs.ui("email").S('html', 'test', 'this'))
+        bs.ui('formGroup').S('<', '#formBox3', '>', bs.ui("label", 'sr-only').S('html', 'password', 'this'), '>', bs.ui("password").S('html', 'test', 'this'))
+        bs.ui("submit", 'btn-default').S('<', '#formBox3', 'margin', 5)
+        bs.ui("reset", 'btn-default').S('<', '#formBox3', 'margin', 5)
+        ////////////////////////////////////////////////////////////
+        // 축약어
+        bs.Dom("<h2>축약어</h2>").S('<', 'body')
+        bs.ui("abbr").S('<', 'body', 'margin', 5, '@title', '축약어확장!', 'html', '축약어')
+        ////////////////////////////////////////////////////////////
+        // help
+        bs.Dom("<h2>helps</h2>").S('<', 'body')
+        bs.ui("close").S('<', 'body')
+        bs.ui("carets").S('<', 'body')
+        ////////////////////////////////////////////////////////////
+        // 알러트
+        bs.Dom("<h2>alert</h2>").S('<', 'body')
+        bs.ui("alert", 'alert-success').S('html', 'alert', '<', 'body')
+        bs.ui("alert", 'alert-info').S('html', 'alert', '<', 'body')
+        bs.ui("alert", 'alert-warning').S('html', 'alert', '<', 'body')
+        bs.ui("alert", 'alert-danger').S('html', 'alert', '<', 'body')
+        ////////////////////////////////////////////////////////////
+        // img
+        bs.Dom("<h2>img</h2>").S('<', 'body')
+        bs.ui("img", 'img-round').S('<', 'body', '@src', 'http://projectbs.github.io/bsJS/test/redcamel_test_demo2_asset/1.png')
+        bs.ui("img", 'img-circle').S('<', 'body', '@src', 'http://projectbs.github.io/bsJS/test/redcamel_test_demo2_asset/1.png')
+        bs.ui("img", 'img-thumbnail').S('<', 'body', '@src', 'http://projectbs.github.io/bsJS/test/redcamel_test_demo2_asset/1.png')
+    })
+</script>
+</body>
+</html>

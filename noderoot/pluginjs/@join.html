@@ -1,0 +1,33 @@
+<%
+if( !bs.session('id') ){
+	var post = bs.application('post')( false, 'email', 's', 'pw', 's', 'nick', 's', 'thumb', 's' );
+	if( post ) bs.application('db')( 'join', post, function( data, rs, e ){
+		if( rs ){
+			bs.application('db')( 'login', ['email', post.email, 'pw', post.pw], function( data, rs, e ){
+				if( rs && rs.length ){
+					rs = rs[0];
+					bs.ck( 'savedid', rs.email, '/', 100 ),
+					data.contents = {
+						email:rs.email,
+						nick:rs.nick,
+						thumb:rs.thumb
+					},
+					bs.session( 'id', rs.member_rowid, 'email', rs.email, 'nick', rs.nick, 'thumb', rs.thumb );
+				}else data.result = 'fail', data.contents = e.toString();
+				bs.response(JSON.stringify(data)), bs.WEB.pass();
+			} );
+			return 1;
+		}else data.result = 'fail', data.contents = e.toString();
+	} );
+	else bs.response(JSON.stringify({result:'fail', contents:'no post'}));
+}else{
+	bs.response(JSON.stringify({
+		result:'ok',
+		contents:{
+			email:bs.session('email'),
+			nick:bs.session('nick'),
+			thumb:bs.session('thumb')
+		}
+	}));
+}
+%>

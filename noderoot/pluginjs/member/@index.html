@@ -1,0 +1,58 @@
+<%var R = bs.application('root'), t0, i, j;%>
+
+<%if( bs.SITE.method() == 'POST' ) return bs.application('db')( 'Plist', ['p', 0, 'rpp', 10, 'id', bs.session('id')] );%>
+
+<%IMPORT( '@head.html' );%>
+
+<div id="miAdd" class="GR0">
+    <div id="miAdd0" class="BS2 BR10">
+		<div><img src="<%=R%>/res/member/plugin_reg.png"><div id="Acancel" class="batch FR">&#xf165;</div></div>
+		<div id="miAdd1" class="FL">
+			<div class="title"><%=bs.i18n( 'miAdd','category' )%></div>
+			<select id="Acat" class="value">
+<%for( t0 = bs.application( 'cat' ), i = 0, j = t0.length; i < j ; i++ ){%>
+				<option value="<%=t0[i].cat_rowid%>"><%=t0[i].title%></option>
+<%}%>
+			</select>
+			<div class="title"><%=bs.i18n('miAdd','type')%></div>
+			<select id="Atype" class="value">
+<%for( t0 = bs.application( 'type' ), i = 0, j = t0.length; i < j ; i++ ){%>
+				<option value="<%=t0[i].plugintype_rowid%>"><%=t0[i].title%></option>
+<%}%>
+			</select>
+			<div class="title"><%=bs.i18n('miAdd','title')%></div><input type="text" id="Atitle" class="value"/>
+			<div class="title"><%=bs.i18n('miAdd','unique')%></div><input type="text" id="Auname" class="value"/>
+			<div class="title"><%=bs.i18n('miAdd','keyword')%></div><input type="text" id="Akeyword" class="value"/>
+		</div>
+		<div id="miAdd2" class="FR">
+			<div class="title"><%=bs.i18n('miAdd','description')%></div>
+			<div><textarea id="Adescription"></textarea></div>
+			<div id="miAdd3" class="FL">
+				<div class="title"><%=bs.i18n('miAdd','thumb')%></div>
+				<input type="text" id="Athumb" class="value" placeholder="<%=bs.i18n('miAdd','rthumb')%> : 200*200"/>
+				<div id="Aalert">&nbsp;</div>
+				<div id="Aadd" class="batch">&#xf164;</div>
+			</div>
+			<img id="Aimg" src="<%=R%>/res/draft/index_Bthumb_1.png" class="THB0 FR"/>
+		</div>
+    </div>
+</div>
+
+<div class="contents">
+	<table id="miTop" cellspacing="0" border="0" cellpadding="0">
+	<tr><td rowspan="2" id="miTop0"><img src="<%=bs.session('thumb')||R+'/res/thumb/default.png'%>" class="THB0"></td>
+		<td id="miTop1"><span id="miTop2"><%=bs.session('nick')%></span><%=bs.i18n('mi','title')%></td>
+		<td rowspan="2" id="miTop3"><img src="<%=R%>/res/member/title.png"></td>
+	</tr>
+	<tr><td><div id="Padd" class="ADD"><span class="batch">&#xF14C;</span><%=bs.i18n('mi','add')%></div></td></tr>
+	</table>
+	<table id="miListTop" cellspacing="0" border="0" cellpadding="0">
+	<tr><td id="miListTop0" class="THL GR2"><%=bs.i18n('mi','title0')%></td>
+	<td class="miListTop1 TH GR2"><%=bs.i18n('miAdd','type')%></td><td class="miListTop1 TH GR2"><%=bs.i18n('miAdd','category')%></td>
+	<td class="THR GR2"><%=bs.i18n('miAdd','date')%></td></tr>
+	</table>
+	<div id="miList"><div id="miList0"><%=bs.i18n("mi","noplugin")%></div></div>
+</div>
+<script>bs( site.mi );</script>
+
+<%IMPORT( '@foot.html' );%>

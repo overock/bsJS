@@ -1,7 +1,0 @@
-exports.bs = function( bs ){
-	bs.$response(
-		'<div>absolute Foot</div>',
-		'</body>',
-		'</html>'
-	);
-};

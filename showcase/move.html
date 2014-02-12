@@ -16,7 +16,7 @@
 <div id="stage"></div>
 <script src="../bs/bsjs.js"></script> 
 <script>
-bs.$import( 'fps', 'last' );
+bs.plugin( 'fps', 'last' );
 bs( function(){
 
 	var game = {
@@ -26,21 +26,21 @@ bs( function(){
 			var i;
 			
 			this.div.length = i = bs.DETECT.device =='tablet' || bs.DETECT.device=='mobile' ? 30 : 80;
-			while( i-- ) this.div[i] = bs.dom('<div></div>' ).$( 'position','absolute', 'visibility', 'hidden', '<', '#stage', 'this' );
+			while( i-- ) this.div[i] = bs.Dom('<div></div>' ).S( 'position','absolute', 'visibility', 'hidden', '<', '#stage', 'this' );
 			
-			this.w = bs.dom('body').$('_width') - 10;
+			this.w = bs.Dom('body').S('_width') - 10;
 			this.h = 300;
-			bs.css( 'body' ).$( 'margin', 0, 'padding', 0 );
-			bs.dom( '#stage' ).$( 'top', 30, 'position', 'absolute', 'width', '100%', 'height', this.h, 'background', '#eee', 'overflow', 'hidden', 'down', function( $e ){
+			bs.Css( 'body' ).S( 'margin', 0, 'padding', 0 );
+			bs.Dom( '#stage' ).S( 'top', 30, 'position', 'absolute', 'width', '100%', 'height', this.h, 'background', '#eee', 'overflow', 'hidden', 'down', function( $e ){
 				game.vx = ( $e.lx - game.x )*.1, game.vy = ($e.ly - game.y)*.1;
 			} );
-			bs.dom( '<div></div>' ).$( '@id', 'a', 'position', 'absolute', 'background', '#950',
+			bs.Dom( '<div></div>' ).S( '@id', 'a', 'position', 'absolute', 'background', '#950',
 				'left', 0, 'top', 0, 'width', 10, 'height', 10, 'border-radius',5,
 				'<', '#stage'
 			);
 		},
 		end:function( $target ){
-			game.div[game.div.length++] = $target.$('visibility', 'hidden', 'this');
+			game.div[game.div.length++] = $target.S('visibility', 'hidden', 'this');
 		},
 		ANI:function( $time ){
 			//accelation
@@ -57,20 +57,20 @@ bs( function(){
 			if( this.x < 5 ) this.x = 5, this.vx = 0;
 			else if( this.x > this.w ) this.x = this.w, this.vx = 0;
 		
-			bs.dom('#a').$( 'left', this.x, 'top', this.y );
+			bs.Dom('#a').S( 'left', this.x, 'top', this.y );
 
 			//particle
 			if( $time > this.tcheck ){
 				this.tcheck = $time + this.term;
-				var s = bs.$ex( 20, '~', 50 );
-				var d = this.div.length ? this.div[--this.div.length] : bs.dom('<div></div>' ).$( 'position','absolute', '<', '#stage', 'this' );
-				d.$( 'visibility', 'visible', 'background', 'rgb('+bs.$ex(100,'~',200)+','+bs.$ex(100,'~',200)+','+bs.$ex(100, '~',200)+')', 
+				var s = bs.ex( 20, 50 );
+				var d = this.div.length ? this.div[--this.div.length] : bs.Dom('<div></div>' ).S( 'position','absolute', '<', '#stage', 'this' );
+				d.S( 'visibility', 'visible', 'background', 'rgb('+bs.ex(100,200)+','+bs.ex(100,200)+','+bs.ex(100,200)+')', 
 					'width',10, 'height',10, 'border-radius', 10, 'left',this.x,'top',this.y, 'opacity', 1 
 				);
 				bs.ANI.tween( d,
-					'left', bs.$ex( -100, '~', 100 ) + this.x, 'top', bs.$ex( -100, '~', 100 ) + this.y,
+					'left', bs.ex( -100, 100 ) + this.x, 'top', bs.ex( -100, 100 ) + this.y,
 					'border-radius', s, 'width', s, 'height',s, 'opacity', 0, 
-					'time', bs.$ex( 1, '~f', 3 ), 'end', this.end
+					'time', bs.ex( 1, '~f', 3 ), 'end', this.end
 				);
 			}
 	
@@ -82,7 +82,7 @@ bs( function(){
 		}
 	};
     game.init();
-	bs.$fps( bs.dom('<div></div>' ).$( '@id', 'fps', 'position','absolute', 'font-size', 11, 'color', '#900', '<', 'body', 'this' )[0] );
+	bs.fps( bs.Dom('<div></div>' ).S( '@id', 'fps', 'position','absolute', 'font-size', 11, 'color', '#900', '<', 'body', 'this' )[0] );
     bs.ANI.ani( game );
 } );
 

@@ -1,0 +1,82 @@
+<%var R = bs.application('root');%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta http-equiv="imagetoolbar" content="no">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="Content-Style-Type" content="text/css"/>
+	<meta http-equiv="Content-Script-Type" content="text/javascript"/>
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<meta name="keyword" content="bsjs,javascript,plugin"/>
+	<meta name="description" content="plugin management system for bsjs - https://github.com/projectBS/bsJS"/>
+	<meta property="og:title" content="bs-plugin"/>
+	<meta property="og:url" content="http://js.bsplugin.com/"/>
+	<meta property="og:image" content="i/logo.png"/>
+	<meta property="og:description" content="bs-plugin site"/>
+	<meta property="og:type" content="website"/>
+	<link rel="shortcut icon" href="http://blog.bsidesoft.com/favicon.ico" type="image/x-icon">
+	<link href="/res/main.css" rel="stylesheet" media="screen">
+	<!--<script type="text/javascript" src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>-->
+	<script type="text/javascript" src="http://www.bsidesoft.com/bs/bs5/bs/bsjs.js"></script>
+	<script type="text/javascript" src="<%=R%>/res/main.js"></script>
+	<script>
+	bs.plugin('md5', 'last', 'test', 'last', 'rgbback', 'last');
+	site.R = '<%=R%>';
+	</script>
+<body>
+<div id="top">
+	<div class="contents">
+		<div id="topLogo" class="FL"><a href="/"><img src="<%=R%>/res/draft/logo.jpg"></a></div>
+		<div id="topMenu" class="FL TS2">
+			<a href="/recent"><%=bs.i18n('top','recent')%></a> &nbsp; 
+			<a href="/hot"><%=bs.i18n('top','hot')%></a> &nbsp;
+			<a href="/updated"><%=bs.i18n('top','updated')%></a> &nbsp; 
+			<a href="/category"><%=bs.i18n('top','category')%></a>
+		</div>
+		<div id="topSearch" class="FL">
+			<input type="text" id="topSearchTxt" class="BS85 O5 BR7" placeholder="<%=bs.i18n('top','search')%>"/> &nbsp;
+			<span id="topSearchBtn" class="O5 batch">&#xF097;</span>
+		</div>
+		<div id="topMember" class="FR">
+<%if( !bs.session('id') ){%>
+			<div class="FL">
+				<span class="batch">&#xf152;</span> <input type="text" id="Lemail" class="BR7 O5 BS85" value="<%=bs.ck('savedid') || ''%>"/>
+				<span class="batch">&#xF0C0;</span> <input type="password" id="Lpw" class="BR7 O5 BS85"/>
+			</div>
+			<div class="FR">
+				<input type="image" id="Llogin" src="<%=R%>/res/top/login/bt_login.png"/>
+				<input type="image" id="Ljoin" src="<%=R%>/res/top/login/bt_join.png"/>
+			</div>
+			<div id="Lalert"></div>
+			<script>bs(site.header);</script>
+<%}else{%>
+			<script>bs( function(){bs.Dom('#topMember').S( 'html', site.logined( '<%=bs.session('nick')%>' ) )} );</script>
+<%}%>
+		</div>
+	</div>
+</div>
+<div id="topJoin" class="GR0">
+    <div id="topJoin0" class="BR10 BS2">
+		<div><img src="<%=R%>/res/member/plugin_reg.png"><div class="batch FR" id="Jcancel">&#xf165;</div></div>
+		<div id="topJoin1" class="FL">
+			<div class="title TS1"><%=bs.i18n('join','email')%></div>
+			<div><input type="text" id="Jemail" placeholder="email" class="value BS5 BR5"/></div>
+			<div class="title TS1"><%=bs.i18n('join','pw')%></div>
+			<div><input type="password" id="Jpw"  class="value BS5 BR5"/></div>
+			<div class="title TS1"><%=bs.i18n('join','pw2')%></div>
+			<div><input type="password" id="Jpwc"  class="value BS5 BR5"/></div>
+			<div class="title TS1"><%=bs.i18n('join','nick')%></div>
+			<div><input type="text" id="Jnick" placeholder="nick"  class="value BS5 BR5"/></div>
+		</div>
+		<div id="topJoin2" class="FL">
+			<div class="title TS1"><%=bs.i18n('join','thumb')%></div>
+			<div><input type="text" id="Jthumb" class="value BS5 BR5" placeholder="<%=bs.i18n('join','rthumb')%> : 200*200"/></div>
+			<div><img id="Jimg" onerror="this.src=\'<%=R%>/res/thumb/default.png\'" src="<%=R%>/res/thumb/default.png" class="THB0"></div>
+			<div id="Jalert">&nbsp;</div>
+			<span id="Jjoin" class="batch">&#xf164;</span>
+		</div>
+    </div>
+</div>

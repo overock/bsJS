@@ -14,23 +14,23 @@
 <script src="../bs/bsjs.js"></script> 
 <script>
 bs( function(){
-	function digit( $dom, $x, $y, $w, $h, $s, $c, $a ){
-		this.dom = $dom,
-		this.x = $x,
-		this.y = $y,
-		this.w = $w + $x,
-		this.h = $h + $y,
-		this.s = $s,
+	function digit( dom, x, y, w, h, s, c, a ){
+		this.dom = dom,
+		this.x = x,
+		this.y = y,
+		this.w = w + x,
+		this.h = h + y,
+		this.s = s,
 		this.px = this.py = 0;
 		this.stat = -1;
 		this.step = 0;
 		this.pcount = 0;
-		this.c = $c;
-		this.a = $a;
+		this.c = c;
+		this.a = a;
 	}
 	digit.div = {length:0};
-	digit.end = function( $target ){
-		digit.div[digit.div.length++] = $target.S('visibility', 'hidden', 'this');
+	digit.end = function( target ){
+		digit.div[digit.div.length++] = target.S('visibility', 'hidden', 'this');
 	};
 	
 	digit.prototype[1] = function(){
@@ -161,9 +161,9 @@ bs( function(){
 		case 4:if( this.py > this.y ) this.py -= this.s; else this.step = 1;
 		}
 	};
-	digit.prototype.ani = function( $num ){
-		if( this.stat === $num ){
-			this[$num](),
+	digit.prototype.ani = function( num ){
+		if( this.stat === num ){
+			this[num](),
 			this.dom.S( 'left', this.px, 'top', this.py );
 			if( this.pcount++ % 2 ){
 				var s = bs.rand( 30, 50 );
@@ -177,7 +177,7 @@ bs( function(){
 					'time', bs.randf( 1.5, 2.5 ), 'end', digit.end
 				);
 			}
-		}else this.stat = $num, this.step = 0, this.px = this.x, this.py = this.y;
+		}else this.stat = num, this.step = 0, this.px = this.x, this.py = this.y;
 	};
 	bs.Css('body').S('background','#fff', 'margin', 0, 'padding', 0 );
 	bs.Css('.time').S('position','absolute','width',10,'height',10,'background','#fff','border-radius',5);
