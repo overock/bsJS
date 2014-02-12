@@ -126,7 +126,7 @@ function view2 () {
  */
 function view3 () {
 	bs.Dom( "#div_contents" ).S( '>', null );
-
+/*
 	
 	var autoKeyTest = {
 		ANI: function ($time) {
@@ -154,6 +154,19 @@ function view3 () {
 	};
 
 	bs.ANI.ani(autoKeyTest);
+	*/
+	
+	bs.Dom('<div><input type="text" id="txt_value" /></div>').S('<', '#div_contents', 'position', 'absolute', 'left', '40px', 'top', '230px', 'width', '200px', 'height', '100px');
+	
+	bs.Dom('#txt_value').S('keydown', function(e){
+		
+		if( e.key('a')) showImage('a');
+		if( e.key('s')) showImage('s');
+		if( e.key('d')) showImage('d');
+		if( e.key('f')) showImage('f');
+		if( e.key('g')) showImage('g');
+		
+	});
 	
 	function showImage(key) {
 		
