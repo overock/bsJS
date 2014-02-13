@@ -30,14 +30,14 @@ else throw new Error( 0, 'not supported platform' );
 	fn( 'obj', function( name, o ){bs[name.replace( trim, '' ).toUpperCase()] = o;} ),
 	fn( 'cls', function( name, f ){
 		var cls, pr, t0, t1, k;
-		pr = ( cls = function( sel, arg ){this.__k = arg[0] = sel, this.NEW.apply( this, arg );} ).prototype,
+		pr = ( cls = function( sel, arg ){this.__k = sel, this.NEW.apply( this, arg );} ).prototype,
 		pr.NEW = none, pr.END = function(){delete cls[this.__k];},
 		t0 = name.replace( trim, '' ).toLowerCase(),
 		t0 = t0.charAt(0).toUpperCase() + t0.substr(1),
 		t1 = bs[t0] = pr.instanceOf = function(sel){
 			var t0;
 			if( typeof sel == 'string' ){
-				if( ( t0 = sel.charAt(0) ) == '@' ) return sel = sel.substr(1), cls[sel] = new cls( sel, arguments );
+				if( ( t0 = sel.charAt(0) ) == '@' ) return sel = arguments[0] = sel.substr(1), cls[sel] = new cls( sel, arguments );
 				else if( t0 != '<' ) return cls[sel] || ( cls[sel] = new cls( sel, arguments ) );
 			}
 			return new cls( sel, arguments );
@@ -268,11 +268,13 @@ fn( 'js', (function(doc){
 fn( 'img', (function(){
 	var c = window['HTMLCanvasElement'];
 	return function(end){
-		var arg, t0, f, i, j;
-		t0 = [], arg = arguments, i = 1, j = arg.length,
+		var progress, arg, t0, f, i, j;
+		t0 = [], arg = arguments, i = 1, j = arg.length;
+		if( end.progress ) progress = end.progress;
 		f = function(){
 			var img, id;
 			if( i == j ) return end(t0);
+			if( progress ) progress(t0, i - 2, j - 1);
 			t0[t0.length] = img = new Image;
 			if( c ) img.onload = f;
 			else id = setInterval( function(){
@@ -457,7 +459,7 @@ function DOM(){
 					if( this[k] === undefined ){ //add
 						if( ( t0 = typeof v ) == 'number' ) this[k] = v, u[k] = nopx[k] ? '' : 'px';
 						else if( t0 == 'string' ){
-							if( v0 = style[v.substr(0,4)] ) this[k] = v = v0(v), u[k]='';
+							if( v0 = style[v.substr(0,4)] && typeof v0 == 'function' ) this[k] = v = v0(v), u[k]='';
 							else if( ( v0 = v.indexOf( ':' ) ) == -1 ) this[k] = v, u[k] = '';
 							else this[k] = parseFloat( v.substr( 0, v0 ) ), u[k] = v.substr( v0 + 1 ), v = this[k];
 						}
