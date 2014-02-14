@@ -29,11 +29,13 @@ bs( function(){
 	
 	bs.Dom( '<div id="div_menu"></div>' ).S( '<', '#body_wrap', 'position', 'absolute', 'top', '100px', 'float', 'left', 'background-color', '#fff', 'border-radius', 10, 'opacity', .7, 'padding', 10, 'z-index', '100' );
 
-	bs.Dom( '#div_menu' ).S( '>', '<div><a href="#" onclick="view1();">마우스클릭</a></div>',
-		'>', '<div><a href="#" onclick="view2();">CSS Animation</a></div>',
-		'>', '<div><a href="#" onclick="view3();">Key 이벤트(asdfg)</a></div>',
-		'>', '<div><a href="#" onclick="view4();">Photo Wall</a></div>',
-		'>', '<div><a href="#" onclick="view5();">Carousel</a></div>' );
+	bs.Dom( '#div_menu' ).S( '>', '<div><a href="#" onclick="view1();">마우스클릭</a></div>'
+		, '>', '<div><a href="#" onclick="view2();">CSS Animation</a></div>'
+		, '>', '<div><a href="#" onclick="view3();">Key 이벤트(asdfg)</a></div>'
+		, '>', '<div><a href="#" onclick="view4();">Photo Wall</a></div>'
+		, '>', '<div><a href="#" onclick="view5();">Carousel</a></div>'
+		//, '>', '<div><a href="#" onclick="view6();">CSS Sample</a></div>'
+	);
 
 	bs.Dom( '#div_menu' ).S( 'left', -200 );
 	setTimeout(function(){ bs.ANI.tween( bs.Dom( '#div_menu' ), 'left', 10, 'time', 0.3 ); }, 1500 );
@@ -104,7 +106,8 @@ function view3 (){
 		if( e.key( 's' )) showImage( 2 );
 		if( e.key( 'd' )) showImage( 3 );
 		if( e.key( 'f' )) showImage( 4 );
-		if( e.key( 'g' )) showImage( 5 );
+		if( e.key( 'g' )) showImage( 6 );
+		if( e.key( 'enter' )) showImage( 5 );
 		
 	});
 	
@@ -178,7 +181,7 @@ function view5 (){
 	init();
 	curr = 5;
 	var imagesLoaded, div_content;
-	bs.Dom( "#div_contents" ).S( '>', null );
+	//bs.Dom( "#div_contents" ).S( '>', null );
 	div_content = bs.Dom('<div></div>').S('<', '#div_contents', 'position', 'absolute', 'left', (cw * 0.5) - 400, 'top', (ch / 2) - 490 ,  'width', '945px', 'height', '1090px', 'overflow', 'hidden', 'padding', '0', 'this');
 	bs.Dom('<div id="progress"></div>').S('<', div_content, 'position', 'absolute', 'width', 945, 'height', 1090 );
 	imagesLoaded = function(images){
@@ -223,6 +226,19 @@ function view5 (){
 		imageName + '23.jpg',
 		imageName + '24.jpg',
 		imageName + '25.jpg');
+}
+
+function view6() {
+	init();
+	curr = 5;
+
+	bs.Css('.textabc').S('color', 'blact', 'font-size', 50);
+	
+	bs.Dom('<div class="textabc">Hello<div>').S('<', '#div_contents', 'width', 300, 'height', 300, 'position', 'absolute', 'left', 200, 'top', 200);
+	bs.Dom( '<button></button>' ).S( '<', '#div_contents', 'html', 'change', 'position', 'absolute', 'top', 250, 'left', 350, 'down', function (e){
+		bs.Css('.textabc').S('color', 'red', 'font-size', 100);
+	});
+
 }
 
 </script>
