@@ -47,7 +47,7 @@
 	</div>
 	<div>sec-div3
 		<ul class='testid'>
-			<li>sec-div3-ul-li
+			<li><a href='#testid'>sec-div3-ul-li</a>
 				<div id='testid' data-id='abc'>sec-div3-ul-li-div
 					<ul>
 						<li class='testid testid2' data-id='abc def' href='#'><a href='http://www.naver.com'>sec-div3-ul-li-div-ul-li1</a></li>
@@ -59,39 +59,34 @@
 		</ul>
 	</div>
 	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <div id="page-wrap">
-        <img src="image-110.png" alt="image" />
-        <span>Text</span>
-        <br /><br />
-        <img src="image-110.png" alt="image" />
-        <span>Text</span>
-        <br /><br />
-        <span>Text</span>
-        <br /><br />
-        <img src="image-110.png" alt="image" />
-        <span>Text</span>
-        <br /><br />
-        <img src="image-110.png" alt="image" />
-        <span>Text</span>
-        <br /><br />
-        <span>Text</span>
-        <br /><br />
-        <span>Text</span>
-    </div>
+	<p class='empty'></p>
 </section>
 <form>
 <input type='text' name='aaa' alt='' readonly disabled>
 <input type='text' name='aaa1' alt='' readonly disabled>
 <input type='checkbox' name='bbb' alt='fff' readonly>
-<input type='checkbox' name='bbb1' alt='fff' checked>
+<input type='checkbox' name='bbb1' alt='fff' checked='false'>
 <input type='checkbox' name='bbb2' alt='fff' checked disabled>
 <input type='radio' name='ccc' alt='fff' disabled readonly>
+<br/>
+<select name='sel1'>
+<option>1<option>
+<option>2<option>
+</select>
+
+<select name='sel2' disabled>
+<option disabled>1<option>
+<option>2<option>
+</select>
+
+<textarea name='area1'>
+</textarea>
+<textarea name='area2' disabled>
+</textarea>
 
 </form>
-<script src="./../../lab/benchmark/jquery-2.0.3.js" type></script>
 <script src="./selector.js" type></script>
 <script>
-//bssel("#page-wrap img+span");
 //bssel('li[disabled], input[type], :checked[type][type]');
 //bssel('.testid>[data-id]');
 //bssel('.testid>[data-id], .testid [data-id]');
@@ -99,8 +94,24 @@
 //bssel('li   [data-id="abc   def"]');
 //bssel('.testid.testid2');
 //bssel('#testid:first-child');
-bssel('section+article+section');
+//bssel('article+section');
 //bssel('li[data-id~=\'def\']');
+//bssel("p  ~  div   ~   p  [data-id='abc  def']  :first-child  [data-id='abc  def']  ");
+//bssel('article ~ form');
+//bssel('li[data-id$=\'f\']');
+//bssel('input:nth-of-type(1)');
+//bssel('input:first-of-type');
+//bssel('input:last-of-type');
+//bssel('input:nth-last-of-type(1)');
+//bssel('input:only-of-type');
+//bssel('li:only-child');
+//bssel('li:first-child');
+//bssel('li:last-child');
+//bssel('li:nth-child(odd)');
+//bssel('li:nth-last-child(even)');
+//bssel('input:empty');
+bssel(':checked');
+//bssel(':enabled');
 </script>
 
 </body>
