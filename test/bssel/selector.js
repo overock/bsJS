@@ -162,8 +162,33 @@ var finder = (function(){
 		return tokens;
 	},
 	compareEl = (function(){
-		var r0, _nthOfType, _lastNthOfType, _hasCls;
+		var r0, _nthOf, _lastNthOf, _nthOfType, _lastNthOfType, _hasCls;
 		r0 = /"|'/g, //"
+		_nthOf = function _nthOf(el, nth){
+			var pEl, typeIdx, i, j;
+			if( el.nodeType != 1 ) return 0;
+			pEl = el.parentNode && el.parentNode.childNodes;
+			if( pEl && ( j = pEl.length ) ){
+				i = 0, typeIdx = 0;
+				while( i < j ){
+					if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
+					i++;
+				}
+			}
+			return 0;
+		},
+		_lastNthOf = function _lastNthOf(el, nth){
+			var pEl, typeIdx, i;
+			if( el.nodeType != 1 ) return 0;
+			pEl = el.parentNode && el.parentNode.childNodes;
+			if( pEl && ( i = pEl.length ) ){
+				typeIdx = 0;
+				while( i-- ){
+					if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
+				}
+			}
+			return 0;
+		},
 		_nthOfType = function _nthOfType(el, nth){
 			var pEl, typeIdx, i, j;
 			if( el.nodeType != 1 ) return 0;
@@ -171,7 +196,7 @@ var finder = (function(){
 			if( pEl && ( j = pEl.length ) ){
 				i = 0, typeIdx = 0;
 				while( i < j ){
-					if( pEl[i].tagName != 'HTML' && el.tagName == pEl[i].tagName && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
+					if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && el.tagName == pEl[i].tagName && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
 					i++;
 				}
 			}
@@ -184,7 +209,7 @@ var finder = (function(){
 			if( pEl && ( i = pEl.length ) ){
 				typeIdx = 0;
 				while( i-- ){
-					if( pEl[i].tagName != 'HTML' && el.tagName == pEl[i].tagName && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
+					if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && el.tagName == pEl[i].tagName && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
 				}
 			}
 			return 0;
@@ -268,7 +293,7 @@ var finder = (function(){
 					if( op && ( j = op.length ) ){
 						i = 0, opIdx = 0;
 						while( i < j ){
-							if( op[i].tagName != 'HTML' && op[i].nodeType == 1 && el.tagName == op[i].tagName && ++opIdx && (val = op[i]) && opIdx > 1 ) return 0;
+							if( op[i].nodeType == 1 && op[i].tagName != 'HTML' && el.tagName == op[i].tagName && ++opIdx && (val = op[i]) && opIdx > 1 ) return 0;
 							i++;
 						}
 						if( opIdx == 1 && el == val ) return 1;
@@ -281,40 +306,23 @@ var finder = (function(){
 					if( op && ( i = op.length ) ){
 						opIdx = 0;
 						while( i-- ){
-							if( op[i].tagName != 'HTML' && op[i].nodeType == 1 && ++opIdx && (val = op[i]) && opIdx > 1 ) return 0;
+							if( op[i].nodeType == 1 && op[i].tagName != 'HTML' && ++opIdx && (val = op[i]) && opIdx > 1 ) return 0;
 						}
 						if( opIdx == 1 && el == val ) return 1;
 					}
 					return 0;
 					break;
 				case'first-child':
-					if( el.nodeType != 1 ) return 0;
-					op = el.parentNode && el.parentNode.childNodes;
-					if( op && ( j = op.length ) ){
-						i = 0, opIdx = 0;
-						while( i < j ){
-							if( op[i].tagName != 'HTML' && op[i].nodeType == 1 && ++opIdx && opIdx == 1 && el == op[i] ) return 1;
-							i++;
-						}
-					}
-					return 0;
+					return _nthOf(el, 1);
 					break;
 				case'last-child':
-					if( el.nodeType != 1 ) return 0;
-					op = el.parentNode && el.parentNode.childNodes;
-					if( op && ( i = op.length ) ){
-						opIdx = 0;
-						while( i-- ){
-							if( op[i].tagName != 'HTML' && op[i].nodeType == 1 && ++opIdx && opIdx == 1 && el == op[i] ) return 1;
-						}
-					}
-					return 0;
+					return _lastNthOf(el, 1);
 					break;
 				case'nth-child':
-					return _nthOfType(el, val);
+					return _nthOf(el, val);
 					break;
 				case'nth-last-child':
-					return _lastNthOfType(el, val);
+					return _lastNthOf(el, val);
 					break;
 				case'empty':
 					if( el.nodeType == 1 && !el.nodeValue && !el.childNodes.length ) return 1;
@@ -349,12 +357,11 @@ var finder = (function(){
 		};
 	})();
 	return function($s){
-		var ret, el, els, pel, sel, sels, oSel, t0, i, j, k, m, n,
+		var nRet, ret, el, els, pel, sel, sels, oSel, t0, i, j, k, m, n,
 			key, hit, pIdx, aIdx, attrs, token, tokens, ntoken;
 		console.log('############', $s);
 		document.getElementById('selector').value = $s;
 		oSel = [],
-		//sels = trim( $s.replace( r0, ' ' ).split(',') );
 		sels = trim( $s.split(',') );
 		for( i = sels.length; i--; ){
 			oSel.push( parseQuery( sels[i] ) );
@@ -404,10 +411,23 @@ var finder = (function(){
 		}
 		//echo(ret[0]);
 		console.log('## bssel:',ret);
-		if(isQS) console.log( '## native:', document.querySelectorAll($s) );
-		for(var i=0; i<ret.length; i++){
-			ret[i].className = ret[i].className ? ret[i].className + ' selected': 'selected';
+		document.getElementById('result').style.backgroundColor = 'white';
+		document.getElementById('result').innerHTML = ret.length;
+		if(isQS){
+			nRet = document.querySelectorAll($s), console.log( '## native:', nRet );
+			if( ret.length != nRet.length ){
+				document.getElementById('result').innerHTML = 'fail';
+			}else{
+				document.getElementById('result').innerHTML = 'success';
+			}
+			for(var i=0; i<ret.length; i++){
+				if( ret[i] != nRet[i] ){
+					document.getElementById('result').style.backgroundColor = 'red';
+					ret[i].className = ret[i].className ? ret[i].className + ' selected': 'selected';
+				}
+			}
 		}
+		console.log('## bssel length:', ret.length);
 	}
 })();
 	return finder;
