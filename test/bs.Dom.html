@@ -54,8 +54,7 @@ bs( function(){
 		"bs.Dom( '#stage' ).S( 'class', null )", null, bs.Dom( '#stage' ).S( 'class', null ),
 		//
 		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'html' )", 'test', bs.Dom( '<div>test</div>' ).S( 'html' ),
-		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'text' )", 'test', bs.Dom( '<div>test</div>' ).S( 'text' ),
-		"bs.Dom( '&lt;tr&gt;&lt;td&gt;test&lt;/td&gt;&lt;/tr&gt;' ).S( 'html' )", '<td>test</td>', bs.Dom( '<tr><td>test</td></tr>' ).S( 'html' ).toLowerCase()
+		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'text' )", 'test', bs.Dom( '<div>test</div>' ).S( 'text' )
 	);
 	bsTest( 'dom attribute',
 		"bs.Dom( '#stage' ).S( '@data-id' )", "stageId", bs.Dom( '#stage' ).S( '@data-id' ),
