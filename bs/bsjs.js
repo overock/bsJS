@@ -706,7 +706,7 @@ function DOM(){
 					switch( typeof t0.getAttribute( k = t0.attributes[j].nodeName ) ){
 					case'object':case'function': t0.removeAttribute(k);
 					}
-				this[i] = null;
+				if( this[i] ) this[i] = null;
 			}
 			if( this.END ) this.END();
 		},
