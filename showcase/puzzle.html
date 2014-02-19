@@ -43,7 +43,7 @@ var game = function(len, size, img) {
 	},
 	motion = function(block) {
 		moving = 1;
-		bs.ANI.tween( block,'left', block.lx*(size+1), 'top', block.ly*(size+1),'time', 0.3,'ease', 'circleOut', 'end', motionend);
+		bs.ANI.tween( block,'left', block.lx*(size+1), 'top', block.ly*(size+1),'time', 0.5,'ease', 'circleOut', 'end', motionend);
 	},
 	shuffle = function() {
 		for (var i = 0 ; i < 52 ; ++i) swap(getMovable());
