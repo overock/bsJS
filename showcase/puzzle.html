@@ -4,6 +4,7 @@
 <title>puzzle</title>
 <meta charset="utf-8"/>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=0.6,maximum-scale=0.6,minimum-scale=0.6,target-densitydpi=medium-dpi" />
 </head>
 <body>
 <script src="../bs/bsjs.js"></script>
@@ -42,10 +43,7 @@ var game = function(len, size, img) {
 	},
 	motion = function(block) {
 		moving = 1;
-		bs.ANI.tween( block,
-			'left', block.lx*(size+1), 'top', block.ly*(size+1),
-			'time', 0.3, 'end', motionend
-		);
+		bs.ANI.tween( block,'left', block.lx*(size+1), 'top', block.ly*(size+1),'time', 0.3,'ease', 'circleOut', 'end', motionend);
 	},
 	shuffle = function() {
 		for (var i = 0 ; i < 52 ; ++i) swap(getMovable());
