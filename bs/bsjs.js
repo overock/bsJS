@@ -616,9 +616,53 @@ function DOM(){
 			};
 		})(doc),
 		html = (function(doc){
-			var div;
-			div = doc.createElement( 'div' );
-			return html = function(sel){return div.innerHTML = sel, div.childNodes;};
+			var t0, i, div, tbody, tags;
+			div = doc.createElement('div'),
+			tbody = doc.createElement('tbody'),
+			tags = {
+				tr:[1, '<table><tbody>', '</tbody></table>'],
+				col:[1, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
+				th:[2, '<table><tbody><tr>', '</tr></tbody></table>'],
+				option:[0, '<select>', '</select>']
+			},
+			tags.td = tags.th,
+			tags.optgroup = tags.option,
+			t0 = 'thead,tfoot,tbody,caption,colgroup'.split(','), i = t0.length;
+			while( i-- ) tags[t0[i]] = [0,'<table>','</table>'];
+			return function( str, target, mode ){
+				var t0, t1, t2, t3, i, j, n0, n1, n2, parent, tbodyStr;
+				tbodyStr = str.toLowerCase().indexOf('tbody') > -1 ? true : false;
+				t0 = str.replace( trim, '' ), n0 = t0.indexOf(' '), n1 = t0.indexOf('>'), n2 = t0.indexOf('/'),
+				t1 = ( n0 != -1 && n0 < n1 ) ? t0.substring( 1, n0 ) : ( n2 != -1 && n2 < n1 ) ? t0.substring( 1, n2 ) : t0.substring( 1, n1 ),
+				t1 = t1.toLowerCase();
+				if( mode == 'html' && target.nodeName.toLowerCase() == 'table' && t1 == 'tr' ) tbodyStr = true, t1 = 'tbody';
+				if( mode == '>' || 'html+' && t1 == 'tr' && target ) target = target.getElementsByTagName('tbody')[0] || ( target.appendChild(tbody), target.getElementsByTagName('tbody')[0] );
+				if( tags[t1] ){
+					if( div.innerHTML ) fn._.call(div.childNodes);
+					div.innerHTML = tags[t1][1] + str + tags[t1][2], t2 = div.childNodes[0];
+					if( tags[t1][0] ) for( i = 0 ; i < tags[t1][0] ; i++ ) t2 = t2.childNodes[0];
+					parent = t2;
+				}else{
+					div.innerHTML = str;
+					parent = div;
+				}
+				i = parent.childNodes.length;
+				if( !target ) return parent.childNodes;
+				else if( mode == 'html' ){
+					if( target.innerHTML ) fn._.call(target.childNodes);
+					while( i-- ) target.appendChild(parent.childNodes[0]);
+				}else if( mode == 'html+' ) while( i-- ) target.appendChild(parent.childNodes[0]);
+				else if( mode == '+html' ) {
+					i = target.childNodes.length, t0 = {length:i};
+					while(i--) t0[i] = target.childNodes[i];
+					for( i = 0, j = parent.childNodes.length ; i < j ; i++) target.appendChild(parent.childNodes[0]);
+					for( i = 0, j = t0.length ; i < j ; i++) target.appendChild(t0[i]);
+				}
+				else while( i-- ) target.appendChild(parent.childNodes[0]);
+				j = target.childNodes.length;
+				while( j-- ) if( target.childNodes[j].nodeType == 1 && target.childNodes[j].nodeName == 'TBODY' && !target.childNodes[j].childNodes.length && !tbodyStr ) target.removeChild(target.childNodes[j]);
+				return target.innerHTML || target;
+			};
 		})(doc),
 		dom = (function( query, html ){
 			var nodes = {}, dom = function( sel, isSub ){
@@ -662,7 +706,7 @@ function DOM(){
 					switch( typeof t0.getAttribute( k = t0.attributes[j].nodeName ) ){
 					case'object':case'function': t0.removeAttribute(k);
 					}
-				this[i] = null;
+				if( this[i] ) this[i] = null;
 			}
 			if( this.END ) this.END();
 		},
@@ -702,9 +746,9 @@ function DOM(){
 				return t0 = dom(v), t0[0].appendChild(d), t0;
 			}else return d.parentNode;
 		},		
-		fn.html = function( d, v ){return v === undefined ? d.innerHTML : ( d.innerHTML = v );},
-		fn['html+'] = function( d, v ){return d.innerHTML += v;},
-		fn['+html'] = function( d, v ){return d.innerHTML = v + d.innerHTML;},
+		fn.html = function( d, v ){return v === undefined ? d.innerHTML : html( v, d, 'html' );},
+		fn['html+'] = function( d, v ){return html( v, d, 'html+' );},
+		fn['+html'] = function( d, v ){return html( v, d, '+html' );},
 		(function(){
 			var t = bs.DETECT.text;
 			fn.text = function( d, v ){return v === undefined ? d[t] : ( d[t] = v );},
