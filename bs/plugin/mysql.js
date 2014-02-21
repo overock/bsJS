@@ -37,9 +37,7 @@ bs['plugin+']( 'db', 'mysql', function( fn, bs ){
 		}
 	},
 	fn.execute = function(v){return this.open().query(v);},
-	fn.recordset = function( v, end ){this.open().query( v, function( e, r ){e ? end( null, e ) : end(r);});},
-	fn.stream = function( v, end ){this.open().query(v).on('result', end );}
-	fn.transation = function( v, end ){
+	fn.transaction = function( v, end ){
 		var conn = this.open();
 		conn.beginTransaction( function(e){
 			var next, i, j;
@@ -58,5 +56,8 @@ bs['plugin+']( 'db', 'mysql', function( fn, bs ){
 				}
 			}, next();
 		} );
-	};
+	},
+	fn.recordset = function( v, end ){this.open().query( v, function( e, r ){e ? end( null, e ) : end(r);});},
+	fn.stream = function( v, end ){this.open().query(v).on('result', end );}
+	;
 }, 1.0 );
