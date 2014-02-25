@@ -398,7 +398,7 @@ function DETECT(){
 		else if( keyframe.KEYFRAME_RULE ) keyframe = 'keyframes';
 		else keyframe = null;
 	}
-	bs.obj( 'DETECT', {
+	return {
 		'device':device, 'browser':browser, 'browserVer':bVersion, 'os':os, 'osVer':osVersion, 'flash':flash, 'sony':agent.indexOf( 'sony' ) > -1,
 		//dom
 		root:b.scrollHeight ? b : doc.documentElement,
@@ -426,7 +426,7 @@ function DETECT(){
 		geo:navigator.geolocation, worker:W.Worker, file:W.FileReader, message:W.postMessage,
 		history:'pushState' in history, offline:W.applicationCache,
 		db:W.openDatabase, socket:W.WebSocket
-	} );
+	};
 }
 function DOM(){
 	var style;
@@ -1293,7 +1293,7 @@ function ANI(){
 			for( i = 0, j = bs._bsQue.length ; i < j ; i++ ) bs._bsQue[i]();
 			bs._bsQue = null;
 		},
-		DETECT(), DOM(), ANI(), bs._pluginQue.length ? ( bs._pluginQue.unshift( start ), bs.plugin.apply( null, bs._pluginQue ), bs._pluginQue = null ) : start();
+		bs.obj( 'DETECT', DETECT() ), DOM(), ANI(), bs._pluginQue.length ? ( bs._pluginQue.unshift( start ), bs.plugin.apply( null, bs._pluginQue ), bs._pluginQue = null ) : start();
 	}, 1 );
 })();
 } )( this );
