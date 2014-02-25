@@ -949,7 +949,7 @@ function DOM(){
 					else if( t1 == 'rollout' ) this.RU = v, this.S( 'mouseout', EV.rollout );
 					else t2 = this.e[t1] || ( this.e[t1] = [] ),
 						t2[t2.length] = typeof v == 'function' ? {c:this.target, f:v, a:[this]} :
-							v.splice ? {c:v[0]||this.target, f:v[1], a:( t0 = v.slice(1), t0[0] = this, t0 )} :
+							v.splice ? {c:v[0]||this.target, f:typeof v[1] == 'function' ? v[1] : (v[0]||this.target)[v[1]], a:( t0 = v.slice(2), t0[t0.length] = this, t0 )} :
 							v[t0] ? {f:v[t0], c:v, a:[this]} : bs.err(11),
 						add( this, t1 );
 				},
