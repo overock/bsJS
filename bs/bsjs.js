@@ -5,7 +5,7 @@
  */
 ( function( W, N ){
 'use strict';
-var VERSION = 0.3, REPOSITORY = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/',
+var VERSION = 0.3, REPOSITORY = 'http://www.bsplugin.com/plugin/',
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g,
 	bs, doc, fn;
 if( doc = W['document'] ){//browser
