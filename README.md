@@ -49,7 +49,6 @@ bs( function(){
 
 ## License
 Dual licensed under the MIT or GPL Version 2 licenses.  
-It is supported by the [BSIDESOFT](http://www.bsidesoft.com)(http://www.bsidesoft.com).
 
 ## Contact us
 #### [facebook group](https://www.facebook.com/groups/bs5js/?hc_location=stream)  
