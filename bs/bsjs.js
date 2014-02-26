@@ -188,7 +188,7 @@ if( !Array.prototype.indexOf ) Array.prototype.indexOf = function( v, I ){
 if( !W['JSON'] ) W['JSON'] = {
 	parse:function(v){return ( 0, eval )( '(' + v + ')' );},
 	stringify:(function(){
-		var r = /["]/g, f = function(o){
+		var r = /["]/g, f = function(o){//"
 			var t0, i, j;
 			switch( t0 = typeof o ){
 			case'string':return '"' + o.replace( r, '\\"' ) + '"';
