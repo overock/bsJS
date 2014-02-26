@@ -535,9 +535,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 							err( 500, t0 );
 						}
 					}
-				}else{
-					site.next(site.flush), runRule( site._pageEnd, site );
-				}
+				}else site.next(site.flush), runRule( site._pageEnd, site );
 			};
 			return v;
 		},

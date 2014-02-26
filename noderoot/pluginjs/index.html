@@ -1,0 +1,15 @@
+<%IMPORT( 'head.html' );%>
+<%if( bs.WEB.session('nick') ){%>
+
+
+
+
+
+<%}else{%>
+
+	<div>email <input type="text" id="Lemail" /></div>
+	<div>passw <input type="password" id="Lpw" /></div>
+	<div><input type="button" id="Llogin" value="login" /> <input type="button" id="Ljoin" value="join" /></div>
+
+<%}%>
+<%IMPORT( 'foot.html' );%>

@@ -62,15 +62,15 @@ bs( function(){
 			//particle
 			if( $time > this.tcheck ){
 				this.tcheck = $time + this.term;
-				var s = bs.ex( 20, 50 );
+				var s = bs.rand( 20, 50 );
 				var d = this.div.length ? this.div[--this.div.length] : bs.Dom('<div></div>' ).S( 'position','absolute', '<', '#stage', 'this' );
-				d.S( 'visibility', 'visible', 'background', 'rgb('+bs.ex(100,200)+','+bs.ex(100,200)+','+bs.ex(100,200)+')', 
+				d.S( 'visibility', 'visible', 'background', 'rgb('+bs.rand(100,200)+','+bs.rand(100,200)+','+bs.rand(100,200)+')', 
 					'width',10, 'height',10, 'border-radius', 10, 'left',this.x,'top',this.y, 'opacity', 1 
 				);
 				bs.ANI.tween( d,
-					'left', bs.ex( -100, 100 ) + this.x, 'top', bs.ex( -100, 100 ) + this.y,
+					'left', bs.rand( -100, 100 ) + this.x, 'top', bs.rand( -100, 100 ) + this.y,
 					'border-radius', s, 'width', s, 'height',s, 'opacity', 0, 
-					'time', bs.ex( 1, '~f', 3 ), 'end', this.end
+					'time', bs.randf( 1, 3 ), 'end', this.end
 				);
 			}
 	

@@ -16,7 +16,7 @@
 <script src="../../bs/bsjs.js"></script>
 <script>
     bs(function(){
-        bs.dom('<div></div>').$(
+        bs.Dom('<div></div>').S(
                 'html','Hello World',
                 'background','#aa2211',
                 'border-radius',20,
@@ -28,10 +28,10 @@
                     alert('마우스다운')
                 },
                 'mouseover',function(){
-                    bs.dom('#bsTest').$('background','#aaa')
+                    bs.Dom('#bsTest').S('background','#aaa')
                 },
                 'mouseout',function(){
-                    bs.dom('#bsTest').$('background','#aa2211')
+                    bs.Dom('#bsTest').S('background','#aa2211')
                 }
         )
 
@@ -40,7 +40,7 @@
              loopNum:0,
              ANI : function($time){
                  this.loopNum++
-                 bs.dom('#bsTest').$('left', Math.sin(this.loopNum/50)*250+500,'top', Math.cos(this.loopNum/50)*250+300)
+                 bs.Dom('#bsTest').S('left', Math.sin(this.loopNum/50)*250+500,'top', Math.cos(this.loopNum/50)*250+300)
              }
          }
 

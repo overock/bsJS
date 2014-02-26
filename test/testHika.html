@@ -23,30 +23,12 @@
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
 <script>
-    bs.plugin('sprite', 'last');
-    bs(function(){
-        var s0, inited;
-        bs.Sprite('explosion').S('src', 'hika/explosion.png', 'col', 29, 'row', 1);
-        bs.WIN.sizer(function(w, h){
-            if(inited) return;
-            inited=1;
-            bs.Dom('body').S('margin', 0, 'padding', 0);
-            bs.Dom('#stage').S('>', bs.Sprite('explosion').S('@0', 'position', 'absolute', 'div'),
-                    'overflow', 'hidden', 'background', '#000', 'width', w, 'height', h,
-                    'down', function($e){
-                        var s;
-                        bs.Sprite('explosion').S('@0',
-                                'time', bs.randf(.5, 1.5),
-                                'width', s=bs.rand(50, 600), 'height', s,
-                                'left', $e.x-s*.5, 'top', $e.y-s*.5,
-                                '@'
-                        );
-                    },
-                    '>', bs.Sprite('explosion').S('@1', 'position', 'absolute', 'div')
-            ),
-                    bs.Sprite('explosion').S('@1', 'width', 70, 'height', 70, 'frame', 15);
-        });
-    });
+
+bs(function(){
+	bs.Dom( '<div></div>' ).S( 'down', function(){
+		alert('aaaa');
+	}, 'width', 300, 'height', 300, 'background', '#0f0', '<', 'body' );
+});
 </script>
 </body>
 </html>

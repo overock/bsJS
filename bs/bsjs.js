@@ -5,7 +5,7 @@
  */
 ( function( W, N ){
 'use strict';
-var VERSION = 0.3, REPOSITORY = 'http://www.bsidesoft.com/bs/bs5/bs/plugin/',
+var VERSION = 0.3, REPOSITORY = 'http://www.bsplugin.com/plugin/',
 	slice = Array.prototype.slice, none = function(){}, trim = /^\s*|\s*$/g,
 	bs, doc, fn;
 if( doc = W['document'] ){//browser
@@ -37,7 +37,7 @@ else throw new Error( 0, 'not supported platform' );
 		t1 = bs[t0] = pr.instanceOf = function(sel){
 			var t0;
 			if( typeof sel == 'string' ){
-				if( ( t0 = sel.charAt(0) ) == '@' ) return sel = sel.substr(1), cls[sel] = new cls( sel, arguments );
+				if( ( t0 = sel.charAt(0) ) == '@' ) return sel = arguments[0] = sel.substr(1), cls[sel] = new cls( sel, arguments );
 				else if( t0 != '<' ) return cls[sel] || ( cls[sel] = new cls( sel, arguments ) );
 			}
 			return new cls( sel, arguments );
@@ -146,7 +146,7 @@ else throw new Error( 0, 'not supported platform' );
 	(function(){
 		var rc = 0, rand = function(){return rc = ( rc + 1 ) % 1000, rand[rc] || ( rand[rc] = Math.random() );};
 		fn( 'rand', function( a, b ){return parseInt( rand() * ( b - a + 1 ) ) + a;} ),
-		fn( 'randf', function( a, b ){return rand() * ( b - a + 1 ) + a;} );
+		fn( 'randf', function( a, b ){return rand() * ( b - a ) + a;} );
 	})(),		
 	fn( 'reverse', function(o){
 		var t0, i;
@@ -268,11 +268,13 @@ fn( 'js', (function(doc){
 fn( 'img', (function(){
 	var c = window['HTMLCanvasElement'];
 	return function(end){
-		var arg, t0, f, i, j;
-		t0 = [], arg = arguments, i = 1, j = arg.length,
+		var progress, arg, t0, f, i, j;
+		t0 = [], arg = arguments, i = 1, j = arg.length;
+		if( end.progress ) progress = end.progress;
 		f = function(){
 			var img, id;
 			if( i == j ) return end(t0);
+			if( progress ) progress(t0, i - 2, j - 1);
 			t0[t0.length] = img = new Image;
 			if( c ) img.onload = f;
 			else id = setInterval( function(){
@@ -396,7 +398,7 @@ function DETECT(){
 		else if( keyframe.KEYFRAME_RULE ) keyframe = 'keyframes';
 		else keyframe = null;
 	}
-	bs.obj( 'DETECT', {
+	return {
 		'device':device, 'browser':browser, 'browserVer':bVersion, 'os':os, 'osVer':osVersion, 'flash':flash, 'sony':agent.indexOf( 'sony' ) > -1,
 		//dom
 		root:b.scrollHeight ? b : doc.documentElement,
@@ -424,7 +426,7 @@ function DETECT(){
 		geo:navigator.geolocation, worker:W.Worker, file:W.FileReader, message:W.postMessage,
 		history:'pushState' in history, offline:W.applicationCache,
 		db:W.openDatabase, socket:W.WebSocket
-	} );
+	};
 }
 function DOM(){
 	var style;
@@ -457,7 +459,7 @@ function DOM(){
 					if( this[k] === undefined ){ //add
 						if( ( t0 = typeof v ) == 'number' ) this[k] = v, u[k] = nopx[k] ? '' : 'px';
 						else if( t0 == 'string' ){
-							if( v0 = style[v.substr(0,4)] ) this[k] = v = v0(v), u[k]='';
+							if( v0 = style[v.substr(0,4)] && typeof v0 == 'function' ) this[k] = v = v0(v), u[k]='';
 							else if( ( v0 = v.indexOf( ':' ) ) == -1 ) this[k] = v, u[k] = '';
 							else this[k] = parseFloat( v.substr( 0, v0 ) ), u[k] = v.substr( v0 + 1 ), v = this[k];
 						}
@@ -577,7 +579,7 @@ function DOM(){
 			}
 			return this;
 		},
-		r = /^[0-9.-]+/,
+		r = /^[0-9.-]+$/,
 		parser = function(data){
 			var t0, t1, t2, c, i, j, k, v;
 			t2 = [], t0 = data.split('}');
@@ -588,7 +590,7 @@ function DOM(){
 						c = bs.Css(t0[i][0]), t1 = bs.trim(t0[i][1].split(';')), k = t1.length, t2.length = 0;
 						while( k-- ) v = bs.trim(t1[k].split(':')), t2[t2.length] = v[0], t2[t2.length] = r.test(v[1]) ? parseFloat(v[1]) : v[1];
 						c.S.apply( c, t2 );
-					}else if( t0[i][0].substr( 0, 9 ) == 'font-face' ) bs.Css(t0[i].join(' '));
+					}else if( t0[i][0].substr( 0, 9 ) == 'font-face' ) console.log(t0[i].join(' ')),bs.Css(t0[i].join(' '));
 				}
 			}
 		}, 
@@ -614,9 +616,53 @@ function DOM(){
 			};
 		})(doc),
 		html = (function(doc){
-			var div;
-			div = doc.createElement( 'div' );
-			return html = function(sel){return div.innerHTML = sel, bs.reverse( div.childNodes );};
+			var t0, i, div, tbody, tags;
+			div = doc.createElement('div'),
+			tbody = doc.createElement('tbody'),
+			tags = {
+				tr:[1, '<table><tbody>', '</tbody></table>'],
+				col:[1, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
+				th:[2, '<table><tbody><tr>', '</tr></tbody></table>'],
+				option:[0, '<select>', '</select>']
+			},
+			tags.td = tags.th,
+			tags.optgroup = tags.option,
+			t0 = 'thead,tfoot,tbody,caption,colgroup'.split(','), i = t0.length;
+			while( i-- ) tags[t0[i]] = [0,'<table>','</table>'];
+			return function( str, target, mode ){
+				var t0, t1, t2, t3, i, j, n0, n1, n2, parent, tbodyStr;
+				tbodyStr = str.toLowerCase().indexOf('tbody') > -1 ? true : false;
+				t0 = str.replace( trim, '' ), n0 = t0.indexOf(' '), n1 = t0.indexOf('>'), n2 = t0.indexOf('/'),
+				t1 = ( n0 != -1 && n0 < n1 ) ? t0.substring( 1, n0 ) : ( n2 != -1 && n2 < n1 ) ? t0.substring( 1, n2 ) : t0.substring( 1, n1 ),
+				t1 = t1.toLowerCase();
+				if( mode == 'html' && target.nodeName.toLowerCase() == 'table' && t1 == 'tr' ) tbodyStr = true, t1 = 'tbody';
+				if( mode == '>' || 'html+' && t1 == 'tr' && target ) target = target.getElementsByTagName('tbody')[0] || ( target.appendChild(tbody), target.getElementsByTagName('tbody')[0] );
+				if( tags[t1] ){
+					if( div.innerHTML ) fn._.call(div.childNodes);
+					div.innerHTML = tags[t1][1] + str + tags[t1][2], t2 = div.childNodes[0];
+					if( tags[t1][0] ) for( i = 0 ; i < tags[t1][0] ; i++ ) t2 = t2.childNodes[0];
+					parent = t2;
+				}else{
+					div.innerHTML = str;
+					parent = div;
+				}
+				i = parent.childNodes.length;
+				if( !target ) return parent.childNodes;
+				else if( mode == 'html' ){
+					if( target.innerHTML ) fn._.call(target.childNodes);
+					while( i-- ) target.appendChild(parent.childNodes[0]);
+				}else if( mode == 'html+' ) while( i-- ) target.appendChild(parent.childNodes[0]);
+				else if( mode == '+html' ) {
+					i = target.childNodes.length, t0 = {length:i};
+					while(i--) t0[i] = target.childNodes[i];
+					for( i = 0, j = parent.childNodes.length ; i < j ; i++) target.appendChild(parent.childNodes[0]);
+					for( i = 0, j = t0.length ; i < j ; i++) target.appendChild(t0[i]);
+				}
+				else while( i-- ) target.appendChild(parent.childNodes[0]);
+				j = target.childNodes.length;
+				while( j-- ) if( target.childNodes[j].nodeType == 1 && target.childNodes[j].nodeName == 'TBODY' && !target.childNodes[j].childNodes.length && !tbodyStr ) target.removeChild(target.childNodes[j]);
+				return target.innerHTML || target;
+			};
 		})(doc),
 		dom = (function( query, html ){
 			var nodes = {}, dom = function( sel, isSub ){
@@ -624,8 +670,10 @@ function DOM(){
 				t0 = typeof sel;
 				if( t0 == 'function' ) return sel();
 				if( t0 == 'string' ) return sel.charAt(0) == '<' ? html(sel) : query(sel);
-				if( sel.instanceOf == bs.Dom ) return sel;
-				if( sel.nodeType == 1 ) return isSub ? sel : ( nodes[0] = sel, nodes.length = 1, nodes );
+				if( sel['instanceOf'] == bs.Dom ) return sel;
+				t0 = sel['nodeType'];
+				if( t0 == 1 ) return isSub ? sel : ( nodes[0] = sel, nodes.length = 1, nodes );
+				if( t0 !== undefined ) return 0;
 				if( j = sel.length ){
 					r = isSub ? {} : nodes, r.length = 0;
 					for( i = 0 ; i < j ; i++ ){
@@ -639,9 +687,10 @@ function DOM(){
 			return dom;
 		})( query, html ),
 		fn.NEW = function(sel){
-			var t0, i;
-			t0 = dom(sel), this.length = i = t0.length;
-			while( i-- ) this[i] = t0[i];
+			var t0, i, j;
+			for( t0 = dom(sel), i = 0, this.length = j = t0.length ; i < j ; i++ ) this[i] = t0[i];
+			t0 = dom(sel), this.length = i = j = t0.length;
+			while(i--) this[j - i - 1] = t0[i];
 		},
 		fn._ = function(){
 			var t0, i, j, k;
@@ -657,7 +706,7 @@ function DOM(){
 					switch( typeof t0.getAttribute( k = t0.attributes[j].nodeName ) ){
 					case'object':case'function': t0.removeAttribute(k);
 					}
-				this[i] = null;
+				if( this[i] ) this[i] = null;
 			}
 			if( this.END ) this.END();
 		},
@@ -697,9 +746,9 @@ function DOM(){
 				return t0 = dom(v), t0[0].appendChild(d), t0;
 			}else return d.parentNode;
 		},		
-		fn.html = function( d, v ){return v === undefined ? d.innerHTML : ( d.innerHTML = v );},
-		fn['html+'] = function( d, v ){return d.innerHTML += v;},
-		fn['+html'] = function( d, v ){return d.innerHTML = v + d.innerHTML;},
+		fn.html = function( d, v ){return v === undefined ? d.innerHTML : html( v, d, 'html' );},
+		fn['html+'] = function( d, v ){return html( v, d, 'html+' );},
+		fn['+html'] = function( d, v ){return html( v, d, '+html' );},
 		(function(){
 			var t = bs.DETECT.text;
 			fn.text = function( d, v ){return v === undefined ? d[t] : ( d[t] = v );},
@@ -709,8 +758,8 @@ function DOM(){
 		fn['class'] = function( d, v ){return v === undefined ? d.className : ( d.className = v );},
 		fn['class+'] = function( d, v ){
 			var t0;
-			return !( t0 = d.className.replace( t, '' ) ) ? ( console.log(1),d.className = v ) :
-				t0.split(' ').indexOf(v) == -1 ? ( console.log(t, t0, v),d.className = v + ' ' + t0 ) : t0;
+			return !( t0 = d.className.replace( t, '' ) ) ? ( d.className = v ) :
+				t0.split(' ').indexOf(v) == -1 ? ( d.className = v + ' ' + t0 ) : t0;
 		},
 		fn['class-'] = function( d, v ){
 			var t0, i;
@@ -900,7 +949,7 @@ function DOM(){
 					else if( t1 == 'rollout' ) this.RU = v, this.S( 'mouseout', EV.rollout );
 					else t2 = this.e[t1] || ( this.e[t1] = [] ),
 						t2[t2.length] = typeof v == 'function' ? {c:this.target, f:v, a:[this]} :
-							v.splice ? {c:v[0]||this.target, f:v[1], a:( t0 = v.slice(1), t0[0] = this, t0 )} :
+							v.splice ? {c:v[0]||this.target, f:typeof v[1] == 'function' ? v[1] : (v[0]||this.target)[v[1]], a:( t0 = v.slice(2), t0[t0.length] = this, t0 )} :
 							v[t0] ? {f:v[t0], c:v, a:[this]} : bs.err(11),
 						add( this, t1 );
 				},
@@ -1244,7 +1293,7 @@ function ANI(){
 			for( i = 0, j = bs._bsQue.length ; i < j ; i++ ) bs._bsQue[i]();
 			bs._bsQue = null;
 		},
-		DETECT(), DOM(), ANI(), bs._pluginQue.length ? ( bs._pluginQue.unshift( start ), bs.plugin.apply( null, bs._pluginQue ), bs._pluginQue = null ) : start();
+		bs.obj( 'DETECT', DETECT() ), DOM(), ANI(), bs._pluginQue.length ? ( bs._pluginQue.unshift( start ), bs.plugin.apply( null, bs._pluginQue ), bs._pluginQue = null ) : start();
 	}, 1 );
 })();
 } )( this );

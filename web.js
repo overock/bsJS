@@ -16,7 +16,7 @@ bs.Site('bsplugin').plugin( 'form', 'last' );
 bs.Site('bsplugin').plugin( 'router', 'last',
 	'member', [
 		'function', function(){
-			if( !bs.session('id') ) bs.SITE.redirect('/'), bs.SITE.pause();
+			if( !bs.WEB.session('id') ) bs.WEB.redirect('/'), bs.WEB.pause();
 		},
 		'template', '@.html'
 	]
