@@ -631,6 +631,7 @@ function DOM(){
 			while( i-- ) tags[t0[i]] = [0,'<table>','</table>'];
 			return function( str, target, mode ){
 				var t0, t1, t2, t3, i, j, n0, n1, n2, parent, tbodyStr;
+				str = ''+str;
 				tbodyStr = str.toLowerCase().indexOf('tbody') > -1 ? true : false;
 				t0 = str.replace( trim, '' ), n0 = t0.indexOf(' '), n1 = t0.indexOf('>'), n2 = t0.indexOf('/'),
 				t1 = ( n0 != -1 && n0 < n1 ) ? t0.substring( 1, n0 ) : ( n2 != -1 && n2 < n1 ) ? t0.substring( 1, n2 ) : t0.substring( 1, n1 ),
