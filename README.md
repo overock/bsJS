@@ -7,7 +7,7 @@ JavaScript lib for DOM, CORE, utility and so on
 
 1. 문서의 아무 곳이나 스크립트태그를 통해 bs를 삽입합니다.
 ```
-<script src="http://projectbs.github.io/bs/bsjs.js"></script>
+<script src="http://projectbs.github.io/bsJS/bs/bsjs.js"></script>
 ```
 
 2. 삽입한 이 후에는 다음과 같은 형식으로 bs를 사용합니다.
