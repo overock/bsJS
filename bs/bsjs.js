@@ -349,7 +349,7 @@ function DETECT(){
 			device = i == 'ipad' ? 'tablet' : 'mobile', browser = os = i;
 			if( i = /os ([\d_]+)/.exec( agent ) ) i = i[1].split('_'), osVersion = parseFloat( i[0] + '.' + i[1] );
 			else osVersion = 0;
-			if( i = /mobile\/10a([\d]+)/.exec( agent ) ) bVersion = parseFloat( i[1] );
+			if( i = /mobile\/([\S]+)/.exec( agent ) ) bVersion = parseFloat( i[1] );
 			naver() || chrome() || firefox() || opera();
 		}else{
 			(function(){
