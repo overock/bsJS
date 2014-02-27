@@ -25,7 +25,7 @@ doc = document,
 W = window;
 bs( function() {
 	var k, arg, detect;
-	arg = ['detect test'], detect = DETECT();
+	arg = ['detect test'], detect = DETECT( W, doc );
 	for( k in detect ){
 		//항목명, 기대값, 실제값(bs.detect[k])
 		arg.push( 'bs.DETECT.' + k, detect[k], detect[k] );
