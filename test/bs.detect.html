@@ -21,14 +21,12 @@
 <script src="./printer.js"></script>
 <script>
 bs( function() {
-    var key = '', temp = '',
-        detect = bs.DETECT;
-
-    for ( key in detect ) {
-        temp += ('<p>' + key + ': ' + detect[key] + '</p>');
-    }
-
-    bs.Dom( '#stage' ).S( 'html', temp );
+	var k, arg = ['detect test'];
+	for( k in bs.DETECT ){
+		//항목명, 기대값, 실제값(bs.detect[k])
+		arg.push( 'bs.DETECT.' + k, bs.DETECT[k], bs.DETECT[k] );
+	}
+	bsTest.apply( null, arg );
 } );
 </script>
 </body>
