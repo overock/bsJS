@@ -1,6 +1,7 @@
 bs.ajax.html
 bs.Css.html
 bs.Dom.html
+bs.detect.html
 bs.event.html
 bs.fb.html
 bs.function.html
