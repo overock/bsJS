@@ -19,12 +19,16 @@
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
 <script src="./printer.js"></script>
+<script src="http://projectbs.github.io/bsDetect/js/detect.js"></script>
 <script>
+doc = document, 
+W = window;
 bs( function() {
-	var k, arg = ['detect test'];
-	for( k in bs.DETECT ){
+	var k, arg, detect;
+	arg = ['detect test'], detect = DETECT();
+	for( k in detect ){
 		//항목명, 기대값, 실제값(bs.detect[k])
-		arg.push( 'bs.DETECT.' + k, bs.DETECT[k], bs.DETECT[k] );
+		arg.push( 'bs.DETECT.' + k, detect[k], detect[k] );
 	}
 	bsTest.apply( null, arg );
 } );
