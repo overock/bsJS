@@ -712,7 +712,7 @@ function DOM(){
 			if( this.END ) this.END();
 		},
 		fn.S = function(){
-			var d, target, t0, l, s, i, j, k, v;
+			var d, target, t0, l, s, i, j, k, v, k0, v0;
 			j = arguments.length, typeof arguments[0] == 'number' ? ( s = l = 1, target = this[arguments[0]] ) : ( l = this.length, s = 0 );
 			while( l-- ){
 				d = target || this[l], i = s, ds.length = 0;
@@ -726,6 +726,14 @@ function DOM(){
 							fn[k] ? fn[k](d) :
 							d.bsS ? d.bsS.g(k) : d.style[style[k]];
 					}else{
+						console.log( 'dom', v );
+						if( typeof v == 'string' && v.charAt(0) == '{' && v.charAt(v.length - 1) == '}' ){
+							k0 = v.charAt(1), v0 = ( t0 = ds[k.charAt(0)] ) ? t0( d, k.substr(1) ) : fn[k] ? fn[k](d) : d.bsS ? d.bsS.g(k) : d.style[style[k]];
+							v = k0 == '=' ? v0 : (
+								v0 = parseFloat(v0), v = parseFloat(v.substring( 2, v.length - 1 )),
+								k0 == '+' ? v0 + v : k0 == '-' ? v0 - v : k0 == '*' ? v0 * v : k0 == '/' ? v0 / v : 0
+							);
+						}
 						v = ev[k] ? ev( d, k, v ) : ( t0 = ds[k.charAt(0)] ) ? ( v = t0( d, k.substr(1), v ) ) :
 							fn[k] ? fn[k]( d, v ) : ( ds[ds.length++] = k, ds[ds.length++] = v );
 					}

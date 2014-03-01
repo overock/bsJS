@@ -115,6 +115,23 @@ bs( function(){
 			return bs.Dom( document.getElementsByTagName('div') ).length;
 		}, document.getElementsByTagName('div').length
 	);
+	bsTest.tear( '사칙참조값', function(){
+		bs.Dom('<div id="testOP"></div>').S( '<', '#stageHika', 'font-size', 10 );
+	} );
+	bsTest( '사칙참조',
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', '{=}' );
+		}, 10,
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', '{+2}' );
+		}, 12,
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', '{*2}' );
+		}, 24,
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', '{/2}' );
+		}, 12
+	);
 } );
 </script>
 </body>
