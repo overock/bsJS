@@ -162,55 +162,47 @@ var finder = (function(){
 		return tokens;
 	},
 	compareEl = (function(){
-		var r0, _nthOf, _lastNthOf, _nthOfType, _lastNthOfType, _hasCls;
+		var r0, pEl, _bNth, _nthOf, _lastNthOf, _nthOfType, _lastNthOfType, _hasCls;
 		r0 = /"|'/g, //"
+		_bNth = function(el){
+			if( el.nodeType != 1 || !( pEl = el.parentNode && el.parentNode.childNodes ) || !pEl.length ) return 0;
+			return 1;
+		},
 		_nthOf = function _nthOf(el, nth){
-			var pEl, typeIdx, i, j;
-			if( el.nodeType != 1 ) return 0;
-			pEl = el.parentNode && el.parentNode.childNodes;
-			if( pEl && ( j = pEl.length ) ){
-				i = 0, typeIdx = 0;
-				while( i < j ){
-					if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
-					i++;
-				}
+			var typeIdx, i, j;
+			if( !_bNth( el ) ) return 0;
+			i = 0, typeIdx = 0, j = pEl.length;
+			while( i < j ){
+				if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
+				i++;
 			}
 			return 0;
 		},
-		_lastNthOf = function _lastNthOf(el, nth){
-			var pEl, typeIdx, i;
-			if( el.nodeType != 1 ) return 0;
-			pEl = el.parentNode && el.parentNode.childNodes;
-			if( pEl && ( i = pEl.length ) ){
-				typeIdx = 0;
-				while( i-- ){
-					if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
-				}
+		_lastNthOf = function(el, nth){
+			var typeIdx, i;
+			if( !_bNth( el ) ) return 0;
+			i = pEl.length, typeIdx = 0;
+			while( i-- ){
+				if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
 			}
 			return 0;
 		},
 		_nthOfType = function _nthOfType(el, nth){
-			var pEl, typeIdx, i, j;
-			if( el.nodeType != 1 ) return 0;
-			pEl = el.parentNode && el.parentNode.childNodes;
-			if( pEl && ( j = pEl.length ) ){
-				i = 0, typeIdx = 0;
-				while( i < j ){
-					if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && el.tagName == pEl[i].tagName && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
-					i++;
-				}
+			var typeIdx, i, j;
+			if( !_bNth( el ) ) return 0;
+			i = 0, typeIdx = 0, j = pEl.length;
+			while( i < j ){
+				if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && el.tagName == pEl[i].tagName && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
+				i++;
 			}
 			return 0;
 		},
 		_lastNthOfType = function _lastNthOfType(el, nth){
-			var pEl, typeIdx, i;
-			if( el.nodeType != 1 ) return 0;
-			pEl = el.parentNode && el.parentNode.childNodes;
-			if( pEl && ( i = pEl.length ) ){
-				typeIdx = 0;
-				while( i-- ){
-					if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && el.tagName == pEl[i].tagName && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
-				}
+			var typeIdx, i;
+			if( !_bNth( el ) ) return 0;
+			i = pEl.length, typeIdx = 0;
+			while( i-- ){
+				if( pEl[i].nodeType == 1 && pEl[i].tagName != 'HTML' && el.tagName == pEl[i].tagName && ++typeIdx && ( nth == 'even' ? ( typeIdx%2 == 0 ) : nth == 'odd' ? ( typeIdx%2 == 1 ) : (typeIdx == nth) ) && el == pEl[i] ) return 1;
 			}
 			return 0;
 		},
@@ -357,8 +349,8 @@ var finder = (function(){
 		};
 	})();
 	return function($s){
-		var nRet, ret, el, els, pel, sel, sels, oSel, t0, i, j, k, m, n,
-			key, hit, pIdx, aIdx, attrs, token, tokens, ntoken;
+		var nRet, ret, el, els, sels, oSel, t0, i, j, k, m, n,
+			key, hit, token, tokens;
 		console.log('############', $s);
 		document.getElementById('selector').value = $s;
 		oSel = [],
@@ -373,7 +365,6 @@ var finder = (function(){
 			for( i = 0, j = els.length; i < j; i++ ){
 				els[i].className = els[i].className.replace('selected','');
 				hit = 0;
-				pel = null;
 				for( k = oSel.length; k--; ){
 					tokens = oSel[k];
 					el = els[i];
@@ -405,7 +396,7 @@ var finder = (function(){
 					}
 					if( hit ) break; // 여긴 OR 연산
 				}
-				//console.log(hit.length, attrs.length)
+				//console.log(hit.length)
 				if( hit ) ret.push(els[i]);
 			}
 		}
