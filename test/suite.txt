@@ -18,4 +18,3 @@ bs.test.html
 bs.tmpl.html
 bs.tween.html
 bs.xml.html
-bs.detect.html
