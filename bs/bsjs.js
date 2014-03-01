@@ -820,7 +820,6 @@ function DOM(){
 					var t0 = view.getComputedStyle(d,'').getPropertyValue(k);
 					return t0.substr( t0.length - 2 ) == 'px' ? parseFloat( t0.substring( 0, t0.length - 2 ) ) : t0;
 				} : function( d, k ){
-					console.log('b');
 					var t0 = d.currentStyle[style.key(k)];
 					return t0.substr( t0.length - 2 ) == 'px' ? parseFloat( t0.substring( 0, t0.length - 2 ) ) : t0;
 				};
@@ -916,23 +915,31 @@ function DOM(){
 									self['ly'+id] = ( self['y'+id] = Y = t1[pageY] ) - dy,
 									self['cx'+id] = t1.clientX, self['cy'+id] = t1.clientY,
 									type == 2 ?
-										( self['_x'+id] = X, self['_y'+id] = Y ) :
-										( self['dx'+id] = X - self['_x'+id], self['dy'+id] = Y - self['_y'+id] );
-								self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
+										( self['$x'+id] = self['_x'+id] = X, self['$y'+id] = self['_y'+id] = Y ) :
+										( self['dx'+id] = X - self['_x'+id], self['dy'+id] = Y - self['_y'+id],
+										  self['mx'+id] = X - self['$x'+id], self['my'+id] = Y - self['$y'+id],
+										  self['$x'+id] = X, self['$y'+id] = Y
+										);
+								self.mx = self.mx0, self.my = self.my0, self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
 							}else{
 								self.length = 0,
-								self.lx = ( self.x = e[pageX] ) - dx, self.ly = ( self.y = e[pageY] ) - dy,
+								self.lx = ( self.x = X = e[pageX] ) - dx, self.ly = ( self.y = Y = e[pageY] ) - dy,
 								self.cx = e.clientX, self.cy = e.clientY,
 								type == 4 ?
-									( self._x = self.x, self._y = self.y ) :
-									( self.dx = self.x - self._x, self.dy = self.y - self._y );
+									( self.$x = self._x = X, self.$y = self._y = Y ) :
+									( self.dx = X - self._x, self.dy = Y - self._y,
+									  self.mx = X - self.$x, self.my = Y - self.$y,
+									  self.$x = X, self.$y = Y
+									);
 							}
 						}
 						t0 = self.e[self.type], i = 0, j = t0.length;
 						while( i < j ){
-							this.stop = 0, t1 = t0[i++];
-							if( !t1.disable ) t1.f.apply( t1.c, t1.a );
-							if( this.stop ) break;
+							this.stop = 0;
+							if( t1 = t0[i++] ){
+								if( !t1.disable ) t1.f.apply( t1.c, t1.a );
+								if( this.stop ) break;
+							}else return;
 						}
 					};
 				} ).prototype,
