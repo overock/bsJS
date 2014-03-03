@@ -1,4 +1,4 @@
-/* bsJS - OpenSource JavaScript library version 0.2.0 / 2013.12.25 by projectBS committee
+/* bsJS - OpenSource JavaScript library version 0.3.0 / 2013.12.25 by projectBS committee
  * Copyright 2013.10 projectBS committee.
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * GitHub-http://goo.gl/FLI7te Facebook group-http://goo.gl/8s5qmQ
