@@ -1,5 +1,6 @@
 /*
 	bs selector 백승현
+	bs Core가 있어야 합니다.
 	http://css4-selectors.com/browser-selector-test/
 	http://kimblim.dk/css-tests/selectors/
 */
@@ -8,31 +9,6 @@ var bssel = (function(){
 var isQS;
 isQS = ( typeof document.querySelector == 'function' ); // <= IE8
 
-var trim = (function(){
-	var dotrim = (function(){
-		var r0 = /^\s*|\s*$/g;
-		return function(str){
-			return typeof String.prototype.trim == 'function' ? str.trim() : str.replace(r0, '');
-		};
-	})();
-	return function(t){
-		var i;
-		if( t.splice ){
-			for( i=t.length; i--; ) t[i] = dotrim( t[i] );
-			return t;
-		}
-		return dotrim(t);
-	}
-})();
-var uniqArray = function(arr) {
-	var _ret = [], _len = arr.length, i, j;
-	for (i = 0; i < _len; i++) {
-		for (j = i + 1; j < _len; j++)
-			if (arr[i] === arr[j]) j = ++i;
-		_ret.push(arr[i]);
-	}
-	return _ret;
-};
 var echo = function(target, filter, parentName) {
 	var k;
 	if (parentName && (typeof parentName != "string" || typeof parentName == "string" && (parentName.split(".").length + parentName.split("]").length) > 3)) return;
@@ -109,7 +85,6 @@ var CSSSelectors = {
 		'Dir pseudo-class': ['E:dir(*)']
 	}
 };
-//var CSSSelectors = {'CSS1': {'Type': ['E'],'ID': ['E#ElementID'],'Class': ['E.classname'],'Descendant combination': ['E F'],'User action pseudo-class': ['E:active'],'Link history pseudo-class': ['E:link']},'CSS2': {'Universal': ['*'],'User action pseudo-class': ['E:hover','E:focus'],'Dir pseudo-class': ['E:dir(ltr)'],'Lang pseudo-class': ['E:lang(en)'],'Attribute': ['E[foobar]','E[foo=\'bar\']','E[foo~=\'bar\']','E[foo|=\'en\']'],'Structural pseudo-class': ['E:first-child'],'Child combination': ['E > F'],'Adjacent sibling combination': ['E + F']},'CSS3': {'Negation pseudo-class': ['E:not(s)'],'Target pseudo-class': ['E:target'],'Scope pseudo-class': ['E:scope'],'Enabled and Disabled pseudo-class': ['E:enabled','E:disabled'],'Selected-option pseudo-class': ['E:checked'],'Structural pseudo-class': ['E:root','E:empty','E:last-child','E:only-child','E:first-of-type','E:last-of-type','E:only-of-type','E:nth-child(n)','E:nth-last-child(n)','E:nth-of-type(n)','E:nth-last-of-type(n)'],'Attribute': ['E[foo^=\'bar\']','E[foo$=\'bar\']','E[foo*=\'bar\']'],'General sibling combinator': ['E ~ F']},'CSS4': {'Negation pseudo-class': ['E:not(s1, s2)'],'Matches-any pseudo-class': ['E:matches(s1, s2)'],'Local link pseudo-class': ['E:local-link'],'Time-dimensional pseudo-class': ['E:current'],'Indeterminate-value pseudo-class': ['E:indeterminate'],'Default option pseudo-class': ['E:default'],'Validity pseudo-class': ['E:in-range','E:out-of-range'],'Optionality pseudo-class': ['E:required','E:optional'],'Mutability pseudo-class': ['E:read-only','E:read-write'],'Structural pseudo-class': ['E:nth-match(n of selector)'],'Grid-Structural pseudo-class': ['E:column(selector)','E:nth-column(n)','E:nth-last-column(n)'],'Attribute case-sensitivity': ['E[foo=\'bar\' i]'],'Reference combination': ['E /foo/ F'],'Subject of a selector with Child combinator': ['E! > F'],'Hyperlink pseudo-class': ['E:any-link'],'Dir pseudo-class': ['E:dir(*)']}};
 var DETECT;
 (function(){
 	var k, kk, i;
@@ -150,7 +125,7 @@ var finder = (function(){
 					if( token ) tokens.push(token), token = '';
 					if( ( t0 = tokens[tokens.length-1] ) != '>' && t0 != '+' && t0 != '~' ) tokens.push(key);
 				}else if( key == '*' || key == '>' || key == '+' || key == '~' ){
-					if( trim(token) ) tokens.push(token), token = '';
+					if( bs.trim(token) ) tokens.push(token), token = '';
 					if( tokens[tokens.length-1] == ' ' ) tokens.pop();
 					tokens.push(key);
 				}else if( key == '.' || key == ':' || key == '[' || !i ){
@@ -209,7 +184,7 @@ var finder = (function(){
 		_hasCls = function _hasCls(key, clsNm){
 			var i;
 			if( !clsNm ) return 0;
-			clsNm = trim( clsNm.split(' ') );
+			clsNm = bs.trim( clsNm.split(' ') );
 			for( i = clsNm.length; i--; )	if( key == clsNm[i] ) return 1;
 			return 0;
 		};
@@ -251,7 +226,7 @@ var finder = (function(){
 			}else if( key == ':' ){
 				// TODO:pseudo 처리
 				key = token.substr(1);
-				val = ( opIdx = key.indexOf('(') ) > -1 ? isNaN( val = key.substr( opIdx+1 ) ) ? trim(val) : Number( val ) : null;
+				val = ( opIdx = key.indexOf('(') ) > -1 ? isNaN( val = key.substr( opIdx+1 ) ) ? bs.trim(val) : Number( val ) : null;
 				if( val ) key = key.substring( 0, opIdx );
 				switch(key){
 				case'link':
@@ -354,7 +329,7 @@ var finder = (function(){
 		console.log('############', $s);
 		document.getElementById('selector').value = $s;
 		oSel = [],
-		sels = trim( $s.split(',') );
+		sels = bs.trim( $s.split(',') );
 		for( i = sels.length; i--; ){
 			oSel.push( parseQuery( sels[i] ) );
 		}
@@ -417,6 +392,11 @@ var finder = (function(){
 					ret[i].className = ret[i].className ? ret[i].className + ' selected': 'selected';
 				}
 			}
+		}else{
+			for (var i=0; i < ret.length; i++) {
+				console.log( ret[i].outerHTML );
+			};
+			console.log()
 		}
 		console.log('## bssel length:', ret.length);
 	}
