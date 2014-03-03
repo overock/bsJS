@@ -130,7 +130,10 @@ bs( function(){
 		}, 24,
 		function(){
 			return bs.Dom('#testOP').S( 'font-size', '{/2}' );
-		}, 12
+		}, 12,
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', function(v){return ( v + 8 ) / 2;} );
+		}, 10
 	);
 } );
 </script>
