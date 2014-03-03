@@ -19,18 +19,43 @@
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
 <script src="./printer.js"></script>
+<script src="./shallaa/jquery-2.1.0.js"></script>
+<script src="./shallaa/jquery.browser.js"></script>
 <script src="http://projectbs.github.io/bsDetect/js/detect.js"></script>
 <script>
 doc = document, 
 W = window;
 bs( function() {
-	var k, arg, detect;
-	arg = ['detect test'], detect = DETECT( W, doc );
-	for( k in detect ){
-		//항목명, 기대값, 실제값(bs.detect[k])
-		arg.push( 'bs.DETECT.' + k, detect[k], detect[k] );
-	}
-	bsTest.apply( null, arg );
+	var k, arg = ['DETECT list'], detect = DETECT( W, doc ),
+        jb = $.browser;
+
+    bsTest.tear(navigator.userAgent + ' :: ' + 
+                navigator.platform + ' :: ' + 
+                navigator.appVersion, function(){
+/* navigator.userAgent :: navigator.platform :: navigator.appVersion */
+        
+        jqueryStr = function( origin ) {
+            switch ( origin ) {
+                case 'mozilla': return 'firefox';
+                case 'msie': return 'ie';
+                case 'webkit': return 'chrome';
+                default: return origin;
+            }
+        }
+    } );
+
+    for ( k in detect ) {
+        arg.push( k, detect[k] + '', bsTest.NOT('undefined') );
+    }
+
+    bsTest.apply( null, arg );
+    /*
+    bsTest('DETECT jQuery.browser check',
+        'browser', jqueryStr( jb.name ), detect.browser,
+        'os', jb.platform, detect.os,
+        'browserVer', jb.versionNumber, detect.browserVer
+    );
+    */
 } );
 </script>
 </body>
