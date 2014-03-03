@@ -601,7 +601,7 @@ function DOM(){
 		query = (function(doc){
 			var c;
 			if( doc.querySelectorAll ) return function(sel){return doc.querySelectorAll(sel);};
-			else return c = {}, selector = function(sel){
+			else return c = {}, function(sel){
 				var t0, i;
 				if( ( t0 = sel.charAt(0) ) == '#' ){
 					if( c[0] = doc.getElementById(sel.substr(1)) ) return c.length = 1, c;
