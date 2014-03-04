@@ -921,17 +921,18 @@ function DOM(){
 							dx = x(d), dy = y(d);
 							if( type < 3 ){
 								t0 = e.changedTouches, self.length = i = t0.length;
-								while( i-- ) self[i] = t1 = t0[i], id = t1.identifier,
-									self['lx'+id] = ( self['x'+id] = X = t1[pageX] ) - dx,
-									self['ly'+id] = ( self['y'+id] = Y = t1[pageY] ) - dy,
-									self['cx'+id] = t1.clientX, self['cy'+id] = t1.clientY,
+								while( i-- ) self[i] = t1 = t0[i], self['id'+i] = t1.identifier,
+									self['lx'+i] = ( self['x'+i] = X = t1[pageX] ) - dx,
+									self['ly'+i] = ( self['y'+i] = Y = t1[pageY] ) - dy,
+									self['cx'+i] = t1.clientX, self['cy'+i] = t1.clientY,
 									type == 2 ?
-										( self['$x'+id] = self['_x'+id] = X, self['$y'+id] = self['_y'+id] = Y ) :
-										( self['dx'+id] = X - self['_x'+id], self['dy'+id] = Y - self['_y'+id],
-										  self['mx'+id] = X - self['$x'+id], self['my'+id] = Y - self['$y'+id],
-										  self['$x'+id] = X, self['$y'+id] = Y
+										( self['$x'+i] = self['_x'+i] = X, self['$y'+i] = self['_y'+i] = Y ) :
+										( self['dx'+i] = X - self['_x'+i], self['dy'+i] = Y - self['_y'+i],
+										  self['mx'+i] = X - self['$x'+i], self['my'+i] = Y - self['$y'+i],
+										  self['$x'+i] = X, self['$y'+i] = Y
 										);
-								self.mx = self.mx0, self.my = self.my0, self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
+								
+								self.id = self.id0, self.mx = self.mx0, self.my = self.my0, self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
 							}else{
 								self.length = 0,
 								self.lx = ( self.x = X = e[pageX] ) - dx, self.ly = ( self.y = Y = e[pageY] ) - dy,
@@ -1036,6 +1037,15 @@ function DOM(){
 			wh();
 		},
 		bs.obj( 'WIN', win = {
+			prevent:function(e){e.preventDefault();},
+			lock:doc['addEventListener'] ? function( isCapture ){
+				var i, j;
+				for( i = 1, j = arguments.length ; i < j ; i++ ) doc.addEventListener( arguments[i], win.prevent, isCapture );
+			} : none,
+			unlock:doc['removeEventListener'] ? function( isCapture ){
+				var i, j;
+				for( i = 1, j = arguments.length ; i < j ; i++ ) doc.removeEventListener( arguments[i], win.prevent, isCapture );
+			} : none,
 			on:function( k, v ){
 				if( k == 'hashchange' && !'onhashchange' in W ) return hash(v);
 				if( k == 'orientationchange' && !'onorientationchange' in W ) k = 'resize';
@@ -1079,9 +1089,11 @@ function DOM(){
 						W.scrollTo( 0, 1000 );
 						break;
 					case'android':case'androidTablet':
-						if( bs.DETECT.sony && bs.DETECT.browser != 'chrome' ) sizer( function(){end( win.w = s.S('w'), win.h = s.S('h') );} );
-						else sizer( function wh(){end( win.w = outerWidth, win.h = outerHeight + 1 );} );
-						break;
+						if( bs.DETECT.sony && bs.DETECT.browser != 'chrome' ){
+							sizer( function(){end( win.w = s.S('w'), win.h = s.S('h') );} );
+							break;
+						}
+//						else sizer( function wh(){end( win.w = outerWidth, win.h = doc.documentElement.clientHeight || doc.body.clientHeight + 1 );} );
 					default:
 						sizer( W.innerHeight === undefined ? function(){
 								end( win.w = doc.documentElement.clientWidth || doc.body.clientWidth,
