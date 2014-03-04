@@ -746,6 +746,7 @@ function DOM(){
 			return v;
 		},
 		fn.style = function(d){return d.bsS;},
+		fn.isCapture = function(d){return arguments.length == 1 ? d.isCapture : ( d.isCapture = arguments[1] );},
 		fn.x = x = function(d){var i = 0; do i += d.offsetLeft; while( d = d.offsetParent ) return i;},
 		fn.y = y = function(d){var i = 0; do i += d.offsetTop; while( d = d.offsetParent ) return i;},
 		fn.lx = function(d){return x(d) - x(d.parentNode);}, fn.ly = function(d){return y(d) - y(d.parentNode);},
@@ -894,10 +895,10 @@ function DOM(){
 				if( W['TransitionEvent'] && !EV.transitionend ) EV.transitionend = 1;
 			}
 			ev = ( function( EV, x, y ){
-				var ev, fn, pageX, pageY, evType, prevent, keycode, add, del, eventName, isChild, keyName;
-				( bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 9 ) ? ( pageX = 'x', pageY = 'y' ) : ( pageX = 'pageX', pageY = 'pageY' );
-				if( W['addEventListener'] ) add = function( ev, k ){ev.target.addEventListener( k, ev.listener, false );},
-					del = function( ev, k ){ev.target.removeEventListener( k, ev.listener, false );};
+				var ev, fn, pageX, pageY, evType, prevent, keycode, add, del, eventName, isChild, keyName, layerX, layerY;
+				( bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 9 ) ? ( pageX = 'x', pageY = 'y', layerX = 'offsetX', layerY = 'offsetY' ) : ( pageX = 'pageX', pageY = 'pageY', layerX = 'layerX', layerY = 'layerY' );
+				if( W['addEventListener'] ) add = function( ev, k ){ev.target.addEventListener( k, ev.listener, ev.target.isCapture ? true : false );},
+					del = function( ev, k ){ev.target.removeEventListener( k, ev.listener, ev.target.isCapture ? true : false );};
 				else if( W['attachEvent'] ) add = function( ev, k ){ev.target.attachEvent( 'on' + k, ev.listener );},
 					del = function( ev, k ){ev.target.detachEvent( 'on' + k, ev.listener );};
 				else add = function( ev, k ){ev.target['on' + k] = ev.listener;},
@@ -922,8 +923,8 @@ function DOM(){
 							if( type < 3 ){
 								t0 = e.changedTouches, self.length = i = t0.length;
 								while( i-- ) self[i] = t1 = t0[i], self['id'+i] = t1.identifier,
-									self['lx'+i] = ( self['x'+i] = X = t1[pageX] ) - dx,
-									self['ly'+i] = ( self['y'+i] = Y = t1[pageY] ) - dy,
+									self['x'+i] = X = t1[pageX], self['y'+i] = Y = t1[pageY],
+									self['lx'+i] = t1[layerX], self['ly'+i] = t1[layerY],
 									self['cx'+i] = t1.clientX, self['cy'+i] = t1.clientY,
 									type == 2 ?
 										( self['$x'+i] = self['_x'+i] = X, self['$y'+i] = self['_y'+i] = Y ) :
@@ -931,11 +932,11 @@ function DOM(){
 										  self['mx'+i] = X - self['$x'+i], self['my'+i] = Y - self['$y'+i],
 										  self['$x'+i] = X, self['$y'+i] = Y
 										);
-								
 								self.id = self.id0, self.mx = self.mx0, self.my = self.my0, self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
 							}else{
 								self.length = 0,
-								self.lx = ( self.x = X = e[pageX] ) - dx, self.ly = ( self.y = Y = e[pageY] ) - dy,
+								self.x = X = e[pageX], self.y = Y = e[pageY],
+								self.lx = e[layerX], self.ly = e[layerY],
 								self.cx = e.clientX, self.cy = e.clientY,
 								type == 4 ?
 									( self.$x = self._x = X, self.$y = self._y = Y ) :
