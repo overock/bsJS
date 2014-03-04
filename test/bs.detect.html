@@ -19,7 +19,7 @@
 <script src="../bs/bsjs.js"></script>
 <script src="../bs/bsTest.js"></script>
 <script src="./printer.js"></script>
-<script src="./shallaa/jquery-2.1.0.js"></script>
+<script src="./shallaa/jquery-1.11.0.js"></script>
 <script src="./shallaa/jquery.browser.js"></script>
 <script src="http://projectbs.github.io/bsDetect/js/detect.js"></script>
 <script>
@@ -49,13 +49,13 @@ bs( function() {
     }
 
     bsTest.apply( null, arg );
-    /*
+    
     bsTest('DETECT jQuery.browser check',
-        'browser', jqueryStr( jb.name ), detect.browser,
+        // browser에 webkit을 추가시킬지 여부 검토 중.
+        // 'browser', jqueryStr( jb.name ), detect.browser,
         'os', jb.platform, detect.os,
         'browserVer', jb.versionNumber, detect.browserVer
     );
-    */
 } );
 </script>
 </body>

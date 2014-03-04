@@ -21,7 +21,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		var I, fn;
 		bs.__DB = {},
 		fn = ( I = function(){} ).prototype,
-		fn.S = fn.execute = fn.recordset = fn.stream = fn.transation = fn.open = fn.close = none;
+		fn.S = fn.execute = fn.recordset = fn.stream = fn.transaction = fn.open = fn.close = none;
 		return function( name, f ){
 			var cls, fn, t0, k;
 			f( t0 = {}, bs ),
@@ -152,7 +152,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 })( HTTP, URL, FS_ROOTS ),
 (function(){ //db
 	var type, i;
-	type = 'execute,recordset,stream,transation'.split(','); for( i in type ) type[type[i]] = 1;
+	type = 'execute,recordset,stream,transaction'.split(','); for( i in type ) type[type[i]] = 1;
 	bs.cls( 'Db', function( fn, bs ){
 		fn.NEW = function( sel, type ){
 			if( !bs.__DB[type] ) return bs.err( 0, 'no db connector for ' + type );
@@ -164,7 +164,7 @@ var HTTP = require('http'), HTTPS = require('https'), URL = require('url'), fn =
 		fn.execute = function(q){return this.__db.execute(q);},
 		fn.recordset = function( q, end ){this.__db.recordset( q, end );},
 		fn.stream = function( q, end ){this.__db.stream( q, end );};
-		fn.transation = function( q, end ){this.__db.transation( q, end );};
+		fn.transaction = function( q, end ){this.__db.transaction( q, end );};
 	} ),
 	bs.cls( 'Sql', function( fn, bs ){
 		var key, i, r0 = /[']/g, r1 = /--/g, toDB = function(v){return typeof v == 'string' ? v.replace( r0, "''" ).replace( r1, '' ) : v;};

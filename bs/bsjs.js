@@ -1,4 +1,4 @@
-/* bsJS - OpenSource JavaScript library version 0.2.0 / 2013.12.25 by projectBS committee
+/* bsJS - OpenSource JavaScript library version 0.3.0 / 2013.12.25 by projectBS committee
  * Copyright 2013.10 projectBS committee.
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * GitHub-http://goo.gl/FLI7te Facebook group-http://goo.gl/8s5qmQ
@@ -601,7 +601,7 @@ function DOM(){
 		query = (function(doc){
 			var c;
 			if( doc.querySelectorAll ) return function(sel){return doc.querySelectorAll(sel);};
-			else return c = {}, selector = function(sel){
+			else return c = {}, function(sel){
 				var t0, i;
 				if( ( t0 = sel.charAt(0) ) == '#' ){
 					if( c[0] = doc.getElementById(sel.substr(1)) ) return c.length = 1, c;

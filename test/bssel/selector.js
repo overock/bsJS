@@ -8,7 +8,7 @@ var bssel = (function(){
 'use strict';
 var isQS;
 isQS = ( typeof document.querySelector == 'function' ); // <= IE8
-
+var isIE7;
 var echo = function(target, filter, parentName) {
 	var k;
 	if (parentName && (typeof parentName != "string" || typeof parentName == "string" && (parentName.split(".").length + parentName.split("]").length) > 3)) return;
