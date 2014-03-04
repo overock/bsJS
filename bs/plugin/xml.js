@@ -35,7 +35,7 @@ bs['plugin+']( 'method', 'xml', (function(){
 		if( v.substr( v.length - 5 ).indexOf( ']]>' ) > -1 ) v = v.substring( 0, v.length - 5 ) + v.substr( v.length - 5 ).replace( ']]>', '' );
 		return bs.trim(v);
 	}
-	if( DOMParser ) return type = 1, parser = new DOMParser, function( end, v ){return xml0( parser.parseFromString( filter(v), "text/xml" ), end );};
+	if( parser ) return type = 1, parser = new DOMParser, function( end, v ){return xml0( parser.parseFromString( filter(v), "text/xml" ), end );};
 	else{
 		type = 0, parser = (function(){
 			var t0, i, j;

@@ -1,0 +1,22 @@
+{
+  "name": "bsjs",
+  "version": "0.3.0",
+  "homepage": "https://github.com/projectBS/bsJS",
+  "authors": [
+    "projectBS committee"
+  ],
+  "description": "OpenSource JavaScript library for Server/Client Env.",
+  "main": "./bs/bsjs.js",
+  "keywords": [
+    "node.js",
+    "library"
+  ],
+  "license": "MIT or GPL Version 2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

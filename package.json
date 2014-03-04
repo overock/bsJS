@@ -1,8 +1,8 @@
 {
-	"name": "bsnode",
-	"version": "0.0.1",
-	"description": "0.0.1",
-	"main": "web.js",
+	"name": "bsjs",
+	"version": "0.3.0",
+	"description": "OpenSource JavaScript library for Server/Client Env.",
+	"main": "./bs/bsjs.js",
 	"directories": {
 		"test": "test"
 	},
@@ -18,6 +18,9 @@
 		"JavaScript"
 	],
 	"author": "projectBS committee",
+	"engines": {
+    "node": ">= 0.10.1"
+  },
 	"license": "MIT or GPL Version 2",
 	"bugs": {
 		"url": "https://www.facebook.com/groups/bs5js/?hc_location=stream"

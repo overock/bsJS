@@ -37,6 +37,8 @@ bs['plugin+']( 'db', 'mysql', function( fn, bs ){
 		}
 	},
 	fn.execute = function(v){return this.open().query(v);},
+	fn.recordset = function( v, end ){this.open().query( v, function( e, r ){e ? end( null, e ) : end(r);});},
+	fn.stream = function( v, end ){this.open().query(v).on('result', end );},
 	fn.transaction = function( v, end ){
 		var conn = this.open();
 		conn.beginTransaction( function(e){

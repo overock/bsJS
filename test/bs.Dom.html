@@ -44,7 +44,7 @@ bs( function(){
 	bsTest( 'dom method',
 		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'html' )", 'test', bs.Dom( '<div>test</div>' ).S( 'html' ),
 		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'text' )", 'test', bs.Dom( '<div>test</div>' ).S( 'text' ),
-		"bs.Dom( '&lt;tr&gt;&lt;td&gt;test&lt;/td&gt;&lt;/tr&gt;' ).S( 'html' )", undefined, bs.Dom( '<tr><td>test</td></tr>' ).S( 'html' ),
+		"bs.Dom( '&lt;tr&gt;&lt;td&gt;test&lt;/td&gt;&lt;/tr&gt;' ).S( 'html' )", '<td>test</td>', bs.Dom( '<tr><td>test</td></tr>' ).S( 'html' ).toLowerCase(),
 		"bs.Dom( '#stage' ).S( 'class' )", 'cls1', bs.Dom( '#stage' ).S( 'class' ),
 		"bs.Dom( '#stage' ).S( 'class+', 'cls2' )", 'cls2 cls1', bs.Dom( '#stage' ).S( 'class+', 'cls2' ),
 		"bs.Dom( '#stage' ).S( 'class+', 'cls2' )", 'cls2 cls1', bs.Dom( '#stage' ).S( 'class+', 'cls2' ),
@@ -55,7 +55,7 @@ bs( function(){
 		//
 		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'html' )", 'test', bs.Dom( '<div>test</div>' ).S( 'html' ),
 		"bs.Dom( '&lt;div&gt;test&lt;/div&gt;' ).S( 'text' )", 'test', bs.Dom( '<div>test</div>' ).S( 'text' ),
-		"bs.Dom( '&lt;tr&gt;&lt;td&gt;test&lt;/td&gt;&lt;/tr&gt;' ).S( 'html' )", undefined, bs.Dom( '<tr><td>test</td></tr>' ).S( 'html' )
+		"bs.Dom( '&lt;tr&gt;&lt;td&gt;test&lt;/td&gt;&lt;/tr&gt;' ).S( 'html', 123 )", "123", bs.Dom( '<tr><td>test</td></tr>' ).S( 'html', 123 )
 	);
 	bsTest( 'dom attribute',
 		"bs.Dom( '#stage' ).S( '@data-id' )", "stageId", bs.Dom( '#stage' ).S( '@data-id' ),
@@ -114,6 +114,26 @@ bs( function(){
 		function(){
 			return bs.Dom( document.getElementsByTagName('div') ).length;
 		}, document.getElementsByTagName('div').length
+	);
+	bsTest.tear( '사칙참조값', function(){
+		bs.Dom('<div id="testOP"></div>').S( '<', '#stageHika', 'font-size', 10 );
+	} );
+	bsTest( '사칙참조',
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', '{=}' );
+		}, 10,
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', '{+2}' );
+		}, 12,
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', '{*2}' );
+		}, 24,
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', '{/2}' );
+		}, 12,
+		function(){
+			return bs.Dom('#testOP').S( 'font-size', function(v){return ( v + 8 ) / 2;} );
+		}, 10
 	);
 } );
 </script>
