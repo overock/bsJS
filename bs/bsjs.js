@@ -928,10 +928,8 @@ function DOM(){
 									self['cx'+i] = t1.clientX, self['cy'+i] = t1.clientY,
 									type == 2 ?
 										( self['$x'+i] = self['_x'+i] = X, self['$y'+i] = self['_y'+i] = Y ) :
-										( self['dx'+i] = X - self['_x'+i], self['dy'+i] = Y - self['_y'+i],
-										  self['mx'+i] = X - self['$x'+i], self['my'+i] = Y - self['$y'+i],
-										  self['$x'+i] = X, self['$y'+i] = Y
-										);
+										( self['dx'+i] = X - self['_x'+i], self['dy'+i] = Y - self['_y'+i] );
+									if( type == 1 ) self['mx'+i] = X - self['$x'+i], self['my'+i] = Y - self['$y'+i], self['$x'+i] = X, self['$y'+i] = Y;
 								self.id = self.id0, self.mx = self.mx0, self.my = self.my0, self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
 							}else{
 								self.length = 0,
@@ -940,10 +938,8 @@ function DOM(){
 								self.cx = e.clientX, self.cy = e.clientY,
 								type == 4 ?
 									( self.$x = self._x = X, self.$y = self._y = Y ) :
-									( self.dx = X - self._x, self.dy = Y - self._y,
-									  self.mx = X - self.$x, self.my = Y - self.$y,
-									  self.$x = X, self.$y = Y
-									);
+									( self.dx = X - self._x, self.dy = Y - self._y );
+								if( type == 3 ) self.mx = X - self.$x, self.my = Y - self.$y, self.$x = X, self.$y = Y;
 							}
 						}
 						t0 = self.e[self.type], i = 0, j = t0.length;
