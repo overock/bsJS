@@ -905,7 +905,6 @@ function DOM(){
 					del = function( ev, k ){ev.target.detachEvent( 'on' + k, ev.listener );};
 				else add = function( ev, k ){ev.target['on' + k] = ev.listener;},
 					del = function( ev, k ){ev.target['on' + k] = null;};
-				ev.type = evType = {'touchstart':2,'touchend':1,'touchmove':1,'mousedown':4,'mouseup':3,'mousemove':3,'click':3,'mouseover':3,'mouseout':3},
 				bs.obj( 'KEYCODE', keycode = (function(){
 					var t0, t1, i, j, k, v;
 					t0 = 'a,65,b,66,c,67,d,68,e,69,f,70,g,71,h,72,i,73,j,74,k,75,l,76,m,77,n,78,o,79,p,80,q,81,r,82,s,83,t,84,u,85,v,86,w,87,x,88,y,88,z,90,back,8,tab,9,enter,13,shift,16,control,17,alt,18,pause,19,caps,20,esc,27,space,32,pageup,33,pagedown,34,end,35,home,36,left,37,up,38,right,39,down,40,insert,45,delete,46,numlock,144,scrolllock,145,0,48,1,49,2,50,3,51,4,52,5,53,6,54,7,55,8,56,9,57'.split(','),
@@ -954,6 +953,7 @@ function DOM(){
 						}
 					};
 				} ).prototype,
+				ev.type = evType = {'touchstart':2,'touchend':1,'touchmove':1,'mousedown':4,'mouseup':3,'mousemove':3,'click':3,'mouseover':3,'mouseout':3},
 				fn.stop = function(){this.stop = 1;},
 				fn.prevent = bs.DETECT.event ? function(){this.event.preventDefault(), this.event.stopPropagation();} :
 					function(e){this.event.returnValue = false, this.event.cancelBubble = true;},
