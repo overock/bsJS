@@ -509,13 +509,12 @@ function DOM(){
 			style.gradientDirection = function( self, v ){return v === undefined ? self.grD:(gra( self.s, self.grD = v, self.grB || b, self.grE || b ), v);};
 		} )();
 		if( !( 'opacity' in b ) ){
-			style.opacity = function( s, v ){
-				var v = arguments[1];
+			style['opacity'] = function( s, v ){
 				if( v === undefined ) return s.opacity;
 				else if( v === null ) return delete s.opacity, s.s.filter = '', v;
 				else return s.s.filter = 'alpha(opacity=' + parseInt( v * 100 ) + ')', s.opacity = v;
 			},
-			style.rgba = function(v){
+			style['rgba'] = function(v){
 				var t0 = v.substring( 5, v.length - 1 ).split(',');
 				t0[3] = parseFloat(t0[3]);
 				return 'rgb('+parseInt((255+t0[0]*t0[3])*.5)+','+parseInt((255+t0[1]*t0[3])*.5)+','+parseInt((255+t0[2]*t0[3])*.5)+')';
