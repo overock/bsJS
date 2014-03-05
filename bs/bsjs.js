@@ -114,7 +114,7 @@ else throw new Error( 0, 'not supported platform' );
 				if( t1 !== undefined ) cnt++, t2 = t1;
 			}
 			if( cnt == 0 ) return _0;
-			if( cnt > 1 ) return '@ERROR matchs '+cnt+'times@'
+			if( cnt > 1 ) return '@ERROR matchs '+cnt+'times@';
 			if( t2 ){
 				if( typeof t2 == 'function' ) return t2(_0);
 				if( t2.splice ) return t2.join('');
@@ -509,7 +509,7 @@ function DOM(){
 			style.gradientDirection = function( self, v ){return v === undefined ? self.grD:(gra( self.s, self.grD = v, self.grB || b, self.grE || b ), v);};
 		} )();
 		if( !( 'opacity' in b ) ){
-			style['opacity'] = function( s, v ){
+			style.opacity = function( s, v ){
 				if( v === undefined ) return s.opacity;
 				else if( v === null ) return delete s.opacity, s.s.filter = '', v;
 				else return s.s.filter = 'alpha(opacity=' + parseInt( v * 100 ) + ')', s.opacity = v;
