@@ -37,9 +37,9 @@ JavaScript lib for DOM, CORE, utility and so on
 ### Wiki
 [bsJS Wiki](https://github.com/projectBS/bsJS/wiki)
 ### APIs
-* bs.$XXX [[ko](https://github.com/projectBS/bsJS/wiki/bs.$XXX-ko)][[ja](https://github.com/projectBS/bsJS/wiki/bs.$XXX-ja)]  
-* bs.ANI [[ko](https://github.com/projectBS/bsJS/wiki/bs.ANI-ko)][[ja](https://github.com/projectBS/bsJS/wiki/bs.ANI-ja)]  
-* bs.dom [[ko](https://github.com/projectBS/bsJS/wiki/bs.dom-ko)][[ja](https://github.com/projectBS/bsJS/wiki/bs.dom-ja)]  
+* bs core [[ko](https://github.com/projectBS/bsJS/wiki/doc1-core)][[ja](https://github.com/projectBS/bsJS/wiki/doc1-core-ja)]  
+* bs base function [[ko](https://github.com/projectBS/bsJS/wiki/doc2-base-function)][[ja](https://github.com/projectBS/bsJS/wiki/doc2-base-function-ja)]  
+* bs Dom [[ko](https://github.com/projectBS/bsJS/wiki/doc3-Dom)][[ja](https://github.com/projectBS/bsJS/wiki/doc3-Dom-ja)]  
 * bs Unit Test [[ko](https://github.com/projectBS/bsJS/wiki/Unit-Test-of-BS-ko)][[ja](https://github.com/projectBS/bsJS/wiki/Unit-Test-of-BS-ja)]  
 * Structure of BS [[ko](https://github.com/projectBS/bsJS/wiki/Structure-of-BS)][[ja](https://github.com/projectBS/bsJS/wiki/Structure-of-BS-ja)]  
 

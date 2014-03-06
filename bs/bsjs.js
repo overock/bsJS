@@ -58,12 +58,12 @@ else throw new Error( 0, 'not supported platform' );
 				if( ( v != 'last' && typeof v != 'number' ) || v <= 0 ) return bs.err(4);
 				if( depends[k] == v || depends[k] > v ) return loader();
 				depends[k] = v;
-				register[k] = function( type, name, obj, v/*,dependency*/ ){
+				register[k] = function( type, name, obj, ver/*,dependency*/ ){
 					var add, t0, t1, i, j, k, v;
 					clearTimeout( isLoaded ), isLoaded = -1,
 					add = function(){
 						var t0, t1, i, k;
-						if( ( v != 'last' && typeof v != 'number' ) || v <= 0 ) return bs.err(4);
+						if( ( ver != 'last' && typeof ver != 'number' ) || ver <= 0 ) return bs.err(4);
 						switch( type ){
 						case'class':case'method':case'static':
 							bs[type == 'method' ? 'fn' : type == 'class' ? 'cls' : 'obj']( name, obj );
@@ -114,7 +114,7 @@ else throw new Error( 0, 'not supported platform' );
 				if( t1 !== undefined ) cnt++, t2 = t1;
 			}
 			if( cnt == 0 ) return _0;
-			if( cnt > 1 ) return '@ERROR matchs '+cnt+'times@'
+			if( cnt > 1 ) return '@ERROR matchs '+cnt+'times@';
 			if( t2 ){
 				if( typeof t2 == 'function' ) return t2(_0);
 				if( t2.splice ) return t2.join('');
@@ -484,7 +484,7 @@ function DOM(){
 			}else if( typeof k == 'function' ) return k( this, v );
 			return this[k] = v;
 		},
-		style.float = 'styleFloat' in b ? 'styleFloat' : 'cssFloat' in b ? 'cssFloat' : 'float', style['url('] = function(v){return v;},
+		style['float'] = 'styleFloat' in b ? 'styleFloat' : 'cssFloat' in b ? 'cssFloat' : 'float', style['url('] = function(v){return v;},
 		(function(){
 			var gra, rgb, mk0, mk1, b;
 			b = '#000000', gra = bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 10 ? function( s, d, b, e ){
@@ -510,12 +510,11 @@ function DOM(){
 		} )();
 		if( !( 'opacity' in b ) ){
 			style.opacity = function( s, v ){
-				var v = arguments[1];
 				if( v === undefined ) return s.opacity;
 				else if( v === null ) return delete s.opacity, s.s.filter = '', v;
 				else return s.s.filter = 'alpha(opacity=' + parseInt( v * 100 ) + ')', s.opacity = v;
 			},
-			style.rgba = function(v){
+			style['rgba'] = function(v){
 				var t0 = v.substring( 5, v.length - 1 ).split(',');
 				t0[3] = parseFloat(t0[3]);
 				return 'rgb('+parseInt((255+t0[0]*t0[3])*.5)+','+parseInt((255+t0[1]*t0[3])*.5)+','+parseInt((255+t0[2]*t0[3])*.5)+')';
@@ -746,11 +745,15 @@ function DOM(){
 			return v;
 		},
 		fn.style = function(d){return d.bsS;},
+		fn.isCapture = function(d){return arguments.length == 1 ? d.isCapture : ( d.isCapture = arguments[1] );},
 		fn.x = x = function(d){var i = 0; do i += d.offsetLeft; while( d = d.offsetParent ) return i;},
 		fn.y = y = function(d){var i = 0; do i += d.offsetTop; while( d = d.offsetParent ) return i;},
 		fn.lx = function(d){return x(d) - x(d.parentNode);}, fn.ly = function(d){return y(d) - y(d.parentNode);},
 		fn.w = function(d){return d.offsetWidth;}, fn.h = function(d){return d.offsetHeight;},
 		fn.s = function(d){d.submit();}, fn.f = function(d){d.focus();}, fn.b = function(d){d.blur();},
+		fn.bound = function( d, v ){
+			
+		},
 		fn['<'] =function( d, v ){
 			var t0;
 			if( v ){
@@ -894,15 +897,14 @@ function DOM(){
 				if( W['TransitionEvent'] && !EV.transitionend ) EV.transitionend = 1;
 			}
 			ev = ( function( EV, x, y ){
-				var ev, fn, pageX, pageY, evType, prevent, keycode, add, del, eventName, isChild, keyName;
-				( bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 9 ) ? ( pageX = 'x', pageY = 'y' ) : ( pageX = 'pageX', pageY = 'pageY' );
-				if( W['addEventListener'] ) add = function( ev, k ){ev.target.addEventListener( k, ev.listener, false );},
-					del = function( ev, k ){ev.target.removeEventListener( k, ev.listener, false );};
+				var ev, fn, pageX, pageY, evType, prevent, keycode, add, del, eventName, isChild, keyName, layerX, layerY;
+				( bs.DETECT.browser == 'ie' && bs.DETECT.browserVer < 9 ) ? ( pageX = 'x', pageY = 'y', layerX = 'offsetX', layerY = 'offsetY' ) : ( pageX = 'pageX', pageY = 'pageY', layerX = 'layerX', layerY = 'layerY' );
+				if( W['addEventListener'] ) add = function( ev, k ){ev.target.addEventListener( k, ev.listener, ev.target.isCapture ? true : false );},
+					del = function( ev, k ){ev.target.removeEventListener( k, ev.listener, ev.target.isCapture ? true : false );};
 				else if( W['attachEvent'] ) add = function( ev, k ){ev.target.attachEvent( 'on' + k, ev.listener );},
 					del = function( ev, k ){ev.target.detachEvent( 'on' + k, ev.listener );};
 				else add = function( ev, k ){ev.target['on' + k] = ev.listener;},
 					del = function( ev, k ){ev.target['on' + k] = null;};
-				evType = {'touchstart':2,'touchend':1,'touchmove':1,'mousedown':4,'mouseup':3,'mousemove':3,'click':3,'mouseover':3,'mouseout':3},
 				bs.obj( 'KEYCODE', keycode = (function(){
 					var t0, t1, i, j, k, v;
 					t0 = 'a,65,b,66,c,67,d,68,e,69,f,70,g,71,h,72,i,73,j,74,k,75,l,76,m,77,n,78,o,79,p,80,q,81,r,82,s,83,t,84,u,85,v,86,w,87,x,88,y,88,z,90,back,8,tab,9,enter,13,shift,16,control,17,alt,18,pause,19,caps,20,esc,27,space,32,pageup,33,pagedown,34,end,35,home,36,left,37,up,38,right,39,down,40,insert,45,delete,46,numlock,144,scrolllock,145,0,48,1,49,2,50,3,51,4,52,5,53,6,54,7,55,8,56,9,57'.split(','),
@@ -916,32 +918,29 @@ function DOM(){
 					var self;
 					self = this, self.target = d, this.e = {}, self.listener = function(e){
 						var type, start, dx, dy, t0, t1, t2, id, i, j, X, Y;
-						self.event = e || ( e = event ), self.type = eventName[e.type] || e.type, self.keyName = keyName[self.keyCode = e.keyCode], self.value = d.value && bs.trim(d.value);
+						self.event = e || ( e = event ), self.type = eventName[e.type] || e.type, self.keyName = keyName[self.keyCode = e.keyCode];
+						if( d.value ) self.value = bs.trim(d.value);
 						if( type = evType[self.type] ){
-							dx = x(d), dy = y(d);
 							if( type < 3 ){
 								t0 = e.changedTouches, self.length = i = t0.length;
-								while( i-- ) self[i] = t1 = t0[i], id = t1.identifier,
-									self['lx'+id] = ( self['x'+id] = X = t1[pageX] ) - dx,
-									self['ly'+id] = ( self['y'+id] = Y = t1[pageY] ) - dy,
-									self['cx'+id] = t1.clientX, self['cy'+id] = t1.clientY,
+								while( i-- ) self[i] = t1 = t0[i], self['id'+i] = t1.identifier,
+									self['x'+i] = X = t1[pageX], self['y'+i] = Y = t1[pageY],
+									self['lx'+i] = t1[layerX], self['ly'+i] = t1[layerY],
+									self['cx'+i] = t1.clientX, self['cy'+i] = t1.clientY,
 									type == 2 ?
-										( self['$x'+id] = self['_x'+id] = X, self['$y'+id] = self['_y'+id] = Y ) :
-										( self['dx'+id] = X - self['_x'+id], self['dy'+id] = Y - self['_y'+id],
-										  self['mx'+id] = X - self['$x'+id], self['my'+id] = Y - self['$y'+id],
-										  self['$x'+id] = X, self['$y'+id] = Y
-										);
-								self.mx = self.mx0, self.my = self.my0, self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
+										( self['$x'+i] = self['_x'+i] = X, self['$y'+i] = self['_y'+i] = Y ) :
+										( self['dx'+i] = X - self['_x'+i], self['dy'+i] = Y - self['_y'+i] );
+									if( type == 1 ) self['mx'+i] = X - self['$x'+i], self['my'+i] = Y - self['$y'+i], self['$x'+i] = X, self['$y'+i] = Y;
+								self.id = self.id0, self.mx = self.mx0, self.my = self.my0, self.x = self.x0, self.y = self.y0, self.lx = self.lx0, self.ly = self.ly0, self.dx = self.dx0, self.dy = self.dy0, self.cx = self.cx0, self.cy = self.cy0;
 							}else{
 								self.length = 0,
-								self.lx = ( self.x = X = e[pageX] ) - dx, self.ly = ( self.y = Y = e[pageY] ) - dy,
+								self.x = X = e[pageX], self.y = Y = e[pageY],
+								self.lx = e[layerX], self.ly = e[layerY],
 								self.cx = e.clientX, self.cy = e.clientY,
 								type == 4 ?
 									( self.$x = self._x = X, self.$y = self._y = Y ) :
-									( self.dx = X - self._x, self.dy = Y - self._y,
-									  self.mx = X - self.$x, self.my = Y - self.$y,
-									  self.$x = X, self.$y = Y
-									);
+									( self.dx = X - self._x, self.dy = Y - self._y );
+								if( type == 3 ) self.mx = X - self.$x, self.my = Y - self.$y, self.$x = X, self.$y = Y;
 							}
 						}
 						t0 = self.e[self.type], i = 0, j = t0.length;
@@ -954,6 +953,7 @@ function DOM(){
 						}
 					};
 				} ).prototype,
+				ev.type = evType = {'touchstart':2,'touchend':1,'touchmove':1,'mousedown':4,'mouseup':3,'mousemove':3,'click':3,'mouseover':3,'mouseout':3},
 				fn.stop = function(){this.stop = 1;},
 				fn.prevent = bs.DETECT.event ? function(){this.event.preventDefault(), this.event.stopPropagation();} :
 					function(e){this.event.returnValue = false, this.event.cancelBubble = true;},
@@ -1036,10 +1036,23 @@ function DOM(){
 			wh();
 		},
 		bs.obj( 'WIN', win = {
-			on:function( k, v ){
+			x:0, y:0,
+			_pos:function(e){e.prevent(), win.x = e.x, win.y = e.y;},
+			pos:function(){doc.isCapture = true, win.on( 'move', win._pos, 1 );},
+			unpos:function(){doc.isCapture = false, win.on( 'move', null, 1 );},
+			prevent:function(e){e.preventDefault();},
+			lock:doc['addEventListener'] ? function( isCapture ){
+				var i, j;
+				for( i = 1, j = arguments.length ; i < j ; i++ ) doc.addEventListener( arguments[i], win.prevent, isCapture );
+			} : none,
+			unlock:doc['removeEventListener'] ? function( isCapture ){
+				var i, j;
+				for( i = 1, j = arguments.length ; i < j ; i++ ) doc.removeEventListener( arguments[i], win.prevent, isCapture );
+			} : none,
+			on:function( k, v, isDoc ){
 				if( k == 'hashchange' && !'onhashchange' in W ) return hash(v);
 				if( k == 'orientationchange' && !'onorientationchange' in W ) k = 'resize';
-				return ev( k.substr(0,3) == 'key' ? doc : W, k, v );
+				return ev( isDoc || k.substr(0,3) == 'key' ? doc : W, k, v );
 			},
 			is:function(sel){
 				var t0 = query(sel);
@@ -1054,8 +1067,8 @@ function DOM(){
 			scroll:(function( W, doc, root ){
 				return function scroll(){
 					switch( arguments[0] ){
-					case'w': return root.scrollWidth;
-					case'h': return root.scrollHeight;
+					case'w': return Math.max( root.scrollWidth, root.clientWidth );
+					case'h': return Math.max( root.scrollHeight, root.clientHeight );
 					case'l': return doc.documentElement.scrollLeft || W.pageXOffset || 0;
 					case't': return doc.documentElement.scrollTop || W.pageYOffset || 0;
 					}
@@ -1066,29 +1079,11 @@ function DOM(){
 			sizer:(function( W, doc ){
 				return function(end){
 					var wh, r, s;
-					if( !win.is('#bsSizer') ) bs.Dom('<div></div>').S( '@id', 'bsSizer', 'display','none','width','100%','height','100%','position','absolute','<','body' );
-					s = bs.Dom('#bsSizer');
-					switch( bs.DETECT.os ){
-					case'iphone':
-						s.S( 'display', 'block', 'height', '120%' ),
-						W.onscroll = function(e){
-							W.onscroll = null, W.scrollTo( 0, 0 ),
-							s.S( 'display', 'none', 'height', W.innerHeight + 1 ),
-							sizer( function(e){end( win.w = innerWidth, win.h = innerHeight );} );
-						},
-						W.scrollTo( 0, 1000 );
-						break;
-					case'android':case'androidTablet':
-						if( bs.DETECT.sony && bs.DETECT.browser != 'chrome' ) sizer( function(){end( win.w = s.S('w'), win.h = s.S('h') );} );
-						else sizer( function wh(){end( win.w = outerWidth, win.h = outerHeight + 1 );} );
-						break;
-					default:
-						sizer( W.innerHeight === undefined ? function(){
-								end( win.w = doc.documentElement.clientWidth || doc.body.clientWidth,
-									win.h = doc.documentElement.clientHeight || doc.body.clientHeight );
-							} : function(){end( win.w = W.innerWidth, win.h = W.innerHeight );}
-						);
-					}
+					sizer( W.innerHeight === undefined ? function(){
+							end( win.w = doc.documentElement.clientWidth || doc.body.clientWidth,
+								win.h = doc.documentElement.clientHeight || doc.body.clientHeight );
+						} : function(){end( win.w = W.innerWidth, win.h = W.innerHeight );}
+					);
 				}
 			})( W, doc )
 		} );

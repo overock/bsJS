@@ -38,7 +38,6 @@ bs( function() {
             switch ( origin ) {
                 case 'mozilla': return 'firefox';
                 case 'msie': return 'ie';
-                case 'webkit': return 'chrome';
                 default: return origin;
             }
         }
@@ -51,7 +50,7 @@ bs( function() {
     bsTest.apply( null, arg );
     
     bsTest('DETECT jQuery.browser check',
-        'browser', jqueryStr( jb.name ), detect.browser,
+        'browser', ( jb.name == 'webkit' ) ? bsTest.IN( 'chrome', 'iphone', 'android', 'naver' ) : jqueryStr( jb.name ), detect.browser,
         'os', jb.platform, detect.os,
         'browserVer', jb.versionNumber, detect.browserVer
     );
